@@ -2,6 +2,7 @@ const ApiError = require('../db/mongo/ApiError')
 const ApiResult = require('../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 
+
 module.exports = {
   async setDefault (ctx, next) {
     const addressId = ctx.request.params.id
