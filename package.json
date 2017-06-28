@@ -2,7 +2,9 @@
   "name": "koa2-demo",
   "version": "0.1.0",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "migrate": "node app/db/mysql/migrate.js"
+  },
   "dependencies": {
     "axios": "^0.15.3",
     "bluebird": "3.5.0",

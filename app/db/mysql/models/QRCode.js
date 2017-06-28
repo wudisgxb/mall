@@ -1,4 +1,4 @@
-const sequelizex = rootRequire('app/db/mysql/sequelizex');
+const sequelizex = require('../../../db/mysql/sequelizex');
 const shortDataTypes = sequelizex.DataTypes;
 
 module.exports = function(sequelize, DataTypes) {

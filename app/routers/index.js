@@ -25,7 +25,7 @@ var fs = require('fs');
 var path = require('path');
 var util = require('util');
 
-var db = require('./../models/db/index.js');
+var db = require('./../db/mysql/index.js');
 
 var router = new Router();
 
