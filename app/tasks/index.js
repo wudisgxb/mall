@@ -1,6 +1,5 @@
-const schedule = rootRequire('node-schedule')
+const schedule = require('node-schedule')
 
-const weatherForecast = rootRequire('app/tasks/weatherForecast')
 
 module.exports = function tasks (app) {
   
@@ -16,6 +15,5 @@ module.exports = function tasks (app) {
   // └───────────────────────── second (0 - 59, OPTIONAL)
   schedule.scheduleJob('59 21 * * *', function() {
     //  定时给固定用户推送未来两天天气预报
-    weatherForecast(app)
   })
 }

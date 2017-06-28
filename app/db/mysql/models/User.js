@@ -4,6 +4,7 @@ const shortDataTypes = sequelizex.DataTypes
 module.exports = function(sequelize, DataTypes) {
 
   const User = sequelize.define('User', {
+    
     nickname: shortDataTypes.String(),
     headimgurl: shortDataTypes.Url(),
     sex: shortDataTypes.Int(),

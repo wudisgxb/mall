@@ -7,12 +7,12 @@ class ApiResult {
 module.exports = ApiResult
 
 const SUCCESS = 0
-const DB_ERROR = 42
+const DB_ERROR = -2
 
-module.exports.Address = {
+module.exports.Result = {
   SUCCESS: {
     resCode: SUCCESS,
-    resMsg: '设置默认地址成功!'
+    resMsg: 'success'
   },
   DB_ERROR: {
     resCode: DB_ERROR,

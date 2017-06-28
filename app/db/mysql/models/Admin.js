@@ -15,6 +15,7 @@ module.exports = function(sequelize, DataTypes) {
     password: shortDataTypes.String(),
     phone: shortDataTypes.Phone(),
     status: shortDataTypes.Int(),
+
     /**
      * 管理员类型
      * 1 => 商品管理

@@ -1,7 +1,6 @@
-const Address = rootRequire('app/db/mongo/Address')
-const ApiError = rootRequire('app/db/mongo/ApiError')
-const ApiResult = rootRequire('app/db/mongo/ApiResult')
-const logger = rootRequire('koa-log4').getLogger('AddressController')
+const ApiError = require('../db/mongo/ApiError')
+const ApiResult = require('../db/mongo/ApiResult')
+const logger = require('koa-log4').getLogger('AddressController')
 
 module.exports = {
   async setDefault (ctx, next) {
@@ -22,9 +21,7 @@ module.exports = {
     return ctx.body = new ApiResult(ApiResult.Address.SUCCESS)
   },
 
-  async getDefault (ctx, next) {
-
-  },
+  
 
   async getAll (ctx, next) {
 

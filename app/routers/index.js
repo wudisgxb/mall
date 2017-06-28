@@ -1,14 +1,14 @@
 /**
  * Created by Thinkpad on 2017/3/19.
  */
-const fs = rootRequire('fs')
+const fs = require('fs')
 
 module.exports = function (app) {
 
   try {
     fs.readdirSync(__dirname)
       .filter(filename => filename !== 'index.js')
-      .map(filename => rootRequire(`app/routers/${filename}`))
+      .map(filename => require(`./${filename}`))
       .forEach(router => {
         app.use(router.routes(), router.allowedMethods())
       })

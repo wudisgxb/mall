@@ -1,5 +1,5 @@
 const app = new(require('koa'))()
-const port = require('config/config').port
+const port = require('./app/config/config').port
 const logger = require('koa-log4').getLogger('app')
 
 // 绑定中间件
