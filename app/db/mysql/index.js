@@ -4,7 +4,7 @@ const Sequelize = require('sequelize')
 const modelDir = path.join(__dirname, 'models')
 
 // const configs = require('./../../instances/config.js')
-const sequelize = new Sequelize('mysql', 'root', '123581321', {
+const sequelize = new Sequelize('v3', 'root', '123456', {
   host: 'localhost',
   logging: function() {}
 })

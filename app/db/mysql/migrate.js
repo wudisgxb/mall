@@ -1,7 +1,7 @@
-var db = require('./index.js')
-var co = require('co')
+const db = require('./index.js')
+const co = require('co')
 
-var util = require('util')
+const util = require('util')
 
 function* addSuperAdminer() {
   yield db.models.Admin.create({

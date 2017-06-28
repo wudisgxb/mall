@@ -1,17 +1,52 @@
 /**
  * Created by Thinkpad on 2017/3/19.
  */
-const fs = require('fs')
+// const fs = require('fs')
+//
+// module.exports = function (app) {
+//
+//   try {
+//     fs.readdirSync(__dirname)
+//       .filter(filename => filename !== 'index.js')
+//       .map(filename => require(`./${filename}`))
+//       .forEach(router => {
+//         app.use(router.routes(), router.allowedMethods())
+//       })
+//   } catch (e) {
+//     app.emit('error', e)
+//   }
+// }
+
+// parties
+var Router = require('koa-router');
+
+// local
+var fs = require('fs');
+var path = require('path');
+var util = require('util');
+
+var db = require('./../models/db/index.js');
+
+var router = new Router();
 
 module.exports = function (app) {
 
   try {
-    fs.readdirSync(__dirname)
-      .filter(filename => filename !== 'index.js')
-      .map(filename => require(`./${filename}`))
-      .forEach(router => {
-        app.use(router.routes(), router.allowedMethods())
-      })
+    var loadDir = (dir) => {
+      fs
+          .readdirSync(dir)
+          .forEach((file) => {
+            var nextPath = path.join(dir, file);
+            var stat = fs.statSync(nextPath);
+            if (stat.isDirectory()) {
+              loadDir(nextPath);
+            } else if (stat.isFile() && file.indexOf('.') !== 0 && file !== 'index.js' && file !== 'url.js') {
+              require(nextPath)(router);
+            }
+          });
+    };
+
+    loadDir(__dirname);
   } catch (e) {
     app.emit('error', e)
   }
