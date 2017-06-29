@@ -9,7 +9,7 @@ let Foods = db.models.Foods;
 let Menus = db.models.Menus;
 let Foodsofmenus = db.models.FoodsOfTMenus;
 let Ratings = db.models.Ratings;
-let ChildAlipayConfigs = db.models.ChildAlipayConfigs;
+let ProfitSharings = db.models.ProfitSharings;
 
 
 module.exports = {
@@ -24,22 +24,21 @@ module.exports = {
     let excludeFoodIdArray = [];
     if (consigneeId != null) {
       console.log(tenantId);
-      console.log(consignee);
-      let childAlipayConfigs = await ChildAlipayConfigs.findAll({
+      let profitSharings = await ProfitSharings.findAll({
         where:{
           tenantId:tenantId,
-          merchant:consignee
+          ConsigneeId:consigneeId
         }
       });
-      console.log("childAlipayConfigs===========" + childAlipayConfigs.length);
-      if (childAlipayConfigs.length >0) {
-        excludeFoodIdArray = JSON.parse(childAlipayConfigs[0].excludeFoodId);
+      console.log("profitSharings===========" + profitSharings.length);
+      if (profitSharings.length >0) {
+        excludeFoodIdArray = JSON.parse(profitSharings[0].excludeFoodId);
         console.log(excludeFoodIdArray);
       }
     }
-
+    let menus;
     if (menuId == null) {
-      let menus = await Menus.findAll({
+        menus = await Menus.findAll({
         where:{
           tenantId:tenantId
         },
@@ -123,34 +122,16 @@ module.exports = {
   async getUserMenus (ctx, next) {
     let menuId =  ctx.query.id;
     let tenantId =  ctx.query.tenantId;
-    let consignee = ctx.query.consignee;
 
-    ctx.checkBody('password').notEmpty();
+    ctx.checkBody('tenantId').notEmpty();
     if (ctx.errors) {
-      ctx.body =new ApiResult(ApiResult.Result.SUCCESS,ctx.errors)
+      ctx.body =new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
       return;
     }
 
-
-    let excludeFoodIdArray = [];
-    if (consignee != null) {
-      console.log(tenantId);
-      console.log(consignee);
-      let childAlipayConfigs = await ChildAlipayConfigs.findAll({
-        where:{
-          tenantId:tenantId,
-          merchant:consignee
-        }
-      });
-      console.log("childAlipayConfigs===========" + childAlipayConfigs.length);
-      if (childAlipayConfigs.length >0) {
-        excludeFoodIdArray = JSON.parse(childAlipayConfigs[0].excludeFoodId);
-        console.log(excludeFoodIdArray);
-      }
-    }
-
+    let menus;
     if (menuId == null) {
-      let menus = await Menus.findAll({
+       menus = await Menus.findAll({
         where:{
           tenantId:tenantId
         },
@@ -183,11 +164,6 @@ module.exports = {
       });
       let food;
       for(let j = 0; j < foodsofmenus.length; j ++) {
-        if (excludeFoodIdArray != null && excludeFoodIdArray.length>0 && excludeFoodIdArray.indexOf(foodsofmenus[j].FoodId) != -1) {
-          console.log("GGGGGGGGGGG||" + foodsofmenus[j].FoodId);
-          console.log("HHHHHHHHHHH||" + excludeFoodIdArray.indexOf(foodsofmenus[j].FoodId))
-          continue;
-        }
         food = await Foods.findAll({
           where: {
             id:foodsofmenus[j].FoodId ,

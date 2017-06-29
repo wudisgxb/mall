@@ -17,6 +17,8 @@ module.exports = function (sequelize, DataTypes) {
         ownRate:shortDataTypes.Double(),
         //配送费
         distributionFee:shortDataTypes.Double(),
+        //排除食物
+        excludeFoodId:shortDataTypes.String(2048,true),
 
     }, {
         associate: function (models) {

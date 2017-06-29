@@ -292,12 +292,14 @@ function * Merchantseed() {
     tenantId:tenantId1
   });
 
+  var arr = [1,2,3];
   yield db.models.ProfitSharings.create({
     tenantId:tenantId1,
     merchantRemark: '辣尚瘾代售-转账',
     consigneeRemark: '雪花冰-代售分润',
     rate :0.2,
     ownRate:0.1,
+    excludeFoodId:JSON.stringify(arr),
     ConsigneeId:1,
   });
 
@@ -322,12 +324,14 @@ function * Merchantseed() {
     tenantId:tenantId2
   });
 
+  arr = [19,20]
   yield db.models.ProfitSharings.create({
     tenantId:tenantId2,
     merchantRemark: '麻辣盛宴代售-转账',
     consigneeRemark: '辣尚瘾-代售分润',
     rate :0.2,
     ownRate:0.1,
+    excludeFoodId:JSON.stringify(arr),
     ConsigneeId:2,
   });
 }

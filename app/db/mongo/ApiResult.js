@@ -7,6 +7,7 @@ class ApiResult {
 module.exports = ApiResult
 
 const SUCCESS = 0
+const PARAMS_ERROR = -1
 const DB_ERROR = -2
 
 module.exports.Result = {
@@ -22,5 +23,9 @@ module.exports.Result = {
     resCode: 10001,
     resMsg: '未找到地址!'
   },
+  PARAMS_ERROR: {
+    resCode: PARAMS_ERROR,
+    resMsg: 'PARAMS_ERROR'
+  }
 
 }
