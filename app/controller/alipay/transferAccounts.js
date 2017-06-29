@@ -3,7 +3,7 @@ var request = require('request');
 var Promise = require('promise');
 
 var path = require('path');
-var db = require('../../models/db/index');
+var db = require('../../db/mysql/index');
 var TransferAccountInfos = db.models.TransferAccountInfos;
 
 const  transferAccountsManger = (function() {
