@@ -7,21 +7,17 @@ module.exports = function (sequelize, DataTypes) {
 
     var Menus = sequelize.define('Menus', {
 
-        name:shortDataTypes.String(),
+        name: shortDataTypes.String(),
         type: shortDataTypes.Int(),
-        tenantId : {
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {
         paranoid: true,
         associate: function (models) {
         },
-        classMethods: {
-
-        },
-        getterMethods: {
-
-        },
+        classMethods: {},
+        getterMethods: {},
         scopes: {
             all: {
                 paranoid: false,

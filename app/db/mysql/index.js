@@ -5,24 +5,26 @@ const modelDir = path.join(__dirname, 'models')
 
 // const configs = require('./../../instances/config.js')
 const sequelize = new Sequelize('v3', 'root', '123456', {
-  host: 'localhost',
-  logging: function() {}
+    host: 'localhost',
+    logging: function () {
+    }
 })
 
 //  autoload
 fs
-  .readdirSync(modelDir)
-  .forEach(function(filename) {
-    try {
-      sequelize.import(path.join(modelDir, filename))
-    } catch (e) {}
-  })
+    .readdirSync(modelDir)
+    .forEach(function (filename) {
+        try {
+            sequelize.import(path.join(modelDir, filename))
+        } catch (e) {
+        }
+    })
 
 const models = sequelize.models
-Object.keys(sequelize.models).forEach(function(modelName) {
-  if (models[modelName].options.hasOwnProperty('associate')) {
-    models[modelName].options.associate(models)
-  }
+Object.keys(sequelize.models).forEach(function (modelName) {
+    if (models[modelName].options.hasOwnProperty('associate')) {
+        models[modelName].options.associate(models)
+    }
 })
 
 module.exports = sequelize

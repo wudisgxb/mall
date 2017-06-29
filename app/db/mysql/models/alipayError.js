@@ -9,18 +9,15 @@ module.exports = function (sequelize, DataTypes) {
 
         errRsp: shortDataTypes.String(),
         signFlag: shortDataTypes.Bool(),
-        tenantId : {
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {
         paranoid: true,
         associate: function (models) {
         },
-        classMethods: {
-        },
-        getterMethods: {
-
-        },
+        classMethods: {},
+        getterMethods: {},
         scopes: {
             deleted: {
                 where: {

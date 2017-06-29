@@ -7,13 +7,13 @@ module.exports = function (sequelize, DataTypes) {
 
     var Foods = sequelize.define('Foods', {
 
-        name:shortDataTypes.String(),
+        name: shortDataTypes.String(),
         /**
          * 图片链接数组的json串
          * [url, url, url]
          */
         image: shortDataTypes.String(),
-        icon:shortDataTypes.String(),
+        icon: shortDataTypes.String(),
         /**
          * 现价
          */
@@ -22,13 +22,13 @@ module.exports = function (sequelize, DataTypes) {
          * 原价
          */
         oldPrice: shortDataTypes.Double(),
-        vipPrice:shortDataTypes.Double(),
-        sellCount:shortDataTypes.Int(),
-        rating:shortDataTypes.Int(),
-        info:shortDataTypes.String(),
-        isActive:shortDataTypes.Bool(),
-        unit:shortDataTypes.String(),
-        tenantId : {
+        vipPrice: shortDataTypes.Double(),
+        sellCount: shortDataTypes.Int(),
+        rating: shortDataTypes.Int(),
+        info: shortDataTypes.String(),
+        isActive: shortDataTypes.Bool(),
+        unit: shortDataTypes.String(),
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {
@@ -40,7 +40,7 @@ module.exports = function (sequelize, DataTypes) {
         classMethods: {
             upOrDown: function *(id, mode) {
                 yield this.update({
-                    deletedAt: mode ?  null : Date.now()
+                    deletedAt: mode ? null : Date.now()
                 }, {
                     where: {
                         id: id
@@ -55,9 +55,7 @@ module.exports = function (sequelize, DataTypes) {
                 yield this.upOrDown(id, false);
             },
         },
-        getterMethods: {
-
-        },
+        getterMethods: {},
         scopes: {
             deleted: {
                 where: {

@@ -7,24 +7,24 @@ module.exports = function (sequelize, DataTypes) {
 
     var PaymentReqs = sequelize.define('PaymentReqs', {
 
-        params:shortDataTypes.String(),
+        params: shortDataTypes.String(),
 
         tableId: shortDataTypes.Int(),
         paymentMethod: {
             type: Sequelize.STRING
         },//支付方式，支付宝，微信
         isFinish: shortDataTypes.Bool(),//0-第一次支付，1-非第一次
-        isInvalid : shortDataTypes.Bool(),//是否超时失效10min写死
-        trade_no:shortDataTypes.String(),
-        app_id:shortDataTypes.String(),
-        total_amount:shortDataTypes.String(),//原收金额
-        actual_amount:shortDataTypes.String(),//实收金额
-        refund_amount:shortDataTypes.String(),//退款金额
-        refund_reason:shortDataTypes.String(),//退款原因
-        consignee:shortDataTypes.String(),//代售商户名
-        TransferAccountIsFinish:shortDataTypes.Bool(),//主商户是否转账成功
-        consigneeTransferAccountIsFinish : shortDataTypes.Bool(),//代售商户是否转账完成
-        tenantId : {
+        isInvalid: shortDataTypes.Bool(),//是否超时失效10min写死
+        trade_no: shortDataTypes.String(),
+        app_id: shortDataTypes.String(),
+        total_amount: shortDataTypes.String(),//原收金额
+        actual_amount: shortDataTypes.String(),//实收金额
+        refund_amount: shortDataTypes.String(),//退款金额
+        refund_reason: shortDataTypes.String(),//退款原因
+        consignee: shortDataTypes.String(),//代售商户名
+        TransferAccountIsFinish: shortDataTypes.Bool(),//主商户是否转账成功
+        consigneeTransferAccountIsFinish: shortDataTypes.Bool(),//代售商户是否转账完成
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {
@@ -34,7 +34,7 @@ module.exports = function (sequelize, DataTypes) {
         classMethods: {
             upOrDown: function *(id, mode) {
                 yield this.update({
-                    deletedAt: mode ?  null : Date.now()
+                    deletedAt: mode ? null : Date.now()
                 }, {
                     where: {
                         id: id
@@ -49,9 +49,7 @@ module.exports = function (sequelize, DataTypes) {
                 yield this.upOrDown(id, false);
             },
         },
-        getterMethods: {
-
-        },
+        getterMethods: {},
         scopes: {
             deleted: {
                 where: {

@@ -6,7 +6,7 @@ var Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
 
     var FoodsOfTMenus = sequelize.define('FoodsOfTMenus', {
-        tenantId : {
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {

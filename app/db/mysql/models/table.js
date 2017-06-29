@@ -6,9 +6,9 @@ module.exports = function (sequelize, DataTypes) {
 
     var tables = sequelize.define('Tables', {
         name: shortDataTypes.String(),
-        status:shortDataTypes.Int(),
-        info:shortDataTypes.String(),
-        tenantId : {
+        status: shortDataTypes.Int(),
+        info: shortDataTypes.String(),
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {
@@ -16,11 +16,8 @@ module.exports = function (sequelize, DataTypes) {
             models.Consignees.hasMany(models.Tables);
             models.Tables.belongsTo(models.Consignees);
         },
-        instanceMethods: {
-        },
-        classMethods: {
-
-        },
+        instanceMethods: {},
+        classMethods: {},
 
         scopes: {
             all: {

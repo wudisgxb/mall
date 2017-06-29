@@ -6,19 +6,19 @@ const Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
 
     let ProfitSharings = sequelize.define('ProfitSharings', {
-        tenantId: shortDataTypes.String(100,false),
+        tenantId: shortDataTypes.String(100, false),
         //主商户支付备注
-        merchantRemark:shortDataTypes.String(100,false),
+        merchantRemark: shortDataTypes.String(100, false),
         //代售商户支付备注
-        consigneeRemark:shortDataTypes.String(100,false),
+        consigneeRemark: shortDataTypes.String(100, false),
         //代售商分成比例
-        rate:shortDataTypes.Double(),
+        rate: shortDataTypes.Double(),
         //服务商分成比例
-        ownRate:shortDataTypes.Double(),
+        ownRate: shortDataTypes.Double(),
         //配送费
-        distributionFee:shortDataTypes.Double(),
+        distributionFee: shortDataTypes.Double(),
         //排除食物
-        excludeFoodId:shortDataTypes.String(2048,true),
+        excludeFoodId: shortDataTypes.String(2048, true),
 
     }, {
         associate: function (models) {

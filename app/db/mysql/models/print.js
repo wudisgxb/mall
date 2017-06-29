@@ -5,38 +5,35 @@ var Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
 
     var Prints = sequelize.define('Prints', {
-        printName : {
+        printName: {
             type: Sequelize.STRING
         },
-        deviceName : {
+        deviceName: {
             type: Sequelize.STRING
         },
-        printType : {
+        printType: {
             type: Sequelize.STRING
         },
-        printTime : {
+        printTime: {
             type: Sequelize.STRING
         },
-        isNeedCustomSmallTicketHeader : shortDataTypes.Bool(),
-        customSmallTicketHeader : {
+        isNeedCustomSmallTicketHeader: shortDataTypes.Bool(),
+        customSmallTicketHeader: {
             type: Sequelize.STRING
         },
-        smallTicketNum :  shortDataTypes.Int(),
-        isShowMoney :  shortDataTypes.Bool(),
-        printModel :  {
+        smallTicketNum: shortDataTypes.Int(),
+        isShowMoney: shortDataTypes.Bool(),
+        printModel: {
             type: Sequelize.STRING
         },
-        tenantId : {
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {
         associate: function (models) {
         },
-        instanceMethods: {
-        },
-        classMethods: {
-
-        },
+        instanceMethods: {},
+        classMethods: {},
         scopes: {
             all: {
                 paranoid: false,

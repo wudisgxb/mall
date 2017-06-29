@@ -26,10 +26,10 @@ module.exports = function (sequelize, DataTypes) {
          * 100 => 超级管理员
          */
         type: shortDataTypes.Int(),
-        tenantId : {
+        tenantId: {
             type: Sequelize.STRING
         }
-        
+
     }, {
         timestamps: false,
         associate: function (models) {

@@ -7,16 +7,16 @@ module.exports = function (sequelize, DataTypes) {
 
     var TransferAccountInfos = sequelize.define('TransferAccountInfos', {
 
-        code:shortDataTypes.String(),
+        code: shortDataTypes.String(),
         msg: shortDataTypes.String(),
-        out_biz_no:shortDataTypes.String(),
+        out_biz_no: shortDataTypes.String(),
         sub_code: shortDataTypes.String(),
-        sub_msg:shortDataTypes.String(),
+        sub_msg: shortDataTypes.String(),
 
-        order_id:shortDataTypes.String(),
-        pay_date:shortDataTypes.String(),
-        transferAccountInfoUrl:shortDataTypes.String(),
-        tenantId : {
+        order_id: shortDataTypes.String(),
+        pay_date: shortDataTypes.String(),
+        transferAccountInfoUrl: shortDataTypes.String(),
+        tenantId: {
             type: Sequelize.STRING
         }
 
@@ -26,11 +26,8 @@ module.exports = function (sequelize, DataTypes) {
             // models.Menus.hasMany(models.Foods);
             // models.Foods.belongsTo(models.Menus);
         },
-        classMethods: {
-        },
-        getterMethods: {
-
-        },
+        classMethods: {},
+        getterMethods: {},
         scopes: {
             deleted: {
                 where: {

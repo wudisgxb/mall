@@ -4,7 +4,7 @@ var Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
 
-    var Consignees =  sequelize.define('Consignees', {
+    var Consignees = sequelize.define('Consignees', {
         /**
          * 代售商户名
          */

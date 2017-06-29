@@ -17,9 +17,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         instanceMethods: {
         },
-        classMethods: {
-
-        },
+        classMethods: {},
         scopes: {
             all: {
                 paranoid: false,

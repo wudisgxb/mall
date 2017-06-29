@@ -35,7 +35,7 @@ function Alipay(opts) {
 
 var props = Alipay.prototype;
 
-props.makeParams = function(method, biz_content) {
+props.makeParams = function (method, biz_content) {
     return {
         app_id: this.appId,
         method: method,
@@ -55,9 +55,9 @@ props.makeParams = function(method, biz_content) {
  * @param {String} [opts.body]               对一笔交易的具体描述信息。如果是多种商品，请将商品描述字符串累加传给body
  * @param {String} opts.outTradeId           商户网站唯一订单号
  * @param {String} [opts.timeout]            设置未付款支付宝交易的超时时间，一旦超时，该笔交易就会自动被关闭。
-                                              当用户进入支付宝收银台页面（不包括登录页面），会触发即刻创建支付宝交易，此时开始计时。
-                                              取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。
-                                              该参数数值不接受小数点， 如 1.5h，可转换为 90m。
+ 当用户进入支付宝收银台页面（不包括登录页面），会触发即刻创建支付宝交易，此时开始计时。
+ 取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。
+ 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
  * @param {String} opts.amount               订单总金额，单位为元，精确到小数点后两位，取值范围[0.01,100000000]
  * @param {String} [opts.sellerId]           收款支付宝用户ID。 如果该值为空，则默认为商户签约账号对应的支付宝用户ID
  * @param {String} opts.goodsType            商品主类型：0—虚拟类商品，1—实物类商品 注：虚拟类商品不支持使用花呗渠道
@@ -101,9 +101,9 @@ props.pay = function (opts) {
  * @param {String} [opts.body]               对一笔交易的具体描述信息。如果是多种商品，请将商品描述字符串累加传给body
  * @param {String} opts.outTradeId           商户网站唯一订单号
  * @param {String} [opts.timeout]            设置未付款支付宝交易的超时时间，一旦超时，该笔交易就会自动被关闭。
-                                              当用户进入支付宝收银台页面（不包括登录页面），会触发即刻创建支付宝交易，此时开始计时。
-                                              取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。
-                                              该参数数值不接受小数点， 如 1.5h，可转换为 90m。
+ 当用户进入支付宝收银台页面（不包括登录页面），会触发即刻创建支付宝交易，此时开始计时。
+ 取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。
+ 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
  * @param {String} opts.amount               订单总金额，单位为元，精确到小数点后两位，取值范围[0.01,100000000]
  * @param {String} [opts.sellerId]           收款支付宝用户ID。 如果该值为空，则默认为商户签约账号对应的支付宝用户ID
  * @param {String} opts.goodsType            商品主类型：0—虚拟类商品，1—实物类商品 注：虚拟类商品不支持使用花呗渠道
@@ -149,25 +149,25 @@ props.webPay = function (opts) {
  * @param {String} opts.out_biz_no           商户转账唯一订单号。
  * @param {String} opts.payee_type           收款方账户类型。
  * @param {String} opts.payee_account        收款方账户。与payee_type配合使用。
- * @param {String} opts.amount               转账金额，单位：元。 
- * @param {String} opts.payer_show_name      付款方显示姓名（最长支持100个英文/50个汉字）。 
- * @param {String} opts.payee_real_name      收款方真实姓名（最长支持100个英文/50个汉字）。 
- * @param {String} opts.remark               转账备注（支持200个英文/100个汉字）。 
+ * @param {String} opts.amount               转账金额，单位：元。
+ * @param {String} opts.payer_show_name      付款方显示姓名（最长支持100个英文/50个汉字）。
+ * @param {String} opts.payee_real_name      收款方真实姓名（最长支持100个英文/50个汉字）。
+ * @param {String} opts.remark               转账备注（支持200个英文/100个汉字）。
  */
 props.transferPay = function (opts) {
-  var biz_content = {
-    out_biz_no: opts.out_biz_no || Date.now(),
-    payee_type: opts.payee_type,
-    payee_account: opts.payee_account,
-    amount: opts.amount,
-    payer_show_name: opts.payer_show_name,
-    payee_real_name: opts.payee_real_name,
-    remark: opts.remark
-  }
+    var biz_content = {
+        out_biz_no: opts.out_biz_no || Date.now(),
+        payee_type: opts.payee_type,
+        payee_account: opts.payee_account,
+        amount: opts.amount,
+        payer_show_name: opts.payer_show_name,
+        payee_real_name: opts.payee_real_name,
+        remark: opts.remark
+    }
 
-  var params = this.makeParams('alipay.fund.trans.toaccount.transfer', biz_content);
+    var params = this.makeParams('alipay.fund.trans.toaccount.transfer', biz_content);
 
-  return util.processParams(params, this.rsaPrivate, this.signType);
+    return util.processParams(params, this.rsaPrivate, this.signType);
 }
 
 /**
@@ -178,14 +178,14 @@ props.transferPay = function (opts) {
  * @param {String} opts.order_id           支付宝转账单据号：和商户转账唯一订单号不能同时为空。
  */
 props.queryTransfer = function (opts) {
-  var biz_content = {
-    out_biz_no: opts.out_biz_no,
-    order_id: opts.order_id,
-  }
+    var biz_content = {
+        out_biz_no: opts.out_biz_no,
+        order_id: opts.order_id,
+    }
 
-  var params = this.makeParams('alipay.fund.trans.order.query', biz_content);
+    var params = this.makeParams('alipay.fund.trans.order.query', biz_content);
 
-  return util.processParams(params, this.rsaPrivate, this.signType);
+    return util.processParams(params, this.rsaPrivate, this.signType);
 }
 
 /**
@@ -228,7 +228,7 @@ props.query = function (opts) {
         biz_content: JSON.stringify(biz_content)
     };
     var params = this.makeParams('alipay.trade.query', biz_content);
-    if(this.appAuthToken) {
+    if (this.appAuthToken) {
         params.app_auth_token = this.appAuthToken;
     }
 
@@ -236,7 +236,7 @@ props.query = function (opts) {
 
     return util.request({
         method: 'GET',
-        url: (this.sandbox? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
+        url: (this.sandbox ? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
     });
 };
 
@@ -258,7 +258,7 @@ props.close = function (opts) {
     };
 
     var params = this.makeParams('alipay.trade.close', biz_content);
-    if(this.appAuthToken) {
+    if (this.appAuthToken) {
         params.app_auth_token = this.appAuthToken;
     }
 
@@ -266,7 +266,7 @@ props.close = function (opts) {
 
     return util.request({
         method: 'GET',
-        url: (this.sandbox? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
+        url: (this.sandbox ? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
     });
 };
 
@@ -284,7 +284,7 @@ props.close = function (opts) {
  * @param {String} [opts.storeId]       商户的门店编号
  * @param {String} [opts.terminalId]    商户的终端编号
  */
-props.refund  = function (opts) {
+props.refund = function (opts) {
 
     var biz_content = {
         out_trade_no: opts.outTradeId,
@@ -298,7 +298,7 @@ props.refund  = function (opts) {
     };
 
     var params = this.makeParams('alipay.trade.refund', biz_content);
-    if(this.appAuthToken) {
+    if (this.appAuthToken) {
         params.app_auth_token = this.appAuthToken;
     }
 
@@ -306,7 +306,7 @@ props.refund  = function (opts) {
 
     return util.request({
         method: 'GET',
-        url: (this.sandbox? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
+        url: (this.sandbox ? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
     });
 };
 
@@ -328,7 +328,7 @@ props.refundQuery = function (opts) {
     };
 
     var params = this.makeParams('alipay.trade.fastpay.refund.query', biz_content);
-    if(this.appAuthToken) {
+    if (this.appAuthToken) {
         params.app_auth_token = this.appAuthToken;
     }
 
@@ -336,7 +336,7 @@ props.refundQuery = function (opts) {
 
     return util.request({
         method: 'GET',
-        url: (this.sandbox? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
+        url: (this.sandbox ? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
     });
 };
 
@@ -345,7 +345,7 @@ props.refundQuery = function (opts) {
  * 查询对账单下载地址 https://doc.open.alipay.com/doc2/apiDetail.htm?spm=a219a.7629065.0.0.iX5mPA&apiId=1054&docType=4
  * @param {Object} opts
  * @param {String} [opts.billType]     账单类型，商户通过接口或商户经开放平台授权后其所属服务商通过接口可以获取以下账单类型：
-                                        trade、signcustomer；trade指商户基于支付宝交易收单的业务账单；signcustomer是指基于商户支付宝余额收入及支出等资金变动的帐务账单；
+ trade、signcustomer；trade指商户基于支付宝交易收单的业务账单；signcustomer是指基于商户支付宝余额收入及支出等资金变动的帐务账单；
  * @param {String} [opts.billDate]     账单时间：日账单格式为yyyy-MM-dd，月账单格式为yyyy-MM。
  * @param {String} [opts.appAuthToken]  https://doc.open.alipay.com/doc2/detail.htm?treeId=216&articleId=105193&docType=1
  */
@@ -357,7 +357,7 @@ props.billDownloadUrlQuery = function (opts) {
     };
 
     var params = this.makeParams('alipay.data.dataservice.bill.downloadurl.query', biz_content);
-    if(this.appAuthToken) {
+    if (this.appAuthToken) {
         params.app_auth_token = this.appAuthToken;
     }
 
@@ -365,6 +365,6 @@ props.billDownloadUrlQuery = function (opts) {
 
     return util.request({
         method: 'GET',
-        url: (this.sandbox? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
+        url: (this.sandbox ? alipay_gate_way_sandbox : alipay_gate_way) + '?' + body
     });
 };

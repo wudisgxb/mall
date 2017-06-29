@@ -5,7 +5,7 @@ const fs = require('fs')
 
 var db = require('../../db/mysql/index');
 var Tables = db.models.Tables;
-var FoodOrders = db.models.FoodOrders;
+var Orders = db.models.Orders;
 var PaymentReqs = db.models.PaymentReqs;
 var AlipayErrors = db.models.AlipayErrors;
 var AlipayConfigs = db.models.AlipayConfigs;
@@ -71,7 +71,7 @@ module.exports = {
         var tableId = this.query.tableId;
         //var total_amount = this.query.total_amount;
         var total_amount = 0;
-        var foodOrders = await FoodOrders.findAll({
+        var foodOrders = await Orders.findAll({
             where: {
                 TableId: tableId,
                 $or: [{status : 0}, {status : 1}] ,
@@ -174,7 +174,7 @@ module.exports = {
         //tableId and order状态不等于1-待支付状态（order满足一个就行）
         //且未超时失效,微信貌似没有超时的说法，预留着，10分钟
 
-        var foodOrders = await FoodOrders.findAll({
+        var foodOrders = await Orders.findAll({
             where: {
                 TableId: tableId,
                 status:1//待支付
@@ -245,7 +245,7 @@ module.exports = {
                 tenantId: this.query.tenantId
             });
 
-            foodOrders = await FoodOrders.findAll({
+            foodOrders = await Orders.findAll({
                 where: {
                     TableId: tableId,
                     // status:0//未支付
@@ -380,7 +380,7 @@ module.exports = {
                 await table.save();
 
                 //order状态改成2-已支付
-                var foodOrders = await FoodOrders.findAll({
+                var foodOrders = await Orders.findAll({
                     where: {
                         TableId : tableId,
                         $or: [{status : 0}, {status : 1}] ,
@@ -541,7 +541,7 @@ module.exports = {
                 }
 
                 //满300加会员
-                foodOrders = await FoodOrders.findAll({
+                foodOrders = await Orders.findAll({
                     where: {
                         trade_no : xml.out_trade_no,
                     }

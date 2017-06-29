@@ -8,10 +8,10 @@ module.exports = function (sequelize, DataTypes) {
         /**
          * 主商户名
          */
-        name: shortDataTypes.String(100,false),
+        name: shortDataTypes.String(100, false),
         phone: shortDataTypes.Phone(true),
         //商户类型
-        industry:{
+        industry: {
             type: DataTypes.STRING,
             defaultValue: '餐饮'
         },
@@ -20,8 +20,8 @@ module.exports = function (sequelize, DataTypes) {
         // //支付宝账号
         // payee_account: shortDataTypes.String(100,false),
         //地址
-        address: shortDataTypes.String(255,true),
-        tenantId: shortDataTypes.String(100,false),
+        address: shortDataTypes.String(255, true),
+        tenantId: shortDataTypes.String(100, false),
         // //是否实时
         // isRealTime:shortDataTypes.Bool(),
     }, {

@@ -6,23 +6,18 @@ module.exports = function (sequelize, DataTypes) {
 
     var smsVerification = sequelize.define('smsVerification', {
         phone: shortDataTypes.Phone(),
-        date:shortDataTypes.Date(),
-        code:shortDataTypes.Int(),
-        tenantId : {
+        date: shortDataTypes.Date(),
+        code: shortDataTypes.Int(),
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {
         associate: function (models) {
         },
-        instanceMethods: {
-        },
-        classMethods: {
+        instanceMethods: {},
+        classMethods: {},
 
-        },
-
-        scopes: {
-
-        }
+        scopes: {}
     });
 
     return smsVerification;

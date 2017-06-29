@@ -8,9 +8,9 @@ module.exports = function (sequelize, DataTypes) {
         username: shortDataTypes.String(),
         rateTime: shortDataTypes.Date(),
         rateType: shortDataTypes.Int(),
-        text:shortDataTypes.String(),
-        avatar:shortDataTypes.String(),
-        tenantId : {
+        text: shortDataTypes.String(),
+        avatar: shortDataTypes.String(),
+        tenantId: {
             type: Sequelize.STRING
         }
     }, {
@@ -18,10 +18,8 @@ module.exports = function (sequelize, DataTypes) {
             models.Foods.hasMany(models.Ratings);
             models.Ratings.belongsTo(models.Foods);
         },
-        instanceMethods: {
-        },
-        classMethods: {
-        }
+        instanceMethods: {},
+        classMethods: {}
     });
 
     return Ratings;

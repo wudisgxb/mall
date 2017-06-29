@@ -8,22 +8,20 @@ module.exports = function (sequelize, DataTypes) {
         userName: shortDataTypes.String(),
         rateTime: shortDataTypes.Date(),
         //rateType: shortDataTypes.Int(),
-        text:shortDataTypes.String(),
-        avatar:shortDataTypes.String(),
-        tenantId : {
+        text: shortDataTypes.String(),
+        avatar: shortDataTypes.String(),
+        tenantId: {
             type: Sequelize.STRING
         },
-        tasteScore:shortDataTypes.Int(),
-        environmentScore:shortDataTypes.Int(),
-        serviceScore:shortDataTypes.Int(),
-        averageScore:shortDataTypes.Double(),
+        tasteScore: shortDataTypes.Int(),
+        environmentScore: shortDataTypes.Int(),
+        serviceScore: shortDataTypes.Int(),
+        averageScore: shortDataTypes.Double(),
     }, {
         associate: function (models) {
         },
-        instanceMethods: {
-        },
-        classMethods: {
-        }
+        instanceMethods: {},
+        classMethods: {}
     });
 
     return MerchantRatings;

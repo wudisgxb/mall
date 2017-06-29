@@ -2,7 +2,8 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 var db = require('../../db/mysql/index');
-var FoodOrders = db.models.FoodOrders;
+var Orders = db.models.Orders;
+var ShoppingCarts = db.models.ShoppingCarts;
 var Foods = db.models.Foods;
 var Vips = db.models.Vips;
 var PaymentReqs = db.models.PaymentReqs;
@@ -20,13 +21,13 @@ module.exports = {
     let startTime = null;
     let endTime = null;
     if (ctx.query.startTime != null) {
-      startTime = new Date(this.query.startTime);
+      startTime = new Date(ctx.query.startTime);
       console.log("startTime:" + startTime);
     } else {
       startTime = '2000-05-14T06:12:22.000Z';
     }
     if (ctx.query.endTime != null) {
-      endTime = new Date(this.query.endTime);
+      endTime = new Date(ctx.query.endTime);
     } else {
       endTime = '2200-05-14T06:12:22.000Z';
     }
@@ -34,7 +35,7 @@ module.exports = {
     let isAlreadyPaid = ctx.query.isAlreadyPaid;
     let foodOrders;
     if (isAlreadyPaid == undefined) {
-      foodOrders = await FoodOrders.findAll({
+      foodOrders = await Orders.findAll({
         where: {
           createdAt: {
             $between:[startTime,endTime]
@@ -48,7 +49,7 @@ module.exports = {
 
     } else {
       if (isAlreadyPaid == true) {
-        foodOrders = await FoodOrders.findAll({
+        foodOrders = await Orders.findAll({
           where: {
             createdAt: {
               $between:[startTime,endTime]
@@ -61,7 +62,7 @@ module.exports = {
           }
         })
       } else {
-        foodOrders = await FoodOrders.findAll({
+        foodOrders = await Orders.findAll({
           where: {
             createdAt: {
               $between:[startTime,endTime]
@@ -89,7 +90,7 @@ module.exports = {
       totalPrice = 0;
       totalVipPrice = 0;
       foodJson = [];
-      foodOrders = await FoodOrders.findAll({
+      foodOrders = await Orders.findAll({
         where: {
           createdAt: {
             $between:[startTime,endTime]
@@ -135,7 +136,7 @@ module.exports = {
       result[i].totalVipPrice = Math.round(totalVipPrice*100)/100;
 
       //根据订单号找退款信息
-      let tmp = await FoodOrders.findAll({
+      let tmp = await Orders.findAll({
         where: {
           own_trade_no:tradeNoArray[i],
           tenantId:ctx.query.tenantId,
@@ -176,7 +177,7 @@ module.exports = {
       }
     }
 
-    this.body =new ApiResult(ApiResult.Result.SUCCESS);
+    ctx.body =new ApiResult(ApiResult.Result.SUCCESS);
   },
   async modifyTableStatus (tableId,tableStatus) {
     let table = await Tables.findById(tableId);
@@ -202,62 +203,62 @@ module.exports = {
     return Promise.resolve(null);
   },
   async updateAdminFoodOrderByEditId (ctx, next) {
-    this.checkParams('id').notEmpty().isInt().toInt();
-    this.checkBody('FoodId').notEmpty();
-    this.checkBody('addNum').notEmpty().isInt();
-    this.checkBody('tableUser').notEmpty();
+    ctx.checkParams('id').notEmpty().isInt().toInt();
+    ctx.checkBody('FoodId').notEmpty();
+    ctx.checkBody('addNum').notEmpty().isInt();
+    ctx.checkBody('tableUser').notEmpty();
 
-    if (this.errors) {
-      this.body = this.errors;
+    if (ctx.errors) {
+      ctx.body = ctx.errors;
       return;
     }
 
-    let id = this.params.id; //桌号
-    let body = this.request.body;
+    let id = ctx.params.id; //桌号
+    let body = ctx.request.body;
 
     let foods = body.foods;
 
 
-    let foodShoppingCarts = await FoodShoppingCarts.findAll({
+    let shoppingCarts = await ShoppingCarts.findAll({
       where: {
         tableUser: body.tableUser,
         FoodId: body.FoodId,
       }
     });
 
-    if (foodShoppingCarts.length == 0) {
-      this.body = {
+    if (shoppingCarts.length == 0) {
+      ctx.body = {
         resCode:-1,
         result:"食品不存在！"
       }
       return;
     }
-    let num = foodShoppingCarts[0].num + body.addNum;
+    let num = shoppingCarts[0].num + body.addNum;
 
     if(num == 0) {
-      foodShoppingCarts[0].destroy();
+      shoppingCarts[0].destroy();
     } else {
-      foodShoppingCarts[0].num = num;
-      foodShoppingCarts[0].save();
+      shoppingCarts[0].num = num;
+      shoppingCarts[0].save();
     }
 
 
-    this.body =new ApiResult(ApiResult.Result.SUCCESS);
+    ctx.body =new ApiResult(ApiResult.Result.SUCCESS);
   },
   async deleteAdminFoodOrderTableId (ctx, next) {
-    this.checkParams('tableId');
+    ctx.checkParams('tableId');
 
-    if (this.errors) {
-      this.body = this.errors;
+    if (ctx.errors) {
+      ctx.body = ctx.errors;
       return;
     }
 
-    let tableId = this.params.tableId; //订单id
+    let tableId = ctx.params.tableId; //订单id
 
-    let foodOrders = await FoodOrders.findAll({
+    let foodOrders = await Orders.findAll({
       where:{
         TableId:tableId,
-        tenantId:this.query.tenantId,
+        tenantId:ctx.query.tenantId,
         $or: [{status : 0}, {status : 1}]
       }
     });
@@ -269,13 +270,13 @@ module.exports = {
         await e.destroy();
       })
     } else {
-      this.body = {
+      ctx.body = {
         resCode:0,
         result:"订单不存在"
       }
     }
     await modifyTableStatus(tableId,0);
 
-    this.body =new ApiResult(ApiResult.Result.SUCCESS);
+    ctx.body =new ApiResult(ApiResult.Result.SUCCESS);
   }
 }

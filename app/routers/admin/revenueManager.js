@@ -2,10 +2,6 @@
  * Created by bian on 12/3/15.
  */
 
-var db = require('../../db/mysql/index');
-var PaymentReqs = db.models.PaymentReqs;
-var Tables = db.models.Tables;
-var tool = require('../../Tool/tool')
 var revenueManager = require('../../controller/admin/revenueManager')
 const router = new (require('koa-router'))()
 
