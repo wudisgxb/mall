@@ -14,10 +14,123 @@ let ChildAlipayConfigs = db.models.ChildAlipayConfigs;
 
 module.exports = {
 
+  async getEshopUserMenus (ctx, next) {
+    let menuId =  ctx.query.id;
+    let tenantId =  ctx.query.tenantId;
+    let consigneeId = ctx.query.consigneeId;
+
+    ctx.checkBody('password').notEmpty();
+
+    let excludeFoodIdArray = [];
+    if (consigneeId != null) {
+      console.log(tenantId);
+      console.log(consignee);
+      let childAlipayConfigs = await ChildAlipayConfigs.findAll({
+        where:{
+          tenantId:tenantId,
+          merchant:consignee
+        }
+      });
+      console.log("childAlipayConfigs===========" + childAlipayConfigs.length);
+      if (childAlipayConfigs.length >0) {
+        excludeFoodIdArray = JSON.parse(childAlipayConfigs[0].excludeFoodId);
+        console.log(excludeFoodIdArray);
+      }
+    }
+
+    if (menuId == null) {
+      let menus = await Menus.findAll({
+        where:{
+          tenantId:tenantId
+        },
+        attributes: [
+          'id',
+          'name',
+          'type'
+        ]});
+    } else {
+      let menus = await Menus.findAll({
+        where: {
+          id:menuId,
+        },
+        attributes: [
+          'id',
+          'name',
+          'type'
+        ]});
+    }
+
+    let resultArray = [];
+
+    let foodsofmenus;
+    let foodArray = [];
+    for(let i = 0; i < menus.length; i ++) {
+      foodsofmenus = await Foodsofmenus.findAll({
+        where: {
+          MenuId:menus[i].id ,
+        }
+      });
+      let food;
+      for(let j = 0; j < foodsofmenus.length; j ++) {
+        if (excludeFoodIdArray != null && excludeFoodIdArray.length>0 && excludeFoodIdArray.indexOf(foodsofmenus[j].FoodId) != -1) {
+          console.log("GGGGGGGGGGG||" + foodsofmenus[j].FoodId);
+          console.log("HHHHHHHHHHH||" + excludeFoodIdArray.indexOf(foodsofmenus[j].FoodId))
+          continue;
+        }
+        food = await Foods.findAll({
+          where: {
+            id:foodsofmenus[j].FoodId ,
+            isActive:true,
+          },
+          attributes:{
+            exclude:['createdAt','updatedAt','deletedAt','isActive']
+          },
+          include: [{
+            model: Ratings,
+            where: { FoodId: foodsofmenus[j].FoodId},
+            required:false,
+            attributes: [
+              'username',
+              'rateTime',
+              'rateType',
+              'text',
+              'avatar'
+            ]
+          }]
+        });
+
+        food.forEach(e => {
+          e.Ratings = e.Ratings.map(rating => {
+            rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
+            return rating
+          })
+        })
+
+        foodArray.push(food[0]);
+      }
+
+      resultArray[i] = {};
+      resultArray[i].id = menus[i].id;
+      resultArray[i].name = menus[i].name;
+      resultArray[i].type = menus[i].type;
+      resultArray[i].foods = foodArray;
+      foodArray = []
+    }
+    ctx.body =new ApiResult(ApiResult.Result.SUCCESS,resultArray)
+
+  },
+
   async getUserMenus (ctx, next) {
     let menuId =  ctx.query.id;
     let tenantId =  ctx.query.tenantId;
     let consignee = ctx.query.consignee;
+
+    ctx.checkBody('password').notEmpty();
+    if (ctx.errors) {
+      ctx.body =new ApiResult(ApiResult.Result.SUCCESS,ctx.errors)
+      return;
+    }
+
 
     let excludeFoodIdArray = [];
     if (consignee != null) {

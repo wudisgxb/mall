@@ -44,6 +44,9 @@ module.exports = function(app) {
       uploadDir: path.join(__dirname, '..', 'public/images')
     }
   }))
+
+  require('koa-validate')(app);
+  
   app.use(convert(cors()))
   app.use(convert(json()))
 
@@ -60,4 +63,6 @@ module.exports = function(app) {
   app.on('error', function(err, ctx) {
     logger.error('server error', err, ctx)
   })
+
+
 }

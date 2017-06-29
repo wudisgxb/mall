@@ -18,7 +18,7 @@
 // }
 
 // parties
-var Router = require('koa-router');
+//var Router = require('koa-router');
 
 // local
 var fs = require('fs');
@@ -27,7 +27,7 @@ var util = require('util');
 
 var db = require('./../db/mysql/index.js');
 
-var router = new Router();
+//var router = new Router();
 
 module.exports = function (app) {
 
@@ -41,7 +41,8 @@ module.exports = function (app) {
             if (stat.isDirectory()) {
               loadDir(nextPath);
             } else if (stat.isFile() && file.indexOf('.') !== 0 && file !== 'index.js' && file !== 'url.js') {
-              require(nextPath)(router);
+                const router = require(nextPath)
+                app.use(router.routes(), router.allowedMethods());
             }
           });
     };

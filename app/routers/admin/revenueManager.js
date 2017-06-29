@@ -7,11 +7,8 @@ var PaymentReqs = db.models.PaymentReqs;
 var Tables = db.models.Tables;
 var tool = require('../../Tool/tool')
 var revenueManager = require('../../controller/admin/revenueManager')
-module.exports = (router) => {
+const router = new (require('koa-router'))()
 
-    //查询收退款信息
-    router.get('/api/v3/admin/receivablesInfo', revenueManager.getAdminReceivablesInfo);
-
-   
-
-};
+//查询收退款信息
+router.get('/api/v3/admin/receivablesInfo', revenueManager.getAdminReceivablesInfo);
+module.exports = router

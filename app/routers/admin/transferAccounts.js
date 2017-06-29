@@ -4,10 +4,10 @@
 let transferAccounts = require('../../controller/admin/transferAccounts')
 
 
+const router = new (require('koa-router'))()
 
-module.exports = (router) => {
-    router.post('/api/v3/admin/transferAccountInfo/save',  transferAccounts.saveAdminTransferAccounts);
-    router.put('/api/v3/admin/transferAccountInfo/save/:id',  transferAccounts.UpdateAdminTransferAccountsById);
-    router.get('/api/v3/admin/transferAccountInfo',transferAccounts.getAdminTransferAccounts);
-    router.delete('/api/v3/admin/transferAccountInfo/delete/:id',transferAccounts.deleteAdminTransferAccounts);
-};
+router.post('/api/v3/admin/transferAccountInfo/save',  transferAccounts.saveAdminTransferAccounts);
+router.put('/api/v3/admin/transferAccountInfo/save/:id',  transferAccounts.UpdateAdminTransferAccountsById);
+router.get('/api/v3/admin/transferAccountInfo',transferAccounts.getAdminTransferAccounts);
+router.delete('/api/v3/admin/transferAccountInfo/delete/:id',transferAccounts.deleteAdminTransferAccounts);
+module.exports = router

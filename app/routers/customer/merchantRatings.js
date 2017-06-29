@@ -2,14 +2,11 @@
 var db = require('../../db/mysql/index');
 let mer = require('../../controller/customer/merchantRatings')
 
+const router = new (require('koa-router'))()
 
-module.exports = (router) => {
+var MerchantRatings = db.models.MerchantRatings;
 
-    var MerchantRatings = db.models.MerchantRatings;
+router.post('/api/v3/user/merchantRatings', mer.saveUserMerchantRatings);
 
-    router.post('/api/v3/user/merchantRatings', mer.saveUserMerchantRatings);
-    
-    router.get('/api/v3/user/merchantRatings',mer.getusermerchantRatings);
-
-
-};
+router.get('/api/v3/user/merchantRatings',mer.getusermerchantRatings);
+module.exports = router
