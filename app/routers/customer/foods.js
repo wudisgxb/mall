@@ -7,6 +7,6 @@ let foods = require('../../controller/customer/foods');
 
 
 module.exports = (router) => {
-    router.get('/api/v2/user/Menus',foods.getUserMenus);
-    router.post('/api/v2/user/rating',foods.saveUserReting);
+    router.get('/api/v3/user/Menus',foods.getUserMenus);
+    router.post('/api/v3/user/rating',foods.saveUserReting);
 };
