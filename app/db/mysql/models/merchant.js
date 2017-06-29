@@ -10,6 +10,11 @@ module.exports = function (sequelize, DataTypes) {
          */
         name: shortDataTypes.String(100,false),
         phone: shortDataTypes.Phone(true),
+        //商户类型
+        industry:{
+            type: DataTypes.STRING,
+            defaultValue: '餐饮'
+        },
         // //微信账号
         // wecharPayee_account: shortDataTypes.String(100,false),
         // //支付宝账号
