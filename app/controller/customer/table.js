@@ -1,6 +1,7 @@
-let db = require('../../db/mysql/index');
-let Tables = db.models.Tables;
-let ShoppingCart = db.models.FoodShoppingCarts;
+const db = require('../../db/mysql/index');
+const Tables = db.models.Tables;
+const ShoppingCart = db.models.FoodShoppingCarts;
+const ApiResult = require('../../db/mongo/ApiResult')
 
 module.exports = {
 

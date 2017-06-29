@@ -1,10 +1,10 @@
 let db = require('../../db/mysql/index');
-
+const ApiResult = require('../../db/mongo/ApiResult')
 let Vips = db.models.Vips;
 module.exports = {
 
-  async saveUserVip (ctx, next) {
-    ctx.checkBody('phone').notEmpty().isInt();
+  async checkUserVip (ctx, next) {
+    ctx.checkQuery('phone').notEmpty().isInt();
 
     if (ctx.errors) {
       ctx.body = ctx.errors;
@@ -12,7 +12,7 @@ module.exports = {
     }
     let vips = await Vips.findAll({
       where:{
-        phone:ctx.request.body.phone,
+        phone:ctx.query.body.phone,
         tenantId:ctx.query.tenantId
       }
     })
