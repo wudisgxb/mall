@@ -25,7 +25,6 @@ module.exports = function (sequelize, DataTypes) {
         // //是否实时
         // isRealTime:shortDataTypes.Bool(),
     }, {
-        timestamps: false,
         associate: function (models) {
             models.Address.hasOne(models.Merchants);
             models.Merchants.belongsTo(models.Address);

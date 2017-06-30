@@ -16,8 +16,13 @@ module.exports = function (sequelize, DataTypes) {
         },
         //是否实时转账
         isRealTime: shortDataTypes.Bool(),
+        //满多少送会员
+        vipFee: shortDataTypes.Double(100000),
+        //快满多少提示会员
+        vipRemindFee: shortDataTypes.Double(100000),
+        //主页图
+        image: shortDataTypes.String(),
     }, {
-        timestamps: false,
         associate: function (models) {
         },
         instanceMethods: {},

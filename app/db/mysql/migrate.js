@@ -347,14 +347,20 @@ function * TenantConfigsSeed() {
         tenantId: tenantId1,
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
-        isRealTime: true
+        isRealTime: true,
+        vipFee: 50,
+        vipRemindFee:25,
+        image:''
     });
 
     yield db.models.TenantConfigs.create({
         tenantId: tenantId2,
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
-        isRealTime: true
+        isRealTime: true,
+        vipFee: 50,
+        vipRemindFee:25,
+        image:''
     });
 }
 

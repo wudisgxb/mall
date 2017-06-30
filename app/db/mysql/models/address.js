@@ -14,7 +14,6 @@ module.exports = function (sequelize, DataTypes) {
         //详细地址
         address: shortDataTypes.String(),
     }, {
-        timestamps: false,
         associate: function (models) {
         },
         instanceMethods: {},
