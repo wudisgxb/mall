@@ -71,7 +71,7 @@ module.exports = {
         var tableId = this.query.tableId;
         //var total_amount = this.query.total_amount;
         var total_amount = 0;
-        var foodOrders = await Orders.findAll({
+        var orders = await Orders.findAll({
             where: {
                 TableId: tableId,
                 $or: [{status : 0}, {status : 1}] ,
@@ -84,24 +84,24 @@ module.exports = {
         var totalPrice = 0;
         var totalVipPrice = 0;
 
-        for(var i = 0; i < foodOrders.length; i ++) {
+        for(var i = 0; i < orders.length; i ++) {
             var food = await Foods.findAll({
                 where: {
-                    id: foodOrders[i].FoodId,
+                    id: orders[i].FoodId,
                 },
                 attributes: ["id","name","price","vipPrice"],
             })
 
-            totalPrice += food[0].price * foodOrders[i].num;//原价
-            totalVipPrice += food[0].vipPrice * foodOrders[i].num;//会员价
+            totalPrice += food[0].price * orders[i].num;//原价
+            totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
         }
 
-        if (foodOrders[0] != null) {
+        if (orders[0] != null) {
             //判断vip
-            if (foodOrders[0].phone != null) {
+            if (orders[0].phone != null) {
                 var vips = await Vips.findAll({
                     where:{
-                        phone:foodOrders[0].phone,
+                        phone:orders[0].phone,
                         tenantId:this.query.tenantId
                     }
                 })
@@ -143,7 +143,7 @@ module.exports = {
 
         //存openid
         await User.create({
-            nickname: foodOrders[0].phone,
+            nickname: orders[0].phone,
             headimgurl: '',
             sex: '男',
             openid: token.data.openid,
@@ -174,7 +174,7 @@ module.exports = {
         //tableId and order状态不等于1-待支付状态（order满足一个就行）
         //且未超时失效,微信貌似没有超时的说法，预留着，10分钟
 
-        var foodOrders = await Orders.findAll({
+        var orders = await Orders.findAll({
             where: {
                 TableId: tableId,
                 status:1//待支付
@@ -191,7 +191,7 @@ module.exports = {
             }
         });
 
-        if(foodOrders.length >0 && paymentReqs.length >0) {
+        if(orders.length >0 && paymentReqs.length >0) {
             //判断是否失效 10min,微信不判断超时
             //if((Date.now() - paymentReqs[0].createdAt.getTime()) > 100*60*1000) {
                 paymentReqs[0].isInvalid = true;
@@ -215,10 +215,10 @@ module.exports = {
                     tenantId:this.query.tenantId
                 });
 
-                for (var i = 0 ; i < foodOrders.length;i++) {
-                    foodOrders[i].trade_no = trade_no;
-                    foodOrders[i].paymentMethod = '微信';
-                    await foodOrders[i].save();
+                for (var i = 0 ; i < orders.length;i++) {
+                    orders[i].trade_no = trade_no;
+                    orders[i].paymentMethod = '微信';
+                    await orders[i].save();
                 }
 
                 new_params.trade_no = trade_no;
@@ -245,7 +245,7 @@ module.exports = {
                 tenantId: this.query.tenantId
             });
 
-            foodOrders = await Orders.findAll({
+            orders = await Orders.findAll({
                 where: {
                     TableId: tableId,
                     // status:0//未支付
@@ -253,11 +253,11 @@ module.exports = {
                 }
             })
 
-            for (var i = 0; i < foodOrders.length; i++) {
-                foodOrders[i].status = 1;//待支付
-                foodOrders[i].trade_no = trade_no;
-                foodOrders[i].paymentMethod = '微信';
-                await foodOrders[i].save();
+            for (var i = 0; i < orders.length; i++) {
+                orders[i].status = 1;//待支付
+                orders[i].trade_no = trade_no;
+                orders[i].paymentMethod = '微信';
+                await orders[i].save();
             }
 
             new_params.trade_no = trade_no;
@@ -380,16 +380,16 @@ module.exports = {
                 await table.save();
 
                 //order状态改成2-已支付
-                var foodOrders = await Orders.findAll({
+                var orders = await Orders.findAll({
                     where: {
                         TableId : tableId,
                         $or: [{status : 0}, {status : 1}] ,
                     }
                 });
 
-                for (var i=0;i<foodOrders.length;i++) {
-                    foodOrders[i].status = 2;
-                    await foodOrders[i].save();
+                for (var i=0;i<orders.length;i++) {
+                    orders[i].status = 2;
+                    await orders[i].save();
                 }
 
                 paymentReqs[0].isFinish = true;
@@ -541,13 +541,13 @@ module.exports = {
                 }
 
                 //满300加会员
-                foodOrders = await Orders.findAll({
+                orders = await Orders.findAll({
                     where: {
                         trade_no : xml.out_trade_no,
                     }
                 });
-                var phone = foodOrders[0].phone;
-                var tenantId = foodOrders[0].tenantId;
+                var phone = orders[0].phone;
+                var tenantId = orders[0].tenantId;
                 if (xml.total_fee >= 30000) {
                     var vips = await Vips.findAll({
                         where:{
