@@ -350,7 +350,9 @@ function * TenantConfigsSeed() {
         isRealTime: true,
         vipFee: 50,
         vipRemindFee:25,
-        image:''
+        image:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        startTime:'9:00',
+        endTime:'18:30'
     });
 
     yield db.models.TenantConfigs.create({
@@ -360,7 +362,9 @@ function * TenantConfigsSeed() {
         isRealTime: true,
         vipFee: 50,
         vipRemindFee:25,
-        image:''
+        image:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        startTime:'9:00',
+        endTime:'18:30'
     });
 }
 

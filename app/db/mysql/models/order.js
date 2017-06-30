@@ -15,7 +15,7 @@ module.exports = function (sequelize, DataTypes) {
             type: Sequelize.STRING
         },//支付方式，支付宝，微信
         own_trade_no: shortDataTypes.String(),//商家自己的订单号,
-        consignee: shortDataTypes.String(2048, true),
+        consigneeId: shortDataTypes.Int(0),
         unit: shortDataTypes.String(),
         tenantId: {
             type: Sequelize.STRING

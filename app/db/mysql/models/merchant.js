@@ -19,8 +19,6 @@ module.exports = function (sequelize, DataTypes) {
         // wecharPayee_account: shortDataTypes.String(100,false),
         // //支付宝账号
         // payee_account: shortDataTypes.String(100,false),
-        //地址
-        address: shortDataTypes.String(255, true),
         tenantId: shortDataTypes.String(100, false),
         // //是否实时
         // isRealTime:shortDataTypes.Bool(),

@@ -217,7 +217,7 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, resultArray)
     },
-    async saveUserReting (ctx, next) {
+    async saveUserRating (ctx, next) {
         ctx.checkBody('userName').notEmpty();
         ctx.checkBody('text').notEmpty();
         ctx.checkBody('avatar').notEmpty();

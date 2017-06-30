@@ -1,12 +1,11 @@
-/**
- * Created by bian on 12/3/15.
- */
-
-let table = require('../../controller/customer/table');
+const table = require('../../controller/customer/table');
 
 const router = new (require('koa-router'))()
 
-//查看桌状态的
-router.get('/api/v3/user/table/:id',table.getUserTableById);
+//查看点餐桌状态的
+router.get('/api/v3/customer/deal/table', table.getUserDealTable);
+
+//查看代售桌状态的
+router.get('/api/v3/customer/eshop/table', table.getUserEshopTable);
 
 module.exports = router

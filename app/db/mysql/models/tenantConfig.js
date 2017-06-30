@@ -22,6 +22,10 @@ module.exports = function (sequelize, DataTypes) {
         vipRemindFee: shortDataTypes.Double(100000),
         //主页图
         image: shortDataTypes.String(),
+        //营业起始时间
+        startTime: shortDataTypes.String(),
+        //营业结束时间
+        endTime: shortDataTypes.String(),
     }, {
         associate: function (models) {
         },

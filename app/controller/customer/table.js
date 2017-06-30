@@ -1,41 +1,92 @@
 const db = require('../../db/mysql/index');
 const Tables = db.models.Tables;
-const ShoppingCart = db.models.ShoppingCarts;
+const ShoppingCarts = db.models.ShoppingCarts;
+const Orders = db.models.Orders;
 const ApiResult = require('../../db/mongo/ApiResult')
 
 module.exports = {
-    async getUserTableById (ctx, next) {
-        ctx.checkParams('id').notEmpty().isInt();
+    async getUserDealTable (ctx, next) {
+        ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('tableName').notEmpty();
 
         if (ctx.errors) {
-            ctx.body = ctx.errors;
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
 
-        let table = await Tables.findAll({
+        let table = await Tables.findOne({
             where: {
-                id: ctx.params.id
+                name: ctx.query.tableName,
+                tenantId: ctx.query.tenantId
             }
         })
-        if (table.length > 0) {
-            if (table[0].status == 1) {
-                let shoppingCart = await ShoppingCart.findById(ctx.params.id);
+        if (table != null) {
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                tableStatus:table.status
+            })
+        } else {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "桌号不存在!")
+        }
+    },
 
-                if (shoppingCart == null) {
-                    table.status = 0;
-                    await table[0].save();
-                    ctx.body = {
-                        tableStatus: 0
+    async getUserEshopTable (ctx, next) {
+        ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('tableName').notEmpty();
+        ctx.checkQuery('consigneeId').notEmpty();
+        ctx.checkQuery('phoneNumber').notEmpty();
+
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
+        let table = await Tables.findOne({
+            where: {
+                name: ctx.query.tableName,
+                tenantId: ctx.query.tenantId,
+                consigneeId:ctx.query.consigneeId
+            }
+        })
+        if (table == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "桌号不存在!")
+            return;
+        } else {
+            //判断是否购物车状态
+            let shoppingCarts = await ShoppingCarts.findAll({
+                where: {
+                    phone: ctx.query.phoneNumber,
+                    tenantId: ctx.query.tenantId,
+                    TableId: table.id
+                }
+            });
+
+            if (shoppingCarts.length > 0) {
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                    tableStatus:1
+                });
+                return;
+            } else {
+                //判断是否订单状态
+                let orders = await Orders.findAll({
+                    where: {
+                        phone: ctx.query.phoneNumber,
+                        tenantId: ctx.query.tenantId,
+                        TableId: table.id,
+                        $or:[{status:0},{status:1}]
                     }
-                    return;
+                });
+                //下单状态
+                if (orders.length > 0) {
+                    ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                        tableStatus:2
+                    });
+                } else {
+                    //空桌
+                    ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                        tableStatus:0
+                    });
                 }
             }
-
-            ctx.body = {
-                tableStatus: table[0].status
-            }
-        } else {
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result, "桌号不存在")
         }
     },
 

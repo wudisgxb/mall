@@ -9,9 +9,11 @@ module.exports = function (sequelize, DataTypes) {
         tableUser:shortDataTypes.String(),
         tableUserNumber: shortDataTypes.Int(),
         unit:shortDataTypes.String(),
+        phone:shortDataTypes.Phone(true),
         tenantId : {
             type: Sequelize.STRING
         },
+        consigneeId: shortDataTypes.Int(0),
         remark : {
             type: Sequelize.STRING
         }
