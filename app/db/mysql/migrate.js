@@ -360,27 +360,25 @@ function * Merchantseed() {
 
 function * TenantConfigsSeed() {
     yield db.models.TenantConfigs.create({
-        name: '雪花冰',
         tenantId: tenantId1,
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
         vipFee: 50,
         vipRemindFee:25,
-        homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        image:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
         startTime:'9:00',
         endTime:'18:30'
     });
 
     yield db.models.TenantConfigs.create({
-        name: '辣尚瘾',
         tenantId: tenantId2,
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
         vipFee: 50,
         vipRemindFee:25,
-        homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        image:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
         startTime:'9:00',
         endTime:'18:30'
     });
