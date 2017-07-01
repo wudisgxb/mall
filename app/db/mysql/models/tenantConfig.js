@@ -6,6 +6,8 @@ module.exports = function (sequelize, DataTypes) {
 
     var TenantConfigs = sequelize.define('TenantConfigs', {
         tenantId: shortDataTypes.String(),
+        //主商户名称
+        name: shortDataTypes.String(),
         //微信账号
         wecharPayee_account: {
             type: Sequelize.STRING,
@@ -21,7 +23,7 @@ module.exports = function (sequelize, DataTypes) {
         //快满多少提示会员
         vipRemindFee: shortDataTypes.Double(100000),
         //主页图
-        image: shortDataTypes.String(),
+        homeImage: shortDataTypes.String(),
         //营业起始时间
         startTime: shortDataTypes.String(),
         //营业结束时间

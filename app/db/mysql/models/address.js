@@ -13,6 +13,8 @@ module.exports = function (sequelize, DataTypes) {
         area: shortDataTypes.String(),
         //详细地址
         address: shortDataTypes.String(),
+        tenantId: shortDataTypes.String(255,true),
+        consigneeId: shortDataTypes.String(255,true),
     }, {
         associate: function (models) {
         },

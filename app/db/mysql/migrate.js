@@ -9,6 +9,9 @@ var tool = require('../../Tool/tool');
 var tenantId1 = '68d473e77f459833bb06c60f9a8f4809';
 var tenantId2 = '2cc4642a61354e4ed585390efce007f1';
 
+var consigneeId1 = '68d473e77f459833bb06c60f9a8f4800';
+var consigneeId2 = '2cc4642a61354e4ed585390efce007f0';
+
 function *addSuperAdminer() {
     yield db.models.Adminer.create({
         nickname: 'sss',
@@ -192,21 +195,32 @@ function * AddressSeed() {
         province: '江苏省',
         city: '南京市',
         area: '建邺区',
-        address: '金润国际广场2楼雪花冰'
+        address: '金润国际广场2楼雪花冰',
+        tenantId:tenantId1
     });
 
     yield db.models.Address.create({
         province: '江苏省',
         city: '南京市',
         area: '建邺区',
-        address: '金润国际广场-2楼辣尚瘾'
+        address: '金润国际广场-2楼辣尚瘾',
+        tenantId:tenantId2
     });
 
     yield db.models.Address.create({
         province: '江苏省',
         city: '南京市',
         area: '建邺区',
-        address: '金润国际广场-2楼麻辣盛宴'
+        address: '金润国际广场-2楼辣尚瘾',
+        tenantId:consigneeId1
+    });
+
+    yield db.models.Address.create({
+        province: '江苏省',
+        city: '南京市',
+        area: '建邺区',
+        address: '金润国际广场-2楼麻辣盛宴',
+        tenantId:consigneeId2
     });
 }
 
@@ -218,7 +232,7 @@ function * TablesSeed() {
             status: 0,
             info: "双人桌",
             tenantId: tenantId1,
-            ConsigneeId: 1
+            consigneeId: 1
         });
     }
 
@@ -228,7 +242,7 @@ function * TablesSeed() {
             status: 0,
             info: "双人桌",
             tenantId: tenantId1,
-            ConsigneeId: 2
+            consigneeId: 2
         });
     }
 
@@ -238,7 +252,7 @@ function * TablesSeed() {
             status: 0,
             info: "双人桌",
             tenantId: tenantId2,
-            ConsigneeId: 1
+            consigneeId: 1
         });
     }
     for (i = 0; i < 5; i++) {
@@ -247,7 +261,7 @@ function * TablesSeed() {
             status: 0,
             info: "双人桌",
             tenantId: tenantId2,
-            ConsigneeId: 2
+            consigneeId: 2
         });
     }
     yield db.models.Tables.create({
@@ -265,7 +279,8 @@ function * Consigneeseed() {
         phone: '13585130223',
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
-        address: "双龙大道"
+        address: "双龙大道",
+        consigneeId:consigneeId1
         // payee_real_name: '官绪斌',
         // remark:'测试单笔转账-非代售',
         //isRealTime:true,
@@ -277,7 +292,8 @@ function * Consigneeseed() {
         phone: '13585130223',
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
-        address: "双龙大道"
+        address: "双龙大道",
+        consigneeId:consigneeId2
         // payee_real_name: '官绪斌',
         // remark:'测试单笔转账-非代售',
         //isRealTime:true,
@@ -306,7 +322,7 @@ function * Merchantseed() {
         rate: 0.2,
         ownRate: 0.1,
         excludeFoodId: JSON.stringify(arr),
-        ConsigneeId: 1,
+        consigneeId: consigneeId1,
     });
 
     yield db.models.ProfitSharings.create({
@@ -315,7 +331,7 @@ function * Merchantseed() {
         consigneeRemark: '雪花冰-代售分润',
         rate: 0.2,
         ownRate: 0.1,
-        ConsigneeId: 2,
+        consigneeId: consigneeId2,
     });
 
     yield db.models.Merchants.create({
@@ -338,31 +354,33 @@ function * Merchantseed() {
         rate: 0.2,
         ownRate: 0.1,
         excludeFoodId: JSON.stringify(arr),
-        ConsigneeId: 2,
+        consigneeId: consigneeId2,
     });
 }
 
 function * TenantConfigsSeed() {
     yield db.models.TenantConfigs.create({
+        name: '雪花冰',
         tenantId: tenantId1,
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
         vipFee: 50,
         vipRemindFee:25,
-        image:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
         startTime:'9:00',
         endTime:'18:30'
     });
 
     yield db.models.TenantConfigs.create({
+        name: '辣尚瘾',
         tenantId: tenantId2,
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
         vipFee: 50,
         vipRemindFee:25,
-        image:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
         startTime:'9:00',
         endTime:'18:30'
     });

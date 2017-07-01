@@ -24,8 +24,6 @@ module.exports = function (sequelize, DataTypes) {
         // isRealTime:shortDataTypes.Bool(),
     }, {
         associate: function (models) {
-            models.Address.hasOne(models.Merchants);
-            models.Merchants.belongsTo(models.Address);
         },
         instanceMethods: {},
         classMethods: {}

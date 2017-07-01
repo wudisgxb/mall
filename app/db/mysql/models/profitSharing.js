@@ -7,6 +7,7 @@ module.exports = function (sequelize, DataTypes) {
 
     let ProfitSharings = sequelize.define('ProfitSharings', {
         tenantId: shortDataTypes.String(100, false),
+        consigneeId: shortDataTypes.String(100, false),
         //主商户支付备注
         merchantRemark: shortDataTypes.String(100, false),
         //代售商户支付备注
@@ -22,8 +23,8 @@ module.exports = function (sequelize, DataTypes) {
 
     }, {
         associate: function (models) {
-            models.Consignees.hasMany(models.ProfitSharings);
-            models.ProfitSharings.belongsTo(models.Consignees);
+            // models.Consignees.hasMany(models.ProfitSharings);
+            // models.ProfitSharings.belongsTo(models.Consignees);
         }
     });
 

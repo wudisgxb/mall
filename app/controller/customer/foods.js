@@ -36,7 +36,7 @@ module.exports = {
         let profitSharings = await ProfitSharings.findAll({
             where: {
                 tenantId: tenantId,
-                ConsigneeId: consigneeId
+                consigneeId: consigneeId
             }
         });
         console.log("profitSharings===========" + profitSharings.length);

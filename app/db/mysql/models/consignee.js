@@ -18,8 +18,7 @@ module.exports = function (sequelize, DataTypes) {
         payee_account: {
             type: Sequelize.STRING,
         },
-        //地址
-        address: shortDataTypes.String(),
+        consigneeId: shortDataTypes.String(100, false),
     }, {
         associate: function (models) {
         },

@@ -10,11 +10,12 @@ module.exports = function (sequelize, DataTypes) {
         info: shortDataTypes.String(),
         tenantId: {
             type: Sequelize.STRING
+        },
+        consigneeId: {
+            type: Sequelize.STRING
         }
     }, {
         associate: function (models) {
-            models.Consignees.hasMany(models.Tables);
-            models.Tables.belongsTo(models.Consignees);
         },
         instanceMethods: {},
         classMethods: {},
