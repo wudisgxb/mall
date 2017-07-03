@@ -19,7 +19,7 @@ const  infoPushManager = (function(){
             .setAudience(JPush.alias(tenantId))
             .send(function (err, res) {
                 if (err) {
-                    console.log(err.message)
+                    console.log("消息推送失败：" + err.message)
                 } else {
                     // console.log("pushInfo: " + content);
                     // console.log('Sendno: ' + res.sendno);

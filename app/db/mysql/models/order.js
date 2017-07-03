@@ -9,13 +9,13 @@ module.exports = function (sequelize, DataTypes) {
         status: shortDataTypes.Int(),
         info: shortDataTypes.String(),
         phone: shortDataTypes.Phone(),
-        diners_num: shortDataTypes.Int(),
+        diners_num: shortDataTypes.Int(1),
         trade_no: shortDataTypes.String(),//支付宝或微信订单号
         paymentMethod: {
             type: Sequelize.STRING
         },//支付方式，支付宝，微信
-        own_trade_no: shortDataTypes.String(),//商家自己的订单号,
-        consigneeId: shortDataTypes.Int(0),
+        //own_trade_no: shortDataTypes.String(),//商家自己的订单号,
+        consigneeId: shortDataTypes.String(255,true),
         unit: shortDataTypes.String(),
         tenantId: {
             type: Sequelize.STRING

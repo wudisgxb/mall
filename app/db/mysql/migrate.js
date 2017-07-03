@@ -6,11 +6,11 @@ var tool = require('../../Tool/tool');
 
 // var tenantId1 = tool.allocTenantId();
 // var tenantId2 = tool.allocTenantId();
-var tenantId1 = '68d473e77f459833bb06c60f9a8f4809';
-var tenantId2 = '2cc4642a61354e4ed585390efce007f1';
+var tenantId1 = 'tenantId1';
+var tenantId2 = 'tenantId2';
 
-var consigneeId1 = '68d473e77f459833bb06c60f9a8f4800';
-var consigneeId2 = '2cc4642a61354e4ed585390efce007f0';
+var consigneeId1 = 'consigneeId1';
+var consigneeId2 = 'consigneeId2';
 
 function *addSuperAdminer() {
     yield db.models.Adminer.create({

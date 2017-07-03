@@ -129,6 +129,7 @@ module.exports = {
                 where: {
                     TableId: table.id,
                     tenantId: body.tenantId,
+                    consigneeId: null
                 },
                 attributes: ["tableUserNumber"],
             });
@@ -146,6 +147,7 @@ module.exports = {
                 where: {
                     tableUser: body.tableUser,
                     tenantId: body.tenantId,
+                    consigneeId: null
                 },
                 attributes: ["tableUserNumber"],
             });
@@ -181,6 +183,7 @@ module.exports = {
                 tableUser: body.tableUser,
                 tableUserNumber: tableUserNumber,
                 tenantId: body.tenantId,
+                consigneeId: null
             }));
         }
 
@@ -206,8 +209,8 @@ module.exports = {
         ctx.checkBody('/condition/tenantId', true).first().notEmpty();
         ctx.checkBody('/condition/tableName', true).first().notEmpty();
         ctx.checkBody('/condition/tableUser', true).first().notEmpty();
-        ctx.checkBody('/foods/foodId', true).first().notEmpty();
-        ctx.checkBody('/foods/foodCount', true).first().notEmpty().isFloat().ge(0).toFloat();
+        ctx.checkBody('/food/foodId', true).first().notEmpty();
+        ctx.checkBody('/food/foodCount', true).first().notEmpty().isFloat().ge(0).toFloat();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -219,8 +222,8 @@ module.exports = {
         //获取tableId
         let table = await Tables.findOne({
             where: {
-                tenantId: body.tenantId,
-                name: body.tableName,
+                tenantId: body.condition.tenantId,
+                name: body.condition.tableName,
                 consigneeId: null
             }
         })
@@ -230,14 +233,13 @@ module.exports = {
             return;
         }
 
-        const foods = body.foods;
-
         let shoppingCarts = await ShoppingCarts.findAll({
             where: {
                 tableUser: body.condition.tableUser,
                 TableId : table.id,
-                FoodId: body.foods.foodId,
-                tenantId:body.condition.tenantId
+                FoodId: body.food.foodId,
+                tenantId:body.condition.tenantId,
+                consigneeId: null
             }
         });
 
@@ -246,8 +248,8 @@ module.exports = {
             return;
         }
 
-        if (body.foods.foodCount > 0) {
-            shoppingCarts[0].num = body.foods.foodCount;
+        if (body.food.foodCount > 0) {
+            shoppingCarts[0].num = body.food.foodCount;
             await shoppingCarts[0].save();
         } else {
             await shoppingCarts[0].destroy();
@@ -422,8 +424,8 @@ module.exports = {
         ctx.checkBody('/condition/tableName', true).first().notEmpty();
         ctx.checkBody('/condition/consigneeId', true).first().notEmpty();
         ctx.checkBody('/condition/phoneNumber', true).first().notEmpty();
-        ctx.checkBody('/foods/foodId', true).first().notEmpty();
-        ctx.checkBody('/foods/foodCount', true).first().notEmpty().isFloat().ge(0).toFloat();
+        ctx.checkBody('/food/foodId', true).first().notEmpty();
+        ctx.checkBody('/food/foodCount', true).first().notEmpty().isFloat().ge(0).toFloat();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -446,15 +448,13 @@ module.exports = {
             return;
         }
 
-        const foods = body.foods;
-
 
         let shoppingCarts = await ShoppingCarts.findAll({
             where: {
                 consigneeId: body.condition.consigneeId,
                 phone:body.condition.phoneNumber,
                 TableId : table.id,
-                FoodId: body.foods.foodId,
+                FoodId: body.food.foodId,
                 tenantId:body.condition.tenantId
             }
         });
@@ -464,8 +464,8 @@ module.exports = {
             return;
         }
 
-        if (body.foods.foodCount > 0) {
-            shoppingCarts[0].num = body.foods.foodCount;
+        if (body.food.foodCount > 0) {
+            shoppingCarts[0].num = body.food.foodCount;
             await shoppingCarts[0].save();
         } else {
             await shoppingCarts[0].destroy();

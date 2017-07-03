@@ -10,7 +10,7 @@ Date.prototype.format = function (fmt) {
         "m+": this.getMinutes(), //分
         "s+": this.getSeconds(), //秒
         "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-        "S": this.getMilliseconds() //毫秒
+        "S": Tool.zeroize(this.getMilliseconds(),3)  //毫秒
     };
     if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
     for (var k in o)
@@ -101,5 +101,16 @@ Tool.jsonIsInArray = function (arr,obj) {
     }
     return false
 }
+
+Tool.zeroize = function (value, length) {
+    if (!length) length = 2;
+
+    value = String(value);
+
+    for (var i = 0, zeros = ''; i < (length - value.length); i++) {
+        zeros += '0';
+    }
+    return zeros + value;
+};
 
 module.exports = Tool;

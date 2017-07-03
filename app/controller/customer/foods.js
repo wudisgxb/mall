@@ -90,6 +90,7 @@ module.exports = {
                 food = await Foods.findAll({
                     where: {
                         id: foodsofmenus[j].FoodId,
+                        tenantId: tenantId,
                         isActive: true,
                     },
                     attributes: {
@@ -155,6 +156,7 @@ module.exports = {
             menus = await Menus.findAll({
                 where: {
                     id: menuId,
+                    tenantId: tenantId,
                 },
                 attributes: [
                     'id',
@@ -172,6 +174,7 @@ module.exports = {
             foodsofmenus = await Foodsofmenus.findAll({
                 where: {
                     MenuId: menus[i].id,
+                    tenantId: tenantId,
                 }
             });
             let food;
@@ -179,6 +182,7 @@ module.exports = {
                 food = await Foods.findAll({
                     where: {
                         id: foodsofmenus[j].FoodId,
+                        tenantId: tenantId,
                         isActive: true,
                     },
                     attributes: {
