@@ -23,8 +23,12 @@ module.exports.Result = {
         resCode: 10000,
         resMsg: '未找到记录!'
     },
+    EXISTED: {
+        resCode: 10001,
+        resMsg: '记录已存在'
+    },
     PARAMS_ERROR: {
-        resCode: PARAMS_ERROR,
-        resMsg: 'PARAMS_ERROR'
+    resCode: PARAMS_ERROR,
+    resMsg: 'PARAMS_ERROR'
     }
 }

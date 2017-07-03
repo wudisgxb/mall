@@ -7,15 +7,15 @@ let Prints = db.models.Prints;
 module.exports = {
 
     async saveAdminPrint (ctx, next) {
-        ctx.checkBody('printName').notEmpty();
-        ctx.checkBody('deviceName').notEmpty();
-        ctx.checkBody('printType').notEmpty();
-        ctx.checkBody('printTime').notEmpty();
-        ctx.checkBody('isNeedCustomSmallTicketHeader').notEmpty();
-        ctx.checkBody('smallTicketNum').notEmpty().isInt().ge(0).toInt();
-        ctx.checkBody('isShowMoney').notEmpty();
-        ctx.checkBody('printModel').notEmpty();
+        ctx.checkBody('deviceName').first().notEmpty();
+        ctx.checkBody('printType').first().notEmpty();
+        ctx.checkBody('printTime').first().notEmpty();
+        ctx.checkBody('isNeedCustomSmallTicketHeader').first().notEmpty();
+        ctx.checkBody('smallTicketNum').first().notEmpty().isInt().ge(0).toInt();
+        ctx.checkBody('isShowMoney').first().notEmpty();
+        ctx.checkBody('printModel').first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('printName').first().notEmpty();
 
         let body = ctx.request.body;
 

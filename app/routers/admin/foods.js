@@ -7,8 +7,7 @@ let foods = require('../../controller/admin/foods');
 
 
 const router = new (require('koa-router'))()
-
-router.post('/api/v3/admin/foods/save',  foods.saveAdminFonds);
-router.put('/api/v3/admin/foods/save/:id',foods.updateAdminFoodsById);
-router.get('/api/v3/admin/foods',foods.getAdminFoods);
+router.post('/api/v3/admin/food',  foods.saveAdminFonds);
+router.put('/api/v3/admin/food',foods.updateAdminFoodsById);
+router.get('/api/v3/admin/food',foods.getAdminFoods);
 module.exports = router
