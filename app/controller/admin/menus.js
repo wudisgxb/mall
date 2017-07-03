@@ -69,6 +69,7 @@ module.exports = {
         ctx.checkQuery('tenantId').notEmpty();
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+            return;
         }
         let menus = await Menus.findAll({
             where: {
