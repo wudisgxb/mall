@@ -5,6 +5,7 @@ let db = require('../../db/mysql/index');
 let Menus = db.models.Menus;
 
 module.exports = {
+    //新增商品类型
     async saveAdminMenus (ctx, next) {
         ctx.checkBody('/menu/name',true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
@@ -35,7 +36,7 @@ module.exports = {
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
-
+    //修改商品类型
     async updateAdminMenusById (ctx, next) {
         ctx.checkBody('/condition/id',true).first().notEmpty();
         ctx.checkBody('/menu/name',true).first().notEmpty();
@@ -59,12 +60,11 @@ module.exports = {
             menus.name = body.menu.name;
             //menus.type = body.type;
             await menus.save();
-            isCreate = false;
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
-
+    //
     async getAdminMenus (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
         if(ctx.errors){

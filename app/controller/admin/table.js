@@ -107,9 +107,6 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table);
     },
 
-
-
-
     async deleteAdminTable(ctx, next){
         ctx.checkParams('id').notEmpty().isInt().toInt();
         let table = await Tables.findById(ctx.params.id);
