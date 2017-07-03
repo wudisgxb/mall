@@ -73,8 +73,8 @@ module.exports = {
     },
 
     async getAdminTableByTableName (ctx, next) {
-        ctx.checkQuery('tenantId', true).notEmpty();
-        ctx.checkQuery('tableName',true).notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('tableName').notEmpty();
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
         }
@@ -90,8 +90,8 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table);
     },
     async getAdminTableByConsigneeId (ctx, next) {
-        ctx.checkQuery('tenantId', true).notEmpty();
-        ctx.checkQuery('tableName',true).notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('ConsigneeId').notEmpty();
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
         }

@@ -28,13 +28,13 @@ module.exports = {
 
     },
     //新增租户信息
-    async saveTenantInfoByTenantId(ctx, next){
+    async saveTenantInfo(ctx, next){
         ctx.checkBody('/tenantConfig/wecharPayee_account',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/payee_account',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/isRealTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/vipFee',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/vipRemindFee',true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/image',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/homeImage',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
@@ -76,7 +76,7 @@ module.exports = {
         ctx.checkBody('/tenantConfig/isRealTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/vipFee',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/vipRemindFee',true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/image',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/homeImage',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
