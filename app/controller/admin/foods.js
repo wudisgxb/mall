@@ -9,7 +9,7 @@ let Foodsofmenus = db.models.FoodsOfTMenus;
 
 module.exports = {
 
-    async saveAdminFonds (ctx, next) {
+    async saveAdminFoods (ctx, next) {
         ctx.checkBody('/food/name',true).first().notEmpty();
         ctx.checkBody('/food/image',true).first().notEmpty();
         ctx.checkBody('/food/icon',true).first().notEmpty();

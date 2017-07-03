@@ -72,9 +72,9 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
-    async getAdminTable (ctx, next) {
-        ctx.checkQuery('tenantId', true).first().notEmpty();
-        ctx.checkQuery('tableName',true).first().notEmpty();
+    async getAdminTableByTableName (ctx, next) {
+        ctx.checkQuery('tenantId', true).notEmpty();
+        ctx.checkQuery('tableName',true).notEmpty();
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
         }
@@ -89,6 +89,24 @@ module.exports = {
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table);
     },
+    async getAdminTableByConsigneeId (ctx, next) {
+        ctx.checkQuery('tenantId', true).notEmpty();
+        ctx.checkQuery('tableName',true).notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+        }
+        let table = await Tables.findAll({
+            where: {
+                tenantId: ctx.query.tenantId,
+                name:ctx.query.tableName
+            },
+            attributes: {
+                exclude: ['createdAt', 'updatedAt']
+            }
+        })
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table);
+    },
+
 
 
 
