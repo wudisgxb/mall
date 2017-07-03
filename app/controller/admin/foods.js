@@ -21,7 +21,7 @@ module.exports = {
         ctx.checkBody('/food/info',true).first().notEmpty();
         ctx.checkBody('/food/isActive',true).first().notEmpty();
         ctx.checkBody('/food/menuId',true).first().notEmpty();
-        ctx.checkBody('tenantId',true).first().notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
         // ctx.checkBody('/condition/id',true).first().notEmpty();
 
         let body = ctx.request.body;
@@ -127,9 +127,10 @@ module.exports = {
     },
 
     async getAdminFoods (ctx, next) {
-        ctx.checkQuery('tenantId', true).first().notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+            return;
         }
         let foods = await Foods.findAll({
             where: {

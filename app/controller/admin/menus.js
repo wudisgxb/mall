@@ -7,7 +7,7 @@ let Menus = db.models.Menus;
 module.exports = {
     async saveAdminMenus (ctx, next) {
         ctx.checkBody('/menu/name',true).first().notEmpty();
-        ctx.checkBody('tenantId',true).notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -66,7 +66,7 @@ module.exports = {
     },
 
     async getAdminMenus (ctx, next) {
-        ctx.checkQuery('tenantId', true).first().notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
         }
