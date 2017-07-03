@@ -150,11 +150,13 @@ function * FoodsSeed() {
     for (i = 0; i < 10; i++) {
         var type1 = menus[i % menus.length];
         //  var type2 = menus[(i + 1) % menus.length];
+        var arr = ['麻辣','超辣','微辣'];
         var foods = yield db.models.Foods.create({
             name: '皮蛋瘦肉粥' + i,
             price: 2,
             oldPrice: 3,
             vipPrice: 1,
+            taste: JSON.stringify(arr),
             unit: '份',
             description: '咸粥',
             sellCount: 100 + i,
@@ -232,7 +234,7 @@ function * TablesSeed() {
             status: 0,
             info: "双人桌",
             tenantId: tenantId1,
-            consigneeId: 1
+            consigneeId: consigneeId1
         });
     }
 
@@ -242,7 +244,7 @@ function * TablesSeed() {
             status: 0,
             info: "双人桌",
             tenantId: tenantId1,
-            consigneeId: 2
+            consigneeId: consigneeId2
         });
     }
 
@@ -252,7 +254,7 @@ function * TablesSeed() {
             status: 0,
             info: "双人桌",
             tenantId: tenantId2,
-            consigneeId: 1
+            consigneeId: consigneeId1
         });
     }
     for (i = 0; i < 5; i++) {
@@ -261,11 +263,11 @@ function * TablesSeed() {
             status: 0,
             info: "双人桌",
             tenantId: tenantId2,
-            consigneeId: 2
+            consigneeId: consigneeId2
         });
     }
     yield db.models.Tables.create({
-        name: 21 + "号桌",
+        name: 1 + "号桌",
         status: 0,
         info: "双人桌",
         tenantId: tenantId1
@@ -361,24 +363,26 @@ function * Merchantseed() {
 function * TenantConfigsSeed() {
     yield db.models.TenantConfigs.create({
         tenantId: tenantId1,
+        name:'雪花冰',
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
         vipFee: 50,
         vipRemindFee:25,
-        image:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
         startTime:'9:00',
         endTime:'18:30'
     });
 
     yield db.models.TenantConfigs.create({
         tenantId: tenantId2,
+        name:'辣尚瘾',
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
         vipFee: 50,
         vipRemindFee:25,
-        image:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
         startTime:'9:00',
         endTime:'18:30'
     });

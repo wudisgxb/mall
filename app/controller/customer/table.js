@@ -2,6 +2,7 @@ const db = require('../../db/mysql/index');
 const Tables = db.models.Tables;
 const ShoppingCarts = db.models.ShoppingCarts;
 const Orders = db.models.Orders;
+const Vips = db.models.Vips;
 const ApiResult = require('../../db/mongo/ApiResult')
 
 module.exports = {
@@ -13,16 +14,30 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
+        
+        //查询vip
+        let vips = await Vips.findAll({
+            where: {
+                phone: ctx.query.phoneNumber,
+                tenantId: ctx.query.tenantId
+            }
+        })
+        let isVip = false;
+        if (vips.length > 0) {
+            isVip = true;
+        }
 
         let table = await Tables.findOne({
             where: {
                 name: ctx.query.tableName,
-                tenantId: ctx.query.tenantId
+                tenantId: ctx.query.tenantId,
+                consigneeId:null
             }
         })
         if (table != null) {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                tableStatus:table.status
+                tableStatus:table.status,
+                isVip : isVip
             })
         } else {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "桌号不存在!")
@@ -51,6 +66,18 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "桌号不存在!")
             return;
         } else {
+            //查询vip
+            let vips = await Vips.findAll({
+                where: {
+                    phone: ctx.query.phoneNumber,
+                    tenantId: ctx.query.tenantId
+                }
+            })
+            let isVip = false;
+            if (vips.length > 0) {
+                isVip = true;
+            }
+
             //判断是否购物车状态
             let shoppingCarts = await ShoppingCarts.findAll({
                 where: {
@@ -62,7 +89,8 @@ module.exports = {
 
             if (shoppingCarts.length > 0) {
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                    tableStatus:1
+                    tableStatus:1,
+                    isVip:isVip
                 });
                 return;
             } else {
@@ -78,12 +106,14 @@ module.exports = {
                 //下单状态
                 if (orders.length > 0) {
                     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                        tableStatus:2
+                        tableStatus:2,
+                        isVip:isVip
                     });
                 } else {
                     //空桌
                     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                        tableStatus:0
+                        tableStatus:0,
+                        isVip:isVip
                     });
                 }
             }

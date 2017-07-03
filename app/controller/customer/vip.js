@@ -12,7 +12,7 @@ module.exports = {
         }
         let vips = await Vips.findAll({
             where: {
-                phone: ctx.query.body.phone,
+                phone: ctx.request.body.phone,
                 tenantId: ctx.query.tenantId
             }
         })

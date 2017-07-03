@@ -6,14 +6,14 @@ module.exports = function (sequelize, DataTypes) {
 
     var ShoppingCarts = sequelize.define('ShoppingCarts', {
         num: shortDataTypes.Double(),
-        tableUser:shortDataTypes.String(),
+        tableUser:shortDataTypes.String(255,true),
         tableUserNumber: shortDataTypes.Int(),
         unit:shortDataTypes.String(),
         phone:shortDataTypes.Phone(true),
         tenantId : {
             type: Sequelize.STRING
         },
-        consigneeId: shortDataTypes.Int(0),
+        consigneeId: shortDataTypes.String(255,true),
         remark : {
             type: Sequelize.STRING
         }
