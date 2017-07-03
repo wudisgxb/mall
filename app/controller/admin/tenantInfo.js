@@ -85,32 +85,28 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let tenantInfo = await TenantConfigs.findAll({
+        let TenantConfig = await TenantConfigs.findOne({
             where: {
                 tenantId: body.condition.tenantId,
             }
         })
-        if(tenantInfo.length <= 0){
+        if(TenantConfig == null){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到租户信息")
             return;
         }
-        let TenantConfig
-        let TenantConfigss = await TenantConfigs.findById(tenantInfo[0].id)
-        if(TenantConfigss!=null){
-            TenantConfigss.wecharPayee_account = body.tenantConfig.wecharPayee_account;
-            TenantConfigss.payee_account = body.tenantConfig.payee_account;
-            TenantConfigss.isRealTime = body.tenantConfig.isRealTime;
-            TenantConfigss.vipFee = body.tenantConfig.vipFee;
-            TenantConfigss.vipRemindFee = body.tenantConfig.vipRemindFee;
-            TenantConfigss.image = body.tenantConfig.image;
-            TenantConfigss.startTime = body.tenantConfig.startTime;
-            TenantConfigss.endTime = body.tenantConfig.endTime;
-            TenantConfigss.tenantId = body.condition.tenantId;
-            await TenantConfigss.save();
-        }
+
+        TenantConfig.wecharPayee_account = body.tenantConfig.wecharPayee_account;
+        TenantConfig.payee_account = body.tenantConfig.payee_account;
+        TenantConfig.isRealTime = body.tenantConfig.isRealTime;
+        TenantConfig.vipFee = body.tenantConfig.vipFee;
+        TenantConfig.vipRemindFee = body.tenantConfig.vipRemindFee;
+        TenantConfig.image = body.tenantConfig.image;
+        TenantConfig.startTime = body.tenantConfig.startTime;
+        TenantConfig.endTime = body.tenantConfig.endTime;
+        TenantConfig.tenantId = body.condition.tenantId;
+        await TenantConfig.save();
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-
-
     }
 
 
