@@ -92,7 +92,6 @@ module.exports = {
         ctx.checkBody('/food/isActive',true).first().notEmpty();
         ctx.checkBody('/food/menuIds',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
-        ctx.checkBody('/condition/taste',true).first().notEmpty();
         ctx.checkBody('/condition/id',true).first().notEmpty();
 
         let body = ctx.request.body;

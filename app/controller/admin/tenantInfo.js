@@ -30,7 +30,7 @@ module.exports = {
     //新增租户信息
     async saveTenantInfo(ctx, next){
         ctx.checkBody('/tenantConfig/name',true).first().notEmpty();
-        ctx.checkBody('/condition/tenantId',true).first().notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('/tenantConfig/wecharPayee_account',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/payee_account',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/isRealTime',true).first().notEmpty();
@@ -47,7 +47,7 @@ module.exports = {
         }
         let tenantInfo = await TenantConfigs.findAll({
             where: {
-                tenantId: body.condition.tenantId
+                tenantId: body.tenantId
             }
         })
         if(tenantInfo.length > 0){
@@ -65,7 +65,7 @@ module.exports = {
             homeImage:body.tenantConfig.homeImage,
             startTime:body.tenantConfig.startTime,
             endTime:body.tenantConfig.endTime,
-            tenantId:body.condition.tenantId,
+            tenantId:body.tenantId,
             name:body.tenantConfig.name
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
