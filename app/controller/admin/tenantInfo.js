@@ -89,29 +89,31 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let tenantInfo = await TenantConfigs.findOne({
+
+        let TenantConfig = await TenantConfigs.findOne({
             where: {
                 tenantId: body.condition.tenantId,
             }
         })
-        if(tenantInfo == null){
+
+        if(TenantConfig == null){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到租户信息")
             return;
         }
-        tenantInfo.name = body.tenantConfig.name;
-        tenantInfo.wecharPayee_account = body.tenantConfig.wecharPayee_account;
-        tenantInfo.payee_account = body.tenantConfig.payee_account;
-        tenantInfo.isRealTime = body.tenantConfig.isRealTime;
-        tenantInfo.vipFee = body.tenantConfig.vipFee;
-        tenantInfo.vipRemindFee = body.tenantConfig.vipRemindFee;
-        tenantInfo.homeImage = body.tenantConfig.homeImage;
-        tenantInfo.startTime = body.tenantConfig.startTime;
-        tenantInfo.endTime = body.tenantConfig.endTime;
-        tenantInfo.tenantId = body.condition.tenantId;
-        await tenantInfo.save();
-       
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
+        TenantConfig.wecharPayee_account = body.tenantConfig.wecharPayee_account;
+        TenantConfig.payee_account = body.tenantConfig.payee_account;
+        TenantConfig.isRealTime = body.tenantConfig.isRealTime;
+        TenantConfig.vipFee = body.tenantConfig.vipFee;
+        TenantConfig.vipRemindFee = body.tenantConfig.vipRemindFee;
+        TenantConfig.homeImage = body.tenantConfig.homeImage;
+        TenantConfig.startTime = body.tenantConfig.startTime;
+        TenantConfig.endTime = body.tenantConfig.endTime;
+        TenantConfig.name = body.tenantConfig.name;
+        TenantConfig.tenantId = body.condition.tenantId;
+        await TenantConfig.save();
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
 
 

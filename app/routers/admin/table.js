@@ -6,6 +6,6 @@ const router = new (require('koa-router'))()
 
 router.post('/api/v3/admin/table/save',  table.saveAdminTable);
 router.put('/api/v3/admin/table/save/:id',  table.updateAdminTableById);
-// router.get('/api/v3/admin/table',table.getAdminTable);
+router.get('/api/v3/admin/table',table.getAdminTableByTableName);
 router.delete('/api/v3/admin/table/delete/:id',table.deleteAdminTable);
 module.exports = router
