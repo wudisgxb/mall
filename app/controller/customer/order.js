@@ -2,6 +2,7 @@ const db = require('../../db/mysql/index');
 const sequelizex = require('../../lib/sequelizex.js');
 const Orders = db.models.Orders;
 const Foods = db.models.Foods;
+const Consignees = db.models.Consignees;
 const Tables = db.models.Tables;
 const ShoppingCarts = db.models.ShoppingCarts;
 const Vips = db.models.Vips;
@@ -299,9 +300,15 @@ module.exports = {
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
+        let consignee = await Consignees.findOne({
+            where: {
+                consigneeId: body.consigneeId,
+            }
+        });
+
         //下单成功发送推送消息
         let date = new Date().format("hh:mm");
-        let content = table.name + '已下单成功，请及时处理！ ' + date;
+        let content = '代售商：' + consignee.name + ' '+ "桌名：" + table.name + ' 手机号' + body.phoneNumber + '已下单成功，请及时处理！ ' + date;
         infoPushManager.infoPush(content, body.tenantId);
 
         //通知管理台修改桌态
@@ -360,6 +367,17 @@ module.exports = {
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+
+        let consignee = await Consignees.findOne({
+            where: {
+                consigneeId: body.consigneeId,
+            }
+        });
+
+        //修改订单发送推送消息
+        let date = new Date().format("hh:mm");
+        let content = '代售商：' + consignee.name + ' '+ "桌名：" + table.name + ' 手机号' + body.phoneNumber + '修改订单成功，请及时处理！ ' + date;
+        infoPushManager.infoPush(content, body.tenantId);
     },
 
     async deleteUserEshopOrder (ctx, next) {

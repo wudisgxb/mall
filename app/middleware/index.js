@@ -5,6 +5,7 @@ const convert = require('koa-convert')
 const json = require('koa-json')
 const koaBody = require('koa-body')
 const cors = require('koa-cors')
+
 const static = require('koa-static')
 const jwt = require('koa-jwt')
 
@@ -16,53 +17,54 @@ const timeCost = require('./timeCost')
 const path = require('path')
 const ApiError = require('../db/mongo/ApiError')
 
-module.exports = function(app) {
-  app.use(async(ctx, next) => {
-    try {
-      await next()
-    } catch (err) {
-      if (err.status === 401) {
-        ctx.status = 401
-        ctx.body = 'Protected resource, use Authorization header to get access; Format is "Authorization: Bearer <token>"\n'
-      } else {
-        ctx.status = err.status || 500
-        if (err instanceof ApiError) {
-          ctx.body = err
-        } else {
-          ctx.body = 'Server Internal Error!'
+module.exports = function (app) {
+    app.use(async(ctx, next) => {
+        try {
+            await next()
+        } catch (err) {
+            if (err.status === 401) {
+                ctx.status = 401
+                ctx.body = 'Protected resource, use Authorization header to get access; Format is "Authorization: Bearer <token>"\n'
+            } else {
+                ctx.status = err.status || 500
+                if (err instanceof ApiError) {
+                    ctx.body = err
+                } else {
+                    ctx.body = 'Server Internal Error!'
+                }
+                ctx.app.emit('error', err, ctx)
+            }
         }
-        ctx.app.emit('error', err, ctx)
-      }
-    }
-  })
+    })
 
-  app.use(log4js.koaLogger(log4js.getLogger('http'), { level: 'auto' }))
+    app.use(log4js.koaLogger(log4js.getLogger('http'), {level: 'auto'}))
 
-  app.use(koaBody({
-    multipart: true,
-    formidable: {
-      uploadDir: path.join(__dirname, '..', 'public/images')
-    }
-  }))
+    app.use(koaBody({
+        multipart: true,
+        formidable: {
+            uploadDir: path.join(__dirname, '..', 'public')
+        }
+    }))
 
-  require('koa-validate')(app);
-  
-  app.use(convert(cors()))
-  app.use(convert(json()))
+    require('koa-validate')(app);
 
-  app.use(jwt({ secret: require('../config/config').jwtSecret }).unless(function() {
-    // 匹配需要验证token的路径
-    return !(/needAuth/i.test(this.originalUrl))
-  }))
+    app.use(convert(cors()))
+    app.use(convert(json()))
 
-  app.use(timeCost())
+    app.use(jwt({secret: require('../config/config').jwtSecret}).unless(function () {
+        // 匹配需要验证token的路径
+        return !(/needAuth/i.test(this.originalUrl))
+    }))
 
-  app.use(static(path.join(__dirname, '..', 'public/images')))
+    app.use(timeCost())
 
-  // errorHandler
-  app.on('error', function(err, ctx) {
-    logger.error('server error', err, ctx)
-  })
+    app.use(convert(static(path.join(__dirname,'../public')
+    )))
+
+    // errorHandler
+    app.on('error', function (err, ctx) {
+        logger.error('server error', err, ctx)
+    })
 
 
 }
