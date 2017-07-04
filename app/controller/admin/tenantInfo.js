@@ -28,16 +28,18 @@ module.exports = {
 
     },
     //新增租户信息
-    async saveTenantInfoByTenantId(ctx, next){
+    async saveTenantInfo(ctx, next){
+        ctx.checkBody('/tenantConfig/name',true).first().notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('/tenantConfig/wecharPayee_account',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/payee_account',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/isRealTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/vipFee',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/vipRemindFee',true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/image',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/homeImage',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
-        ctx.checkBody('/condition/tenantId',true).first().notEmpty();
+
         let body = ctx.request.body;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -45,13 +47,14 @@ module.exports = {
         }
         let tenantInfo = await TenantConfigs.findAll({
             where: {
-                tenantId: body.condition.tenantId,
+                tenantId: body.tenantId
             }
         })
         if(tenantInfo.length > 0){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到租户信息")
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "已有租户信息");
             return;
         }
+
         let TenantConfig
         TenantConfig = await TenantConfigs.create({
             wecharPayee_account:body.tenantConfig.wecharPayee_account,
@@ -59,13 +62,13 @@ module.exports = {
             isRealTime:body.tenantConfig.isRealTime,
             vipFee:body.tenantConfig.vipFee,
             vipRemindFee:body.tenantConfig.vipRemindFee,
-            image:body.tenantConfig.image,
+            homeImage:body.tenantConfig.homeImage,
             startTime:body.tenantConfig.startTime,
             endTime:body.tenantConfig.endTime,
-            tenantId:body.condition.tenantId,
+            tenantId:body.tenantId,
+            name:body.tenantConfig.name
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-
 
     },
 
@@ -76,8 +79,9 @@ module.exports = {
         ctx.checkBody('/tenantConfig/isRealTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/vipFee',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/vipRemindFee',true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/image',true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/homeImage',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty()
+        ctx.checkBody('/tenantConfig/name',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
         let body = ctx.request.body;
@@ -85,11 +89,13 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
+
         let TenantConfig = await TenantConfigs.findOne({
             where: {
                 tenantId: body.condition.tenantId,
             }
         })
+
         if(TenantConfig == null){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到租户信息")
             return;
@@ -100,9 +106,10 @@ module.exports = {
         TenantConfig.isRealTime = body.tenantConfig.isRealTime;
         TenantConfig.vipFee = body.tenantConfig.vipFee;
         TenantConfig.vipRemindFee = body.tenantConfig.vipRemindFee;
-        TenantConfig.image = body.tenantConfig.image;
+        TenantConfig.homeImage = body.tenantConfig.homeImage;
         TenantConfig.startTime = body.tenantConfig.startTime;
         TenantConfig.endTime = body.tenantConfig.endTime;
+        TenantConfig.name = body.tenantConfig.name;
         TenantConfig.tenantId = body.condition.tenantId;
         await TenantConfig.save();
 

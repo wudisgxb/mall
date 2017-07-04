@@ -19,8 +19,11 @@ module.exports = {
         ctx.checkBody('/food/sellCount',true).first().notEmpty().isInt().ge(0).toInt();
         ctx.checkBody('/food/rating',true).first().notEmpty().isInt().ge(0).toInt();
         ctx.checkBody('/food/info',true).first().notEmpty();
+        ctx.checkBody('/food/unit',true).first().notEmpty();
         ctx.checkBody('/food/isActive',true).first().notEmpty();
-        ctx.checkBody('/food/menuId',true).first().notEmpty();
+
+
+        ctx.checkBody('/food/menuIds',true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         // ctx.checkBody('/condition/id',true).first().notEmpty();
 
@@ -58,6 +61,7 @@ module.exports = {
                 rating: body.food.rating,
                 info: body.food.info,
                 unit: body.food.unit,
+                taste: JSON.stringify(body.food.taste),
                 isActive: body.food.isActive,
                 tenantId: body.tenantId
 
@@ -101,7 +105,9 @@ module.exports = {
         }
         let createMenuTask = [];
         let foods;/food/
-        foods = await Foods.findById(body.condition.id);
+        foods = await Foods.findById(
+            body.condition.id
+        );
         if (foods != null) {
             foods.name = body.food.name;
             foods.image = body.food.image;
@@ -112,6 +118,7 @@ module.exports = {
             foods.sellCount = body.food.sellCount;
             foods.rating = body.food.rating;
             foods.info = body.food.info;
+            foods.state=JSON.stringify(body.food.state);
             foods.unit = body.food.unit;
             foods.isActive = body.food.isActive;
 
@@ -125,7 +132,7 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
-
+//获取租户下所有商品
     async getAdminFoods (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
         if(ctx.errors){
@@ -172,6 +179,7 @@ module.exports = {
             foodsJson[i].oldPrice = foods[i].oldPrice;
             foodsJson[i].vipPrice = foods[i].vipPrice;
             foodsJson[i].isActive = foods[i].isActive;
+            foodsJson[i].taste=JSON.parse(foods[i].taste);
             foodsJson[i].name = foods[i].name;
             foodsJson[i].menuName = menuName[0].name;
             foodsJson[i].unit = foods[i].unit;
