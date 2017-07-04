@@ -312,7 +312,8 @@ module.exports = {
     async updateUserEshopOrder (ctx, next) {
         ctx.checkBody('/condition/tenantId', true).first().notEmpty();
         ctx.checkBody('/condition/consigneeId', true).first().notEmpty();
-        ctx.checkBody('/condition/tradeNo', true).first().notEmpty();
+        ctx.checkBody('/condition/tableName', true).first().notEmpty();
+        ctx.checkBody('/condition/phoneNumber', true).first().notEmpty();
         ctx.checkBody('/food/foodId', true).first().notEmpty();
         ctx.checkBody('/food/foodCount', true).first().notEmpty();
 
@@ -322,10 +323,25 @@ module.exports = {
         }
         const body = ctx.request.body;
 
+        //获取tableId
+        let table = await Tables.findOne({
+            where: {
+                tenantId: body.condition.tenantId,
+                name: body.condition.tableName,
+                consigneeId: body.condition.consigneeId
+            }
+        })
+
+        if (table == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
+            return;
+        }
+
         let orders = await Orders.findAll({
             where: {
                 consigneeId: body.condition.consigneeId,
-                trade_no: body.condition.tradeNo,
+                TableId: table.id,
+                phone: body.condition.phoneNumber,
                 FoodId: body.food.foodId,
                 tenantId: body.condition.tenantId
             }
@@ -348,18 +364,34 @@ module.exports = {
 
     async deleteUserEshopOrder (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
-        ctx.checkQuery('tradeNo').notEmpty();
+        ctx.checkQuery('phoneNumber').notEmpty();
         ctx.checkQuery('consigneeId').notEmpty();
+        ctx.checkQuery('tableName').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
 
+        //获取tableId
+        let table = await Tables.findOne({
+            where: {
+                tenantId: ctx.query.tenantId,
+                name: ctx.query.tableName,
+                consigneeId: ctx.query.consigneeId
+            }
+        })
+
+        if (table == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
+            return;
+        }
+
         let orders = await Orders.findAll({
             where: {
                 consigneeId: ctx.query.consigneeId,
-                trade_no: ctx.query.tradeNo,
+                TableId: table.id,
+                phone: ctx.query.phoneNumber,
                 tenantId: ctx.query.tenantId
             }
         });

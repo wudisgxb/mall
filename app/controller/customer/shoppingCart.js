@@ -164,8 +164,6 @@ module.exports = {
 
         let foods = body.foods;
 
-        let createShoppingCartTask = [];
-
         for (var i = 0; i < foods.length; i++) {
 
             var foodUnits = await Foods.findAll({
@@ -174,20 +172,34 @@ module.exports = {
                     tenantId: body.tenantId
                 }
             });
-            createShoppingCartTask.push(ShoppingCarts.create({
-                num: foods[i].foodCount,
-                unit: foodUnits[0].unit,
-                FoodId: foods[i].foodId,
-                remark: foods[i].foodRemark,
-                TableId: table.id,
-                tableUser: body.tableUser,
-                tableUserNumber: tableUserNumber,
-                tenantId: body.tenantId,
-                consigneeId: null
-            }));
-        }
 
-        await createShoppingCartTask;
+            var shoppingCart = await ShoppingCarts.findOne({
+                where:{
+                    FoodId: foods[i].foodId,
+                    tenantId: body.tenantId,
+                    tableUser: body.tableUser,
+                    TableId: table.id
+                }
+            })
+
+            if (shoppingCart != null) {
+                shoppingCart.num = shoppingCart.num + foods[i].foodCount;
+                await shoppingCart.save();
+            } else {
+                await ShoppingCarts.create({
+                    num: foods[i].foodCount,
+                    unit: foodUnits[0].unit,
+                    FoodId: foods[i].foodId,
+                    remark: foods[i].foodRemark,
+                    TableId: table.id,
+                    tableUser: body.tableUser,
+                    tableUserNumber: tableUserNumber,
+                    tenantId: body.tenantId,
+                    consigneeId: null
+                });
+            }
+
+        }
 
         //修改桌号状态
         //let table = await Tables.findById(id);
@@ -380,8 +392,6 @@ module.exports = {
 
         let foods = body.foods;
 
-        let createShoppingCartTask = [];
-
         for (var i = 0; i < foods.length; i++) {
             var foodUnits = await Foods.findAll({
                 where: {
@@ -389,19 +399,33 @@ module.exports = {
                     tenantId: body.tenantId
                 }
             });
-            createShoppingCartTask.push(ShoppingCarts.create({
-                num: foods[i].foodCount,
-                unit: foodUnits[0].unit,
-                FoodId: foods[i].foodId,
-                remark: foods[i].foodRemark,
-                TableId: table.id,
-                consigneeId: body.consigneeId,
-                phone: body.phoneNumber,
-                tenantId: body.tenantId,
-            }));
+
+            var shoppingCart = await ShoppingCarts.findOne({
+                where:{
+                    FoodId: foods[i].foodId,
+                    tenantId: body.tenantId,
+                    phone: body.phoneNumber,
+                    TableId: table.id
+                }
+            })
+
+            if (shoppingCart != null) {
+                shoppingCart.num = shoppingCart.num + foods[i].foodCount;
+                await shoppingCart.save();
+            } else {
+                await ShoppingCarts.create({
+                    num: foods[i].foodCount,
+                    unit: foodUnits[0].unit,
+                    FoodId: foods[i].foodId,
+                    remark: foods[i].foodRemark,
+                    TableId: table.id,
+                    consigneeId: body.consigneeId,
+                    phone: body.phoneNumber,
+                    tenantId: body.tenantId,
+                });
+            }
         }
 
-        await createShoppingCartTask;
 
         //修改桌号状态
         //let table = await Tables.findById(id);
