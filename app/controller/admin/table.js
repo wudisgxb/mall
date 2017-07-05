@@ -10,14 +10,12 @@ module.exports = {
     //获取租户下桌状态
     async getAdminTableByTableName (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
-        ctx.checkQuery('tableName').notEmpty();
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
         }
         let table = await Tables.findAll({
             where: {
                 tenantId: ctx.query.tenantId,
-                name:ctx.query.tableName,
                 consigneeId:null
             },
             attributes: {
@@ -25,7 +23,7 @@ module.exports = {
             }
         })
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table.status);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table);
     },
     //获取租户下 代售点下桌状态
     async getAdminTableByConsigneeId (ctx, next) {

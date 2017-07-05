@@ -23,7 +23,7 @@ module.exports = {
         ctx.checkBody('/food/isActive',true).first().notEmpty();
 
 
-        ctx.checkBody('/food/menuIds',true).first().notEmpty();
+        ctx.checkBody('/food/menuId',true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         // ctx.checkBody('/condition/id',true).first().notEmpty();
 
@@ -90,7 +90,7 @@ module.exports = {
         ctx.checkBody('/food/rating',true).first().notEmpty().isInt().ge(0).toInt();
         ctx.checkBody('/food/info',true).first().notEmpty();
         ctx.checkBody('/food/isActive',true).first().notEmpty();
-        ctx.checkBody('/food/menuIds',true).first().notEmpty();
+        ctx.checkBody('/food/menuId',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
         ctx.checkBody('/condition/id',true).first().notEmpty();
 
@@ -98,7 +98,7 @@ module.exports = {
         // if (!(body.menuIds instanceof Array)) {
         //     body.menuIds = [body.menuIds];
         // }
-        body.menuIds = body.menuIds;
+        //body.menuIds = body.menuIds;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
             return;
@@ -109,6 +109,7 @@ module.exports = {
             body.condition.id
         );
         if (foods != null) {
+            foods.id = body.condition.id;
             foods.name = body.food.name;
             foods.image = body.food.image;
             foods.icon = body.food.icon;
@@ -121,14 +122,21 @@ module.exports = {
             foods.state=JSON.stringify(body.food.state);
             foods.unit = body.food.unit;
             foods.isActive = body.food.isActive;
+            foods.tenantId = body.condition.tenantId;
 
             await foods.save();
-            await Foodsofmenus.destroy({
+            let foodsofmenus;
+            foodsofmenus =  await Foodsofmenus.findOne({
                 where: {
-                    FoodId: foods.id
+                    FoodId: foods.id,
+                    tenantId:body.tenantId
                 },
-                force: true
+
             });
+            foodsofmenus.FoodId=foods.id;
+            foodsofmenus.MenuId = body.food.menuId;
+            foodsofmenus.tenantId = body.tenantId;
+            await foodsofmenus.save();
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
@@ -180,6 +188,7 @@ module.exports = {
             foodsJson[i].vipPrice = foods[i].vipPrice;
             foodsJson[i].isActive = foods[i].isActive;
             foodsJson[i].taste=JSON.parse(foods[i].taste);
+            foodsJson[i].info=foods[i].info;
             foodsJson[i].name = foods[i].name;
             foodsJson[i].menuName = menuName[0].name;
             foodsJson[i].unit = foods[i].unit;

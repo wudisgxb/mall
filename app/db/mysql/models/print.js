@@ -24,7 +24,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         smallTicketNum: shortDataTypes.Int(),
         isShowMoney: shortDataTypes.Bool(),
-        printModel: {
+        connectMode: {
             type: Sequelize.STRING
         },
         tenantId: {

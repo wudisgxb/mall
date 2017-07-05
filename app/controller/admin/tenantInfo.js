@@ -8,7 +8,6 @@ module.exports = {
 
     async getTenantInfoByTenantId (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
-        ctx.checkQuery('tableName').notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -17,14 +16,13 @@ module.exports = {
         var tenantInfo = await TenantConfigs.findOne({
             where: {
                 tenantId: ctx.query.tenantId,
-                name:ctx.query.tableName
             }
         })
 
         if (tenantInfo != null) {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS,tenantInfo);
         } else {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'有该租户的基本信息！');
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'没有该租户的基本信息！');
         }
         
 
