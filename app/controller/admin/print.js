@@ -13,14 +13,14 @@ module.exports = {
         ctx.checkBody('/printerSetting/isNeedCustomSmallTicketHeader',true).first().notEmpty();
         ctx.checkBody('/printerSetting/smallTicketNum',true).first().notEmpty();
         ctx.checkBody('/printerSetting/isShowMoney',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/printModel',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/connectMode',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
         ctx.checkBody('/condition/printName',true).first().notEmpty();
 
         let body = ctx.request.body;
 
-        if (ctx.errors) {
-            ctx.body = ctx.errors;
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
             return;
         }
         let prints = await Prints.findAll({
@@ -29,7 +29,7 @@ module.exports = {
                 tenantId: body.condition.tenantId
             }
         })
-        if (prints.length > 0) {
+        if (prints!=null) {
             ctx.body =  new ApiResult(ApiResult.Result.EXISTED,"打印机名已存在" );
             return;
         }
@@ -43,47 +43,63 @@ module.exports = {
             customSmallTicketHeader: body.printerSetting.customSmallTicketHeader || "",
             smallTicketNum: body.printerSetting.smallTicketNum,
             isShowMoney: body.printerSetting.isShowMoney,
-            printModel: body.printerSetting.printModel,
+            connectMode: body.printerSetting.connectMode,
             tenantId: body.condition.tenantId,
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     async updateAdminPrintById (ctx, next) {
-        ctx.checkBody('printName').notEmpty();
-        ctx.checkBody('deviceName').notEmpty();
-        ctx.checkBody('printType').notEmpty();
-        ctx.checkBody('printTime').notEmpty();
-        ctx.checkBody('isNeedCustomSmallTicketHeader').notEmpty();
-        ctx.checkBody('smallTicketNum').notEmpty().isInt().ge(0).toInt();
-        ctx.checkBody('isShowMoney').notEmpty();
-        ctx.checkBody('printModel').notEmpty();
-        ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('/printerSetting/deviceName',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/printType',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/printTime',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/isNeedCustomSmallTicketHeader',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/smallTicketNum',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/isShowMoney',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/connectMode',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/printName',true).first().notEmpty();
 
+        ctx.checkBody('/condition/tenantId',true).first().notEmpty();
+        ctx.checkBody('/condition/id',true).first().notEmpty();
         let body = ctx.request.body;
 
-        if (ctx.errors) {
-            ctx.body = ctx.errors;
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
             return;
         }
-        let print = await Prints.findById(ctx.params.id);
+        let print = await Prints.findOne({
+            where:{
+                id:body.condition.id,
+                tenantId:body.condition.tenantId
+            }
+        });
         if (print != null) {
-            print.printName = body.printName;
-            print.deviceName = body.deviceName;
-            print.printType = body.printType;
-            print.printTime = body.printTime;
-            print.isNeedCustomSmallTicketHeader = body.isNeedCustomSmallTicketHeader;
-            print.customSmallTicketHeader = body.customSmallTicketHeader || "",
-                print.smallTicketNum = body.smallTicketNum;
-            print.isShowMoney = body.isShowMoney;
-            print.printModel = body.printModel;
-            print.tenantId = body.tenantId;
+            print.printName = body.printerSetting.printName;
+            print.deviceName = body.printerSetting.deviceName;
+            print.printType = body.printerSetting.printType;
+            print.printTime = body.printerSetting.printTime;
+            print.isNeedCustomSmallTicketHeader = body.printerSetting.isNeedCustomSmallTicketHeader;
+            print.customSmallTicketHeader = body.printerSetting.customSmallTicketHeader || "",
+                print.smallTicketNum = body.printerSetting.smallTicketNum;
+            print.isShowMoney = body.printerSetting.isShowMoney;
+            print.connectMode = body.printerSetting.connectMode;
+            print.tenantId = body.condition.tenantId;
 
             await print.save();
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     async getAdminPrint (ctx, next) {
-        let keys = ['id', 'printName', 'deviceName', 'printType', 'printTime', 'isNeedCustomSmallTicketHeader', 'customSmallTicketHeader', 'smallTicketNum', 'isShowMoney', 'printModel', 'tenantId'];
+        ctx.checkQuery('deviceName').notEmpty();
+        ctx.checkQuery('connectMode').notEmpty();
+        ctx.checkQuery('printTime').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+            return;
+        }
+        let deviceName = ctx.query.deviceName;
+        let connectMode = ctx.query.connectMode;
+        let printTime = ctx.query.printTime;
+        let keys = ['id', 'printName', 'deviceName', 'printType', 'printTime', 'isNeedCustomSmallTicketHeader', 'customSmallTicketHeader', 'smallTicketNum', 'isShowMoney', 'connectMode', 'tenantId'];
         const condition = await keys.reduce((accu, curr) => {
             if (ctx.query[curr]) {
                 accu[curr] = ctx.query[curr]
@@ -97,6 +113,14 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, prints);
     },
     async deleteAdminPrint(ctx, next){
+        ctx.checkQuery('id').notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+            return;
+        }
+        let id = ctx.query.id;
+        let tenantId = ctx.query.tenantId;
         let keys = ['id', 'printName', 'deviceName', 'printType', 'printTime', 'isNeedCustomSmallTicketHeader', 'customSmallTicketHeader', 'smallTicketNum', 'isShowMoney', 'printModel', 'tenantId'];
         const condition = await keys.reduce((accu, curr) => {
             if (ctx.query[curr]) {
