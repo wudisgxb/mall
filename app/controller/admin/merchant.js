@@ -111,7 +111,7 @@ module.exports = {
     },
 
     async deleteAdminMerchant(ctx, next){
-        ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkParam('tenantId').notEmpty();
 
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );

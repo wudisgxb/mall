@@ -11,8 +11,11 @@ router.get('/api/v3/admin/eshop/table',table.getAdminTableByConsigneeId);
 router.post('/api/v3/admin/deal/table',  table.saveAdminTableByTableName);
 //新增租户下 代售点下桌号(即代售 桌号)
 router.post('/api/v3/admin/eshop/table',  table.saveAdminTableByConsigneeId);
+//编辑租户下桌状态
+router.put('/api/v3/admin/deal/table',  table.updateAdminTableByTableName);
+//编辑租户下 代售点下桌号(即代售 桌号)
+router.put('/api/v3/admin/eshop/table',  table.updateAdminTableByConsigneeId);
 
-
-router.put('/api/v3/admin/table/save/:id',  table.updateAdminTableById);
-router.delete('/api/v3/admin/table/delete/:id',table.deleteAdminTable);
+router.delete('/api/v3/admin/deal/table',table.deleteAdminTable);
+router.delete('/api/v3/admin/eshop/table',table.deleteAdminByConsigneeId);
 module.exports = router

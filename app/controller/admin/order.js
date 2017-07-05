@@ -179,6 +179,7 @@ module.exports = {
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
+
     async modifyTableStatus (tableId, tableStatus) {
         let table = await Tables.findById(tableId);
         table.status = tableStatus;
@@ -202,6 +203,7 @@ module.exports = {
         }
         return Promise.resolve(null);
     },
+
     async updateAdminOrderByEditId (ctx, next) {
         ctx.checkParams('id').notEmpty().isInt().toInt();
         ctx.checkBody('FoodId').notEmpty();
@@ -245,6 +247,7 @@ module.exports = {
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
+    
     async deleteAdminOrderTableId (ctx, next) {
         ctx.checkParams('tableId');
 

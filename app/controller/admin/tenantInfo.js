@@ -8,6 +8,7 @@ module.exports = {
 
     async getTenantInfoByTenantId (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('tableName').notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -16,6 +17,7 @@ module.exports = {
         var tenantInfo = await TenantConfigs.findOne({
             where: {
                 tenantId: ctx.query.tenantId,
+                name:ctx.query.tableName
             }
         })
 

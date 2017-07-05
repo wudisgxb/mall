@@ -48,6 +48,7 @@ function * adminerSeed() {
 }
 
 
+
 function * addressSeed() {
     var users = yield db.models.User.findAll({});
     var defaults = {};

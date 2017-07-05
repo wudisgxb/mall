@@ -5,6 +5,7 @@ var Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
 
     var Prints = sequelize.define('Prints', {
+        
         printName: {
             type: Sequelize.STRING
         },
