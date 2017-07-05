@@ -21,7 +21,7 @@ module.exports = function (sequelize, DataTypes) {
         actual_amount: shortDataTypes.String(),//实收金额
         refund_amount: shortDataTypes.String(),//退款金额
         refund_reason: shortDataTypes.String(),//退款原因
-        consignee: shortDataTypes.String(),//代售商户名
+        consignee: shortDataTypes.String(255,true),//代售商户名
         TransferAccountIsFinish: shortDataTypes.Bool(),//主商户是否转账成功
         consigneeTransferAccountIsFinish: shortDataTypes.Bool(),//代售商户是否转账完成
         tenantId: {
