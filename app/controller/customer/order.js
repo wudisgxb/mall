@@ -85,7 +85,7 @@ module.exports = {
         }
         result.tableName = table.name;
         result.foods = foodJson;
-        result.traneNo = orders[0].trade_no;
+        result.tradeNo = orders[0].trade_no;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         if (orders[0] != null) {
@@ -540,7 +540,7 @@ module.exports = {
         }
         result.tableName = table.name;
         result.foods = foodJson;
-        result.traneNo = orders[0].trade_no;
+        result.tradeNo = orders[0].trade_no;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         if (orders[0] != null) {
