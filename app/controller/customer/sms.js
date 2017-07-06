@@ -17,7 +17,7 @@ module.exports = {
             return;
         }
 
-        let phone = ctx.params.phone; //手机号
+        let phone = ctx.query.phoneNumber; //手机号
         // const re = /^[0-9]+$/;
         // let a =  re.test(phone);
         let randomNum = parseInt(Math.random() * 8999 + 1000);
