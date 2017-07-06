@@ -177,7 +177,8 @@ module.exports = {
                     TableId: table.id,
                     // status:0//未支付
                     $or: [{status: 0}, {status: 1}],
-                    tenantId: ctx.query.tenantId
+                    tenantId: ctx.query.tenantId,
+                    consigneeId: null,
                 }
             })
 
@@ -423,7 +424,9 @@ module.exports = {
                         TableId: tableId,
                         paymentMethod: '支付宝',
                         $or: [{status: 0}, {status: 1}],
-                        consigneeId: consigneeId
+                        tenantId:tenantId,
+                        consigneeId: consigneeId,
+                        trade_no: ret.out_trade_no,
                     }
                 });
 

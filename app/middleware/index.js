@@ -37,6 +37,17 @@ module.exports = function (app) {
         }
     })
 
+    //xml
+    var xmlParser = require('koa-xml-body'); // note the default
+    app.use(xmlParser());
+
+    app.use(async function(ctx,next) {
+        // the parsed body will store in this.request.body
+        // if nothing was parsed, body will be undefined
+        ctx.xmlBody = ctx.request.body;
+        await next();
+    });
+
     app.use(log4js.koaLogger(log4js.getLogger('http'), {level: 'auto'}))
 
     app.use(koaBody({
