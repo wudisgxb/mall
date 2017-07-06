@@ -10,7 +10,7 @@ const ApiResult = require('../../db/mongo/ApiResult');
 const router = new (require('koa-router'))()
 
 //查询订单
-router.get('/api/v3/admin/order/query', order.getAdminOrder);
+router.get('/api/v3/admin/order', order.getAdminOrder);
 
 router.put('/api/v3/admin/order/edit/:id', order.updateAdminOrderByEditId);
 

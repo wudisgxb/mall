@@ -29,54 +29,35 @@ module.exports = {
     async getAdminTableByConsigneeId (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
         // ctx.checkQuery('tableName').notEmpty();
-        ctx.checkQuery('consigneeId').notEmpty();
+        //ctx.checkQuery('consigneeId').notEmpty();
         //ctx.checkQuery('phoneNumber').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-            //判断是否购物车状态
-        let shoppingCart = await ShoppingCarts.findAll({
-            where: {
-                // phone: ctx.query.phoneNumber,
-                tenantId: ctx.query.tenantId,
-                consigneeId:ctx.query.consigneeId
-            }
-        });
-            //判断是否是订单状态
-        let orders = await Orders.findAll({
-            where: {
-                // phone: ctx.query.phoneNumber,
-                tenantId: ctx.query.tenantId,
-                consigneeId:ctx.query.consigneeId
-            }
-        });
+        //根据tenantId查询consigneeId
+        let consignee = [];
+        let json={}
+        let tables=[];
+        let tableId=[]
+        let shoppingCart=[];
+        let shop = [];
+        let order=[];
+        let table = await Tables.findAll({
+            where:{
+                tenantId: ctx.query.tenantId
+            },
 
-        if (shoppingCart.length > 0) {
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                tableStatus:1,
-                tenantId:shoppingCart.tenantId,
-                phone:shoppingCart.phone
-            });
-            return;
-        } else if(orders.length>0){
-            //判断是否订单状态
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                tableStatus:2,
-                tenantId:orders.tenantId,
-                phone:orders.phone
-
-            });
-            return;
-            //下单状态
-        }else {
-            //空桌
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                tableStatus:0
-            });
-            return;
+        })
+        if(table.length<=0){
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有该租户");
         }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table)
+
+
+
+
     },
     //新增租户下桌状态
     async saveAdminTableByTableName (ctx, next) {
