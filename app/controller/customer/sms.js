@@ -10,8 +10,7 @@ let util = require('util');
 
 module.exports = {
     async updateUserSendByPhone (ctx, next) {
-
-        ctx.checkParams('phone').notEmpty().isInt().toInt();
+        ctx.checkQuery('phoneNumber').notEmpty().isInt().toInt();
 
         if (ctx.errors) {
             ctx.body = ctx.errors;
