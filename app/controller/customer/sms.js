@@ -54,19 +54,20 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
     async updateUserConfirmByPhoneOrCode (ctx, next) {
-        ctx.checkParams('phone').notEmpty().isInt().toInt();
-        ctx.checkParams('code').notEmpty().isInt().toInt();
+        ctx.checkBody('phoneNumber').notEmpty();
+        ctx.checkBody('verifyCode').notEmpty().isInt().toInt();
+        ctx.checkBody('tenantId').notEmpty().isInt().toInt();
 
         if (ctx.errors) {
             ctx.body = ctx.errors;
             return;
         }
 
-        let phone = ctx.params.phone; //手机号
-        let code = ctx.params.code; //验证码;
+        let phone = ctx.request.body.phoneNumber; //手机号
+        let code = ctx.request.body.verifyCode; //验证码;
         let ret = await smsVerification.findAll({
             where: {
-                tenantId: ctx.query.tenantId,
+                tenantId: ctx.request.body.tenantId,
                 phone: phone,
                 code: code,
                 date: {
