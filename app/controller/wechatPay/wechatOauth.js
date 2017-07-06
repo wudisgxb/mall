@@ -267,7 +267,7 @@ module.exports = {
                 orders[i].paymentMethod = '微信';
                 await orders[i].save();
             }
-            ctx.body = new_params;
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         } else {
             await PaymentReqs.create({
                 params: JSON.stringify(new_params),
@@ -304,7 +304,7 @@ module.exports = {
                 await orders[i].save();
             }
 
-            ctx.body = new_params;
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
 
     },
@@ -494,7 +494,7 @@ module.exports = {
                 orders[i].paymentMethod = '微信';
                 await orders[i].save();
             }
-            ctx.body = new_params;
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         } else {
             await PaymentReqs.create({
                 params: JSON.stringify(new_params),
@@ -533,7 +533,7 @@ module.exports = {
                 await orders[i].save();
             }
 
-            ctx.body = new_params;
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
 
     },

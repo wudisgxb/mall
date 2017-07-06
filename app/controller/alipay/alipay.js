@@ -145,13 +145,9 @@ module.exports = {
                     await foodOrders[i].save();
                 }
 
-                ctx.body = {
-                    params: new_params
-                }
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
             } else {
-                ctx.body = {
-                    params: paymentReqs[0].params
-                }
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, paymentReqs[0].params)
             }
         } else {
             await PaymentReqs.create({
@@ -189,9 +185,8 @@ module.exports = {
                 await foodOrders[i].save();
             }
 
-            ctx.body = {
-                params: new_params
-            }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
+
         }
 
     },
@@ -313,13 +308,9 @@ module.exports = {
                     await foodOrders[i].save();
                 }
 
-                ctx.body = {
-                    params: new_params
-                }
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
             } else {
-                ctx.body = {
-                    params: paymentReqs[0].params
-                }
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, paymentReqs[0].params)
             }
         } else {
             await PaymentReqs.create({
@@ -359,9 +350,7 @@ module.exports = {
                 await foodOrders[i].save();
             }
 
-            ctx.body = {
-                params: new_params
-            }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
 
     },
