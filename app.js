@@ -1,4 +1,4 @@
-const app = new(require('koa'))()
+const app = new (require('koa'))()
 const port = require('./app/config/config').port
 const logger = require('koa-log4').getLogger('app')
 
@@ -17,5 +17,5 @@ tasks(app)
 
 
 app.listen(port, () => {
-  logger.info(`Listening on port: ${port}`)
+    logger.info(`Listening on port: ${port}`)
 })

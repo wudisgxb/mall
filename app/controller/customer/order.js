@@ -10,7 +10,8 @@ const PaymentReqs = db.models.PaymentReqs;
 const webSocket = require('../../controller/socketManager/socketManager');
 const infoPushManager = require('../../controller/infoPush/infoPush');
 const tool = require('../../Tool/tool');
-const ApiResult = require('../../db/mongo/ApiResult')
+const ApiResult = require('../../db/mongo/ApiResult');
+const Promise = require('Promise');
 
 module.exports = {
     async getUserDealOrder (ctx, next) {
@@ -63,9 +64,9 @@ module.exports = {
         let totalNum = 0;
         let totalPrice = 0;
         let totalVipPrice = 0;
-
+        let food;
         for (let i = 0; i < orders.length; i++) {
-            let food = await Foods.findAll({
+            food = await Foods.findAll({
                 where: {
                     id: orders[i].FoodId,
                     tenantId: ctx.query.tenantId
@@ -308,7 +309,7 @@ module.exports = {
 
         //下单成功发送推送消息
         let date = new Date().format("hh:mm");
-        let content = '代售商：' + consignee.name + ' '+ "桌名：" + table.name + ' 手机号' + body.phoneNumber + '已下单成功，请及时处理！ ' + date;
+        let content = '代售商：' + consignee.name + ' ' + "桌名：" + table.name + ' 手机号' + body.phoneNumber + '已下单成功，请及时处理！ ' + date;
         infoPushManager.infoPush(content, body.tenantId);
 
         //通知管理台修改桌态
@@ -376,7 +377,7 @@ module.exports = {
 
         //修改订单发送推送消息
         let date = new Date().format("hh:mm");
-        let content = '代售商：' + consignee.name + ' '+ "桌名：" + table.name + ' 手机号' + body.phoneNumber + '修改订单成功，请及时处理！ ' + date;
+        let content = '代售商：' + consignee.name + ' ' + "桌名：" + table.name + ' 手机号' + body.phoneNumber + '修改订单成功，请及时处理！ ' + date;
         infoPushManager.infoPush(content, body.tenantId);
     },
 
@@ -481,9 +482,9 @@ module.exports = {
         let totalNum = 0;
         let totalPrice = 0;
         let totalVipPrice = 0;
-
+        let food;
         for (let i = 0; i < orders.length; i++) {
-            let food = await Foods.findAll({
+            food = await Foods.findAll({
                 where: {
                     id: orders[i].FoodId,
                     tenantId: ctx.query.tenantId
@@ -530,4 +531,27 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
+
+    async getOrderPriceByTradeNo(tradeNo, tenantId) {
+        let orders = await Orders.findAll({
+            where: {
+                trade_no: tradeNo,
+                tenantId: tenantId
+            },
+            paranoid: false
+        })
+
+        let totalPrice = 0;
+        let food;
+        for (let i = 0; i < orders.length; i++) {
+            food = await Foods.findOne({
+                where: {
+                    id: orders[i].FoodId,
+                    tenantId: tenantId
+                }
+            })
+            totalPrice += food.price * orders[i].num;//原价
+        }
+        return Promise.resolve(totalPrice);
+    }
 }

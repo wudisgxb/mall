@@ -5,10 +5,8 @@ let alipay = require('../../controller/alipay/alipay');
 const router = new (require('koa-router'))()
 
 
-router.get('/api/v3/customer/deal/alipay/wap', alipay.getUserDealAlipayReq);
+router.post('/api/v3/admin/deal/alipay/refund', alipay.dealAlipayRefund);
 
-router.get('/api/v3/customer/eshop/alipay/wap', alipay.getUserEshopAlipayReq);
-
-router.post('/api/v3/alipay', alipay.alipay);
+router.post('/api/v3/admin/eshop/alipay/refund', alipay.eshopAlipayRefund);
 
 module.exports = router
