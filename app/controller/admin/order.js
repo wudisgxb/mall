@@ -13,6 +13,7 @@ var Tables = db.models.Tables;
 module.exports = {
 
     async getAdminOrder (ctx, next) {
+        ctx.checkQuery('tenantId').notEmpty();
         let result = [];
         let foodJson = [];
         let totalNum = 0;
@@ -77,10 +78,10 @@ module.exports = {
             }
         }
 
-        let tradeNoArray = [];
+        let tradeNoArray = [];//订单号
         for (var i = 0; i < orders.length; i++) {
-            if (!tradeNoArray.contains(orders[i].own_trade_no)) {
-                tradeNoArray.push(orders[i].own_trade_no);
+            if (!tradeNoArray.contains(orders[i].trade_no)) {
+                tradeNoArray.push(orders[i].trade_no);
             }
         }
 
@@ -96,9 +97,6 @@ module.exports = {
                         $between: [startTime, endTime]
                     },
                     own_trade_no: tradeNoArray[i]
-                },
-                attributes: {
-                    exclude: ['updatedAt']
                 }
             })
             for (let j = 0; j < orders.length; j++) {
