@@ -9,7 +9,7 @@ let util = require('util');
 
 
 module.exports = {
-    async pdateUserSendByPhone (ctx, next) {
+    async updateUserSendByPhone (ctx, next) {
 
         ctx.checkParams('phone').notEmpty().isInt().toInt();
 
