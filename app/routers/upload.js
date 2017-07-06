@@ -18,7 +18,7 @@ var newFileName = (filename) => {
     } while (fs.exists(ret));
     return {
         path: ret,
-        url: `upload/${newfilename}`
+        url: `v3/upload/${newfilename}`
     };
 };
 
