@@ -56,7 +56,7 @@ module.exports = {
     async updateUserConfirmByPhoneOrCode (ctx, next) {
         ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('verifyCode').notEmpty().isInt().toInt();
-        ctx.checkBody('tenantId').notEmpty().isInt().toInt();
+        ctx.checkBody('tenantId').notEmpty();
 
         if (ctx.errors) {
             ctx.body = ctx.errors;
