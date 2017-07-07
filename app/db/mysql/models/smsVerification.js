@@ -10,6 +10,9 @@ module.exports = function (sequelize, DataTypes) {
         code: shortDataTypes.Int(),
         tenantId: {
             type: Sequelize.STRING
+        },
+        consigneeId: {
+            type: Sequelize.STRING
         }
     }, {
         associate: function (models) {
