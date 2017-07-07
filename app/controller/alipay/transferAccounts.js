@@ -13,8 +13,8 @@ const  transferAccountsManger = (function() {
             appId: '2017053107387940',
             notify_url: 'http://deal.xiaovbao.cn/alipay',
             return_url: 'http://deal.xiaovbao.cn/alipay-callback',
-            rsaPrivate: path.resolve('./file/pem/sandbox_iobox_private.pem'),
-            rsaPublic: path.resolve('./file/pem/sandbox_ali_public.pem'),
+            rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
+            rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
             sandbox: false,
             signType: 'RSA2'
         });
