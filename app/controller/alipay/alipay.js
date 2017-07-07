@@ -2,7 +2,7 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
-let util = require('util');
+const util = require('../alipay/util');
 let path = require('path');
 let Tool = require('../../Tool/tool');
 const fs = require('fs');
@@ -20,10 +20,20 @@ const transAccountsManager = require('./transferAccounts')
 const webSocket = require('../socketManager/socketManager');
 const orderManager = require('../customer/order');
 
-const ali = new Alipay({
+const aliDeal = new Alipay({
     appId: '2017053107387940',
     notify_url: 'http://deal.xiaovbao.cn/api/v3/alipay',
-    return_url: 'http://deal.xiaovbao.cn/alipay-callback',
+    return_url: 'http://dealclient.xiaovbao.cn/alipay-callback',
+    rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
+    rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
+    sandbox: false,
+    signType: 'RSA2'
+});
+
+const aliEshop = new Alipay({
+    appId: '2017053107387940',
+    notify_url: 'http://deal.xiaovbao.cn/api/v3/alipay',
+    return_url: 'http://dealclient.xiaovbao.cn/alipay-callback',
     rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
     sandbox: false,
@@ -74,7 +84,7 @@ module.exports = {
 
         let merchant = tenantConfigs.name;
 
-        let new_params = ali.webPay({
+        let new_params = aliDeal.webPay({
             subject: merchant + '-' + tableName + '账单',
             body: '消费',
             outTradeId: ctx.query.tradeNo,
@@ -236,7 +246,7 @@ module.exports = {
 
         let merchant = tenantConfigs.name;
 
-        let new_params = ali.webPay({
+        let new_params = aliEshop.webPay({
             subject: merchant + '-' + tableName + '账单',
             body: '消费',
             outTradeId: ctx.query.tradeNo,
@@ -563,6 +573,11 @@ module.exports = {
         ctx.checkBody('refundReason').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
 
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
         let outRequestId = Date.now().toString();//时间戳当唯一标识
         let body = ctx.request.body;
 
@@ -584,7 +599,7 @@ module.exports = {
             return;
         }
 
-        let result = await ali.refund({
+        let result = await aliDeal.refund({
             outTradeId: body.tradeNo,
             refundAmount: body.refundAmount,
             refundReason: body.refundReason,
@@ -624,6 +639,11 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
 
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
         let outRequestId = Date.now().toString();//时间戳当唯一标识
         let body = ctx.request.body;
 
@@ -645,7 +665,7 @@ module.exports = {
             return;
         }
 
-        let result = await ali.refund({
+        let result = await aliEshop.refund({
             outTradeId: body.tradeNo,
             refundAmount: body.refundAmount,
             refundReason: body.refundReason,

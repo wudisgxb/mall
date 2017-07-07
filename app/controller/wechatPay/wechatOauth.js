@@ -90,9 +90,11 @@ module.exports = {
         ctx.checkQuery('code').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('tableName').notEmpty();
-        ctx.checkQuery('tradeNo').notEmpty();
-
-        let trade_no = ctx.query.tradeNo;
+        //ctx.checkQuery('tradeNo').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
 
         //获取tableId
         const table = await Tables.findOne({
@@ -111,7 +113,7 @@ module.exports = {
         let total_amount = 0;
         let orders = await Orders.findAll({
             where: {
-                trade_no:trade_no,
+                //trade_no:trade_no,
                 TableId: table.id,
                 $or: [{status : 0}, {status : 1}] ,
                 tenantId: ctx.query.tenantId,
@@ -123,6 +125,8 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '订单不存在！请重新下单！')
             return;
         }
+
+        let trade_no = orders[0].trade_no;
 
         let totalPrice = 0;
         let totalVipPrice = 0;
@@ -170,7 +174,7 @@ module.exports = {
         //查找桌名
         let tableName = table.name;
         console.log("tableName:" + tableName);
-        let merchant = tenantConfigs.merchant;
+        let merchant = tenantConfigs.name;
         console.log("merchant:" + merchant);
 
         console.log(`code: ${ctx.query.code}`)
@@ -311,11 +315,15 @@ module.exports = {
         ctx.checkQuery('code').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('tableName').notEmpty();
-        ctx.checkQuery('tradeNo').notEmpty();
+       // ctx.checkQuery('tradeNo').notEmpty();
         ctx.checkQuery('consigneeId').notEmpty();
         ctx.checkQuery('phoneNumber').notEmpty();
 
-        let trade_no = ctx.query.tradeNo;
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
 
         //获取tableId
         const table = await Tables.findOne({
@@ -334,7 +342,7 @@ module.exports = {
         let total_amount = 0;
         let orders = await Orders.findAll({
             where: {
-                trade_no:trade_no,
+                //trade_no:trade_no,
                 TableId: table.id,
                 $or: [{status : 0}, {status : 1}] ,
                 tenantId: ctx.query.tenantId,
@@ -347,6 +355,8 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '订单不存在！请重新下单！')
             return;
         }
+
+        let trade_no = orders[0].trade_no;
 
         let totalPrice = 0;
         let totalVipPrice = 0;
@@ -394,7 +404,7 @@ module.exports = {
         //查找桌名
         let tableName = table.name;
         console.log("tableName:" + tableName);
-        let merchant = tenantConfigs.merchant;
+        let merchant = tenantConfigs.name;
         console.log("merchant:" + merchant);
 
         console.log(`code: ${ctx.query.code}`)
