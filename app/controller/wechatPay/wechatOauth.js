@@ -189,7 +189,7 @@ module.exports = {
             headimgurl: '',
             sex: 1,
             openid: token.data.openid,
-            subscribe_time: '',
+            subscribe_time: new Date(),
             unionid: 'unionidss'
         });
 
@@ -419,7 +419,7 @@ module.exports = {
             headimgurl: '',
             sex: 1,
             openid: token.data.openid,
-            subscribe_time: '',
+            subscribe_time: new Date(),
             unionid: 'unionidss'
         });
 
