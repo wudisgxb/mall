@@ -9,11 +9,12 @@ let util = require('util');
 
 
 module.exports = {
-    async updateUserSendByPhone (ctx, next) {
+    async getDealSmscode (ctx, next) {
         ctx.checkQuery('phoneNumber').notEmpty().isInt().toInt();
+        ctx.checkQuery('tenantId').notEmpty()
 
         if (ctx.errors) {
-            ctx.body = ctx.errors;
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
 
@@ -59,7 +60,7 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
 
         if (ctx.errors) {
-            ctx.body = ctx.errors;
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
 
