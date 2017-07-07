@@ -54,7 +54,7 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
-    async updateUserConfirmByPhoneOrCode (ctx, next) {
+    async dealVerifyCode (ctx, next) {
         ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('verifyCode').notEmpty().isInt().toInt();
         ctx.checkBody('tenantId').notEmpty();

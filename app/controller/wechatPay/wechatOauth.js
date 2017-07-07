@@ -187,7 +187,7 @@ module.exports = {
         await User.create({
             nickname: orders[0].phone,
             headimgurl: '',
-            sex: '男',
+            sex: 1,
             openid: token.data.openid,
             subscribe_time: '',
             unionid: 'unionidss'
@@ -417,7 +417,7 @@ module.exports = {
         await User.create({
             nickname: orders[0].phone,
             headimgurl: '',
-            sex: '男',
+            sex: 1,
             openid: token.data.openid,
             subscribe_time: '',
             unionid: 'unionidss'
