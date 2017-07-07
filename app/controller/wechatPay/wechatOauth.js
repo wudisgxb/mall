@@ -467,7 +467,7 @@ module.exports = {
                 isInvalid : false,
                 tenantId: ctx.query.tenantId,
                 consigneeId: ctx.query.consigneeId,
-                phone:ctx.query.phoneNumber
+                phoneNumber:ctx.query.phoneNumber
             }
         });
 
@@ -490,7 +490,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 consigneeId: ctx.query.consigneeId,
-                phone:ctx.query.phoneNumber,
+                phoneNumber:ctx.query.phoneNumber,
                 TransferAccountIsFinish:false,
                 consigneeTransferAccountIsFinish:false,
                 tenantId:ctx.query.tenantId
@@ -516,7 +516,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 consigneeId: ctx.query.consigneeId,
-                phone:ctx.query.phoneNumber,
+                phoneNumber:ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,
                 consigneeTransferAccountIsFinish: false,
                 tenantId: ctx.query.tenantId
