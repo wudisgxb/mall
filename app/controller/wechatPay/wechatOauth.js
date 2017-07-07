@@ -773,7 +773,7 @@ module.exports = {
                                 }
                             } else {
                                 //找到对应关系
-                                let amount = total_amount * (1-childAlipayConfigs[0].rate-childAlipayConfigs[0].ownRate); //主商户提成
+                                let amount = total_amount * (1-profitsharing.rate-profitsharing.ownRate); //主商户提成
                                 amount = Math.round(amount);
                                 console.log("主商户分润：" + amount);
                                 params = {
