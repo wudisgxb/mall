@@ -573,6 +573,11 @@ module.exports = {
         ctx.checkBody('refundReason').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
 
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
         let outRequestId = Date.now().toString();//时间戳当唯一标识
         let body = ctx.request.body;
 
@@ -633,6 +638,11 @@ module.exports = {
         ctx.checkBody('refundReason').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
+
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
 
         let outRequestId = Date.now().toString();//时间戳当唯一标识
         let body = ctx.request.body;
