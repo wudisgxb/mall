@@ -33,7 +33,7 @@ const aliDeal = new Alipay({
 const aliEshop = new Alipay({
     appId: '2017053107387940',
     notify_url: 'http://deal.xiaovbao.cn/api/v3/alipay',
-    return_url: 'http://dealclient.xiaovbao.cn/alipay-callback',
+    return_url: 'http://eshop.xiaovbao.cn/alipay-callback',
     rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
     sandbox: false,
