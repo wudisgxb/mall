@@ -1,139 +1,74 @@
 /**
  * Created by bian on 12/3/15.
  */
-let debug = require('../../instances/debug');
-let render = require('../../instances/render');
-let db = require('../../models/db/index');
-let auth = require('../../helpers/auth.js');
-let Admins = db.models.Adminer;
-let captchas = require('');
+const ApiError = require('../../db/mongo/ApiError')
+const ApiResult = require('../../db/mongo/ApiResult')
+let db = require('../../db/mysql/index');
+let Tool = require('../../Tool/tool')
+let Captcha = db.models.Captcha
+let Admins = db.models.Adminer
+let Caap = require('ccap')();
+let http = require('http')
 
 
 module.exports = {
 
-    async postAdminLogin(ctx,next){
-        ctx.checkBody("username").notEmpty();
-        ctx.checkBody("password").notEmpty();
-        ctx.checkBody("captcha").notEmpty();
+    async getAdminLoginUser(ctx, next){
+        //if (request.url == '/favicon.ico')return response.end('');
+        let ary = Caap.get();
+        let date = new Date().format("yyyyMMddhhmmssS");
+        let txt = ary[0];
+        let buf = ary[1];
+        let key = date + txt;
+        let buffer = buf.toString('base64');
+        let auth = [];
+        auth.push(key)
+        auth.push(buffer)
+
+        await Captcha.create({
+                key:key,
+                captcha:txt
+        });
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+            "key":key,
+            "number":txt,
+            "buf":buf.toString('base64')
+        });
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,auth)
+    },
+
+    async getadminLong(ctx, next){
+        ctx.checkBody('nickname').notEmpty();
+        ctx.checkBody('password').notEmpty();
+        ctx.checkBody('captcha').notEmpty();
+        ctx.checkBody('key').notEmpty();
+
         let body = ctx.request.body;
-        let captchaname = captchas.name();
-        if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
-            return;
-        }
-
-        let login = await auth.findOne({
-            where:{
-                username:body.username,
-                password:body.password
-            }
-        })
-        if(login==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"用户名密码错误");
-            return;
-        }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
-        // if(login!=null&&captchaname.equals("body.captcha")){
-        //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
-        //     return;
-        // }
-        // if(login!=null&&!captchaname.equals("body.captcha")){
-        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,"验证码错误");
-        //     return;
-        // }
-
-
-
-    },
-
-    async saveAdminregister(ctx,next){
-        ctx.checkBody("username").notEmpty();
-        ctx.checkBody("password").notEmpty();
-        ctx.checkBody("captcha").notEmpty();
-        let body = ctx.request.body;
-        let captchaname = captchas.name();
-        if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
-            return;
-        }
-        //验证码判断，如果是正确的进行下一步，如果是错误的跳出
-        //若果验证码是正确的执行查询语句
-        let login = await auth.findOne({
-            where:{
-                username:body.username,
-                password:body.password
-            }
-        })
-        //判断数据库里面是否有此数据
-        if(login!=null){
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED,"您的用户名已存在" );
-            return;
-        }
-        //如果没有此数据则新增
-        login = await auth.create({
-            username:body.username,
-            password:body.password
-
-        })
-
-
-    },
-
-
-
-
-      async getAdminLogin(ctx,next){
-        this.body = yield render('admin/login');
-    },
-
-
-    // todo: redirect
-    async saveAdminLogin(){
-        var ctx = this;
-        var body = this.request.body;
-        this.checkBody('nickname').notEmpty();
-        this.checkBody('password').notEmpty();
         if (this.errors) {
-            this.body = this.errors;
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
             return;
         }
-        try {
-
-            var c = yield Admins.findOne({
+        let captcha =await Captcha.findOne({
+            where:{
+                key : body.key
+            }
+        })
+        if(captcha==null){
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"验证码超时，请重新获取" );
+        }
+        let c;
+        if(body.captcha==captcha.captcha){
+            c = await Admins.findAll({
                 where: {
                     nickname: body.nickname,
-                    password: body.password,
-                    status: 0
+                    password: body.password
                 }
             });
-
-            var pageSrc;
-            if (c != null && c.status == 0) {
+            if (c.length == null) {
                 ///登陆
-                this.body = {
-                    retCode:0,
-                    result:{
-                        type:c.type,
-                        tenantId:c.tenantId
-                    }
-                };
-            } else {
-                this.body = {
-                    retCode:-1,
-                    result:{
-                    }
-                };
+                ctx.body =  new ApiResult(ApiResult.Result.NOT_FOUND,"用户名密码错误")
             }
-        } catch (err) {
-            this.body = {
-                retCode:-1,
-                result:{
-                }
-            };
         }
-    },
-    async getAdminLogout(){
-        yield auth.logout(this);
-        this.redirect('/admin-login');
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,c)
     }
-};
+}
