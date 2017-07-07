@@ -178,7 +178,7 @@ module.exports = {
         console.log("merchant:" + merchant);
 
         console.log(`code: ${ctx.query.code}`)
-        const token = await client.getAccessToken(ctx.query.code)
+        const token = client.getAccessToken(ctx.query.code)
         const ip = ctx.request.headers['x-real-ip']
 
         console.log(`openid: ${token.data.openid}; ip: ${ip}`)
