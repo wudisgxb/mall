@@ -57,7 +57,7 @@ module.exports = {
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"验证码超时，请重新获取" );
         }
         let c;
-        if(body.captcha==captcha.captcha){
+        if(body.captcha.toLowerCase()==captcha.captcha.toLowerCase()){
             c = await Admins.findAll({
                 where: {
                     nickname: body.nickname,
