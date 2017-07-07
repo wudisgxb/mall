@@ -37,7 +37,7 @@ module.exports = {
         }
 
         let tableId = table.id;
-        let trade_no = ctx.query.trade_no;
+        let trade_no = ctx.query.tradeNo;
         let result = {};
         let orders;
 
@@ -85,6 +85,7 @@ module.exports = {
         }
         result.tableName = table.name;
         result.foods = foodJson;
+        result.tradeNo = orders[0].trade_no;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         if (orders[0] != null) {
@@ -151,15 +152,34 @@ module.exports = {
             }
         })
 
-        //时间戳+4位随机数+tableId生成商家订单号
-        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
+        //取之前的订单号，获取请求参数用一个订单号，手机号也一样
+        let orders = await Orders.findAll({
+            where: {
+                TableId: table.id,
+                tenantId: body.tenantId,
+                $or: [{status: 0}, {status: 1}],
+                consigneeId: null
+            }
+        })
+
+        let trade_no;
+        let phone;
+        if (orders.length > 0) {
+            trade_no = orders[0].trade_no;
+            phone = orders[0].phone;
+        } else {
+            //时间戳+4位随机数+tableId生成商家订单号
+            trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
+            phone = body.phoneNumber;
+        }
+
         let i;
         for (i = 0; i < foodsJson.length; i++) {
             await Orders.create({
                 num: foodsJson[i].num,
                 unit: foodsJson[i].unit,
                 FoodId: foodsJson[i].FoodId,
-                phone: body.phoneNumber,
+                phone: phone,
                 TableId: table.id,
                 info: body.remark,
                 trade_no: trade_no,
@@ -249,8 +269,25 @@ module.exports = {
             }
         })
 
-        //时间戳+4位随机数+tableId生成商家订单号
-        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
+        //取之前的订单号，获取请求参数用一个订单号
+        let orders = await Orders.findAll({
+            where: {
+                TableId: table.id,
+                tenantId: body.tenantId,
+                phone: body.phoneNumber,
+                $or: [{status: 0}, {status: 1}],
+                consigneeId: body.consigneeId
+            }
+        })
+
+        let trade_no;
+        if (orders.length > 0) {
+            trade_no = orders[0].trade_no;
+        } else {
+            //时间戳+4位随机数+tableId生成商家订单号
+            trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
+        }
+
         let i;
         for (i = 0; i < foodsJson.length; i++) {
             await Orders.create({
@@ -453,7 +490,7 @@ module.exports = {
         }
 
         let tableId = table.id;
-        let trade_no = ctx.query.trade_no;
+        let trade_no = ctx.query.tradeNo;
         let result = {};
         let orders;
 
@@ -503,6 +540,7 @@ module.exports = {
         }
         result.tableName = table.name;
         result.foods = foodJson;
+        result.tradeNo = orders[0].trade_no;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         if (orders[0] != null) {

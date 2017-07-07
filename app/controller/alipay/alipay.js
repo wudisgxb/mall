@@ -133,6 +133,9 @@ module.exports = {
                     trade_no: trade_no,
                     app_id: app_id,
                     total_amount: total_amount,
+                    actual_amount: total_amount,
+                    refund_amount: '0',
+                    refund_reason: '',
                     consigneeId: null,
                     TransferAccountIsFinish: false,
                     consigneeTransferAccountIsFinish: false,
@@ -145,13 +148,9 @@ module.exports = {
                     await foodOrders[i].save();
                 }
 
-                ctx.body = {
-                    params: new_params
-                }
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
             } else {
-                ctx.body = {
-                    params: paymentReqs[0].params
-                }
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, paymentReqs[0].params)
             }
         } else {
             await PaymentReqs.create({
@@ -177,7 +176,8 @@ module.exports = {
                     TableId: table.id,
                     // status:0//未支付
                     $or: [{status: 0}, {status: 1}],
-                    tenantId: ctx.query.tenantId
+                    tenantId: ctx.query.tenantId,
+                    consigneeId: null,
                 }
             })
 
@@ -188,9 +188,8 @@ module.exports = {
                 await foodOrders[i].save();
             }
 
-            ctx.body = {
-                params: new_params
-            }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
+
         }
 
     },
@@ -312,13 +311,9 @@ module.exports = {
                     await foodOrders[i].save();
                 }
 
-                ctx.body = {
-                    params: new_params
-                }
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
             } else {
-                ctx.body = {
-                    params: paymentReqs[0].params
-                }
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, paymentReqs[0].params)
             }
         } else {
             await PaymentReqs.create({
@@ -358,9 +353,7 @@ module.exports = {
                 await foodOrders[i].save();
             }
 
-            ctx.body = {
-                params: new_params
-            }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
 
     },
@@ -423,7 +416,9 @@ module.exports = {
                         TableId: tableId,
                         paymentMethod: '支付宝',
                         $or: [{status: 0}, {status: 1}],
-                        consigneeId: consigneeId
+                        tenantId:tenantId,
+                        consigneeId: consigneeId,
+                        trade_no: ret.out_trade_no,
                     }
                 });
 

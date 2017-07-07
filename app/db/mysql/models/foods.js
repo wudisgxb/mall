@@ -30,6 +30,8 @@ module.exports = function (sequelize, DataTypes) {
 
         sellCount: shortDataTypes.Int(),
         rating: shortDataTypes.Int(),
+        
+
         info: shortDataTypes.String(),
         isActive: shortDataTypes.Bool(),
         unit: shortDataTypes.String(),

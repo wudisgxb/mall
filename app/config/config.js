@@ -6,7 +6,7 @@
  */
 const path = require('path')
 module.exports = {
-    port: 8091,
+    port: 8092,
     redis: {
         port: 6379,
         host: '127.0.0.1'

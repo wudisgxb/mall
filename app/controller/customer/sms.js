@@ -9,16 +9,16 @@ let util = require('util');
 
 
 module.exports = {
-    async pdateUserSendByPhone (ctx, next) {
-
-        ctx.checkParams('phone').notEmpty().isInt().toInt();
+    async getDealSmscode (ctx, next) {
+        ctx.checkQuery('phoneNumber').notEmpty().isInt().toInt();
+        ctx.checkQuery('tenantId').notEmpty()
 
         if (ctx.errors) {
-            ctx.body = ctx.errors;
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
 
-        let phone = ctx.params.phone; //手机号
+        let phone = ctx.query.phoneNumber; //手机号
         // const re = /^[0-9]+$/;
         // let a =  re.test(phone);
         let randomNum = parseInt(Math.random() * 8999 + 1000);
@@ -55,19 +55,20 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
     async updateUserConfirmByPhoneOrCode (ctx, next) {
-        ctx.checkParams('phone').notEmpty().isInt().toInt();
-        ctx.checkParams('code').notEmpty().isInt().toInt();
+        ctx.checkBody('phoneNumber').notEmpty();
+        ctx.checkBody('verifyCode').notEmpty().isInt().toInt();
+        ctx.checkBody('tenantId').notEmpty();
 
         if (ctx.errors) {
-            ctx.body = ctx.errors;
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
 
-        let phone = ctx.params.phone; //手机号
-        let code = ctx.params.code; //验证码;
+        let phone = ctx.request.body.phoneNumber; //手机号
+        let code = ctx.request.body.verifyCode; //验证码;
         let ret = await smsVerification.findAll({
             where: {
-                tenantId: ctx.query.tenantId,
+                tenantId: ctx.request.body.tenantId,
                 phone: phone,
                 code: code,
                 date: {

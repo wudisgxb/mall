@@ -1,4 +1,4 @@
-var infoPushManager = require('../../controllers/infoPush/infoPush');
+var infoPushManager = require('../../controller/infoPush/infoPush');
 
 
 var content = '已下单成功，请及时处理！';
