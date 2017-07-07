@@ -44,9 +44,8 @@ module.exports = {
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
-        ctx.body = {
-            url : url
-        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, url)
         console.log(`start: ${new Date()}`)
     },
 
@@ -62,9 +61,7 @@ module.exports = {
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
-        ctx.body = {
-            url : url
-        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, url)
         console.log(`start: ${new Date()}`)
     },
 
