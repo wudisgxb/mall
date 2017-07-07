@@ -174,7 +174,7 @@ module.exports = {
         //查找桌名
         let tableName = table.name;
         console.log("tableName:" + tableName);
-        let merchant = tenantConfigs.merchant;
+        let merchant = tenantConfigs.name;
         console.log("merchant:" + merchant);
 
         console.log(`code: ${ctx.query.code}`)
@@ -404,7 +404,7 @@ module.exports = {
         //查找桌名
         let tableName = table.name;
         console.log("tableName:" + tableName);
-        let merchant = tenantConfigs.merchant;
+        let merchant = tenantConfigs.name;
         console.log("merchant:" + merchant);
 
         console.log(`code: ${ctx.query.code}`)
