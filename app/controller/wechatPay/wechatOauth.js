@@ -77,7 +77,7 @@ module.exports = {
     //   console.log(`userInfo: ${userInfo}`)
     //   ctx.body = userInfo
     // },
-    async getOpenId() {
+    async getOpenId(ctx,next) {
         const token = await client.getAccessToken(ctx.query.code);
 
         ctx.body = {

@@ -37,7 +37,7 @@ module.exports = {
         }
 
         let tableId = table.id;
-        let trade_no = ctx.query.trade_no;
+        let trade_no = ctx.query.tradeNo;
         let result = {};
         let orders;
 
@@ -490,7 +490,7 @@ module.exports = {
         }
 
         let tableId = table.id;
-        let trade_no = ctx.query.trade_no;
+        let trade_no = ctx.query.tradeNo;
         let result = {};
         let orders;
 
