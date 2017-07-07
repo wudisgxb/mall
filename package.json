@@ -41,6 +41,7 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.0",
     "sequelize": "^3.30.4",
+    "util": "^0.10.3",
     "websocket": "^1.0.24"
   },
   "devDependencies": {}
