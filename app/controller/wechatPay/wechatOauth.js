@@ -15,7 +15,7 @@ const Foods = db.models.Foods;
 const User = db.models.User;
 const Vips = db.models.Vips
 const Consignees = db.models.Consignees;
-const Profitsharings = db.models.Profitsharings;
+const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../../controller/infoPush/infoPush');
 const webSocket = require('../../controller/socketManager/socketManager');
 
@@ -743,7 +743,7 @@ module.exports = {
                                 console.log(e);
                             }
                         } else {
-                            let profitsharing = await Profitsharings.findOne({
+                            let profitsharing = await ProfitSharings.findOne({
                                 where: {
                                     tenantId: tenantId,
                                     consigneeId: consigneeId

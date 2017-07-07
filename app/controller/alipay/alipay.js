@@ -14,7 +14,7 @@ const Orders = db.models.Orders;
 const Consignees = db.models.Consignees;
 const AlipayErrors = db.models.AlipayErrors;
 const Vips = db.models.Vips;
-const Profitsharings = db.models.Profitsharings;
+const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../infoPush/infoPush');
 const transAccountsManager = require('./transferAccounts')
 const webSocket = require('../socketManager/socketManager');
@@ -482,7 +482,7 @@ module.exports = {
                                 await paymentReqs[0].save();
                             }
                         } else {
-                            let profitsharing = await Profitsharings.findOne({
+                            let profitsharing = await ProfitSharings.findOne({
                                 where: {
                                     tenantId: tenantId,
                                     consigneeId: consigneeId
