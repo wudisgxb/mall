@@ -15,6 +15,6 @@ const router = new (require('koa-router'))()
 
 router.delete('/api/v3/admin/deal/order',order.deleteAdminOrderTenantId);
 router.delete('/api/v3/admin/eshop/order',order.deleteAdminOrderConsigneeId);
-//router.get('/api/v3/admin/deal/order',order.get);
+router.get('/api/v3/admin/order',order.getAdminOrder);
 
 module.exports = router

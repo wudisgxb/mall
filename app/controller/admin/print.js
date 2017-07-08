@@ -48,6 +48,7 @@ module.exports = {
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+    
     async updateAdminPrintById (ctx, next) {
         ctx.checkBody('/printerSetting/deviceName',true).first().notEmpty();
         ctx.checkBody('/printerSetting/printType',true).first().notEmpty();
@@ -88,6 +89,7 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+    
     async getAdminPrint (ctx, next) {
         ctx.checkQuery('deviceName').notEmpty();
         ctx.checkQuery('connectMode').notEmpty();
@@ -112,6 +114,7 @@ module.exports = {
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, prints);
     },
+    
     async deleteAdminPrint(ctx, next){
         ctx.checkQuery('id').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
