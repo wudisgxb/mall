@@ -419,8 +419,16 @@ function * init() {
     // yield ChildAlipayConfigSeed();
 }
 
+function * update() {
+    yield db.sync({
+        force: false
+    });
+}
+
 co(function *() {
-    yield init();
+    //yield init();
+    yield update();
+
     console.log('finished ...');
     process.exit(0)
 }).catch(function () {
