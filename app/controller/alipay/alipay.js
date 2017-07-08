@@ -14,7 +14,7 @@ const Orders = db.models.Orders;
 const Consignees = db.models.Consignees;
 const AlipayErrors = db.models.AlipayErrors;
 const Vips = db.models.Vips;
-const Profitsharings = db.models.Profitsharings;
+const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../infoPush/infoPush');
 const transAccountsManager = require('./transferAccounts')
 const webSocket = require('../socketManager/socketManager');
@@ -33,7 +33,7 @@ const aliDeal = new Alipay({
 const aliEshop = new Alipay({
     appId: '2017053107387940',
     notify_url: 'http://deal.xiaovbao.cn/api/v3/alipay',
-    return_url: 'http://dealclient.xiaovbao.cn/alipay-callback',
+    return_url: 'http://eshop.xiaovbao.cn/alipay-callback',
     rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
     sandbox: false,
@@ -122,9 +122,12 @@ module.exports = {
             where: {
                 tableId: table.id,
                 paymentMethod: '支付宝',
+                total_amount: total_amount,//订单变了价格会变，加上去限制
                 isFinish: false,
                 isInvalid: false,
-                tenantId: ctx.query.tenantId
+                tenantId: ctx.query.tenantId,
+                consigneeId:null,
+                phoneNumber:null
             }
         });
 
@@ -286,10 +289,12 @@ module.exports = {
             where: {
                 tableId: table.id,
                 paymentMethod: '支付宝',
+                total_amount: total_amount,//订单变了价格会变，加上去限制
                 isFinish: false,
                 isInvalid: false,
                 tenantId: ctx.query.tenantId,
                 consigneeId: ctx.query.consigneeId,
+                phoneNumber:ctx.query.phoneNumber,
             }
         });
 
@@ -482,7 +487,7 @@ module.exports = {
                                 await paymentReqs[0].save();
                             }
                         } else {
-                            let profitsharing = await Profitsharings.findOne({
+                            let profitsharing = await ProfitSharings.findOne({
                                 where: {
                                     tenantId: tenantId,
                                     consigneeId: consigneeId
@@ -506,9 +511,9 @@ module.exports = {
                                     await paymentReqs[0].save();
                                 }
 
-                                let child_amount = total_amount * profitsharing.rate;//代售商户
-                                child_amount = Math.round(child_amount * 100) / 100;
-                                result = await transAccountsManager.transferAccounts(consignee.payee_account, child_amount, null, profitsharing.consigneeRemark, tenantId);
+                                let consignee_amount = total_amount * profitsharing.rate;//代售商户
+                                consignee_amount = Math.round(consignee_amount * 100) / 100;
+                                result = await transAccountsManager.transferAccounts(consignee.payee_account, consignee_amount, null, profitsharing.consigneeRemark, tenantId);
                                 console.log('4444||' + result);
                                 if (result.msg == 'Success') {
                                     paymentReqs[0].consigneeTransferAccountIsFinish = true;

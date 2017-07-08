@@ -6,6 +6,7 @@ const Consignees = db.models.Consignees;
 const Tables = db.models.Tables;
 const ShoppingCarts = db.models.ShoppingCarts;
 const Vips = db.models.Vips;
+const Coupons = db.models.Coupons;
 const PaymentReqs = db.models.PaymentReqs;
 const webSocket = require('../../controller/socketManager/socketManager');
 const infoPushManager = require('../../controller/infoPush/infoPush');
@@ -567,6 +568,7 @@ module.exports = {
                 delete result.totalVipPrice;
             }
         }
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
 

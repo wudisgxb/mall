@@ -15,7 +15,7 @@ const Foods = db.models.Foods;
 const User = db.models.User;
 const Vips = db.models.Vips
 const Consignees = db.models.Consignees;
-const Profitsharings = db.models.Profitsharings;
+const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../../controller/infoPush/infoPush');
 const webSocket = require('../../controller/socketManager/socketManager');
 
@@ -187,9 +187,9 @@ module.exports = {
         await User.create({
             nickname: orders[0].phone,
             headimgurl: '',
-            sex: '男',
+            sex: 1,
             openid: token.data.openid,
-            subscribe_time: '',
+            subscribe_time: new Date(),
             unionid: 'unionidss'
         });
 
@@ -417,9 +417,9 @@ module.exports = {
         await User.create({
             nickname: orders[0].phone,
             headimgurl: '',
-            sex: '男',
+            sex: 1,
             openid: token.data.openid,
-            subscribe_time: '',
+            subscribe_time: new Date(),
             unionid: 'unionidss'
         });
 
@@ -467,7 +467,7 @@ module.exports = {
                 isInvalid : false,
                 tenantId: ctx.query.tenantId,
                 consigneeId: ctx.query.consigneeId,
-                phone:ctx.query.phoneNumber
+                phoneNumber:ctx.query.phoneNumber
             }
         });
 
@@ -490,7 +490,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 consigneeId: ctx.query.consigneeId,
-                phone:ctx.query.phoneNumber,
+                phoneNumber:ctx.query.phoneNumber,
                 TransferAccountIsFinish:false,
                 consigneeTransferAccountIsFinish:false,
                 tenantId:ctx.query.tenantId
@@ -516,7 +516,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 consigneeId: ctx.query.consigneeId,
-                phone:ctx.query.phoneNumber,
+                phoneNumber:ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,
                 consigneeTransferAccountIsFinish: false,
                 tenantId: ctx.query.tenantId
@@ -743,7 +743,7 @@ module.exports = {
                                 console.log(e);
                             }
                         } else {
-                            let profitsharing = await Profitsharings.findOne({
+                            let profitsharing = await ProfitSharings.findOne({
                                 where: {
                                     tenantId: tenantId,
                                     consigneeId: consigneeId
@@ -773,7 +773,7 @@ module.exports = {
                                 }
                             } else {
                                 //找到对应关系
-                                let amount = total_amount * (1-childAlipayConfigs[0].rate-childAlipayConfigs[0].ownRate); //主商户提成
+                                let amount = total_amount * (1-profitsharing.rate-profitsharing.ownRate); //主商户提成
                                 amount = Math.round(amount);
                                 console.log("主商户分润：" + amount);
                                 params = {

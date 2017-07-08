@@ -20,6 +20,8 @@ module.exports = function (sequelize, DataTypes) {
         // //支付宝账号
         // payee_account: shortDataTypes.String(100,false),
         tenantId: shortDataTypes.String(100, false),
+        //是否订单确认
+        isOrderConfirm: shortDataTypes.Bool(),
         // //是否实时
         // isRealTime:shortDataTypes.Bool(),
     }, {
