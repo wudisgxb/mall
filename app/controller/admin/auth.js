@@ -36,6 +36,7 @@ module.exports = {
             "buf":buf.toString('base64')
         });
     },
+    
     async getadminLong(ctx, next){
         ctx.checkBody('userName').notEmpty();
         ctx.checkBody('password').notEmpty();

@@ -41,33 +41,62 @@ module.exports = {
     async updateAdminMenusById (ctx, next) {
         ctx.checkBody('/condition/id',true).first().notEmpty();
         ctx.checkBody('/menu/name',true).first().notEmpty();
+        ctx.checkBody('/menu/sort',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
         let body = ctx.request.body;
-        let menusResult = await Menus.findAll({
-            where: body.condition
+
+        let menusResult = await Menus.findOne({
+            where: {
+                id:body.condition.id,
+                tenantId:body.condition.tenantId
+            }
         });
-        if (menusResult.length <= 0) {
+        if (menusResult == null) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "菜品不存在，请重新定义")
             return;
         }
-        let id = menusResult[0].id
-        let menus;
-        menus = await Menus.findById(id);
-        if (menus != null) {
-            menus.name = body.menu.name;
-            //menus.type = body.type;
-            await menus.save();
-        }
-
+        menusResult.name = body.menu.name;
+        menusResult.sort=body.menu.sort;
+        //menus.type = body.type;
+        await menusResult.save();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     //
     async getAdminMenus (ctx, next) {
-       
+        ctx.checkQuery('tenantId').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+            return;
+        }
+        let menus = await Menus.findAll({
+            where: {
+                tenantId: ctx.query.tenantId
+            },
+            attributes: {
+                exclude: ['createdAt', 'updatedAt', 'deletedAt']
+            },
+            order :["sort"]
+        });
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, menus);
     },
 
+    // async updateAdminMenusBySort (ctx, next) {
+    //     //ctx.checkBody('tenantId').notEmpty();
+    //     ctx.checkBody('id').notEmpty();
+    //     if(ctx.errors){
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+    //         return;
+    //     }
+    //     let body = ctx.request.body;
+    //     let menusid = await Menus.findById(body.id)
+    //     if(body.sort==null){
+    //         body.sort=menusid.sort
+    //     }
+    //     menusid.sort=body.sort;
+    //     await menusid.save();
+    // },
 }
