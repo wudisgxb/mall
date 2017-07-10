@@ -140,11 +140,13 @@ module.exports = {
             return;
         }
         let tenantId = ctx.query.tenantId;
+        //根据tenantId查询查询商户信息
         let profitSharings = await ProfitSharings.findAll({
             where : {
                 tenantId : tenantId
             }
         });
+        //如果没查到显示你所要查询的商户不存在
         if(profitSharings.length<=0){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"你所要查询的商户不存在" );
             return;
@@ -153,7 +155,9 @@ module.exports = {
         let consignee;
         let consignees = [];
         for(let i = 0 ; i <profitSharings.length;i++ ){
+            //找到此商户下下所有代售点Id
             profitSharingId=profitSharings[i].consigneeId;
+
             consignee = await Consignees.findOne({
                 where : {
                     consigneeId:profitSharingId
