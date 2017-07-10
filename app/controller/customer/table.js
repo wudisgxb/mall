@@ -4,6 +4,7 @@ const ShoppingCarts = db.models.ShoppingCarts;
 const Orders = db.models.Orders;
 const Vips = db.models.Vips;
 const ApiResult = require('../../db/mongo/ApiResult')
+const coupon = require('./coupon')
 
 module.exports = {
     async getUserDealTable (ctx, next) {
@@ -78,6 +79,12 @@ module.exports = {
                 isVip = true;
             }
 
+            //查看可用优惠券
+            let isCouponAvailable = false;
+            if (ctx.query.couponKey != null) {
+                isCouponAvailable = await coupon.getCoupon(ctx.query.tenantId,ctx.query.consigneeId,ctx.query.couponKey);
+            }
+
             //判断是否购物车状态
             let shoppingCarts = await ShoppingCarts.findAll({
                 where: {
@@ -90,7 +97,8 @@ module.exports = {
             if (shoppingCarts.length > 0) {
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                     tableStatus:1,
-                    isVip:isVip
+                    isVip:isVip,
+                    isCouponAvailable:isCouponAvailable
                 });
                 return;
             } else {
@@ -107,13 +115,15 @@ module.exports = {
                 if (orders.length > 0) {
                     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                         tableStatus:2,
-                        isVip:isVip
+                        isVip:isVip,
+                        isCouponAvailable:isCouponAvailable
                     });
                 } else {
                     //空桌
                     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                         tableStatus:0,
-                        isVip:isVip
+                        isVip:isVip,
+                        isCouponAvailable:isCouponAvailable
                     });
                 }
             }

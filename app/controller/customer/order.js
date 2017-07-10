@@ -337,6 +337,23 @@ module.exports = {
             paymentReqs[i].save();
         }
 
+        //下单订单号绑定优惠券，支付回调去修改优惠券使用状态
+        if (body.couponKey != null) {
+            let coupon = await Coupons.findOne({
+                where: {
+                    couponKey: body.couponKey,
+                    tenantId: body.tenantId,
+                    phone: body.phoneNumber,
+                    status: 0,
+                }
+            })
+
+            if (coupon != null) {
+                coupon.trade_no = trade_no;
+                await coupon.save();
+            }
+        }
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
         let consignee = await Consignees.findOne({
@@ -550,6 +567,22 @@ module.exports = {
             result.info = orders[0].info;
             result.status = orders[0].status;
             result.diners_num = orders[0].diners_num;
+
+            //通过订单号获取优惠券
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    phone: ctx.query.phoneNumber,
+                    tenantId: ctx.query.tenantId,
+                    consigneeId: ctx.query.consigneeId,
+                    status: 0
+                }
+            })
+
+            if (coupon != null) {
+                result.couponType = coupon.couponType;
+                result.couponvalue = coupon.value;
+            }
             // //判断vip
             // if (orders[0].phone != null) {
             //     let vips = await Vips.findAll({

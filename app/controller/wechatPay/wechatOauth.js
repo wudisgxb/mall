@@ -12,6 +12,7 @@ const PaymentReqs = db.models.PaymentReqs;
 const AlipayErrors = db.models.AlipayErrors;
 const TenantConfigs = db.models.TenantConfigs;
 const Foods = db.models.Foods;
+const Coupons = db.models.Coupons;
 const User = db.models.User;
 const Vips = db.models.Vips
 const Consignees = db.models.Consignees;
@@ -633,6 +634,20 @@ module.exports = {
                 isFinish : false,
                 isInvalid : false
             },null,2));
+
+            //优惠券使用状态修改
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no:  xml.out_trade_no,
+                    status: 0
+                }
+            })
+
+            if (coupon != null) {
+                coupon.status = 1;
+                await coupon.save();
+            }
+
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
                     trade_no : xml.out_trade_no,
