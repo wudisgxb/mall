@@ -3,6 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const TenantConfigs = db.models.TenantConfigs;
+const Merchants = db.models.Merchants;
 
 module.exports = {
 
@@ -13,14 +14,30 @@ module.exports = {
             return;
         }
 
-        var tenantInfo = await TenantConfigs.findOne({
+        let tenantInfo = await TenantConfigs.findOne({
             where: {
                 tenantId: ctx.query.tenantId,
             }
         })
 
+        let result = {};
+
         if (tenantInfo != null) {
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS,tenantInfo);
+            let merchant = await Merchants.findOne({
+                where: {
+                    tenantId: ctx.query.tenantId,
+                }
+            })
+            result.name = tenantInfo.name;
+            result.needVip = tenantInfo.needVip;
+            result.vipFee = tenantInfo.vipFee;
+            result.vipRemindFee = tenantInfo.vipRemindFee;
+            result.homeImage = tenantInfo.homeImage;
+            result.startTime = tenantInfo.startTime;
+            result.endTime = tenantInfo.endTime;
+            result.needOrderConfirmPage = merchant.needOrderConfirmPage;
+
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS,result);
         } else {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'没有该租户的基本信息！');
         }

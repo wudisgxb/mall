@@ -95,23 +95,23 @@ module.exports = {
             result.info = orders[0].info;
             result.status = orders[0].status;
             result.diners_num = orders[0].diners_num;
-            //判断vip
-            if (orders[0].phone != null) {
-                let vips = await Vips.findAll({
-                    where: {
-                        phone: orders[0].phone,
-                        tenantId: ctx.query.tenantId
-                    }
-                })
-                if (vips.length > 0) {
-                    result.discount = Math.round((result.totalPrice - result.totalVipPrice) * 100) / 100;
-                    delete result.totalPrice;
-                } else {
-                    delete result.totalVipPrice;
-                }
-            } else {
-                delete result.totalVipPrice;
-            }
+            // //判断vip
+            // if (orders[0].phone != null) {
+            //     let vips = await Vips.findAll({
+            //         where: {
+            //             phone: orders[0].phone,
+            //             tenantId: ctx.query.tenantId
+            //         }
+            //     })
+            //     if (vips.length > 0) {
+            //         result.discount = Math.round((result.totalPrice - result.totalVipPrice) * 100) / 100;
+            //         delete result.totalPrice;
+            //     } else {
+            //         delete result.totalVipPrice;
+            //     }
+            // } else {
+            //     delete result.totalVipPrice;
+            // }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
@@ -550,23 +550,23 @@ module.exports = {
             result.info = orders[0].info;
             result.status = orders[0].status;
             result.diners_num = orders[0].diners_num;
-            //判断vip
-            if (orders[0].phone != null) {
-                let vips = await Vips.findAll({
-                    where: {
-                        phone: orders[0].phone,
-                        tenantId: ctx.query.tenantId
-                    }
-                })
-                if (vips.length > 0) {
-                    result.discount = Math.round((result.totalPrice - result.totalVipPrice) * 100) / 100;
-                    delete result.totalPrice;
-                } else {
-                    delete result.totalVipPrice;
-                }
-            } else {
-                delete result.totalVipPrice;
-            }
+            // //判断vip
+            // if (orders[0].phone != null) {
+            //     let vips = await Vips.findAll({
+            //         where: {
+            //             phone: orders[0].phone,
+            //             tenantId: ctx.query.tenantId
+            //         }
+            //     })
+            //     if (vips.length > 0) {
+            //         result.discount = Math.round((result.totalPrice - result.totalVipPrice) * 100) / 100;
+            //         delete result.totalPrice;
+            //     } else {
+            //         delete result.totalVipPrice;
+            //     }
+            // } else {
+            //     delete result.totalVipPrice;
+            // }
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)

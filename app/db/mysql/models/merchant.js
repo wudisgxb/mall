@@ -21,7 +21,7 @@ module.exports = function (sequelize, DataTypes) {
         // payee_account: shortDataTypes.String(100,false),
         tenantId: shortDataTypes.String(100, false),
         //是否订单确认
-        isOrderConfirm: shortDataTypes.Bool(),
+        needOrderConfirmPage: shortDataTypes.Bool(),
         // //是否实时
         // isRealTime:shortDataTypes.Bool(),
     }, {

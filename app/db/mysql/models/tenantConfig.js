@@ -18,6 +18,8 @@ module.exports = function (sequelize, DataTypes) {
         },
         //是否实时转账
         isRealTime: shortDataTypes.Bool(),
+        //是否需要VIP
+        needVip:shortDataTypes.Bool(),
         //满多少送会员
         vipFee: shortDataTypes.Double(100000),
         //快满多少提示会员

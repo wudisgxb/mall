@@ -311,6 +311,7 @@ function * Merchantseed() {
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         AddressId: 1,
+        needOrderConfirmPage:false,
         // payee_real_name: '官绪斌',
         // remark:'测试单笔转账-非代售',
         //isRealTime:true,
@@ -343,6 +344,7 @@ function * Merchantseed() {
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         AddressId: 2,
+        needOrderConfirmPage:true,
         // payee_real_name: '官绪斌',
         // remark:'测试单笔转账-非代售',
         //isRealTime:true,
@@ -368,6 +370,7 @@ function * TenantConfigsSeed() {
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
+        needVip:true,
         vipFee: 50,
         vipRemindFee:25,
         homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
@@ -381,6 +384,7 @@ function * TenantConfigsSeed() {
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
+        needVip:true,
         vipFee: 50,
         vipRemindFee:25,
         homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
@@ -426,8 +430,8 @@ function * update() {
 }
 
 co(function *() {
-    //yield init();
-    yield update();
+    yield init();
+    //yield update();
 
     console.log('finished ...');
     process.exit(0)
