@@ -87,27 +87,31 @@ function * MenusSeed() {
         var tmp = yield db.models.Menus.create({
             name: '热销榜' + i,
             type: -1,
-            tenantId: tenantId1
+            tenantId: tenantId1,
+            sort:i
         });
     }
 
     yield db.models.Menus.create({
         name: '套餐',
         type: -1,
-        tenantId: tenantId2
+        tenantId: tenantId2,
+        sort:i
     });
 
     for (i = 1; i < 5; i++) {
         var tmp = yield db.models.Menus.create({
             name: '热销榜' + i,
             type: -1,
-            tenantId: tenantId2
+            tenantId: tenantId2,
+            sort:i
         });
     }
     yield db.models.Menus.create({
         name: '套餐',
         type: -1,
-        tenantId: tenantId2
+        tenantId: tenantId1,
+        sort:i
     });
 }
 

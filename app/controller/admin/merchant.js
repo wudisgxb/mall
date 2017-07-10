@@ -74,40 +74,41 @@ module.exports = {
     },
 
     async getAdminMerchant (ctx, next) {
-        if(ctx.query.tenantId!=null&&ctx.query.consigneeId==null){
-            let merchant = await Merchants.findAll({
-                where: {
-                    tenantId: ctx.query.tenantId
-                },
-                attributes: {
-                    exclude: ['createdAt', 'updatedAt']
-                },
-            });
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchant);
-            return;
-        }
-        if(ctx.query.tenantId==null&&ctx.query.consigneeId!=null){
-            let Profitsharings = await ProfitSharings.findAll({
-                where: {
-                    consigneeId: ctx.query.consigneeId
-                },
+        
 
-            });
-            let merchantId;
-            let merchant;
-            let merchants = [];
-            for(let i = 0; i < Profitsharings.length;i++) {
-                merchantId = Profitsharings[i].tenantId;
-                merchant = await Merchants.findOne({
-                    where: {
-                        tenantId: merchantId
-                    },
-
-                });
-                merchants.push(merchant)
-            }
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchants);
-        }
+        // if(ctx.query.tenantId!=null&&ctx.query.consigneeId==null){
+        //     let merchant = await Merchants.findAll({
+        //         where: {
+        //             tenantId: ctx.query.tenantId
+        //         },
+        //         attributes: {
+        //             exclude: ['createdAt', 'updatedAt']
+        //         },
+        //     });
+        //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchant);
+        // }
+        // if(ctx.query.tenantId==null&&ctx.query.consigneeId!=null){
+        //     let Profitsharings = await ProfitSharings.findAll({
+        //         where: {
+        //             consigneeId: ctx.query.consigneeId
+        //         },
+        //
+        //     });
+        //     let merchantId;
+        //     let merchant;
+        //     let merchants = [];
+        //     for(let i = 0; i < Profitsharings.length;i++) {
+        //         merchantId = Profitsharings[i].tenantId;
+        //         merchant = await Merchants.findOne({
+        //             where: {
+        //                 tenantId: merchantId
+        //             },
+        //
+        //         });
+        //         merchants.push(merchant)
+        //     }
+        //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchants);
+        // }
     },
 
     async deleteAdminMerchant(ctx, next){

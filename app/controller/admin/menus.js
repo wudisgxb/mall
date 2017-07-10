@@ -36,6 +36,7 @@ module.exports = {
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+
     //修改商品类型
     async updateAdminMenusById (ctx, next) {
         ctx.checkBody('/condition/id',true).first().notEmpty();
@@ -66,20 +67,7 @@ module.exports = {
     },
     //
     async getAdminMenus (ctx, next) {
-        ctx.checkQuery('tenantId').notEmpty();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
-            return;
-        }
-        let menus = await Menus.findAll({
-            where: {
-                tenantId: ctx.query.tenantId
-            },
-            attributes: {
-                exclude: ['createdAt', 'updatedAt', 'deletedAt']
-            },
-        });
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, menus);
+       
     },
 
 }
