@@ -91,7 +91,7 @@ module.exports ={
                 tenantId: ctx.query.tenantId
             }
         })
-        let consigneename;
+        // let consigneename;
         if(order.length==0){
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"未找到当前订单")
             return;
@@ -102,6 +102,7 @@ module.exports ={
                 tradeNoArray.push(order[i].trade_no);
             }
         }
+        //循环不相同的订单号
         for(let k = 0;k<tradeNoArray.length;k++){
             totalNum = 0;//数量
             totalPrice = 0;//单价
@@ -123,7 +124,7 @@ module.exports ={
                     consigneeId:consigneesId.consigneeId
                 }
             })
-
+            //根据创建时间和订单号查询所有记录
             orders = await Orders.findAll({
                 where: {
                     createdAt: {

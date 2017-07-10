@@ -20,6 +20,7 @@ function *addSuperAdminer() {
         password: '123456',
         status: 0,
         type: 100,
+        tenantType:"租户",
         tenantId: tenantId1
     });
     yield db.models.Adminer.create({
@@ -29,6 +30,7 @@ function *addSuperAdminer() {
         password: '123456',
         status: 0,
         type: 100,
+        tenantType:"代售点",
         tenantId: tenantId2
     });
 }
@@ -87,27 +89,31 @@ function * MenusSeed() {
         var tmp = yield db.models.Menus.create({
             name: '热销榜' + i,
             type: -1,
-            tenantId: tenantId1
+            tenantId: tenantId1,
+            sort:i
         });
     }
 
     yield db.models.Menus.create({
         name: '套餐',
         type: -1,
-        tenantId: tenantId2
+        tenantId: tenantId2,
+        sort:i
     });
 
     for (i = 1; i < 5; i++) {
         var tmp = yield db.models.Menus.create({
             name: '热销榜' + i,
             type: -1,
-            tenantId: tenantId2
+            tenantId: tenantId2,
+            sort:i
         });
     }
     yield db.models.Menus.create({
         name: '套餐',
         type: -1,
-        tenantId: tenantId2
+        tenantId: tenantId1,
+        sort:i
     });
 }
 

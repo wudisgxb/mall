@@ -9,6 +9,7 @@ module.exports = function (sequelize, DataTypes) {
 
         name: shortDataTypes.String(),
         type: shortDataTypes.Int(),
+        sort: shortDataTypes.Int(),
         tenantId: {
             type: Sequelize.STRING
         }

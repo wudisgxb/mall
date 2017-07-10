@@ -74,6 +74,7 @@ module.exports = {
     },
 
     async getAdminMerchant (ctx, next) {
+
         if(ctx.query.tenantId!=null&&ctx.query.consigneeId==null){
             let merchant = await Merchants.findAll({
                 where: {
@@ -84,7 +85,6 @@ module.exports = {
                 },
             });
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchant);
-            return;
         }
         if(ctx.query.tenantId==null&&ctx.query.consigneeId!=null){
             let Profitsharings = await ProfitSharings.findAll({
