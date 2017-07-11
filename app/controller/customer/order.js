@@ -582,6 +582,14 @@ module.exports = {
             if (coupon != null) {
                 result.couponType = coupon.couponType;
                 result.couponvalue = coupon.value;
+
+                if (coupon.couponType == '金额') {
+                    result.totalPrice = ((result.totalPrice - coupon.value)<= 0)?0.01:(result.totalPrice - coupon.value);
+                    result.totalVipPrice = ((result.totalVipPrice - coupon.value)<= 0)?0.01:(result.totalVipPrice - coupon.value);
+                } else {
+                    result.totalPrice = result.totalPrice * coupon.value;
+                    result.totalVipPrice = result.totalVipPrice * coupon.value;
+                }
             }
             // //判断vip
             // if (orders[0].phone != null) {
