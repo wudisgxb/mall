@@ -402,11 +402,13 @@ module.exports = {
                 }
             })
 
+            //根据订单号修改food总份数
+
             if (coupon != null) {
                 coupon.status = 1;
                 await coupon.save();
             }
-            
+
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
                     trade_no: ret.out_trade_no,
