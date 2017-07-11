@@ -21,14 +21,15 @@ const infoPushManager = require('../../controller/infoPush/infoPush');
 const webSocket = require('../../controller/socketManager/socketManager');
 
 const orderManager = require('../customer/order');
+const config = require('../../config/config')
 
 const ip = require('ip').address();
 
-const client = new OAuth('wx09b412b006792e2c', '0e32eb3b17baa77d2ea46abd990b7c4d')
+const client = new OAuth(config.wechat.appId, config.wechat.secret)
 const wxpay = new WXPay({
-    appId: 'wx09b412b006792e2c',
-    mchId: '1456240202',
-    partnerKey: 'EXvIG4rOpC7AlcooAFkoMAgWIoYa1VbR', //微信商户平台API密钥
+    appId: config.wechat.appId,
+    mchId: config.wechat.mchId,
+    partnerKey: config.wechat.partnerKey, //微信商户平台API密钥
     pfx: fs.readFileSync('./app/controller/wechatPay/apiclient_cert.p12'), //微信商户平台证书
 })
 
