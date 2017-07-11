@@ -48,9 +48,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
-
         let body = ctx.request.body;
-
         let coupon = await Coupons.findOne({
             where: {
                 couponKey: body.couponKey,

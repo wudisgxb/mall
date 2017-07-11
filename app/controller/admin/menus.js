@@ -83,20 +83,5 @@ module.exports = {
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, menus);
     },
-
-    // async updateAdminMenusBySort (ctx, next) {
-    //     //ctx.checkBody('tenantId').notEmpty();
-    //     ctx.checkBody('id').notEmpty();
-    //     if(ctx.errors){
-    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
-    //         return;
-    //     }
-    //     let body = ctx.request.body;
-    //     let menusid = await Menus.findById(body.id)
-    //     if(body.sort==null){
-    //         body.sort=menusid.sort
-    //     }
-    //     menusid.sort=body.sort;
-    //     await menusid.save();
-    // },
+    
 }

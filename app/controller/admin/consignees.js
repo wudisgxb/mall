@@ -51,6 +51,7 @@ module.exports = {
         await consignees.save();
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS);
     },
+    
     async saveAdminConsignees(ctx,next){
         ctx.checkBody('/consignees/name',true).first().notEmpty();
         ctx.checkBody('/consignees/phone',true).first().notEmpty();
