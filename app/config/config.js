@@ -20,6 +20,7 @@ module.exports = {
         token: 'xiaovbao',
         encodingAESKey: '0b0QgxmoY2nbQlrRYPpSiDlKZXDGfwhKbERot9UvA0K'
     },
+	
     root: path.join(__dirname, '..'),
     log: {
         access() {
