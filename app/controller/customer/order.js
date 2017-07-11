@@ -86,7 +86,6 @@ module.exports = {
         }
         result.tableName = table.name;
         result.foods = foodJson;
-        result.tradeNo = orders[0].trade_no;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         if (orders[0] != null) {
@@ -95,6 +94,7 @@ module.exports = {
             result.info = orders[0].info;
             result.status = orders[0].status;
             result.diners_num = orders[0].diners_num;
+            result.tradeNo = orders[0].trade_no;
             // //判断vip
             // if (orders[0].phone != null) {
             //     let vips = await Vips.findAll({
@@ -558,7 +558,6 @@ module.exports = {
         }
         result.tableName = table.name;
         result.foods = foodJson;
-        result.tradeNo = orders[0].trade_no;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         if (orders[0] != null) {
@@ -567,6 +566,7 @@ module.exports = {
             result.info = orders[0].info;
             result.status = orders[0].status;
             result.diners_num = orders[0].diners_num;
+            result.tradeNo = orders[0].trade_no;
 
             //通过订单号获取优惠券
             let coupon = await Coupons.findOne({
