@@ -127,6 +127,8 @@ module.exports = {
                     });
                     result.isVip = true;
                 }
+            } else{
+                result.isVip = true;
             }
 
             //通过订单号获取优惠券
@@ -674,6 +676,8 @@ module.exports = {
                     });
                     result.isVip = true;
                 }
+            } else {
+                result.isVip = true;
             }
 
             //通过订单号获取优惠券
