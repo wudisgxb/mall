@@ -4,20 +4,17 @@ var Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
 
-    var Coupons = sequelize.define('Coupons', {
-        couponKey: shortDataTypes.String(),//优惠券唯一标识
+    var CouponLimits = sequelize.define('CouponLimits', {
+        couponLimitKey: shortDataTypes.String(),//优惠券限制唯一标识
         tenantId: {
             type: Sequelize.STRING
         },
         consigneeId: {
             type: Sequelize.STRING
         },
-        couponType:shortDataTypes.String(),//优惠券类型
-        value:shortDataTypes.String(),//金额或折扣
-        status: shortDataTypes.Int(), //使用状态：0-未使用，1-已使用
-        //time: shortDataTypes.Double(),//使用期限
-        phone: shortDataTypes.Phone(true),//使用优惠券手机号，起始为null
-        trade_no: shortDataTypes.String(255,true),//使用优惠的订单号，起始为null
+        timeLimit:shortDataTypes.Double(),//时间使用限制
+        numLimit:shortDataTypes.Int(),//领用次数限制
+        invalidTime:shortDataTypes.Double(),//失效时间限制
     }, {
         paranoid: true,
         associate: function (models) {
@@ -31,6 +28,6 @@ module.exports = function (sequelize, DataTypes) {
         }
     });
 
-    return Coupons;
+    return CouponLimits;
 };
 
