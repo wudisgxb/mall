@@ -189,7 +189,6 @@ module.exports = {
             foodsJson[i].isActive = foods[i].isActive;
             foodsJson[i].taste=JSON.parse(foods[i].taste);
             foodsJson[i].info=foods[i].info;
-            foodsJson[i].name = foods[i].name;
             foodsJson[i].menuName = menuName[0].name;
             foodsJson[i].unit = foods[i].unit;
         }
