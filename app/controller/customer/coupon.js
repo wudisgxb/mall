@@ -9,7 +9,7 @@ module.exports = {
 
     async bindCoupon (ctx, next) {
         ctx.checkBody('tenantId').notEmpty();
-        ctx.checkBody('consigneeId').notEmpty();
+        //ctx.checkBody('consigneeId').notEmpty();
         ctx.checkBody('couponType').notEmpty();
         ctx.checkBody('couponValue').notEmpty();
         ctx.checkBody('phoneNumber').notEmpty();
