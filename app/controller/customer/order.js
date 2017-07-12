@@ -143,7 +143,7 @@ module.exports = {
                 result.couponType = coupon.couponType;
                 result.couponvalue = coupon.value;
 
-                if (coupon.couponType == '金额') {
+                if (coupon.couponType == 'amount') {
                     result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
                     result.totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
                 } else {
@@ -691,7 +691,7 @@ module.exports = {
                 result.couponType = coupon.couponType;
                 result.couponvalue = coupon.value;
 
-                if (coupon.couponType == '金额') {
+                if (coupon.couponType == 'amount') {
                     result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
                     result.totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
                 } else {
