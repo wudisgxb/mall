@@ -660,7 +660,7 @@ module.exports = {
                 let food = await Foods.findById(order[i].FoodId);
                 //将查询到的数量减去查询到的数量
                 food.sellCount=food.sellCount+order[i].num;
-                food.foodnum=food.foodnum-order[i].num;
+                food.todaySales=food.todaySales+order[i].num;
                 await food.save();
             }
 

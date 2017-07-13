@@ -76,7 +76,8 @@ module.exports = {
                 return;
             }else{
                 //用户名密码正确返回租户Id给前端
-                ctx.body= new ApiResult(ApiResult.Result.SUCCESS,{
+                ctx.body= new ApiResult(ApiResult.Result.SUCCESS,
+                    {
                     id:c.id,
                     tenantId:c.tenantId
                 })

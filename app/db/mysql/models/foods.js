@@ -21,6 +21,7 @@ module.exports = function (sequelize, DataTypes) {
         /**
          * 原价
          */
+        todaySales:shortDataTypes.Int(),//总数量
         oldPrice: shortDataTypes.Double(),
         foodNum : shortDataTypes.Int(),
         vipPrice: shortDataTypes.Double(),

@@ -39,7 +39,6 @@ module.exports = {
             }
         });
 
-
         if (coupon.length >= couponLimits.numLimit) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, '优惠券领用次数超限');
         } else {

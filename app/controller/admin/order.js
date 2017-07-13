@@ -160,7 +160,10 @@ module.exports ={
 
             result[k] = {};
             //result[i].tableId = orders[0].tableId;
+
             let table = await Tables.findById(order[0].TableId);
+
+            result[k].ordersId = orders[k].id
             result[k].tableName = table.name;
             result[k].trade_no = tradeNoArray[k];
             result[k].info = order[0].info;

@@ -144,6 +144,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 //获取租户下所有商品
+
     async getAdminFoods (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
         if(ctx.errors){
@@ -160,7 +161,7 @@ module.exports = {
         let menuName;
         let menuId;
         let foodsJson = [];
-        let i=0;
+        let i;
 
         for (i = 0; i < foods.length; i++) {
             foodId = foods[i].id;//foodId=1,2,3,4,5,6,7,8,9
@@ -184,6 +185,7 @@ module.exports = {
                 ]
             });
             foodsJson[i] = {};
+
             foodsJson[i].id = foods[i].id;
             foodsJson[i].name = foods[i].name;
             foodsJson[i].foodNum = foods[i].foodNum;
@@ -194,6 +196,7 @@ module.exports = {
             foodsJson[i].vipPrice = foods[i].vipPrice;
             foodsJson[i].isActive = foods[i].isActive;
             foodsJson[i].taste=JSON.parse(foods[i].taste);
+            foodsJson[i].rest=(foods[i].foodNum-foods[i].todaySales)<=0?0:(foods[i].foodNum-foods[i].todaySales);
             // foodsJson[i].name = foods[i].name;
             foodsJson[i].info=foods[i].info;
             foodsJson[i].menuName = menuName[0].name;
