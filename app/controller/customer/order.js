@@ -510,8 +510,8 @@ module.exports = {
 
         //修改订单发送推送消息
         let date = new Date().format("hh:mm");
-        let content = '代售商：' + consignee.name + ' ' + "桌名：" + table.name + ' 手机号' + body.phoneNumber + '修改订单成功，请及时处理！ ' + date;
-        infoPushManager.infoPush(content, body.tenantId);
+        let content = '代售商：' + consignee.name + ' ' + "桌名：" + table.name + ' 手机号' + body.condition.phoneNumber + '修改订单成功，请及时处理！ ' + date;
+        infoPushManager.infoPush(content, body.condition.tenantId);
     },
 
     async deleteUserEshopOrder (ctx, next) {
