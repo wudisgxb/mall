@@ -137,13 +137,13 @@ module.exports = {
                     trade_no: orders[0].trade_no,
                     phone: phone,
                     tenantId: orders[0].tenantId,
-                    status: 0
+                    //status: 0
                 }
             })
 
             if (coupon != null) {
                 result.couponType = coupon.couponType;
-                result.couponvalue = coupon.value;
+                result.couponValue = coupon.value;
 
                 if (coupon.couponType == 'amount') {
                     result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
@@ -687,13 +687,13 @@ module.exports = {
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
                    // consigneeId: ctx.query.consigneeId,
-                    status: 0
+                   // status: 0
                 }
             })
 
             if (coupon != null) {
                 result.couponType = coupon.couponType;
-                result.couponvalue = coupon.value;
+                result.couponValue = coupon.value;
 
                 if (coupon.couponType == 'amount') {
                     result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
