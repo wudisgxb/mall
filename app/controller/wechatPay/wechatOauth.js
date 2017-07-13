@@ -163,8 +163,25 @@ module.exports = {
             } else {
                 total_amount =  Math.round(totalPrice*100)/100;
             }
-        }
 
+            //通过订单号获取优惠券
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    phone: orders[0].phone,
+                    tenantId: orders[0].tenantId,
+                    status: 0
+                }
+            })
+
+            if (coupon != null) {
+                if (coupon.couponType == 'amount') {
+                    total_amount = ((total_amount - coupon.value) <= 0) ? 0.01 : (total_amount - coupon.value);
+                } else {
+                    total_amount = total_amount * coupon.value;
+                }
+            }
+        }
 
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
@@ -392,6 +409,24 @@ module.exports = {
                 }
             } else {
                 total_amount =  Math.round(totalPrice*100)/100;
+            }
+
+            //通过订单号获取优惠券
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    phone: orders[0].phone,
+                    tenantId: orders[0].tenantId,
+                    status: 0
+                }
+            })
+
+            if (coupon != null) {
+                if (coupon.couponType == 'amount') {
+                    total_amount = ((total_amount - coupon.value) <= 0) ? 0.01 : (total_amount - coupon.value);
+                } else {
+                    total_amount = total_amount * coupon.value;
+                }
             }
         }
 

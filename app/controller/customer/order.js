@@ -137,13 +137,13 @@ module.exports = {
                     trade_no: orders[0].trade_no,
                     phone: phone,
                     tenantId: orders[0].tenantId,
-                    status: 0
+                    //status: 0
                 }
             })
 
             if (coupon != null) {
                 result.couponType = coupon.couponType;
-                result.couponvalue = coupon.value;
+                result.couponValue = coupon.value;
 
                 if (coupon.couponType == 'amount') {
                     result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
@@ -224,15 +224,13 @@ module.exports = {
             }
         })
 
-        let trade_no;
         let phone;
+        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;;
         if (orders.length > 0) {
-            trade_no = orders[0].trade_no;
-            phone = orders[0].phone;
-        } else {
-            //时间戳+4位随机数+tableId生成商家订单号
-            trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
-            phone = body.phoneNumber;
+            orders.map(async function (e) {
+                e.trade_no = trade_no;
+                await e.save();
+            })
         }
 
         let i;
@@ -359,12 +357,12 @@ module.exports = {
             }
         })
 
-        let trade_no;
+        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;;
         if (orders.length > 0) {
-            trade_no = orders[0].trade_no;
-        } else {
-            //时间戳+4位随机数+tableId生成商家订单号
-            trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
+            orders.map(async function (e) {
+                e.trade_no = trade_no;
+                await e.save();
+            })
         }
 
         let i;
@@ -493,25 +491,29 @@ module.exports = {
             return;
         }
 
+        //暂时只删除，不支持编辑，预留代码后面有需要再改
         if (body.food.foodCount > 0) {
             orders[0].num = body.food.foodCount;
             await orders[0].save();
         } else {
-            await orders[0].destroy();
+            orders.map(async function (e) {
+                await e.destroy();
+            })
+
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
         let consignee = await Consignees.findOne({
             where: {
-                consigneeId: body.consigneeId,
+                consigneeId: body.condition.consigneeId,
             }
         });
 
         //修改订单发送推送消息
         let date = new Date().format("hh:mm");
-        let content = '代售商：' + consignee.name + ' ' + "桌名：" + table.name + ' 手机号' + body.phoneNumber + '修改订单成功，请及时处理！ ' + date;
-        infoPushManager.infoPush(content, body.tenantId);
+        let content = '代售商：' + consignee.name + ' ' + "桌名：" + table.name + ' 手机号' + body.condition.phoneNumber + '修改订单成功，请及时处理！ ' + date;
+        infoPushManager.infoPush(content, body.condition.tenantId);
     },
 
     async deleteUserEshopOrder (ctx, next) {
@@ -687,13 +689,13 @@ module.exports = {
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
                    // consigneeId: ctx.query.consigneeId,
-                    status: 0
+                   // status: 0
                 }
             })
 
             if (coupon != null) {
                 result.couponType = coupon.couponType;
-                result.couponvalue = coupon.value;
+                result.couponValue = coupon.value;
 
                 if (coupon.couponType == 'amount') {
                     result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
@@ -722,6 +724,17 @@ module.exports = {
             // }
         }
 
+        // 将 相同foodId 合并
+        result.foods = result.foods.reduce((accu, curr) => {
+            const exist = accu.find(e => e.id === curr.id)
+            if (exist) {
+                exist.num += curr.num
+            } else {
+                accu.push(curr)
+            }
+
+            return accu
+        }, [])
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
 
