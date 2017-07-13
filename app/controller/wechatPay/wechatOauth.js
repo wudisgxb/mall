@@ -168,7 +168,7 @@ module.exports = {
             let coupon = await Coupons.findOne({
                 where: {
                     trade_no: orders[0].trade_no,
-                    phone: phone,
+                    phone: orders[0].phone,
                     tenantId: orders[0].tenantId,
                     status: 0
                 }
@@ -415,7 +415,7 @@ module.exports = {
             let coupon = await Coupons.findOne({
                 where: {
                     trade_no: orders[0].trade_no,
-                    phone: phone,
+                    phone: orders[0].phone,
                     tenantId: orders[0].tenantId,
                     status: 0
                 }
