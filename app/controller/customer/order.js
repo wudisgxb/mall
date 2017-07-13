@@ -726,6 +726,17 @@ module.exports = {
             // }
         }
 
+        // 将 相同foodId 合并
+        result.foods = result.foods.reduce((accu, curr) => {
+            const exist = accu.find(e => e.id === curr.id)
+            if (exist) {
+                exist.num += curr.num
+            } else {
+                accu.push(curr)
+            }
+
+            return accu
+        }, [])
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
 
