@@ -46,6 +46,11 @@ module.exports = function (sequelize, DataTypes) {
             // models.Menus.hasMany(models.Foods);
             // models.Foods.belongsTo(models.Menus);
         },
+        getterMethods: {
+            rest() {
+                return (this.foodNum - this.todaySales <= 0) ? 0 : (this.foodNum - this.todaySales)
+            }
+        },
         classMethods: {
             upOrDown: function *(id, mode) {
                 yield this.update({
@@ -64,7 +69,6 @@ module.exports = function (sequelize, DataTypes) {
                 yield this.upOrDown(id, false);
             },
         },
-        getterMethods: {},
         scopes: {
             deleted: {
                 where: {

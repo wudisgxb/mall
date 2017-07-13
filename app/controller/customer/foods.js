@@ -110,6 +110,7 @@ module.exports = {
                     }]
                 });
 
+
                 food.forEach(e => {
                     e.Ratings = e.Ratings.map(rating => {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
@@ -123,11 +124,11 @@ module.exports = {
             resultArray[i] = {};
             resultArray[i].id = menus[i].id;
             resultArray[i].name = menus[i].name;
-            resultArray[i].rest=(food[i].foodNum-food[i].todaySales)>0?(food[i].foodNum-food[i].todaySales):0;
             resultArray[i].type = menus[i].type;
             resultArray[i].foods = foodArray;
             foodArray = []
         }
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, resultArray)
     },
 
