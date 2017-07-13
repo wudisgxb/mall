@@ -4,6 +4,7 @@ const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const Coupons = db.models.Coupons;
 const CouponLimits = db.models.CouponLimits;
+const Tool = require('../../Tool/tool');
 
 module.exports = {
 
@@ -113,10 +114,10 @@ module.exports = {
             }
         });
 
-
         for (var i = 0; i < coupons.length; i++) {
             if ((Date.now() - coupons[i].createdAt.getTime()) > couponLimits.invalidTime) {
                 coupons.splice(i,1);
+                i= i -1;
             }
         }
 
