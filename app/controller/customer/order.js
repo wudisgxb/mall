@@ -493,11 +493,15 @@ module.exports = {
             return;
         }
 
+        //暂时只删除，不支持编辑，预留代码后面有需要再改
         if (body.food.foodCount > 0) {
             orders[0].num = body.food.foodCount;
             await orders[0].save();
         } else {
-            await orders[0].destroy();
+            orders.map(async function (e) {
+                await e.destroy();
+            })
+
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
