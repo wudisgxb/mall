@@ -429,12 +429,12 @@ module.exports = {
 
         //修改桌号状态
         //let table = await Tables.findById(id);
-        if (table != null && table.status == 0) {
-            //table.name = table.name;
-            table.status = 1;
-
-            await table.save();
-        }
+        // if (table != null && table.status == 0) {
+        //     //table.name = table.name;
+        //     table.status = 1;
+        //
+        //     await table.save();
+        // }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
