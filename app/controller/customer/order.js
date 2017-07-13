@@ -224,15 +224,13 @@ module.exports = {
             }
         })
 
-        let trade_no;
         let phone;
+        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;;
         if (orders.length > 0) {
-            trade_no = orders[0].trade_no;
-            phone = orders[0].phone;
-        } else {
-            //时间戳+4位随机数+tableId生成商家订单号
-            trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
-            phone = body.phoneNumber;
+            orders.map(async function (e) {
+                e.trade_no = trade_no;
+                await e.save();
+            })
         }
 
         let i;
@@ -359,12 +357,12 @@ module.exports = {
             }
         })
 
-        let trade_no;
+        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;;
         if (orders.length > 0) {
-            trade_no = orders[0].trade_no;
-        } else {
-            //时间戳+4位随机数+tableId生成商家订单号
-            trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
+            orders.map(async function (e) {
+                e.trade_no = trade_no;
+                await e.save();
+            })
         }
 
         let i;
