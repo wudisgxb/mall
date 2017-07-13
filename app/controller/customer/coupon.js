@@ -33,6 +33,7 @@ module.exports = {
                 createdAt: {
                     $gte: new Date(new Date() - couponLimits.invalidTime)
                 },
+                status: 0
                 // createdAt: {
                 //     $lt: new Date(new Date().format("yyyyMMdd")) + 86400000,
                 //     $gte: new Date(new Date().format("yyyyMMdd"))
@@ -116,8 +117,8 @@ module.exports = {
 
         for (var i = 0; i < coupons.length; i++) {
             if ((Date.now() - coupons[i].createdAt.getTime()) > couponLimits.invalidTime) {
-                coupons.splice(i,1);
-                i= i -1;
+                coupons.splice(i, 1);
+                i = i - 1;
             }
         }
 

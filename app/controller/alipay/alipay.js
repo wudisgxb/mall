@@ -26,8 +26,8 @@ const config = require('../../config/config');
 
 const aliDeal = new Alipay({
     appId: config.alipay.appId,
-    notify_url: 'http://deal.xiaovbao.cn/api/v3/alipay',
-    return_url: 'http://dealclient.xiaovbao.cn/alipay-callback',
+    notify_url: 'http://deal.xiaovbao.cn/api/v3/alipay',//后台回调
+    return_url: 'http://dealclient.xiaovbao.cn/alipay-callback',//前台回调
     rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
     sandbox: false,
@@ -420,9 +420,6 @@ module.exports = {
                 food.foodNum=food.foodNum-order[i].num;
                 await food.save();
             }
-
-
-
 
             if (coupon != null) {
                 coupon.status = 1;
