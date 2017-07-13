@@ -13,6 +13,10 @@ module.exports = function (sequelize, DataTypes) {
         tenantId: {
             type: Sequelize.STRING
         },
+        consigneeId: {
+            type: Sequelize.STRING
+        },
+
         tasteScore: shortDataTypes.Int(),
         environmentScore: shortDataTypes.Int(),
         serviceScore: shortDataTypes.Int(),

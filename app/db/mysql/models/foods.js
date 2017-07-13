@@ -22,6 +22,7 @@ module.exports = function (sequelize, DataTypes) {
          * 原价
          */
         oldPrice: shortDataTypes.Double(),
+        foodNum : shortDataTypes.Int(),
         vipPrice: shortDataTypes.Double(),
         //口味
         taste: shortDataTypes.String(255,true),

@@ -684,6 +684,22 @@ module.exports = {
                 await coupon.save();
             }
 
+
+            let order = await Orders.findAll({
+                where:{
+                    trade_no:xml.out_trade_no
+                }
+            })
+            //根据查询到的foodId在菜单中查询当前的菜
+            for(let i = 0;i<order.length;i++){
+                let food = await Foods.findById(order[i].FoodId);
+                //将查询到的数量减去查询到的数量
+                food.sellCount=food.sellCount+order[i].num;
+                food.foodnum=food.foodnum-order[i].num;
+                await food.save();
+            }
+
+
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
                     trade_no : xml.out_trade_no,

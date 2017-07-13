@@ -20,11 +20,11 @@ module.exports = {
         ctx.checkBody('/food/rating',true).first().notEmpty().isInt().ge(0).toInt();
         ctx.checkBody('/food/info',true).first().notEmpty();
         ctx.checkBody('/food/unit',true).first().notEmpty();
-        ctx.checkBody('/food/isActive',true).first().notEmpty();
-
-
+        ctx.checkBody('/food/foodNum',true).first().notEmpty();
         ctx.checkBody('/food/menuId',true).first().notEmpty();
+        ctx.checkBody('/food/isActive',true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('/food/id',true).first().notEmpty();
         // ctx.checkBody('/condition/id',true).first().notEmpty();
 
         let body = ctx.request.body;
@@ -58,6 +58,7 @@ module.exports = {
                 oldPrice: body.food.oldPrice,
                 vipPrice: body.food.vipPrice,
                 sellCount: body.food.sellCount,
+                foodNum:body.food.foodNum,
                 rating: body.food.rating,
                 info: body.food.info,
                 unit: body.food.unit,
@@ -90,6 +91,7 @@ module.exports = {
         ctx.checkBody('/food/rating',true).first().notEmpty().isInt().ge(0).toInt();
         ctx.checkBody('/food/info',true).first().notEmpty();
         ctx.checkBody('/food/isActive',true).first().notEmpty();
+        ctx.checkBody('/food/foodNum',true).first().notEmpty();
         ctx.checkBody('/food/menuId',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
         ctx.checkBody('/condition/id',true).first().notEmpty();
@@ -112,6 +114,7 @@ module.exports = {
             foods.id = body.condition.id;
             foods.name = body.food.name;
             foods.image = body.food.image;
+            foods.foodNum=body.food.foodNum;
             foods.icon = body.food.icon;
             foods.price = body.food.price;
             foods.oldPrice = body.food.oldPrice;
@@ -147,16 +150,18 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
             return;
         }
+        //查询foods
         let foods = await Foods.findAll({
             where: {
                 tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
             }
         });
-        let foodId;//0
+        let foodId;
         let menuName;
         let menuId;
         let foodsJson = [];
         let i=0;
+
         for (i = 0; i < foods.length; i++) {
             foodId = foods[i].id;//foodId=1,2,3,4,5,6,7,8,9
             menuId = await Foodsofmenus.findAll({
@@ -181,6 +186,7 @@ module.exports = {
             foodsJson[i] = {};
             foodsJson[i].id = foods[i].id;
             foodsJson[i].name = foods[i].name;
+            foodsJson[i].foodNum = foods[i].foodNum;
             foodsJson[i].image = foods[i].image;
             foodsJson[i].icon = foods[i].icon;
             foodsJson[i].price = foods[i].price;
@@ -188,6 +194,7 @@ module.exports = {
             foodsJson[i].vipPrice = foods[i].vipPrice;
             foodsJson[i].isActive = foods[i].isActive;
             foodsJson[i].taste=JSON.parse(foods[i].taste);
+            // foodsJson[i].name = foods[i].name;
             foodsJson[i].info=foods[i].info;
             foodsJson[i].menuName = menuName[0].name;
             foodsJson[i].unit = foods[i].unit;
@@ -195,5 +202,10 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsJson);
 
     },
+
+    // async deleteFoods(ctx, next){
+    //     let foods = await Foods.findAll();
+    //
+    // },
 
 }
