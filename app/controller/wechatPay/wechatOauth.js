@@ -852,37 +852,37 @@ module.exports = {
                     }
                 }
 
-                //满多少加会员,考虑订单会删除，要加paranoid: false查询delete的
-                orders = await Orders.findAll({
-                    where: {
-                        trade_no: xml.out_trade_no,
-                    },
-                    paranoid: false
-                });
-                let phone = orders[0].phone;
-
-                let vip = await Vips.findOne({
-                    where: {
-                        phone: phone,
-                        tenantId: orders[0].tenantId
-                    }
-                })
-
-                if (vip == null) {
-                    //根据订单算原始总价格
-                    let orderPrice = await orderManager.getOrderPriceByTradeNo(xml.out_trade_no, tenantId);
-                    console.log("orderPrice:" + orderPrice);
-                    console.log("xml.total_fee" + xml.total_fee/100 + '元');
-                    if (orderPrice >= tenantConfig.vipFee) {
-                        await Vips.create({
-                            phone: phone,
-                            vipLevel: 0,
-                            vipName: "匿名",
-                            tenantId: orders[0].tenantId
-                            // todo: ok?
-                        });
-                    }
-                }
+                // //满多少加会员,考虑订单会删除，要加paranoid: false查询delete的
+                // orders = await Orders.findAll({
+                //     where: {
+                //         trade_no: xml.out_trade_no,
+                //     },
+                //     paranoid: false
+                // });
+                // let phone = orders[0].phone;
+                //
+                // let vip = await Vips.findOne({
+                //     where: {
+                //         phone: phone,
+                //         tenantId: orders[0].tenantId
+                //     }
+                // })
+                //
+                // if (vip == null) {
+                //     //根据订单算原始总价格
+                //     let orderPrice = await orderManager.getOrderPriceByTradeNo(xml.out_trade_no, tenantId);
+                //     console.log("orderPrice:" + orderPrice);
+                //     console.log("xml.total_fee" + xml.total_fee/100 + '元');
+                //     if (orderPrice >= tenantConfig.vipFee) {
+                //         await Vips.create({
+                //             phone: phone,
+                //             vipLevel: 0,
+                //             vipName: "匿名",
+                //             tenantId: orders[0].tenantId
+                //             // todo: ok?
+                //         });
+                //     }
+                // }
             } else {
                 AlipayErrors.create({
                     errRsp:JSON.stringify(ctx.xmlBody),

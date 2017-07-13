@@ -20,7 +20,7 @@ function *addSuperAdminer() {
         password: '123456',
         status: 0,
         type: 100,
-        tenantType:"租户",
+        tenantType: "租户",
         tenantId: tenantId1
     });
     yield db.models.Adminer.create({
@@ -30,7 +30,7 @@ function *addSuperAdminer() {
         password: '123456',
         status: 0,
         type: 100,
-        tenantType:"代售点",
+        tenantType: "代售点",
         tenantId: tenantId2
     });
 }
@@ -48,7 +48,6 @@ function * adminerSeed() {
     //     })
     // }
 }
-
 
 
 function * addressSeed() {
@@ -90,7 +89,7 @@ function * MenusSeed() {
             name: '热销榜' + i,
             type: -1,
             tenantId: tenantId1,
-            sort:i
+            sort: i
         });
     }
 
@@ -98,7 +97,7 @@ function * MenusSeed() {
         name: '套餐',
         type: -1,
         tenantId: tenantId2,
-        sort:i
+        sort: i
     });
 
     for (i = 1; i < 5; i++) {
@@ -106,14 +105,14 @@ function * MenusSeed() {
             name: '热销榜' + i,
             type: -1,
             tenantId: tenantId2,
-            sort:i
+            sort: i
         });
     }
     yield db.models.Menus.create({
         name: '套餐',
         type: -1,
         tenantId: tenantId1,
-        sort:i
+        sort: i
     });
 }
 
@@ -158,7 +157,7 @@ function * FoodsSeed() {
     for (i = 0; i < 10; i++) {
         var type1 = menus[i % menus.length];
         //  var type2 = menus[(i + 1) % menus.length];
-        var arr = ['麻辣','超辣','微辣'];
+        var arr = ['麻辣', '超辣', '微辣'];
         var foods = yield db.models.Foods.create({
             name: '皮蛋瘦肉粥' + i,
             price: 2,
@@ -207,7 +206,7 @@ function * AddressSeed() {
         city: '南京市',
         area: '建邺区',
         address: '金润国际广场2楼雪花冰',
-        tenantId:tenantId1
+        tenantId: tenantId1
     });
 
     yield db.models.Address.create({
@@ -215,7 +214,7 @@ function * AddressSeed() {
         city: '南京市',
         area: '建邺区',
         address: '金润国际广场-2楼辣尚瘾',
-        tenantId:tenantId2
+        tenantId: tenantId2
     });
 
     yield db.models.Address.create({
@@ -223,7 +222,7 @@ function * AddressSeed() {
         city: '南京市',
         area: '建邺区',
         address: '金润国际广场-2楼辣尚瘾',
-        tenantId:consigneeId1
+        tenantId: consigneeId1
     });
 
     yield db.models.Address.create({
@@ -231,7 +230,7 @@ function * AddressSeed() {
         city: '南京市',
         area: '建邺区',
         address: '金润国际广场-2楼麻辣盛宴',
-        tenantId:consigneeId2
+        tenantId: consigneeId2
     });
 }
 
@@ -291,7 +290,7 @@ function * Consigneeseed() {
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         address: "双龙大道",
-        consigneeId:consigneeId1
+        consigneeId: consigneeId1
         // payee_real_name: '官绪斌',
         // remark:'测试单笔转账-非代售',
         //isRealTime:true,
@@ -304,7 +303,7 @@ function * Consigneeseed() {
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         address: "双龙大道",
-        consigneeId:consigneeId2
+        consigneeId: consigneeId2
         // payee_real_name: '官绪斌',
         // remark:'测试单笔转账-非代售',
         //isRealTime:true,
@@ -319,7 +318,7 @@ function * Merchantseed() {
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         AddressId: 1,
-        needOrderConfirmPage:false,
+        needOrderConfirmPage: false,
         // payee_real_name: '官绪斌',
         // remark:'测试单笔转账-非代售',
         //isRealTime:true,
@@ -352,7 +351,7 @@ function * Merchantseed() {
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         AddressId: 2,
-        needOrderConfirmPage:true,
+        needOrderConfirmPage: true,
         // payee_real_name: '官绪斌',
         // remark:'测试单笔转账-非代售',
         //isRealTime:true,
@@ -374,33 +373,105 @@ function * Merchantseed() {
 function * TenantConfigsSeed() {
     yield db.models.TenantConfigs.create({
         tenantId: tenantId1,
-        name:'雪花冰',
+        name: '雪花冰',
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
-        needVip:true,
+        needVip: true,
         vipFee: 50,
-        vipRemindFee:25,
-        homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
-        startTime:'9:00',
-        endTime:'18:30'
+        vipRemindFee: 25,
+        homeImage: 'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        startTime: '9:00',
+        endTime: '18:30'
     });
 
     yield db.models.TenantConfigs.create({
         tenantId: tenantId2,
-        name:'辣尚瘾',
+        name: '辣尚瘾',
         payee_account: '13585130223',
         wecharPayee_account: "oeGC00rSlKScZMw7g9Bz3xj5hrsc",
         isRealTime: true,
-        needVip:true,
+        needVip: true,
         vipFee: 50,
-        vipRemindFee:25,
-        homeImage:'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
-        startTime:'9:00',
-        endTime:'18:30'
+        vipRemindFee: 25,
+        homeImage: 'http://fuss10.elemecdn.com/c/cd/c12745ed8a5171e13b427dbc39401jpeg.jpeg?imageView2/1/w/750/h/750',
+        startTime: '9:00',
+        endTime: '18:30'
     });
 }
 
+function * paymentReqSeed() {
+    for (var i = 200; i > 0; i--) {
+        var date = new Date() - Math.round(i / 20) * 86400000
+        if (i % 3 == 0) {
+            yield db.models.PaymentReqs.create({
+                params: '',
+                tableId: 1,
+                paymentMethod: '支付宝',
+                isFinish: i % 2,
+                isInvalid: 0,
+                trade_no: '2017',
+                app_id: 'appId',
+                total_amount: '100',
+                actual_amount: parseInt(Math.random() * 10 + 5),
+                refund_amount: '0',
+                refund_reason: '',
+                consigneeId: consigneeId1,
+                phoneNumber: '13585130223',
+                TransferAccountIsFinish: true,
+                consigneeTransferAccountIsFinish: false,
+                tenantId: tenantId1,
+                createdAt: date
+            });
+        } else {
+            yield db.models.PaymentReqs.create({
+                params: '',
+                tableId: 1,
+                paymentMethod: '支付宝',
+                isFinish: true,
+                isInvalid: 0,
+                trade_no: '2017',
+                app_id: 'appId',
+                total_amount: '100',
+                actual_amount: parseInt(Math.random() * 10 + 5),
+                refund_amount: '0',
+                refund_reason: '',
+                consigneeId: consigneeId2,
+                phoneNumber: '13585130223',
+                TransferAccountIsFinish: true,
+                consigneeTransferAccountIsFinish: false,
+                tenantId: tenantId1,
+                createdAt: date
+            });
+        }
+
+    }
+}
+
+function * couponLimitSeed() {
+    yield db.models.CouponLimits.create({
+        couponLimitKey: 'testKey',//优惠券限制唯一标识
+        tenantId: 'tenantId1',
+        consigneeId: 'consigneeId1',
+        timeLimit: 86400000,//时间使用限制
+        numLimit: 10,//领用次数限制
+        invalidTime: 86400000 * 30,//失效时间限制
+    });
+}
+
+function * couponSeed() {
+    for (var i = 0; i < 10; i++) {
+        yield db.models.Coupons.create({
+            couponKey: "testkey" + i,
+            tenantId: 'tenantId1',
+            consigneeId: 'consigneeId1',
+            couponType: '金额',
+            value: '5',
+            status: 0,
+            phone: '13585130223',
+        });
+    }
+}
 
 function * init() {
     yield db.sync({
@@ -427,8 +498,13 @@ function * init() {
 
 
     //支付配置预置值
-    // yield AlipayConfigSeed();
-    // yield ChildAlipayConfigSeed();
+    yield paymentReqSeed();
+
+    //优惠券限制预置值
+    yield couponLimitSeed();
+
+    //优惠券预置值
+    yield couponSeed();
 }
 
 function * update() {
