@@ -29,6 +29,8 @@ module.exports = {
                 }
             })
             result.name = tenantInfo.name;
+            result.payee_account=tenantInfo.payee_account;
+            result.wecharPayee_account=tenantInfo.wecharPayee_account;
             result.needVip = tenantInfo.needVip;
             result.vipFee = tenantInfo.vipFee;
             result.vipRemindFee = tenantInfo.vipRemindFee;
@@ -44,6 +46,7 @@ module.exports = {
 
 
     },
+
     //新增租户信息
     async saveTenantInfo(ctx, next){
         ctx.checkBody('/tenantConfig/name',true).first().notEmpty();

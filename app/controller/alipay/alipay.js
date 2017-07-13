@@ -15,6 +15,8 @@ const Coupons = db.models.Coupons;
 const Consignees = db.models.Consignees;
 const AlipayErrors = db.models.AlipayErrors;
 const Vips = db.models.Vips;
+const Foods = db.models.Foods;
+const order = db.models.Orders;
 const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../infoPush/infoPush');
 const transAccountsManager = require('./transferAccounts')
@@ -403,7 +405,24 @@ module.exports = {
                 }
             })
 
-            //根据订单号修改food总份数
+            //计算剩余菜品的数量
+            //根据订单号查询当前订单
+            let order = await Orders.findAll({
+              where:{
+                  trade_no:  ret.out_trade_no
+              }
+            })
+            //根据查询到的foodId在菜单中查询当前的菜
+            for(let i = 0;i<order.length;i++){
+                let food = await Foods.findById(order[i].FoodId);
+                //将查询到的数量减去查询到的数量
+                food.sellCount=food.sellCount+order[i].num;
+                food.foodNum=food.foodNum-order[i].num;
+                await food.save();
+            }
+
+
+
 
             if (coupon != null) {
                 coupon.status = 1;
