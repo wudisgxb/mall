@@ -504,7 +504,7 @@ module.exports = {
 
         let consignee = await Consignees.findOne({
             where: {
-                consigneeId: body.consigneeId,
+                consigneeId: body.condition.consigneeId,
             }
         });
 
