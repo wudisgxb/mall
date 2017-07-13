@@ -136,39 +136,35 @@ module.exports = {
         });
 
         if (foodOrders.length > 0 && paymentReqs.length > 0) {
-            //判断是否失效 10min
-            if ((Date.now() - paymentReqs[0].createdAt.getTime()) > 10 * 60 * 1000) {
-                paymentReqs[0].isInvalid = true;
-                await paymentReqs[0].save();
+            paymentReqs[0].isInvalid = true;
+            await paymentReqs[0].save();
 
-                await PaymentReqs.create({
-                    params: new_params,
-                    tableId: table.id,
-                    paymentMethod: '支付宝',
-                    isFinish: false,
-                    isInvalid: false,
-                    trade_no: trade_no,
-                    app_id: app_id,
-                    total_amount: total_amount,
-                    actual_amount: total_amount,
-                    refund_amount: '0',
-                    refund_reason: '',
-                    consigneeId: null,
-                    TransferAccountIsFinish: false,
-                    consigneeTransferAccountIsFinish: false,
-                    tenantId: ctx.query.tenantId
-                });
+            await PaymentReqs.create({
+                params: new_params,
+                tableId: table.id,
+                paymentMethod: '支付宝',
+                isFinish: false,
+                isInvalid: false,
+                trade_no: trade_no,
+                app_id: app_id,
+                total_amount: total_amount,
+                actual_amount: total_amount,
+                refund_amount: '0',
+                refund_reason: '',
+                consigneeId: null,
+                TransferAccountIsFinish: false,
+                consigneeTransferAccountIsFinish: false,
+                tenantId: ctx.query.tenantId
+            });
 
-                for (let i = 0; i < foodOrders.length; i++) {
-                    //foodOrders[i].trade_no = trade_no;
-                    foodOrders[i].paymentMethod = '支付宝';
-                    await foodOrders[i].save();
-                }
-
-                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
-            } else {
-                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, paymentReqs[0].params)
+            for (let i = 0; i < foodOrders.length; i++) {
+                //foodOrders[i].trade_no = trade_no;
+                foodOrders[i].paymentMethod = '支付宝';
+                await foodOrders[i].save();
             }
+
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
+
         } else {
             await PaymentReqs.create({
                 params: new_params,
@@ -303,37 +299,31 @@ module.exports = {
         });
 
         if (foodOrders.length > 0 && paymentReqs.length > 0) {
-            //判断是否失效 10min
-            if ((Date.now() - paymentReqs[0].createdAt.getTime()) > 10 * 60 * 1000) {
-                paymentReqs[0].isInvalid = true;
-                await paymentReqs[0].save();
+            paymentReqs[0].isInvalid = true;
+            await paymentReqs[0].save();
 
-                await PaymentReqs.create({
-                    params: new_params,
-                    tableId: table.id,
-                    paymentMethod: '支付宝',
-                    isFinish: false,
-                    isInvalid: false,
-                    trade_no: trade_no,
-                    app_id: app_id,
-                    total_amount: total_amount,
-                    consigneeId: ctx.query.consigneeId,
-                    phoneNumber: ctx.query.phoneNumber,
-                    TransferAccountIsFinish: false,
-                    consigneeTransferAccountIsFinish: false,
-                    tenantId: ctx.query.tenantId
-                });
+            await PaymentReqs.create({
+                params: new_params,
+                tableId: table.id,
+                paymentMethod: '支付宝',
+                isFinish: false,
+                isInvalid: false,
+                trade_no: trade_no,
+                app_id: app_id,
+                total_amount: total_amount,
+                consigneeId: ctx.query.consigneeId,
+                phoneNumber: ctx.query.phoneNumber,
+                TransferAccountIsFinish: false,
+                consigneeTransferAccountIsFinish: false,
+                tenantId: ctx.query.tenantId
+            });
 
-                for (let i = 0; i < foodOrders.length; i++) {
-                    //foodOrders[i].trade_no = trade_no;
-                    foodOrders[i].paymentMethod = '支付宝';
-                    await foodOrders[i].save();
-                }
-
-                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
-            } else {
-                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, paymentReqs[0].params)
+            for (let i = 0; i < foodOrders.length; i++) {
+                //foodOrders[i].trade_no = trade_no;
+                foodOrders[i].paymentMethod = '支付宝';
+                await foodOrders[i].save();
             }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         } else {
             await PaymentReqs.create({
                 params: new_params,
