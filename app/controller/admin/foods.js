@@ -196,7 +196,7 @@ module.exports = {
             foodsJson[i].vipPrice = foods[i].vipPrice;
             foodsJson[i].isActive = foods[i].isActive;
             foodsJson[i].taste=JSON.parse(foods[i].taste);
-            foodsJson[i].rest=(foods[i].foodNum-foods[i].todaySales)<=0?0:(foods[i].foodNum-foods[i].todaySales);
+            foodsJson[i].rest=(foods[0].foodNum-foods[0].todaySales)<=0?0:(foods[0].foodNum-foods[0].todaySales);
             // foodsJson[i].name = foods[i].name;
             foodsJson[i].info=foods[i].info;
             foodsJson[i].menuName = menuName[0].name;

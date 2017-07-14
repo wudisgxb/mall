@@ -45,7 +45,7 @@ module.exports = {
             },
             paranoid: false
         })
-        console.log(order[0].id);
+        //console.log(order[0].id);
         if(order.length==0){
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"上个月没有记录")
             return;

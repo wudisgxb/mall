@@ -70,7 +70,7 @@ module.exports = {
                 }
             })
             //判断查询的记录数是否等于0
-            if(c==null){
+            if(c!=null){
                 //如果等于0那么就返回给前台用户名密码错误
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"用户名密码错误")
                 return;
