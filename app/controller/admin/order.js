@@ -9,6 +9,7 @@ var Vips = db.models.Vips;
 var PaymentReqs = db.models.PaymentReqs;
 var Tables = db.models.Tables;
 let Consignees=db.models.Consignees
+const Coupons = db.models.Coupons
 
 
 module.exports ={
