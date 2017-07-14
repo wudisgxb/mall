@@ -155,21 +155,22 @@ module.exports = {
         let profitSharingId;
         let consignee;
         let consignees = [];
-        for(let i = 0 ; i <profitSharings.length;i++ ){
-           
-            //找到此商户下下所有代售点Id
-            profitSharingId=profitSharings[i].consigneeId;
-            jsonProFit.profitSharingId=profitSharings[i].consigneeId;
 
+        for(let i = 0 ; i <profitSharings.length;i++ ){
+            //找到此商户下下所有代售点Id
+
+            profitSharingId=profitSharings[i].consigneeId;
+
+            jsonProFit[j].profitSharingId=profitSharings[i].consigneeId;
+            
             consignee = await Consignees.findOne({
                 where : {
                     consigneeId:profitSharingId
                 }
             })
-
-
             consignees.push(consignee);
         }
+        
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, consignees);
     }
 

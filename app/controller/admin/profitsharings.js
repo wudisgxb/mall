@@ -34,7 +34,6 @@ module.exports = {
                 }
             })
             consignee.name=consigneeId[i].name;
-
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consignee);
     }

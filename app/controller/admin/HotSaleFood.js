@@ -39,8 +39,8 @@ module.exports = {
             where:{
                 tenantId:body.tenantId,
                 createdAt:{
-                    $lt:b,
-                    $gte:a
+                    $lt:new Date(b),
+                    $gte:new Date(a)
                 }
             },
             paranoid: false
@@ -61,7 +61,7 @@ module.exports = {
         }
         console.log(ArrayFood);
 
-        //根据菜单查询order中的数量new Date()
+        //根据菜单查询order中的数量
         let num=0;
         let foodJson={}
         let food;
@@ -70,8 +70,8 @@ module.exports = {
                 where:{
                     tenantId:body.tenantId,
                     createdAt:{
-                        $lt:b,
-                        $gte:a
+                        $lt:new Date(b),
+                        $gte:new Date(a)
                     },
                     FoodId:ArrayFood[j]
                 },
@@ -80,9 +80,9 @@ module.exports = {
             for(var i = 0;i<orderNum.length;i++){
                 num+=orderNum[i].num
             }
-            console.log(num)
-            console.log("111")
-            console.log(orderNum[j].FoodId)
+            // console.log(num)
+            // console.log("111")
+            // console.log(orderNum[j].FoodId)
             food = await Foods.findAll({
                 where:{
                     id:orderNum[j].FoodId
@@ -90,12 +90,12 @@ module.exports = {
                 attributes:["name"]
             })
             console.log("111")
-            console.log(food[i].name)
-                foodJson.name="月销售额";
+            console.log(food[0].name)
+                foodJson.name="月热销榜";
                 foodJson.type=1;
-                foodJson.tenantId=orderNum.tenantId,
+                foodJson.tenantId=orderNum[j].tenantId,
                 foodJson.num=num,
-                foodJson.foodName=food[i].name
+                foodJson.foodName=food[0].name
         }
         //将当前一个月的销售量全部打印出来
         ctx.body=new ApiResult(ApiResult.Result.success,foodJson);

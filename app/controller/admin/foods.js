@@ -24,7 +24,7 @@ module.exports = {
         ctx.checkBody('/food/menuId',true).first().notEmpty();
         ctx.checkBody('/food/isActive',true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
-        ctx.checkBody('/food/id',true).first().notEmpty();
+ //       ctx.checkBody('/food/id',true).first().notEmpty();
         // ctx.checkBody('/condition/id',true).first().notEmpty();
 
         let body = ctx.request.body;
