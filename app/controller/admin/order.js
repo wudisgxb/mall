@@ -202,6 +202,31 @@ module.exports ={
                 }
 
             }
+
+
+            //通过订单号获取优惠券
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    phone: orders[0].phone,
+                    tenantId: orders[0].tenantId,
+                    //status: 0
+                }
+            })
+
+            if (coupon != null) {
+                result[k].couponType = coupon.couponType;
+                result[k].couponValue = coupon.value;
+
+                // if (coupon.couponType == 'amount') {
+                //     result[k].totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
+                //     result[k].totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
+                // } else {
+                //     result[k].totalPrice = result.totalPrice * coupon.value;
+                //     result[k].totalVipPrice = result.totalVipPrice * coupon.value;
+                // }
+            }
+
             //判断vip
             if (orders[0].phone != null) {
                 let vips = await Vips.findAll({
