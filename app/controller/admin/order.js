@@ -24,7 +24,7 @@ module.exports ={
             where:{
                 tenantId:ctx.query.tenantId,
                 trade_no:ctx.query.tradeNo,
-                consigneeId:null
+               //consigneeId:null
             }
         })
         if(order==null){
