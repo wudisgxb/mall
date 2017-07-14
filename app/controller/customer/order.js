@@ -224,11 +224,12 @@ module.exports = {
             }
         })
 
-        let phone;
+        let phone = body.phoneNumber;
         let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;;
         if (orders.length > 0) {
             orders.map(async function (e) {
                 e.trade_no = trade_no;
+                e.phone = phone;
                 await e.save();
             })
         }
