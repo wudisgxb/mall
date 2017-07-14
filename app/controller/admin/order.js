@@ -169,11 +169,11 @@ module.exports ={
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
             result[k].totalPrice = Math.round(totalPrice * 100) / 100;
-            result[k].dinersNum = order[0].diners_num;
-            result[k].paymentMethod = order[0].paymentMethod;//支付方式
-            result[k].status = order[0].status;
-            result[k].time = order[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
-            result[k].phone = order[0].phone;
+            result[k].dinersNum = orders[0].diners_num;
+            result[k].paymentMethod = orders[0].paymentMethod;//支付方式
+            result[k].status = orders[0].status;
+            result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
+            result[k].phone = orders[0].phone;
             result[k].consigneeName = (consigneesName==null?null:consigneesName.name);
             result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
             //根据订单号找退款信息
