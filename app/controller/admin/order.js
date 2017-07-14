@@ -9,6 +9,7 @@ var Vips = db.models.Vips;
 var PaymentReqs = db.models.PaymentReqs;
 var Tables = db.models.Tables;
 let Consignees=db.models.Consignees
+const Coupons = db.models.Coupons
 
 
 module.exports ={
@@ -24,7 +25,7 @@ module.exports ={
             where:{
                 tenantId:ctx.query.tenantId,
                 trade_no:ctx.query.tradeNo,
-                consigneeId:null
+               //consigneeId:null
             }
         })
 
@@ -42,9 +43,6 @@ module.exports ={
                 await tablestaute.save();
             }
         }
-
-
-
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
@@ -154,7 +152,7 @@ module.exports ={
                 //根据菜单号查询菜单
                 let food = await Foods.findOne({
                     where: {
-                        id: order[j].FoodId,
+                        id: orders[j].FoodId,
                     }
                 })
 
@@ -164,14 +162,14 @@ module.exports ={
                 foodJson[j].price = food.price;
                 foodJson[j].vipPrice = food.vipPrice;
                 //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);
-                foodJson[j].num = order[j].num;
-                foodJson[j].unit = order[j].unit;
+                foodJson[j].num = orders[j].num;
+                foodJson[j].unit = orders[j].unit;
                 //总数量为每个循环的数量现价
-                totalNum += order[j].num;
+                totalNum += orders[j].num;
                 //当前菜的总价格为菜品的价格*订单中购买的数量
-                totalPrice += food.price * order[j].num;//原价
+                totalPrice += food.price * orders[j].num;//原价
                 //会员价为菜品的会员价*订单中购买的数量
-                totalVipPrice += food.vipPrice * order[j].num;//会员价
+                totalVipPrice += food.vipPrice * orders[j].num;//会员价
             }
 
             result[k] = {};
@@ -217,11 +215,36 @@ module.exports ={
                     result[k].refund_reason = paymentReqs[0].refund_reason;
                 }
             }
-            //判断vi
-            if (order[0].phone != null) {
+
+
+            //通过订单号获取优惠券
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    phone: orders[0].phone,
+                    tenantId: orders[0].tenantId,
+                    //status: 0
+                }
+            })
+
+            if (coupon != null) {
+                result[k].couponType = coupon.couponType;
+                result[k].couponValue = coupon.value;
+
+                // if (coupon.couponType == 'amount') {
+                //     result[k].totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
+                //     result[k].totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
+                // } else {
+                //     result[k].totalPrice = result.totalPrice * coupon.value;
+                //     result[k].totalVipPrice = result.totalVipPrice * coupon.value;
+                // }
+            }
+
+            //判断vip
+            if (orders[0].phone != null) {
                 let vips = await Vips.findAll({
                     where: {
-                        phone: order[0].phone,
+                        phone: orders[0].phone,
                         tenantId: ctx.query.tenantId
                     }
                 })
