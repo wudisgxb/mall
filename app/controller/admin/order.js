@@ -21,7 +21,7 @@ module.exports ={
             ctx.body=new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return;
         }
-        let order = await Orders.findOne({
+        let orders = await Orders.findAll({
             where:{
                 tenantId:ctx.query.tenantId,
                 trade_no:ctx.query.tradeNo,
@@ -29,20 +29,20 @@ module.exports ={
             }
         })
 
-        if(order==null){
+        if(orders==null){
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有此订单")
             return;
         }
-        order.forEach(async function(e){
+        orders.forEach(async function(e){
             await e.destroy();
         })
-        for(let i=0;i<order.length;i++){
-            let tablestaute = await Tables.findById(order[i].FoodId)
-            if(tablestaute!=null){
-                tablestaute.status=0;
-                await tablestaute.save();
-            }
+
+        let table = await Tables.findById(orders[0].TableId)
+        if(table!=null){
+            table.status=0;
+            await table.save();
         }
+
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
