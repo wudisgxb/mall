@@ -8,7 +8,7 @@ router.put('/api/v3/admin/merchant', merchant.updateAdminMerchantById);
 router.get('/api/v3/admin/merchant', merchant.getAdminMerchant);
 router.delete('/api/v3/admin/merchant', merchant.deleteAdminMerchant);
 
-router.get('/api/v3/admin/consignee', merchant.getAdminConsignee);
+router.get('/api/v3/admin/consignees', merchant.getAdminConsignee);
 
 
 module.exports = router

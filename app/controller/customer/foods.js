@@ -176,7 +176,7 @@ module.exports = {
             foodsofmenus = await Foodsofmenus.findAll({
                 where: {
                     MenuId: menus[i].id,
-                    tenantId: tenantId,
+                    tenantId: tenantId
                 }
             });
             let food;

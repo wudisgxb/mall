@@ -141,6 +141,7 @@ module.exports = {
         }
         let tenantId = ctx.query.tenantId;
         //根据tenantId查询查询商户信息
+        let jsonProFit={};
         let profitSharings = await ProfitSharings.findAll({
             where : {
                 tenantId : tenantId
@@ -155,14 +156,18 @@ module.exports = {
         let consignee;
         let consignees = [];
         for(let i = 0 ; i <profitSharings.length;i++ ){
+           
             //找到此商户下下所有代售点Id
             profitSharingId=profitSharings[i].consigneeId;
+            jsonProFit.profitSharingId=profitSharings[i].consigneeId;
 
             consignee = await Consignees.findOne({
                 where : {
                     consigneeId:profitSharingId
                 }
             })
+
+
             consignees.push(consignee);
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, consignees);

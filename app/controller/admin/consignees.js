@@ -6,6 +6,7 @@ let Consignees = db.models.Consignees
 module.exports = {
     async getAdminConsignees(ctx,next){
         ctx.checkQuery('consigneeId').notEmpty()
+        
         if (this.errors) {
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
             return;

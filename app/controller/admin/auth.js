@@ -63,21 +63,20 @@ module.exports = {
         //判断输入的验证码和数据库中的验证码是否匹配
         if(body.captcha.toLowerCase()==captcha.captcha.toLowerCase()){
             //如果匹配查询用户名密码是否正确
-            c =await Admins.findOne({
+            c = await Admins.findOne({
                 where:{
                     nickname:body.userName,
                     password:body.password
                 }
             })
             //判断查询的记录数是否等于0
-            if(c!=null){
+            if(c==null){
                 //如果等于0那么就返回给前台用户名密码错误
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"用户名密码错误")
                 return;
             }else{
                 //用户名密码正确返回租户Id给前端
-                ctx.body= new ApiResult(ApiResult.Result.SUCCESS,
-                    {
+                ctx.body= new ApiResult(ApiResult.Result.SUCCESS,{
                     id:c.id,
                     tenantId:c.tenantId
                 })

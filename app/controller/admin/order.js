@@ -91,7 +91,7 @@ module.exports ={
                 tenantId: ctx.query.tenantId
             }
         })
-        // let consigneename;
+        // 判断order是否为空
         if(order.length==0){
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"未找到当前订单")
             return;
@@ -166,7 +166,7 @@ module.exports ={
             result[k].ordersId = orders[k].id
             result[k].tableName = table.name;
             result[k].trade_no = tradeNoArray[k];
-            result[k].info = order[0].info;
+            result[k].info = orders[0].info;
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
             result[k].totalPrice = Math.round(totalPrice * 100) / 100;
@@ -203,7 +203,6 @@ module.exports ={
                 }
 
             }
-
             //判断vi
             if (order[0].phone != null) {
                 let vips = await Vips.findAll({
