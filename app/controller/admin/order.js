@@ -138,7 +138,7 @@ module.exports ={
                 //根据菜单号查询菜单
                 let food = await Foods.findOne({
                     where: {
-                        id: order[j].FoodId,
+                        id: orders[j].FoodId,
                     }
                 })
 
@@ -148,14 +148,14 @@ module.exports ={
                 foodJson[j].price = food.price;
                 foodJson[j].vipPrice = food.vipPrice;
                 //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);
-                foodJson[j].num = order[j].num;
-                foodJson[j].unit = order[j].unit;
+                foodJson[j].num = orders[j].num;
+                foodJson[j].unit = orders[j].unit;
                 //总数量为每个循环的数量现价
-                totalNum += order[j].num;
+                totalNum += orders[j].num;
                 //当前菜的总价格为菜品的价格*订单中购买的数量
-                totalPrice += food.price * order[j].num;//原价
+                totalPrice += food.price * orders[j].num;//原价
                 //会员价为菜品的会员价*订单中购买的数量
-                totalVipPrice += food.vipPrice * order[j].num;//会员价
+                totalVipPrice += food.vipPrice * orders[j].num;//会员价
             }
 
             result[k] = {};
@@ -202,11 +202,11 @@ module.exports ={
                 }
 
             }
-            //判断vi
-            if (order[0].phone != null) {
+            //判断vip
+            if (orders[0].phone != null) {
                 let vips = await Vips.findAll({
                     where: {
-                        phone: order[0].phone,
+                        phone: orders[0].phone,
                         tenantId: ctx.query.tenantId
                     }
                 })
