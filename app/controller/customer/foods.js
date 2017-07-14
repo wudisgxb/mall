@@ -216,7 +216,7 @@ module.exports = {
 
             resultArray[i] = {};
             resultArray[i].id = menus[i].id;
-            resultArray[i].rest=(food[i].foodNum-food[i].todaySales)>0?(food[i].foodNum-food[i].todaySales):0;
+            // resultArray[i].rest=(food[i].foodNum-food[i].todaySales)>0?(food[i].foodNum-food[i].todaySales):0;
             resultArray[i].name = menus[i].name;
             resultArray[i].type = menus[i].type;
             resultArray[i].foods = foodArray;
