@@ -66,7 +66,7 @@ module.exports = {
        await MerchantRatings.create({
            userName:body.phoneNumber,
            text:body.comment,
-           avatar:1,
+           avatar:'http://static.galileo.xiaojukeji.com/static/tms/default_header.png',
            tenantId:body.tenantId,
            tasteScore:body.tasteScore,
            serviceScore:body.serviceScore,
@@ -93,7 +93,7 @@ module.exports = {
             userName:body.phoneNumber,
             text:body.comment,
             tenantId:body.tenantId,
-            avatar:1,
+            avatar:'http://static.galileo.xiaojukeji.com/static/tms/default_header.png',
             tasteScore:body.tasteScore,
             serviceScore:body.serviceScore,
             consigneeId:body.consigneeId,
