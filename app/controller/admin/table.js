@@ -5,6 +5,8 @@ let db = require('../../db/mysql/index');
 let Tables = db.models.Tables;
 const ShoppingCarts = db.models.ShoppingCarts;
 const Orders = db.models.Orders;
+const Consignees = db.models.Consignees;
+const Merchant = db.models.Merchants;
 
 module.exports = {
     //获取租户下桌状态
@@ -23,6 +25,8 @@ module.exports = {
             }
         })
 
+
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table);
     },
     //获取租户下 代售点下桌状态
@@ -39,25 +43,38 @@ module.exports = {
         //根据tenantId查询consigneeId
         let consignee = [];
         let json={}
-        let tables=[];
-        let tableId=[]
+        let tables;
+        let merchants;
         let shoppingCart=[];
         let shop = [];
-        let order=[];
+
         let table = await Tables.findAll({
             where:{
                 tenantId: ctx.query.tenantId
             },
 
         })
+
         if(table.length<=0){
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有该租户");
         }
+
+        for(let i = 0; i<table.length;i++){
+            merchants =  await Merchant.findOne({
+                tenantId:table[i].tenantId
+            })
+            if(table[i].tenantId!=null){
+                table[i].tenantId=merchants.name;
+            }
+            tables = await Consignees.findOne({
+                consigneeId:table[i].consigneeId
+            })
+            if(table[i].consigneeId!=null){
+                table[i].consigneeId=tables.name
+            }
+            console.log(tables);
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table)
-
-
-
-
     },
     //新增租户下桌状态
     async saveAdminTableByTableName (ctx, next) {

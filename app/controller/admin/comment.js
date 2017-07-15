@@ -24,6 +24,9 @@ module.exports = {
         for (let i = 0; i < merchantRatings.length; i++) {
             merchantRatings[i].userName = merchantRatings[i].userName.slice(0, 3) + '****' + merchantRatings[i].userName.slice(-4);
         }
+        for (let i = 0; i < merchantRatings.length; i++) {
+            merchantRatings[i].userName = merchantRatings[i].userName.slice(0, 3) + '****' + merchantRatings[i].userName.slice(-4);
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchantRatings);
     },
 
@@ -44,9 +47,7 @@ module.exports = {
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有任何评价");
             return;
         }
-        for (let i = 0; i < merchantRatings.length; i++) {
-            merchantRatings[i].userName = merchantRatings[i].userName.slice(0, 3) + '****' + merchantRatings[i].userName.slice(-4);
-        }
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchantRatings);
     },
 
@@ -63,14 +64,17 @@ module.exports = {
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
             return;
         }
+        let totalScore = parseInt(body.tasteScore) + parseInt(body.environmentScore) + parseInt(body.serviceScore);
+        let averageScore = Math.round(totalScore / 3 * 10) / 10;
        await MerchantRatings.create({
            userName:body.phoneNumber,
            text:body.comment,
-           avatar:1,
+           avatar:"http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
            tenantId:body.tenantId,
            tasteScore:body.tasteScore,
            serviceScore:body.serviceScore,
-           environmentScore:body.environmentScore
+           environmentScore:body.environmentScore,
+           averageScore:averageScore
        })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
@@ -89,15 +93,18 @@ module.exports = {
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
             return;
         }
+        let totalScore = parseInt(body.tasteScore) + parseInt(body.environmentScore) + parseInt(body.serviceScore);
+        let averageScore = Math.round(totalScore / 3 * 10) / 10;
         await MerchantRatings.create({
             userName:body.phoneNumber,
             text:body.comment,
             tenantId:body.tenantId,
-            avatar:1,
+            avatar:"http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
             tasteScore:body.tasteScore,
             serviceScore:body.serviceScore,
             consigneeId:body.consigneeId,
-            environmentScore:body.environmentScore
+            environmentScore:body.environmentScore,
+            averageScore:averageScore
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },

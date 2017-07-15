@@ -2,6 +2,8 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
+let getFoodNum = require('../../controller/statistics/statistics');
+
 let Foods = db.models.Foods;
 let Menus = db.models.Menus;
 let Foodsofmenus = db.models.FoodsOfTMenus;
@@ -148,16 +150,19 @@ module.exports = {
 
     async getAdminFoods (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
+        let foodnum = ctx.query.num;
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
             return;
         }
         //查询foods
+
         let foods = await Foods.findAll({
             where: {
                 tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
             }
         });
+
         let foodId;
         let menuName;
         let menuId;
@@ -186,7 +191,6 @@ module.exports = {
                 ]
             });
             foodsJson[i] = {};
-
             foodsJson[i].id = foods[i].id;
             foodsJson[i].name = foods[i].name;
             foodsJson[i].foodNum = foods[i].foodNum;
@@ -205,8 +209,21 @@ module.exports = {
             foodsJson[i].menuName = menuName[0].name;
             foodsJson[i].unit = foods[i].unit;
         }
+        let results=[];
+        let result=[];
+        let resultId;
+        result = await getFoodNum.getFood(ctx.query.tenantId,foodnum);
+        resultId = result.sort((a, b)=>b.num - a.num);
+        for (let k = 0; k < foodnum; k++) {
+            results.push(resultId[k])
+        }
+        for(let i=0;i<results.length;i++){
+            if(foodsJson.contains(results[i].id)){
+                foodsJson.splice(i,1);
+                foodsJson.length-1
+            }
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsJson);
-
     },
 
     // async deleteFoods(ctx, next){

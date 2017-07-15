@@ -161,14 +161,18 @@ module.exports = {
 
             profitSharingId=profitSharings[i].consigneeId;
 
-            jsonProFit[j].profitSharingId=profitSharings[i].consigneeId;
+            //jsonProFit[i].profitSharingId=profitSharings[i].consigneeId;
             
-            consignee = await Consignees.findOne({
+            consignee = await Consignees.findAll({
                 where : {
                     consigneeId:profitSharingId
                 }
             })
-            consignees.push(consignee);
+            for(let j =0;j<consignee.length;j++){
+                consignees.push(consignee[j]);
+            }
+
+
         }
         
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, consignees);

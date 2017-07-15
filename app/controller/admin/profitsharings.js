@@ -15,6 +15,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
             return;
         }
+
         let profitsharing = await Profitsharings.findAll({
             where:{
                 tenantId:ctx.query.tenantId
@@ -24,17 +25,17 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"未找到信息");
             return;
         }
-        console.log(profitsharing.length);
+        //console.log(profitsharing[0].consigneeId);
         let consigneeId;
-        let consignee={};
+        let consignee=[];
         for(let i=0;i<profitsharing.length;i++) {
             consigneeId = await Consignee.findAll({
                 where:{
                     consigneeId:profitsharing[i].consigneeId
                 }
             })
-            consignee.name=consigneeId[i].name;
+            consignee.push(consigneeId[i].name)
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consignee);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consigneeId);
     }
 }

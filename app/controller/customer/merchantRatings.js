@@ -21,7 +21,7 @@ module.exports = {
             ctx.body = ctx.errors;
             return;
         }
-        let totalScore = parseInt(body.serviceScore) + parseInt(body.environmentScore) + parseInt(body.serviceScore);
+        let totalScore = parseInt(body.tasteScore) + parseInt(body.environmentScore) + parseInt(body.serviceScore);
         let averageScore = Math.round(totalScore / 3 * 10) / 10;
         await MerchantRatings.create({
             userName: body.userName,
