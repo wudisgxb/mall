@@ -16,15 +16,13 @@ module.exports = {
         ctx.checkBody('/food/price',true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice',true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/vipPrice',true).first().notEmpty().isFloat().ge(0).toFloat();
-        ctx.checkBody('/food/sellCount',true).first().notEmpty().isInt().ge(0).toInt();
-        ctx.checkBody('/food/rating',true).first().notEmpty().isInt().ge(0).toInt();
         ctx.checkBody('/food/info',true).first().notEmpty();
         ctx.checkBody('/food/unit',true).first().notEmpty();
         ctx.checkBody('/food/foodNum',true).first().notEmpty();
         ctx.checkBody('/food/menuId',true).first().notEmpty();
-        ctx.checkBody('/food/isActive',true).first().notEmpty();
+        // ctx.checkBody('/food/isActive',true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
- //       ctx.checkBody('/food/id',true).first().notEmpty();
+       // ctx.checkBody('/food/id',true).first().notEmpty();
         // ctx.checkBody('/condition/id',true).first().notEmpty();
 
         let body = ctx.request.body;
@@ -57,13 +55,13 @@ module.exports = {
                 price: body.food.price,
                 oldPrice: body.food.oldPrice,
                 vipPrice: body.food.vipPrice,
-                sellCount: body.food.sellCount,
+                sellCount: 0,
                 foodNum:body.food.foodNum,
-                rating: body.food.rating,
+                // rating: body.food.rating,
                 info: body.food.info,
                 unit: body.food.unit,
                 taste: JSON.stringify(body.food.taste),
-                isActive: body.food.isActive,
+                // isActive: body.food.isActive,
                 tenantId: body.tenantId
 
                 // todo: ok?
@@ -93,6 +91,7 @@ module.exports = {
         ctx.checkBody('/food/isActive',true).first().notEmpty();
         ctx.checkBody('/food/foodNum',true).first().notEmpty();
         ctx.checkBody('/food/menuId',true).first().notEmpty();
+        ctx.checkBody('/food/taste',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
         ctx.checkBody('/condition/id',true).first().notEmpty();
 
@@ -102,11 +101,11 @@ module.exports = {
         // }
         //body.menuIds = body.menuIds;
         if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors);
             return;
         }
-        let createMenuTask = [];
-        let foods;/food/
+        //let createMenuTask = [];
+        let foods;
         foods = await Foods.findById(
             body.condition.id
         );
@@ -122,24 +121,26 @@ module.exports = {
             foods.sellCount = body.food.sellCount;
             foods.rating = body.food.rating;
             foods.info = body.food.info;
-            foods.state=JSON.stringify(body.food.state);
+            foods.taste=JSON.stringify(body.food.taste);
             foods.unit = body.food.unit;
             foods.isActive = body.food.isActive;
             foods.tenantId = body.condition.tenantId;
 
             await foods.save();
-            let foodsofmenus;
-            foodsofmenus =  await Foodsofmenus.findOne({
+
+
+            let foodsofmenus =  await Foodsofmenus.findOne({
                 where: {
                     FoodId: foods.id,
                     tenantId:body.tenantId
                 },
-
             });
-            foodsofmenus.FoodId=foods.id;
-            foodsofmenus.MenuId = body.food.menuId;
-            foodsofmenus.tenantId = body.tenantId;
-            await foodsofmenus.save();
+            if(foodsofmenus!=null){
+                foodsofmenus.FoodId=body.condition.id;
+                foodsofmenus.MenuId = body.foods.menuId;
+                foodsofmenus.tenantId = body.tenantId;
+                await foodsofmenus.save();
+            }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
@@ -196,6 +197,8 @@ module.exports = {
             foodsJson[i].vipPrice = foods[i].vipPrice;
             foodsJson[i].isActive = foods[i].isActive;
             foodsJson[i].taste=JSON.parse(foods[i].taste);
+            foodsJson[i].sellCount=foods[i].sellCount;
+            foodsJson[i].rating=foods[i].rating;
             foodsJson[i].rest=(foods[0].foodNum-foods[0].todaySales)<=0?0:(foods[0].foodNum-foods[0].todaySales);
             // foodsJson[i].name = foods[i].name;
             foodsJson[i].info=foods[i].info;
