@@ -7,8 +7,8 @@ let Ratings = db.models.Ratings;
 module.exports = {
     async getCustomerMerchantByTenantId(ctx,next){
         ctx.checkQuery('tenantId').notEmpty();
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         let merchantRatings = await MerchantRatings.findAll({
@@ -24,17 +24,15 @@ module.exports = {
         for (let i = 0; i < merchantRatings.length; i++) {
             merchantRatings[i].userName = merchantRatings[i].userName.slice(0, 3) + '****' + merchantRatings[i].userName.slice(-4);
         }
-        for (let i = 0; i < merchantRatings.length; i++) {
-            merchantRatings[i].userName = merchantRatings[i].userName.slice(0, 3) + '****' + merchantRatings[i].userName.slice(-4);
-        }
+       
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchantRatings);
     },
 
     async getCustomerMerchantByConsigneeId(ctx,next){
         ctx.checkQuery('consigneeId').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         let merchantRatings = await MerchantRatings.findAll({
@@ -47,7 +45,9 @@ module.exports = {
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有任何评价");
             return;
         }
-
+ 		for (let i = 0; i < merchantRatings.length; i++) {
+            merchantRatings[i].userName = merchantRatings[i].userName.slice(0, 3) + '****' + merchantRatings[i].userName.slice(-4);
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchantRatings);
     },
 
@@ -60,8 +60,8 @@ module.exports = {
         ctx.checkBody('environmentScore').notEmpty();
         let body = ctx.request.body;
 
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         let totalScore = parseInt(body.tasteScore) + parseInt(body.environmentScore) + parseInt(body.serviceScore);
@@ -89,8 +89,8 @@ module.exports = {
         ctx.checkBody('environmentScore').notEmpty();
         let body = ctx.request.body;
 
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         let totalScore = parseInt(body.tasteScore) + parseInt(body.environmentScore) + parseInt(body.serviceScore);
@@ -116,8 +116,8 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         let body = ctx.request.body;
 
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         await Ratings.create({
@@ -138,8 +138,8 @@ module.exports = {
         ctx.checkBody('foodId').notEmpty();
         let body = ctx.request.body;
 
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         await Ratings.create({
