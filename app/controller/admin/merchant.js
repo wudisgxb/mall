@@ -111,7 +111,7 @@ module.exports = {
     },
 
     async deleteAdminMerchant(ctx, next){
-        ctx.checkParam('tenantId').notEmpty();
+        ctx.checkParams('tenantId').notEmpty();
 
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
@@ -141,7 +141,7 @@ module.exports = {
         }
         let tenantId = ctx.query.tenantId;
         //根据tenantId查询查询商户信息
-        let jsonProFit={};
+        let jsonProFit=[];
         let profitSharings = await ProfitSharings.findAll({
             where : {
                 tenantId : tenantId
@@ -155,7 +155,6 @@ module.exports = {
         let profitSharingId;
         let consignee;
         let consignees = [];
-
         for(let i = 0 ; i <profitSharings.length;i++ ){
             //找到此商户下下所有代售点Id
 
@@ -163,19 +162,26 @@ module.exports = {
 
             //jsonProFit[i].profitSharingId=profitSharings[i].consigneeId;
             
-            consignee = await Consignees.findAll({
+            consignee = await Consignees.findOne({
                 where : {
                     consigneeId:profitSharingId
                 }
             })
-            for(let j =0;j<consignee.length;j++){
-                consignees.push(consignee[j]);
-            }
+            jsonProFit[i]={}
+            jsonProFit[i].tenantId=profitSharings[i].tenantId;
 
-
+            jsonProFit[i].consigneeId=profitSharings[i].consigneeId;
+            jsonProFit[i].id=consignee.id;
+            jsonProFit[i].rate=profitSharings[i].rate;
+            jsonProFit[i].ownRate=profitSharings[i].ownRate;
+            jsonProFit[i].merchantRemark=profitSharings[i].merchantRemark;
+            jsonProFit[i].consigneeRemark=profitSharings[i].consigneeRemark;
+            jsonProFit[i].consigneeName=consignee.name;
+            jsonProFit[i].consigneePhone=consignee.phone;
+            jsonProFit[i].consigneeWecharPayee_Account=consignee.wecharPayee_account;
+            jsonProFit[i].consigneePayee_Account=consignee.payee_account;
         }
-        
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, consignees);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, jsonProFit);
     }
 
 }

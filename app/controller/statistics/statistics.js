@@ -12,15 +12,32 @@ const getFoodNum = (function () {
     let getFood = async function (tenantId, foodnums) {
 
         let ArrayFood = [];
-
+        let b;
         let lastDate = new Date()
-        lastDate.setDate(0);
-        let b = lastDate.format("yyyy-MM-dd 23:59:59");
+        if(lastDate.getMonth()==1){
+            lastDate.setYear(-1)
+            b = lastDate.format("yyyy-12-dd 23:59:59")
+        }else{
+            lastDate.setDate(0);
+            b = lastDate.format("yyyy-MM-dd 23:59:59");
+        }
 
+        let a;
         let firstDate = new Date();
-        firstDate.setDate(0);
-        firstDate.setDate(0)
-        let a = firstDate.format("yyyy-MM-dd 23:59:59");
+        if(firstDate.getMonth()==1){
+            firstDate.setYear(-1)
+            a = firstDate.format("yyyy-11-dd 23:59:59")
+        }else if(firstDate.getMonth()==2){
+            firstDate.setDate(0);
+            firstDate.setDate(1);
+            a = firstDate.format("yyyy-MM-dd 00:00:00");
+        }
+        else{
+            firstDate.setDate(0);
+            firstDate.setDate(0)
+            a = firstDate.format("yyyy-MM-dd 23:59:59");
+        }
+
 
         console.log(b);
         console.log(a);

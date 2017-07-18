@@ -218,9 +218,14 @@ module.exports = {
             results.push(resultId[k])
         }
         for(let i=0;i<results.length;i++){
-            if(foodsJson.contains(results[i].id)){
-                foodsJson.splice(i,1);
-                foodsJson.length-1
+            console.log(results[i].id);
+            for(let j=0;j<foodsJson.length;j++){
+                console.log(foodsJson[j].id);
+                console.log((foodsJson[j].id)==(results[i].id));
+                if(foodsJson[j].id==(results[i].id)){
+                    foodsJson.splice(j,1);
+                }
+
             }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsJson);
