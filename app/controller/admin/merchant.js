@@ -178,6 +178,8 @@ module.exports = {
             jsonProFit[i].consigneeRemark=profitSharings[i].consigneeRemark;
             jsonProFit[i].consigneeName=consignee.name;
             jsonProFit[i].consigneePhone=consignee.phone;
+            jsonProFit[i].distributionFee=profitSharings[i].distributionFee;
+            jsonProFit[i].excludeFoodId=profitSharings[i].excludeFoodId;
             jsonProFit[i].consigneeWecharPayee_Account=consignee.wecharPayee_account;
             jsonProFit[i].consigneePayee_Account=consignee.payee_account;
         }

@@ -57,7 +57,7 @@ module.exports = {
                 price: body.food.price,
                 oldPrice: body.food.oldPrice,
                 vipPrice: body.food.vipPrice,
-                sellCount: 0,
+                sellCount: 100,
                 foodNum:body.food.foodNum,
                 // rating: body.food.rating,
                 info: body.food.info,

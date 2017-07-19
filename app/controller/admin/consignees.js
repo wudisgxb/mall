@@ -63,6 +63,8 @@ module.exports = {
         ctx.checkBody('/profitsharings/rate',true).first().notEmpty();
         ctx.checkBody('/profitsharings/ownRate',true).first().notEmpty();
         ctx.checkBody('/profitsharings/distributionFee',true).first().notEmpty();
+        ctx.checkBody('/profitsharings/consigneeRemark',true).first().notEmpty();
+        ctx.checkBody('/condition/consigneeId',true).first().notEmpty();
         if (this.errors) {
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
             return;
@@ -73,10 +75,12 @@ module.exports = {
                 consigneeId:body.condition.consigneeId
             }
         });
+        console.log(consignees.length)
         if(consignees.length>0){
             ctx.body=new ApiResult(ApiResult.Result.EXISTED,"记录已存在");
             return;
         }
+
         await Consignees.create({
             name:body.consignees.name,
             phone:body.consignees.phone,
@@ -87,10 +91,11 @@ module.exports = {
         await ProfitSharings.create({
             tenantId:body.profitsharings.tenantId,
             merchantRemark:body.profitsharings.merchantRemark,
+            consigneeRemark:body.profitsharings.consigneeRemark,
+            consigneeId:body.condition.consigneeId,
             rate:body.profitsharings.rate,
             ownRate:body.profitsharings.ownRate,
-            distributionFee:body.profitsharings.distributionFee,
-            ExcludeFoodId:body.profitsharings.ExcludeFoodId,
+            distributionFee:body.profitsharings.distributionFee
         })
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS);
     },

@@ -1,6 +1,7 @@
 const getWeek_EveryYeay = (function () {
 
     let getWeek = async function (currentDates) {
+        let weekDate;
         //获取当年的年份
         let currentYear = new Date(currentDates).getFullYear()
         //获取当前月份
@@ -8,7 +9,7 @@ const getWeek_EveryYeay = (function () {
         //获取当前天数（一个月的第几天）
         let currentDate = new Date(currentDates).getDate();
         //获取当前天数（一周的第几天）
-        //let currentDay = new Date(currentDates).getDay();
+        let currentDay = new Date(currentDates).getDay();
         //查出所有月份的天数
         let arrayDay=[];
         arrayDay[0]=31
@@ -40,14 +41,15 @@ const getWeek_EveryYeay = (function () {
                 monthDay+=arrayDay[i]
             }
         }
+        //这个月前的天数加上这个月的天数
         yearDay = monthDay+currentDate;
-        let week = Math.cell(yearDay/7)
-        return week;
-
+        let week = Math.cell((yearDay-currentDay)/7)
+        let currentWeek = week+1;
+        return currentWeek;
     }
     let instance = {
         getWeek: getWeek
     }
     return instance;
     })();
-module.exports = getFoodEchats;
+module.exports = getWeek_EveryYeay;
