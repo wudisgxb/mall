@@ -29,21 +29,24 @@ module.exports ={
             }
         })
 
-        if(orders==null){
+        if(orders.length==0){
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有此订单")
             return;
         }
-        orders.forEach(async function(e){
-            await e.destroy();
-        })
-
-        let table = await Tables.findById(orders[0].TableId)
-        if(table!=null){
-            table.status=0;
-            await table.save();
+        let tableId = [];
+        for(let i =0;i<orders.length;i++){
+            await orders[i].destory();
+            if(!tableId.contains(orders[i].TableId)){
+                tableId.push(orders[i].TableId)
+            }
         }
-
-
+        for(let j = 0; j < tableId.length; j++){
+            let table = await Tables.findById(tableId[j])
+            if(table!=null){
+                table.status=0;
+                await table.save();
+            }
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
 
@@ -180,11 +183,12 @@ module.exports ={
             result[k].tableName = table.name;
             result[k].trade_no = tradeNoArray[k];
             result[k].info = orders[0].info;
+            result[k].id = orders[0].id
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
             result[k].totalPrice = Math.round(totalPrice * 100) / 100;
             result[k].dinersNum = orders[0].diners_num;
-            result[k].paymentMethod = orders[0].paymentMethod;//支付方式
+            result[k].paymentMethod = orders[0].paymentMethod==0?"支付宝":"微信";//支付方式
             result[k].status = orders[0].status;
             result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[0].phone;
@@ -258,5 +262,46 @@ module.exports ={
             }
         }
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS,result)
+    },
+
+    async saveAdminOrder(ctx,next){
+        ctx.checkBody("/order/num",true).first().notEmpty();
+        ctx.checkBody("/order/status",true).first().notEmpty();
+        ctx.checkBody("/order/info",true).first().notEmpty();
+        ctx.checkBody("/order/phone",true).first().notEmpty();
+        ctx.checkBody("/order/diners_num",true).first().notEmpty();
+        ctx.checkBody("/order/trade_no",true).first().notEmpty();
+        ctx.checkBody("/order/paymentMethod",true).first().notEmpty();
+        ctx.checkBody("/order/unit",true).first().notEmpty();
+        ctx.checkBody("/order/TableId",true).first().notEmpty();
+        ctx.checkBody("/order/FoodId",true).first().notEmpty();
+        ctx.checkBody("/order/createdAt",true).first().notEmpty();
+        ctx.checkBody("/condition/tenantId",true).first().notEmpty();
+        let body = ctx.request.body;
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        }
+        let foodId = [];
+        foodId = body.order.FoodId;
+        for(let i = 0; i<foodId.length;i++){
+            await Orders.create({
+                num:body.order.num,
+                status:body.order.status,
+                info:body.order.info,
+                phone:body.order.phone,
+                diners_num:body.order.diners_num,
+                trade_no:body.order.trade_no,
+                paymentMethod:body.order.paymentMethod,
+                unit:body.order.unit,
+                TableId:body.order.TableId,
+                FoodId:foodId[i],
+                createdAt:body.order.createdAt,
+                tenantId:body.condition.tenantId,
+                consigneeId:body.condition.consigneeId
+            })
+        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
+
 }

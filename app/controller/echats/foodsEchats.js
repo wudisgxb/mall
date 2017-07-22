@@ -4,7 +4,7 @@ const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 let Orders = db.models.Orders;
 let Foods = db.models.Foods;
-let getWeek = require('../echats/getWeek')
+let getWeek_EveryYeay = require('../echats/getWeek')
 
 
 const getFoodEchats = (function () {
@@ -57,6 +57,8 @@ const getFoodEchats = (function () {
                     })
                     result.push({
                         FoodId:food.name,
+                        consume:food.price*num,
+                        vipConsume:food.vipPrice*num,
                         time: new Date(startDate).format("yyyy-MM-dd"),
                         num: num
                     })
@@ -130,6 +132,8 @@ const getFoodEchats = (function () {
                 })
                 result.push({
                     FoodId:food.name,
+                    price:food.price*num,
+                    vipPrice:food.vipPrice*num,
                     time: "第"+quarter+"季度",
                     num: num
                 })
@@ -181,6 +185,8 @@ const getFoodEchats = (function () {
                 })
                 result.push({
                     FoodId:food.name,
+                    price:food.price*num,
+                    vipPrice:food.vipPrice*num,
                     time: new Date(startTime).format("yyyy-MM-dd"),
                     num: num
                 })
@@ -236,12 +242,15 @@ const getFoodEchats = (function () {
                 })
                 result.push({
                     FoodId:food.name,
+                    price:food.price*num,
+                    vipPrice:food.vipPrice*num,
                     time: new Date(startTime).getFullYear(),
                     num: num
                 })
             }
             return result;
         }
+
     }
     let instance = {
         getfEchats: getfEchats

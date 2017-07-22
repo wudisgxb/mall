@@ -22,7 +22,7 @@ module.exports = {
         ctx.checkBody('/food/unit',true).first().notEmpty();
         ctx.checkBody('/food/foodNum',true).first().notEmpty();
         ctx.checkBody('/food/menuId',true).first().notEmpty();
-        // ctx.checkBody('/food/isActive',true).first().notEmpty();
+        ctx.checkBody('/food/isActive',true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
        // ctx.checkBody('/food/id',true).first().notEmpty();
         // ctx.checkBody('/condition/id',true).first().notEmpty();
@@ -63,7 +63,7 @@ module.exports = {
                 info: body.food.info,
                 unit: body.food.unit,
                 taste: JSON.stringify(body.food.taste),
-                // isActive: body.food.isActive,
+                isActive: body.food.isActive,
                 tenantId: body.tenantId
 
                 // todo: ok?
@@ -129,8 +129,6 @@ module.exports = {
             foods.tenantId = body.condition.tenantId;
 
             await foods.save();
-
-
             let foodsofmenus =  await Foodsofmenus.findOne({
                 where: {
                     FoodId: foods.id,
@@ -146,8 +144,8 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
-//获取租户下所有商品
 
+    //获取租户下所有商品
     async getAdminFoods (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
         let foodnum = ctx.query.num;
@@ -218,10 +216,10 @@ module.exports = {
             results.push(resultId[k])
         }
         for(let i=0;i<results.length;i++){
-            console.log(results[i].id);
+            // console.log(results[i].id);
             for(let j=0;j<foodsJson.length;j++){
-                console.log(foodsJson[j].id);
-                console.log((foodsJson[j].id)==(results[i].id));
+                // console.log(foodsJson[j].id);
+                // console.log((foodsJson[j].id)==(results[i].id));
                 if(foodsJson[j].id==(results[i].id)){
                     foodsJson.splice(j,1);
                 }

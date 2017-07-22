@@ -14,8 +14,8 @@ module.exports = {
         ctx.checkBody('/printerSetting/smallTicketNum',true).first().notEmpty();
         ctx.checkBody('/printerSetting/isShowMoney',true).first().notEmpty();
         ctx.checkBody('/printerSetting/connectMode',true).first().notEmpty();
-        ctx.checkBody('/condition/tenantId',true).first().notEmpty();
-        ctx.checkBody('/condition/printName',true).first().notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('printName').notEmpty();
 
         let body = ctx.request.body;
 
@@ -25,8 +25,8 @@ module.exports = {
         }
         let prints = await Prints.findAll({
             where: {
-                printName: body.condition.tenantId,
-                tenantId: body.condition.tenantId
+                printName: body.printName,
+                tenantId: body.tenantId
             }
         })
         if (prints!=null) {

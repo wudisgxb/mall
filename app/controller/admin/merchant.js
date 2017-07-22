@@ -148,7 +148,7 @@ module.exports = {
             }
         });
         //如果没查到显示你所要查询的商户不存在
-        if(profitSharings.length<=0){
+        if(profitSharings.length==0){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"你所要查询的商户不存在" );
             return;
         }
