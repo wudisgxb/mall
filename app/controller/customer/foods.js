@@ -55,7 +55,8 @@ module.exports = {
                     'id',
                     'name',
                     'type'
-                ]
+                ],
+                order :["sort"]
             });
         } else {
             let menus = await Menus.findAll({
@@ -66,7 +67,8 @@ module.exports = {
                     'id',
                     'name',
                     'type'
-                ]
+                ],
+                order :["sort"]
             });
         }
 
@@ -152,7 +154,8 @@ module.exports = {
                     'id',
                     'name',
                     'type'
-                ]
+                ],
+                order :["sort"]
             });
         } else {
             menus = await Menus.findAll({
@@ -164,7 +167,8 @@ module.exports = {
                     'id',
                     'name',
                     'type'
-                ]
+                ],
+                order :["sort"]
             });
         }
 
@@ -203,7 +207,6 @@ module.exports = {
                         ]
                     }]
                 });
-
                 food.forEach(e => {
                     e.Ratings = e.Ratings.map(rating => {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)

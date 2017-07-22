@@ -14,7 +14,6 @@ const getFoodEchats = (function () {
         if(type==1){
             let orderEchats=[];
             let result=[];
-
             let orders=[]
             let endDate = new Date(startTime).format("yyyy-MM-dd 23:59:59");
             for (let i = new Date(startTime).getTime(); i<new Date(endDate).getTime(); i = i + 86400000) {
@@ -132,8 +131,8 @@ const getFoodEchats = (function () {
                 })
                 result.push({
                     FoodId:food.name,
-                    price:food.price*num,
-                    vipPrice:food.vipPrice*num,
+                    consume:food.price*num,
+                    vipConsume:food.vipPrice*num,
                     time: "第"+quarter+"季度",
                     num: num
                 })
@@ -185,8 +184,8 @@ const getFoodEchats = (function () {
                 })
                 result.push({
                     FoodId:food.name,
-                    price:food.price*num,
-                    vipPrice:food.vipPrice*num,
+                    consume:food.price*num,
+                    vipConsume:food.vipPrice*num,
                     time: new Date(startTime).format("yyyy-MM-dd"),
                     num: num
                 })
@@ -242,8 +241,8 @@ const getFoodEchats = (function () {
                 })
                 result.push({
                     FoodId:food.name,
-                    price:food.price*num,
-                    vipPrice:food.vipPrice*num,
+                    consume:food.price*num,
+                    vipConsume:food.vipPrice*num,
                     time: new Date(startTime).getFullYear(),
                     num: num
                 })

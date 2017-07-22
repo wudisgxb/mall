@@ -6,29 +6,27 @@ module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('ConsumeEchats', {
         /**
-         * ：订单数量
-         *tenantId:商家信息
-         * costPrice:原价
-         * vipPrice：会员价
-         * isVip：是否是会员
-         * createdAt：创建时间
+         * foodName:菜名
+         * foodNum:当前菜品数量
+         * foodPrice:菜品单价
+         * foodNumPrice：菜品总价格
+         * rate:分成比例
+         * wonReat:拥有比例
+         * ratePrice:平台服务费
+         *
+         * phone:手机号码
+         * orderStatus:订单状态
          */
-        num: shortDataTypes.String(100, false),
-        tenantId: shortDataTypes.Phone(true),
-        //商户类型
-        industry: {
-            type: DataTypes.STRING,
-            defaultValue: '餐饮'
-        },
-        // //微信账号
-        // wecharPayee_account: shortDataTypes.String(100,false),
-        // //支付宝账号
-        // payee_account: shortDataTypes.String(100,false),
-        tenantId: shortDataTypes.String(100, false),
-        //是否订单确认
-        needOrderConfirmPage: shortDataTypes.Bool(),
-        // //是否实时
-        // isRealTime:shortDataTypes.Bool(),
+        foodName: shortDataTypes.String(100, false),
+        foodNum: shortDataTypes.String(100, false),
+        foodPrice: shortDataTypes.String(100, false),
+        foodNumPrice: shortDataTypes.String(100, false),
+        rate: shortDataTypes.String(100, false),
+        wonReat: shortDataTypes.String(100, false),
+        ratePrice: shortDataTypes.String(100, false),
+        phone: shortDataTypes.String(100, false),
+        orderStatus: shortDataTypes.String(100, false),
+
     }, {
         associate: function (models) {
         },

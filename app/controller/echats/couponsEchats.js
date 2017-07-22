@@ -9,6 +9,7 @@ let getYearEchat = require('../echats/yearEchat')
 
 const getCouponsEchats = (function () {
     let getCoupons = async function (tenantId,startTime,endTime,type) {
+        //type==1日报表。type==2季度报表，type==3月报表，type==4年报表
         if(type==1){
             let result=[];
             //startTime开始时间
@@ -37,7 +38,7 @@ const getCouponsEchats = (function () {
             }
             return result;
         }
-        if(type==2){
+        if(type==3){
             let result=[];
             let MonthEchats = await getMonthEchats.getMonth(startTime,endTime)
             for (let i =0;i<MonthEchats.length;i++){
@@ -62,7 +63,7 @@ const getCouponsEchats = (function () {
             return result;
 
         }
-        if(type==3){
+        if(type==2){
             let result=[];
             let Quaeter = getQuarterEchats.getQuarter(startTime,endTime);
             for(let i = 0;i <Quaeter.length; i++){

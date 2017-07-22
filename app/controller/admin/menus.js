@@ -31,6 +31,7 @@ module.exports = {
             name: body.menu.name,
             type: -1,
             tenantId: body.tenantId
+
             // todo: ok?
             //deletedAt: Date.now()
         });

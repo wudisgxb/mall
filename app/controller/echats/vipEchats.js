@@ -38,7 +38,7 @@ const getVipEchats = (function () {
             return result;
         }
 
-        if(type==2){
+        if(type==3){
             // //1.将开始时间和结束时间(譬如2016-10和2017-4)相差的值转换成数组
             // //数组[{"start":"2016-10","end":"2016-11"},{"start":"2016-11","end":"2016-12"}，.....]
             // //2.循环遍历数组每一项的会员数
@@ -102,7 +102,7 @@ const getVipEchats = (function () {
             return result;
         }
 
-        if(type==3){
+        if(type==2){
             let ccccc = await getQuarterEchats.getQuarter(startTime,endTime);
             let result = [];
             for(let i = 0;i<ccccc.length;i++){

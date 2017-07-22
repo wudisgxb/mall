@@ -3,9 +3,10 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 let db = require('../../db/mysql/index');
 let Orders = db.models.Orders;
-let getMonthEchats = require('../echats/MonthEchats')
-let getQuarterEchats = require('../echats/quarterEchats')
-let getYearEchat = require('../echats/yearEchat')
+let Foods = db.models.Foods;
+let GetMonthEchats = require('../echats/MonthEchats')
+let GetQuarterEchats = require('../echats/quarterEchats')
+let GetYearEchat = require('../echats/yearEchat')
 
 
 const getConsumptionEchats = (function () {
@@ -16,10 +17,12 @@ const getConsumptionEchats = (function () {
             //startTime开始时间
             //endTime结束时间
             const oneDay = 24*60*60*1000;
-            let arrayTrade_no = [];
-            let foodId = [];
-            let numprice=0;
+
+
+
             for(let i=new Date(startTime).getTime();i<new Date(endTime).getTime();i+=oneDay){
+                let arrayTrade_no = [];
+                let foodId = [];
                 let orders = await Orders.findAll({
                     where:{
                         tenantId:tenantId,
@@ -32,17 +35,22 @@ const getConsumptionEchats = (function () {
                 })
                 console.log("---------")
                 console.log(orders.length)
-                for(let i = 0;i < orders.length;i++){
-                    if(!arrayTrade_no.contains(orders[i].trade_no)){
-                        arrayTrade_no.push(orders[i].trade_no)
+                for(let k = 0;k < orders.length;k++){
+                    if(!arrayTrade_no.contains(orders[k].trade_no)){
+                        arrayTrade_no.push(orders[k].trade_no)
                     }
                 }
-                for(let i = 0;i < orders.length;i++){
-                    if(!foodId.contains(orders[i].FoodId)){
-                        foodId.push(orders[i].FoodId)
+                console.log(arrayTrade_no.length)
+                for(let l = 0;l < orders.length;l++){
+                    if(!foodId.contains(orders[l].FoodId)){
+                        foodId.push(orders[l].FoodId)
                     }
                 }
+                console.log(foodId.length)
+                let numprice=0;
+                //foodId.length==2
                 for(let j = 0;j < foodId.length;j++){
+
                     let num = await Orders.sum('num', {
                         where: {
                             FoodId: foodId[j],
@@ -54,9 +62,18 @@ const getConsumptionEchats = (function () {
                         },
                         paranoid: false
                     })
-                    let foodname = await Orders.findById(foodId[j])
+                    console.log(foodId[j]+"菜的数量")
+                    console.log(num)
+                    let foodname = await Foods.findById(foodId[j])
+                    console.log("当前菜的单价")
+                    console.log(foodname.price)
                     let price = foodname.price*num
+                    console.log("当前菜的总价")
+                    console.log(price)
                     numprice=numprice+price
+
+                    console.log("累加当日的价格")
+                    console.log(numprice)
                 }
                 let time = new Date(i);
                 time.setDate(time.getDate()+1)
@@ -71,13 +88,12 @@ const getConsumptionEchats = (function () {
             return result;
         }
 
-        if(type==2){
+        if(type==3){
             let result = [];
-            let arrayTrade_no=[];
-            let foodId =[];
-            let numprice = 0;
-            let getMonthEchats = await getMonthEchats.getMonth(startTime,endTime);
+            let getMonthEchats = await GetMonthEchats.getMonth(startTime,endTime);
             for(let i = 0; i < getMonthEchats.length; i++){
+                let arrayTrade_no = [];
+                let foodId = [];
                 let orders = await Orders.findAll({
                     where:{
                         tenantId:tenantId,
@@ -88,17 +104,24 @@ const getConsumptionEchats = (function () {
                         }
                     }
                 })
-                for(let i = 0;i < orders.length;i++){
-                    if(!arrayTrade_no.contains(orders[i].trade_no)){
-                        arrayTrade_no.push(orders[i].trade_no)
+                console.log("---------")
+                console.log(orders.length)
+                for(let k = 0;k < orders.length;k++){
+                    if(!arrayTrade_no.contains(orders[k].trade_no)){
+                        arrayTrade_no.push(orders[k].trade_no)
                     }
                 }
-                for(let i = 0;i < orders.length;i++){
-                    if(!foodId.contains(orders[i].FoodId)){
-                        foodId.push(orders[i].FoodId)
+                console.log(arrayTrade_no.length)
+                for(let l = 0;l < orders.length;l++){
+                    if(!foodId.contains(orders[l].FoodId)){
+                        foodId.push(orders[l].FoodId)
                     }
                 }
+                console.log(foodId.length)
+                let numprice=0;
+                //foodId.length==2
                 for(let j = 0;j < foodId.length;j++){
+
                     let num = await Orders.sum('num', {
                         where: {
                             FoodId: foodId[j],
@@ -110,28 +133,37 @@ const getConsumptionEchats = (function () {
                         },
                         paranoid: false
                     })
-                    let foodname = await Orders.findById(foodId[j])
+                    console.log(foodId[j]+"菜的数量")
+                    console.log(num)
+                    let foodname = await Foods.findById(foodId[j])
+                    console.log("当前菜的单价")
+                    console.log(foodname.price)
                     let price = foodname.price*num
+                    console.log("当前菜的总价")
+                    console.log(price)
                     numprice=numprice+price
+
+                    console.log("累加当日的价格")
+                    console.log(numprice)
                 }
 
                 result.push({
                     numPrice:numprice,
                     numPeople:arrayTrade_no.length,
                     avgPrive:numprice/arrayTrade_no.length,
-                    time:getMonthEchats[i].start
+                    time:new Date(getMonthEchats[i].start)
                 })
             }
             return result;
         }
 
-        if(type==3){
+        if(type==2){
             let result = [];
-            let arrayTrade_no=[];
-            let foodId =[];
-            let numprice = 0;
-            let getQuarterEchats = await getQuarterEchats.getQuarter(startTime,endTime);
+
+            let getQuarterEchats = await GetQuarterEchats.getQuarter(startTime,endTime);
             for(let i = 0; i < getQuarterEchats.length; i++){
+                let arrayTrade_no = [];
+                let foodId = [];
                 let orders = await Orders.findAll({
                     where:{
                         tenantId:tenantId,
@@ -142,17 +174,24 @@ const getConsumptionEchats = (function () {
                         }
                     }
                 })
-                for(let i = 0;i < orders.length;i++){
-                    if(!arrayTrade_no.contains(orders[i].trade_no)){
-                        arrayTrade_no.push(orders[i].trade_no)
+                console.log("---------")
+                console.log(orders.length)
+                for(let k = 0;k < orders.length;k++){
+                    if(!arrayTrade_no.contains(orders[k].trade_no)){
+                        arrayTrade_no.push(orders[k].trade_no)
                     }
                 }
-                for(let i = 0;i < orders.length;i++){
-                    if(!foodId.contains(orders[i].FoodId)){
-                        foodId.push(orders[i].FoodId)
+                console.log(arrayTrade_no.length)
+                for(let l = 0;l < orders.length;l++){
+                    if(!foodId.contains(orders[l].FoodId)){
+                        foodId.push(orders[l].FoodId)
                     }
                 }
+                console.log(foodId.length)
+                let numprice=0;
+                //foodId.length==2
                 for(let j = 0;j < foodId.length;j++){
+
                     let num = await Orders.sum('num', {
                         where: {
                             FoodId: foodId[j],
@@ -164,15 +203,29 @@ const getConsumptionEchats = (function () {
                         },
                         paranoid: false
                     })
-                    let foodname = await Orders.findById(foodId[j])
+                    console.log(foodId[j]+"菜的数量")
+                    console.log(num)
+                    let foodname = await Foods.findById(foodId[j])
+                    console.log("当前菜的单价")
+                    console.log(foodname.price)
                     let price = foodname.price*num
+                    console.log("当前菜的总价")
+                    console.log(price)
                     numprice=numprice+price
+
+                    console.log("累加当日的价格")
+                    console.log(numprice)
                 }
+                let year = parseInt(getQuarterEchats[i].start.substring(0,4));
+                let month = parseInt(getQuarterEchats[i].start.substring(5,6));
+                let quarter = (month+2)/3
+
+
                 result.push({
                     numPrice:numprice,
                     numPeople:arrayTrade_no.length,
                     avgPrive:numprice/arrayTrade_no.length,
-                    time:getMonthEchats[i].start
+                    time:year+"年第"+quarter+"季度"
                 })
             }
             return result;
@@ -180,11 +233,10 @@ const getConsumptionEchats = (function () {
 
         if(type==4){
             let result = [];
-            let arrayTrade_no=[];
-            let foodId =[];
-            let numprice = 0;
-            let getYearEchat = await getYearEchat.getYear(startTime,endTime);
+            let getYearEchat = await GetYearEchat.getYear(startTime,endTime);
             for(let i = 0; i < getYearEchat.length; i++){
+                let arrayTrade_no = [];
+                let foodId = [];
                 let orders = await Orders.findAll({
                     where:{
                         tenantId:tenantId,
@@ -195,17 +247,24 @@ const getConsumptionEchats = (function () {
                         }
                     }
                 })
-                for(let i = 0;i < orders.length;i++){
-                    if(!arrayTrade_no.contains(orders[i].trade_no)){
-                        arrayTrade_no.push(orders[i].trade_no)
+                console.log("---------")
+                console.log(orders.length)
+                for(let k = 0;k < orders.length;k++){
+                    if(!arrayTrade_no.contains(orders[k].trade_no)){
+                        arrayTrade_no.push(orders[k].trade_no)
                     }
                 }
-                for(let i = 0;i < orders.length;i++){
-                    if(!foodId.contains(orders[i].FoodId)){
-                        foodId.push(orders[i].FoodId)
+                console.log(arrayTrade_no.length)
+                for(let l = 0;l < orders.length;l++){
+                    if(!foodId.contains(orders[l].FoodId)){
+                        foodId.push(orders[l].FoodId)
                     }
                 }
+                console.log(foodId.length)
+                let numprice=0;
+                //foodId.length==2
                 for(let j = 0;j < foodId.length;j++){
+
                     let num = await Orders.sum('num', {
                         where: {
                             FoodId: foodId[j],
@@ -217,16 +276,27 @@ const getConsumptionEchats = (function () {
                         },
                         paranoid: false
                     })
-                    let foodname = await Orders.findById(foodId[j])
+                    console.log(foodId[j]+"菜的数量")
+                    console.log(num)
+                    let foodname = await Foods.findById(foodId[j])
+                    console.log("当前菜的单价")
+                    console.log(foodname.price)
                     let price = foodname.price*num
+                    console.log("当前菜的总价")
+                    console.log(price)
                     numprice=numprice+price
+
+                    console.log("累加当日的价格")
+                    console.log(numprice)
                 }
+                let year = parseInt(getYearEchat[i].start.substring(0,4));
+
 
                 result.push({
                     numPrice:numprice,
                     numPeople:arrayTrade_no.length,
                     avgPrive:numprice/arrayTrade_no.length,
-                    time:getMonthEchats[i].start
+                    time:year+"年"
                 })
             }
             return result;
