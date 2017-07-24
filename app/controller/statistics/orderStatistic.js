@@ -330,26 +330,27 @@ const getstatistics = (function () {
     }
     // 订单小票查询
     let getOrder = async function (tenantId,startTime,endTime,type) {
+        let getTime = [];
         if(type==1){
-            let getTiem = await getDayEchat.getDay(startTime,endTime)
+            getTime = await getDayEchat.getDay(startTime,endTime)
         }
         if(type==2){
-            let getTiem = await getMonthEchats.getMonth(startTime,endTime)
+            getTime = await getMonthEchats.getMonth(startTime,endTime)
         }
         if(type==3){
-            let getTiem = await getQuarterEchats.getQuarter(startTime,endTime)
+            getTime = await getQuarterEchats.getQuarter(startTime,endTime)
         }
         if(type==4){
-            let getTiem = await getYearEchat.getYear(startTime,endTime)
+            getTime = await getYearEchat.getYear(startTime,endTime)
         }
         let result=[];
-        for (let i = 0; i < getTiem.length; i++){
+        for (let i = 0; i < getTime.length; i++){
             let statisticsOrders = await StatisticsOrders.findAll({
                 where:{
                     tenantId:tenantId,
                     createdAt:{
-                        $gt:new Date(getTiem[i].start),
-                        $lt : new Date(getTiem[i].end)
+                        $gt:new Date(getTime[i].start),
+                        $lt : new Date(getTime[i].end)
                     }
                 }
             })
