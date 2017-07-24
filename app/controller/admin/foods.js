@@ -59,7 +59,7 @@ module.exports = {
                 vipPrice: body.food.vipPrice,
                 sellCount: 100,
                 foodNum:body.food.foodNum,
-                // rating: body.food.rating,
+                rating: body.food.rating,
                 info: body.food.info,
                 unit: body.food.unit,
                 taste: JSON.stringify(body.food.taste),

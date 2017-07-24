@@ -292,89 +292,22 @@ const getVipConsumptionEchats = (function () {
             let result = [];
             let getYearEchat = await GetYearEchat.GetYear(startTime,endTime);
             for(let i = 0; i < getYearEchat.length; i++){
-                let vipPhone = [];
-                let vipsPhone=[];
-                let foodId = [];
-                let numprice=0;
-                //当天tenantId的所有记录
-                let orders = await Orders.findAll({
+                let OrderEchats = await OrderEchats.findAll({
                     where:{
-                        tenantId:tenantId,
-                        createdAt:{
+                        tenantId : tenantId,
+                        createdAt : {
                             $gt:new Date(getYearEchat[i].start),
                             $lt:new Date(getYearEchat[i].end)
-                        },
-                        status:2,
+                        }
                     }
                 })
-                console.log(orders.length)
-                //查询是vip的电话
-                for (let j=0;j<orders.length;j++){
-                    let vip = await Vips.findOne({
-                        where:{
-                            phone:orders[j].phone
-                        }
-
+                for (let j = 0;j<OrderEchats.length;j++){
+                    result.push({
+                        vipNum:OrderEchats[j].vipNum,
+                        vipPrice:OrderEchats[j].vipPrice,
+                        time:new Date(getYearEchat[i].start)
                     })
-                    if(vip!=null){
-                        vipPhone.push(orders[j].phone)
-                        let orderFind = await Orders.findAll({
-                            where:{
-                                phone:vip.phone,
-                                createdAt:{
-                                    $gt:new Date(getYearEchat[i].start),
-                                    $lt:new Date(getYearEchat[i].end)
-                                },
-                                status:2
-                            }
-                        })
-                        //查询不重复的FoodId
-                        //
-                        for(let k=0;k<orderFind.length;k++){
-                            if(!foodId.contains(orderFind[k].FoodId)){
-                                foodId.push(orderFind[k].FoodId)
-                            }
-                        }
-
-                    }
                 }
-                console.log("2222222")
-                for(let x=0;x<vipPhone.length;x++){
-                    console.log(vipPhone[x])
-                    if(!vipsPhone.contains(vipPhone[x])){
-                        vipsPhone.push(vipPhone[x])
-                    }
-                }
-                console.log("33333")
-                for(let l = 0;l<foodId.length;l++){
-                    //根据foodId查询num数量
-                    let num = await Orders.sum('num', {
-                        where: {
-                            FoodId: foodId[l],
-                            createdAt: {
-                                $lt: new Date(i+oneDay),
-                                $gt: new Date(i)
-                            },
-                            status:2
-                        },
-                        paranoid: false
-                    })
-                    console.log(num)
-                    let food = await Foods.findOne({
-                        where: {
-                            id: foodId[l]
-                        },
-                        paranoid: false
-                    })
-                    console.log(food==null)
-                    numprice+=food.vipPrice*num
-                }
-                result.push({
-                    numPrice:numprice,
-                    numpeople:vipsPhone.length,
-                    avgPrive:Math.round(numprice*100/vipsPhone.length)/100,
-                    time:i
-                })
             }
             return result;
         }

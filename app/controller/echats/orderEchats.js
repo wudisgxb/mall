@@ -77,7 +77,7 @@ const getPaymentHistoryEchats = (function () {
                     }
                 })
                 for(let j = 0;j<paymentHistory.length;j++){
-                    orderJson=[];
+                    orderJson = [];
                     orderJson[j].grossIncome = paymentHistory[j].grossIncome;
                     orderJson[j].merchantDiscount = paymentHistory[j].merchantDiscount;
                     orderJson[j].platformFee = paymentHistory[j].platformFee;
@@ -89,8 +89,6 @@ const getPaymentHistoryEchats = (function () {
             }
             return result;
         }
-
-
     }
     let instance = {
         getPaymentHistory: getPaymentHistory
