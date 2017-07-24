@@ -8,9 +8,9 @@ let foods = require('../../controller/admin/foods');
 
 const router = new (require('koa-router'))()
 //新增
-router.post('/api/v3/admin/food',  foods.saveAdminFoods);
+router.post('/api/test/admin/food', foods.saveAdminFoods);
 //编辑
-router.put('/api/v3/admin/food',foods.updateAdminFoodsById);
+router.put('/api/test/admin/food', foods.updateAdminFoodsById);
 //查询
-router.get('/api/v3/admin/food',foods.getAdminFoods);
+router.get('/api/test/admin/food', foods.getAdminFoods);
 module.exports = router

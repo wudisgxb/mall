@@ -27,7 +27,7 @@ module.exports = function (sequelize, DataTypes) {
         /**
          * 是否可用
          */
-        enable: shortDataTypes.Boolean(),
+        enable: shortDataTypes.Bool(),
         /**
          * 被扫描次数
          */

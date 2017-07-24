@@ -42,7 +42,7 @@ module.exports = {
         console.log("profitSharings===========" + profitSharings.length);
         if (profitSharings.length > 0) {
             excludeFoodIdArray = JSON.parse(profitSharings[0].excludeFoodId);
-            console.log(excludeFoodIdArray);
+            console.log("excludeFoodIdArray:" + excludeFoodIdArray);
         }
 
         let menus;
@@ -207,6 +207,7 @@ module.exports = {
                         ]
                     }]
                 });
+
                 food.forEach(e => {
                     e.Ratings = e.Ratings.map(rating => {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)

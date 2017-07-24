@@ -1,18 +1,19 @@
-var myAlipay = require('./index');
-var request = require('request');
-var Promise = require('promise');
+const myAlipay = require('./index');
+const request = require('request');
+const Promise = require('promise');
 
-var path = require('path');
-var db = require('../../db/mysql/index');
-var TransferAccountInfos = db.models.TransferAccountInfos;
+const path = require('path');
+const db = require('../../db/mysql/index');
+const TransferAccountInfos = db.models.TransferAccountInfos;
+const config = require('../../config/config');
 
-const  transferAccountsManger = (function() {
+const transferAccountsManger = (function () {
 
-    let transferAccounts = function (payee_account,amount,payee_real_name,remark,tenantId) {
+    let transferAccounts = function (payee_account, amount, payee_real_name, remark, tenantId) {
         const myAli = new myAlipay({
-            appId: '2017053107387940',
-            notify_url: 'http://deal.xiaovbao.cn/alipay',
-            return_url: 'http://deal.xiaovbao.cn/alipay-callback',
+            appId: config.alipay.appId,
+            notify_url: 'http://deal.xiaovbao.cn/alipay',//暂时乱写的，没用到
+            return_url: 'http://deal.xiaovbao.cn/alipay-callback',//暂时乱写的，没用到
             rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
             rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
             sandbox: false,
@@ -40,8 +41,8 @@ const  transferAccountsManger = (function() {
             }
         };
 
-        var promise =  new Promise(function (resolve,reject) {
-             request(opt, async function (err, data, mess) {
+        var promise = new Promise(function (resolve, reject) {
+            request(opt, async function (err, data, mess) {
                 if (err) {
                     console.log("888888888888888||" + err);
                     resolve(null);
@@ -51,27 +52,27 @@ const  transferAccountsManger = (function() {
                     console.log("999999999999999999||" + rsp.msg);
                     if (rsp.msg == 'Success') {
                         await TransferAccountInfos.create({
-                            code : rsp.code,
-                            msg : rsp.msg,
+                            code: rsp.code,
+                            msg: rsp.msg,
                             order_id: rsp.order_id,
-                            out_biz_no : rsp.out_biz_no,
-                            pay_date:rsp.pay_date,
-                            sub_code:"",
-                            sub_msg:"",
-                            transferAccountInfoUrl:url,
-                            tenantId:tenantId
+                            out_biz_no: rsp.out_biz_no,
+                            pay_date: rsp.pay_date,
+                            sub_code: "",
+                            sub_msg: "",
+                            transferAccountInfoUrl: url,
+                            tenantId: tenantId
                         });
                     } else {
                         await TransferAccountInfos.create({
-                            code : rsp.code,
-                            msg : rsp.msg,
+                            code: rsp.code,
+                            msg: rsp.msg,
                             order_id: "",
-                            out_biz_no : rsp.out_biz_no,
-                            pay_date:"",
-                            sub_code:rsp.sub_code,
-                            sub_msg:rsp.sub_msg,
-                            transferAccountInfoUrl:url,
-                            tenantId:tenantId
+                            out_biz_no: rsp.out_biz_no,
+                            pay_date: "",
+                            sub_code: rsp.sub_code,
+                            sub_msg: rsp.sub_msg,
+                            transferAccountInfoUrl: url,
+                            tenantId: tenantId
                         });
                     }
                     resolve(rsp);
@@ -85,7 +86,7 @@ const  transferAccountsManger = (function() {
     }
 
     let instance = {
-        transferAccounts:transferAccounts
+        transferAccounts: transferAccounts,
     }
 
     return instance;

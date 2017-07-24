@@ -4,8 +4,8 @@ var print = require('../../controller/admin/print')
 
 const router = new (require('koa-router'))()
 
-router.post('/api/v3/admin/printerSetting',  print.saveAdminPrint);
-router.put('/api/v3/admin/printerSetting', print.updateAdminPrintById);
-router.get('/api/v3/admin/printerSetting',print.getAdminPrint);
-router.delete('/api/v3/admin/printerSetting',print.deleteAdminPrint);
+router.post('/api/test/admin/printerSetting',  print.saveAdminPrint);
+router.put('/api/test/admin/printerSetting', print.updateAdminPrintById);
+router.get('/api/test/admin/printerSetting',print.getAdminPrint);
+router.delete('/api/test/admin/printerSetting',print.deleteAdminPrint);
 module.exports = router

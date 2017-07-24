@@ -7,15 +7,15 @@ module.exports = function (sequelize, DataTypes) {
 
     var TransferAccountInfos = sequelize.define('TransferAccountInfos', {
 
-        code: shortDataTypes.String(),
-        msg: shortDataTypes.String(),
-        out_biz_no: shortDataTypes.String(),
-        sub_code: shortDataTypes.String(),
-        sub_msg: shortDataTypes.String(),
+        code: shortDataTypes.String(255, true),
+        msg: shortDataTypes.String(255, true),
+        out_biz_no: shortDataTypes.String(255, true),
+        sub_code: shortDataTypes.String(255, true),
+        sub_msg: shortDataTypes.String(255, true),
 
-        order_id: shortDataTypes.String(),
-        pay_date: shortDataTypes.String(),
-        transferAccountInfoUrl: shortDataTypes.String(),
+        order_id: shortDataTypes.String(255, true),
+        pay_date: shortDataTypes.String(255, true),
+        transferAccountInfoUrl: shortDataTypes.String(255, true),
         tenantId: {
             type: Sequelize.STRING
         }

@@ -26,7 +26,6 @@ module.exports = {
             return;
         }
         //console.log(profitsharing[0].consigneeId);
-        let consigneeId;
         let consignee=[];
         for(let i=0;i<profitsharing.length;i++) {
             consigneeId = await Consignee.findAll({
@@ -36,7 +35,7 @@ module.exports = {
             })
             consignee.push(consigneeId[i].name)
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consigneeId);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consignee);
     }
     
 }

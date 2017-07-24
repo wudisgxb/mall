@@ -8,7 +8,7 @@ module.exports = {
     async getAdminConsignees(ctx,next){
         ctx.checkQuery('consigneeId').notEmpty()
         if (ctx.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         let consignees = await Consignees.findAll({
@@ -65,8 +65,8 @@ module.exports = {
         ctx.checkBody('/profitsharings/distributionFee',true).first().notEmpty();
         ctx.checkBody('/profitsharings/consigneeRemark',true).first().notEmpty();
         ctx.checkBody('/condition/consigneeId',true).first().notEmpty();
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         let body = ctx.request.body;
@@ -95,7 +95,8 @@ module.exports = {
             consigneeId:body.condition.consigneeId,
             rate:body.profitsharings.rate,
             ownRate:body.profitsharings.ownRate,
-            distributionFee:body.profitsharings.distributionFee
+            distributionFee:body.profitsharings.distributionFee,
+            ExcludeFoodId:body.profitsharings.ExcludeFoodId,
         })
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS);
     },

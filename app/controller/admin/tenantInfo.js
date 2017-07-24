@@ -13,6 +13,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
+
         let tenantInfo = await TenantConfigs.findOne({
             where: {
                 tenantId: ctx.query.tenantId,
@@ -34,6 +35,10 @@ module.exports = {
             result.vipFee = tenantInfo.vipFee;
             result.vipRemindFee = tenantInfo.vipRemindFee;
             result.homeImage = tenantInfo.homeImage;
+            result.longitude  = tenantInfo.longitude ;
+            result.latitude = tenantInfo.latitude;
+            result.needChoosePeopleNumberPage = tenantInfo.needChoosePeopleNumberPage;
+            result.officialNews = tenantInfo.officialNews;
             result.startTime = tenantInfo.startTime;
             result.endTime = tenantInfo.endTime;
             result.needOrderConfirmPage = merchant.needOrderConfirmPage;
