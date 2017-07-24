@@ -7,12 +7,6 @@ let statisticsOrders = db.models.Orders;
 
 const getFoodNum = (function () {
 
-    let test = async function (json) {
-        await  statisticsOrders.create({
-            num: '123'
-        });
-    }
-
     let getFood = async function (tenantId, foodnums) {
 
         let ArrayFood = [];
@@ -89,7 +83,6 @@ const getFoodNum = (function () {
     }
     let instance = {
         getFood: getFood,
-        test:test
     }
     return instance;
 })();
