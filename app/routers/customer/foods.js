@@ -5,8 +5,8 @@ let foods = require('../../controller/customer/foods');
 const router = new (require('koa-router'))()
 
 
-router.get('/api/v3/customer/deal/menu', foods.getUserMenus);
-router.get('/api/v3/customer/eshop/menu', foods.getEshopUserMenus);
-router.post('/api/v3/user/rating', foods.saveUserRating);
+router.get('/api/test/customer/deal/menu', foods.getUserMenus);
+router.get('/api/test/customer/eshop/menu', foods.getEshopUserMenus);
+router.post('/api/test/customer/rating', foods.saveUserRating);
 
 module.exports = router

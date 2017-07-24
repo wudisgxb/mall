@@ -7,35 +7,35 @@ let Prints = db.models.Prints;
 module.exports = {
 
     async saveAdminPrint (ctx, next) {
-        ctx.checkBody('/printerSetting/deviceName',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/printType',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/printTime',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/isNeedCustomSmallTicketHeader',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/smallTicketNum',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/isShowMoney',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/connectMode',true).first().notEmpty();
+        ctx.checkBody('/printerSetting/deviceName', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/printType', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/printTime', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/isNeedCustomSmallTicketHeader', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/smallTicketNum', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/isShowMoney', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/connectMode', true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
-        ctx.checkBody('printName').notEmpty();
+        ctx.checkBody('/printerSetting/printName',true).notEmpty();
 
         let body = ctx.request.body;
 
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
         let prints = await Prints.findAll({
             where: {
-                printName: body.printName,
+                printName: body.printerSetting.printName,
                 tenantId: body.tenantId
             }
         })
-        if (prints!=null) {
-            ctx.body =  new ApiResult(ApiResult.Result.EXISTED,"打印机名已存在" );
+        if (prints.length > 0) {
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "打印机名已存在");
             return;
         }
 
         await Prints.create({
-            printName: body.condition.printName,
+            printName: body.printerSetting.printName,
             deviceName: body.printerSetting.deviceName,
             printType: body.printerSetting.printType,
             printTime: body.printerSetting.printTime,
@@ -44,33 +44,33 @@ module.exports = {
             smallTicketNum: body.printerSetting.smallTicketNum,
             isShowMoney: body.printerSetting.isShowMoney,
             connectMode: body.printerSetting.connectMode,
-            tenantId: body.condition.tenantId,
+            tenantId: body.tenantId,
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
-    
-    async updateAdminPrintById (ctx, next) {
-        ctx.checkBody('/printerSetting/deviceName',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/printType',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/printTime',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/isNeedCustomSmallTicketHeader',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/smallTicketNum',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/isShowMoney',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/connectMode',true).first().notEmpty();
-        ctx.checkBody('/printerSetting/printName',true).first().notEmpty();
 
-        ctx.checkBody('/condition/tenantId',true).first().notEmpty();
-        ctx.checkBody('/condition/id',true).first().notEmpty();
+    async updateAdminPrintById (ctx, next) {
+        ctx.checkBody('/printerSetting/deviceName', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/printType', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/printTime', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/isNeedCustomSmallTicketHeader', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/smallTicketNum', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/isShowMoney', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/connectMode', true).first().notEmpty();
+        ctx.checkBody('/printerSetting/printName', true).first().notEmpty();
+
+        ctx.checkBody('/condition/tenantId', true).first().notEmpty();
+        ctx.checkBody('/condition/id', true).first().notEmpty();
         let body = ctx.request.body;
 
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
         let print = await Prints.findOne({
-            where:{
-                id:body.condition.id,
-                tenantId:body.condition.tenantId
+            where: {
+                id: body.condition.id,
+                tenantId: body.condition.tenantId
             }
         });
         if (print != null) {
@@ -89,15 +89,15 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
-    
+
     async getAdminPrint (ctx, next) {
-        ctx.checkQuery('deviceName').notEmpty();
-        ctx.checkQuery('connectMode').notEmpty();
-        ctx.checkQuery('printTime').notEmpty();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
-            return;
-        }
+        // ctx.checkQuery('deviceName').notEmpty();
+        // ctx.checkQuery('connectMode').notEmpty();
+        // ctx.checkQuery('printTime').notEmpty();
+        // if(ctx.errors){
+        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+        //     return;
+        // }
         let deviceName = ctx.query.deviceName;
         let connectMode = ctx.query.connectMode;
         let printTime = ctx.query.printTime;
@@ -114,12 +114,12 @@ module.exports = {
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, prints);
     },
-    
+
     async deleteAdminPrint(ctx, next){
         ctx.checkQuery('id').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
         let id = ctx.query.id;

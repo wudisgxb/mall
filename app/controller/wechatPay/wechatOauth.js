@@ -19,6 +19,7 @@ const Consignees = db.models.Consignees;
 const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../../controller/infoPush/infoPush');
 const webSocket = require('../../controller/socketManager/socketManager');
+const amountManager = require('../amount/amountManager')
 
 const orderManager = require('../customer/order');
 const config = require('../../config/config')
@@ -42,7 +43,7 @@ module.exports = {
 
         console.log(`auth_callback_url: ${auth_callback_url}`)
 
-        const url = client.getAuthorizeURL(auth_callback_url, 'deal', 'snsapi_base')
+        const url = client.getAuthorizeURL(auth_callback_url, 'sales', 'snsapi_base')
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
@@ -59,7 +60,7 @@ module.exports = {
 
         console.log(`auth_callback_url: ${auth_callback_url}`)
 
-        const url = client.getAuthorizeURL(auth_callback_url, 'eshop', 'snsapi_base')
+        const url = client.getAuthorizeURL(auth_callback_url, 'sales', 'snsapi_base')
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
@@ -130,58 +131,8 @@ module.exports = {
 
         let trade_no = orders[0].trade_no;
 
-        let totalPrice = 0;
-        let totalVipPrice = 0;
-
-        let food;
-        for(var i = 0; i < orders.length; i ++) {
-            food = await Foods.findAll({
-                where: {
-                    id: orders[i].FoodId,
-                    tenantId: ctx.query.tenantId
-                }
-            })
-
-            totalPrice += food[0].price * orders[i].num;//原价
-            totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
-        }
-
-        if (orders[0] != null) {
-            //判断vip
-            if (orders[0].phone != null) {
-                var vips = await Vips.findAll({
-                    where:{
-                        phone:orders[0].phone,
-                        tenantId:ctx.query.tenantId
-                    }
-                })
-                if (vips.length > 0) {
-                    total_amount = Math.round(totalVipPrice*100)/100
-                }else {
-                    total_amount = Math.round(totalPrice*100)/100;
-                }
-            } else {
-                total_amount =  Math.round(totalPrice*100)/100;
-            }
-
-            //通过订单号获取优惠券
-            let coupon = await Coupons.findOne({
-                where: {
-                    trade_no: orders[0].trade_no,
-                    phone: orders[0].phone,
-                    tenantId: orders[0].tenantId,
-                    status: 0
-                }
-            })
-
-            if (coupon != null) {
-                if (coupon.couponType == 'amount') {
-                    total_amount = ((total_amount - coupon.value) <= 0) ? 0.01 : (total_amount - coupon.value);
-                } else {
-                    total_amount = total_amount * coupon.value;
-                }
-            }
-        }
+        //根据订单查询需要支付多少
+        total_amount = await orderManager.getOrderPriceByOrder(orders);
 
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
@@ -224,7 +175,7 @@ module.exports = {
             total_fee: parseFloat(total_amount)*100,//分
             trade_type: 'JSAPI',
             spbill_create_ip: ip,
-            notify_url: 'http://deal.xiaovbao.cn/api/v3/wechatPayNotify'
+            notify_url: 'http://deal.xiaovbao.cn/api/test/wechatPayNotify'
         })
         new_params.trade_no = trade_no;
 
@@ -343,7 +294,6 @@ module.exports = {
             return;
         }
 
-
         //获取tableId
         const table = await Tables.findOne({
             where: {
@@ -377,59 +327,8 @@ module.exports = {
 
         let trade_no = orders[0].trade_no;
 
-        let totalPrice = 0;
-        let totalVipPrice = 0;
-
-        let food;
-        for(var i = 0; i < orders.length; i ++) {
-            food = await Foods.findAll({
-                where: {
-                    id: orders[i].FoodId,
-                    tenantId: ctx.query.tenantId
-                }
-            })
-
-            totalPrice += food[0].price * orders[i].num;//原价
-            totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
-        }
-
-        if (orders[0] != null) {
-            //判断vip
-            if (orders[0].phone != null) {
-                var vips = await Vips.findAll({
-                    where:{
-                        phone:orders[0].phone,
-                        tenantId:ctx.query.tenantId
-                    }
-                })
-                if (vips.length > 0) {
-                    total_amount = Math.round(totalVipPrice*100)/100
-                }else {
-                    total_amount = Math.round(totalPrice*100)/100;
-                }
-            } else {
-                total_amount =  Math.round(totalPrice*100)/100;
-            }
-
-            //通过订单号获取优惠券
-            let coupon = await Coupons.findOne({
-                where: {
-                    trade_no: orders[0].trade_no,
-                    phone: orders[0].phone,
-                    tenantId: orders[0].tenantId,
-                    status: 0
-                }
-            })
-
-            if (coupon != null) {
-                if (coupon.couponType == 'amount') {
-                    total_amount = ((total_amount - coupon.value) <= 0) ? 0.01 : (total_amount - coupon.value);
-                } else {
-                    total_amount = total_amount * coupon.value;
-                }
-            }
-        }
-
+        //根据订单查询需要支付多少
+        total_amount = await orderManager.getOrderPriceByOrder(orders);
 
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
@@ -472,7 +371,7 @@ module.exports = {
             total_fee: parseFloat(total_amount)*100,//分
             trade_type: 'JSAPI',
             spbill_create_ip: ip,
-            notify_url: 'http://deal.xiaovbao.cn/api/v3/wechatPayNotify'
+            notify_url: 'http://deal.xiaovbao.cn/api/test/wechatPayNotify'
         })
         new_params.trade_no = trade_no;
 
@@ -767,21 +666,24 @@ module.exports = {
                     }
                 });
 
+                //根据tenantId，consigneeId，订单号获取分成转账金额
+                //input:tenantId,consigneeId,trade_no
+                //output:object（总金额，租户金额，代售金额）
+
+                let amountJson = await amountManager.getTransAccountAmount(tenantId,consigneeId,xml.out_trade_no,'微信',0);
+
+                console.log("amountJson = " + JSON.stringify(amountJson,null,2));
+
                 //支付完成推送支付成功消息
                 let date = new Date().format("hh:mm");
                 let content;
                 if (consignee != null) {
-                    content = '代售商:' + consignee.name + ' ' + table.name + '已结账，结账金额： ' + xml.total_fee / 100 + '元 ' + date;
+                    content = '代售商:' + consignee.name + ' ' + table.name + ' 已结账 订单总价： ' + amountJson.totalPrice + '元 ' + date;
                 } else {
-                    content = table.name + '已结账，结账金额： ' + xml.total_fee / 100 + '元 ' + date;
+                    content = table.name + ' 已结账 订单总价： ' + amountJson.totalPrice + '元 ' + date;
                 }
                 infoPushManager.infoPush(content, tenantId);
 
-                ////四舍五入 千分之0.994转账
-               // var total_amount = Math.round(xml.total_fee*0.994);
-                var total_amount = xml.total_fee;
-                console.log("aaaaaaaaa0000a||" + total_amount);
-                console.log("aaaaaaaaa0000b||" + JSON.stringify(total_amount));
                 if (tenantConfig != null ) {
                     if (tenantConfig.isRealTime) {
                         console.log("服务器公网IP：" + ip);
@@ -793,7 +695,7 @@ module.exports = {
                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                 openid : tenantConfig.wecharPayee_account,
                                 check_name: 'NO_CHECK',
-                                amount: total_amount,
+                                amount: Math.round(amountJson.totalAmount*100),
                                 //desc: tenantConfig.remark,
                                 desc: '收益',
                                 spbill_create_ip: ip
@@ -822,7 +724,7 @@ module.exports = {
                                     partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                     openid : tenantConfig.wecharPayee_account,
                                     check_name: 'NO_CHECK',
-                                    amount: total_amount,
+                                    amount: Math.round(amountJson.totalAmount*100),//分
                                     //desc: tenantConfig.remark,
                                     desc: '收益',
                                     spbill_create_ip: ip
@@ -840,14 +742,12 @@ module.exports = {
                                 }
                             } else {
                                 //找到对应关系
-                                let amount = total_amount * (1-profitsharing.rate-profitsharing.ownRate); //主商户提成
-                                amount = Math.round(amount);
-                                console.log("主商户分润：" + amount);
+                                console.log("主商户分润：" + amountJson.merchantAmount);
                                 params = {
                                     partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                     openid : tenantConfig.wecharPayee_account,
                                     check_name: 'NO_CHECK',
-                                    amount: amount,
+                                    amount: Math.round(amountJson.merchantAmount*100),
                                     desc: profitsharing.merchantRemark,
                                     spbill_create_ip: ip
                                 }
@@ -860,14 +760,12 @@ module.exports = {
                                         await paymentReqs[0].save();
 
                                         //主商户转账成功才能给代售商户转账
-                                        let consignee_amount = total_amount * profitsharing.rate;//代售商户
-                                        consignee_amount = Math.round(consignee_amount);
-                                        console.log("代售点分润：" + consignee_amount);
+                                        console.log("代售点分润：" + amountJson.consigneeAmount);
                                         params = {
                                             partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                             openid : consignee.wecharPayee_account,
                                             check_name: 'NO_CHECK',
-                                            amount: consignee_amount,
+                                            amount: Math.round(amountJson.consigneeAmount*100),
                                             desc: profitsharing.consigneeRemark,
                                             spbill_create_ip: ip
                                         }
@@ -886,38 +784,6 @@ module.exports = {
                         }
                     }
                 }
-
-                // //满多少加会员,考虑订单会删除，要加paranoid: false查询delete的
-                // orders = await Orders.findAll({
-                //     where: {
-                //         trade_no: xml.out_trade_no,
-                //     },
-                //     paranoid: false
-                // });
-                // let phone = orders[0].phone;
-                //
-                // let vip = await Vips.findOne({
-                //     where: {
-                //         phone: phone,
-                //         tenantId: orders[0].tenantId
-                //     }
-                // })
-                //
-                // if (vip == null) {
-                //     //根据订单算原始总价格
-                //     let orderPrice = await orderManager.getOrderPriceByTradeNo(xml.out_trade_no, tenantId);
-                //     console.log("orderPrice:" + orderPrice);
-                //     console.log("xml.total_fee" + xml.total_fee/100 + '元');
-                //     if (orderPrice >= tenantConfig.vipFee) {
-                //         await Vips.create({
-                //             phone: phone,
-                //             vipLevel: 0,
-                //             vipName: "匿名",
-                //             tenantId: orders[0].tenantId
-                //             // todo: ok?
-                //         });
-                //     }
-                // }
             } else {
                 AlipayErrors.create({
                     errRsp:JSON.stringify(ctx.xmlBody),

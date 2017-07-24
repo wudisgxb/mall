@@ -8,11 +8,14 @@ const ShoppingCarts = db.models.ShoppingCarts;
 const Vips = db.models.Vips;
 const TenantConfigs = db.models.TenantConfigs;
 const Coupons = db.models.Coupons;
+const DeliveryFees = db.models.DeliveryFees;
+const DistanceAndPrices = db.models.DistanceAndPrices;
 const PaymentReqs = db.models.PaymentReqs;
 const webSocket = require('../../controller/socketManager/socketManager');
 const infoPushManager = require('../../controller/infoPush/infoPush');
 const tool = require('../../Tool/tool');
 const ApiResult = require('../../db/mongo/ApiResult');
+const vipManager = require('./vip');
 const Promise = require('Promise');
 
 module.exports = {
@@ -98,38 +101,11 @@ module.exports = {
             result.diners_num = orders[0].diners_num;
             result.tradeNo = orders[0].trade_no;
 
-
             //满多少加会员
             let phone = orders[0].phone;
 
-            let vip = await Vips.findOne({
-                where: {
-                    phone: phone,
-                    tenantId: orders[0].tenantId
-                }
-            })
-
-            //根据订单算原始总价格
-            let tenantConfig = await TenantConfigs.findOne({
-                where: {
-                    tenantId: orders[0].tenantId
-                }
-            });
-
-            if (vip == null) {
-                if (result.totalPrice >= tenantConfig.vipFee) {
-                    await Vips.create({
-                        phone: phone,
-                        vipLevel: 0,
-                        vipName: "匿名",
-                        tenantId: orders[0].tenantId
-                        // todo: ok?
-                    });
-                    result.isVip = true;
-                }
-            } else{
-                result.isVip = true;
-            }
+            let isVip = await vipManager.isVip(phone,orders[0].tenantId,result.totalPrice);
+            result.isVip = isVip;
 
             //通过订单号获取优惠券
             let coupon = await Coupons.findOne({
@@ -137,22 +113,40 @@ module.exports = {
                     trade_no: orders[0].trade_no,
                     phone: phone,
                     tenantId: orders[0].tenantId,
-                    //status: 0
+                    status: 0
                 }
             })
 
             if (coupon != null) {
-                result.couponType = coupon.couponType;
-                result.couponValue = coupon.value;
+                // result.couponType = coupon.couponType;
+                // result.couponValue = coupon.value;
+                result.couponKey = coupon.couponKey;
 
-                if (coupon.couponType == 'amount') {
-                    result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
-                    result.totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
-                } else {
-                    result.totalPrice = result.totalPrice * coupon.value;
-                    result.totalVipPrice = result.totalVipPrice * coupon.value;
-                }
+                // switch (coupon.couponType) {
+                //     case 'amount':
+                //         result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
+                //         result.totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
+                //         break;
+                //     case 'discount':
+                //         result.totalPrice = result.totalPrice * coupon.value;
+                //         result.totalVipPrice = result.totalVipPrice * coupon.value;
+                //         break;
+                //     case 'reduce':
+                //         if (result.totalPrice >= coupon.value.split('-')[0]) {
+                //             result.totalPrice = result.totalPrice - coupon.value.split('-')[1];
+                //         }
+                //         if (result.totalVipPrice >= coupon.value.split('-')[0]) {
+                //             result.totalVipPrice = result.totalVipPrice - coupon.value.split('-')[1];
+                //         }
+                //         break;
+                //     default:
+                //         result.totalPrice = result.totalPrice;
+                //         result.totalVipPrice = result.totalVipPrice;
+                // }
             }
+
+            result.totalPrice = Math.round(result.totalPrice * 100) / 100;
+            result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
 
             // //判断vip
             // if (orders[0].phone != null) {
@@ -236,7 +230,7 @@ module.exports = {
         })
 
         let phone = body.phoneNumber;
-        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;;
+        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
         if (orders.length > 0) {
             orders.map(async function (e) {
                 e.trade_no = trade_no;
@@ -291,22 +285,22 @@ module.exports = {
             paymentReqs[i].save();
         }
 
-        //下单订单号绑定优惠券，支付回调去修改优惠券使用状态
-        if (body.couponKey != null) {
-            let coupon = await Coupons.findOne({
-                where: {
-                    couponKey: body.couponKey,
-                    tenantId: body.tenantId,
-                    phone: body.phoneNumber,
-                    status: 0,
-                }
-            })
-
-            if (coupon != null) {
-                coupon.trade_no = trade_no;
-                await coupon.save();
-            }
-        }
+        // //下单订单号绑定优惠券，支付回调去修改优惠券使用状态
+        // if (body.couponKey != null) {
+        //     let coupon = await Coupons.findOne({
+        //         where: {
+        //             couponKey: body.couponKey,
+        //             tenantId: body.tenantId,
+        //             phone: body.phoneNumber,
+        //             status: 0,
+        //         }
+        //     })
+        //
+        //     if (coupon != null) {
+        //         coupon.trade_no = trade_no;
+        //         await coupon.save();
+        //     }
+        // }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
@@ -369,7 +363,7 @@ module.exports = {
             }
         })
 
-        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;;
+        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
         if (orders.length > 0) {
             orders.map(async function (e) {
                 e.trade_no = trade_no;
@@ -440,6 +434,15 @@ module.exports = {
                 coupon.trade_no = trade_no;
                 await coupon.save();
             }
+        }
+
+        //配送费绑定订单号
+        if (body.deliveryFeeId != null && body.deliveryFeeId != "") {
+            await DeliveryFees.create({
+                deliveryFeeId: body.deliveryFeeId,
+                tenantId: body.tenantId,
+                trade_no: trade_no
+            })
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
@@ -665,34 +668,8 @@ module.exports = {
             //满多少加会员
             let phone = ctx.query.phoneNumber;
 
-            let vip = await Vips.findOne({
-                where: {
-                    phone: phone,
-                    tenantId: orders[0].tenantId
-                }
-            })
-
-            //根据订单算原始总价格
-            let tenantConfig = await TenantConfigs.findOne({
-                where: {
-                    tenantId: orders[0].tenantId
-                }
-            });
-
-            if (vip == null) {
-                if (result.totalPrice >= tenantConfig.vipFee) {
-                    await Vips.create({
-                        phone: phone,
-                        vipLevel: 0,
-                        vipName: "匿名",
-                        tenantId: orders[0].tenantId
-                        // todo: ok?
-                    });
-                    result.isVip = true;
-                }
-            } else {
-                result.isVip = true;
-            }
+            let isVip = await vipManager.isVip(phone,orders[0].tenantId,result.totalPrice);
+            result.isVip = isVip;
 
             //通过订单号获取优惠券
             let coupon = await Coupons.findOne({
@@ -706,17 +683,55 @@ module.exports = {
             })
 
             if (coupon != null) {
-                result.couponType = coupon.couponType;
-                result.couponValue = coupon.value;
+                // result.couponType = coupon.couponType;
+                // result.couponValue = coupon.value;
+                result.couponKey = coupon.couponKey;
 
-                if (coupon.couponType == 'amount') {
-                    result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
-                    result.totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
-                } else {
-                    result.totalPrice = result.totalPrice * coupon.value;
-                    result.totalVipPrice = result.totalVipPrice * coupon.value;
-                }
+                // switch (coupon.couponType) {
+                //     case 'amount':
+                //         result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
+                //         result.totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
+                //         break;
+                //     case 'discount':
+                //         result.totalPrice = result.totalPrice * coupon.value;
+                //         result.totalVipPrice = result.totalVipPrice * coupon.value;
+                //         break;
+                //     case 'reduce':
+                //         if (result.totalPrice >= coupon.value.split('-')[0]) {
+                //             result.totalPrice = result.totalPrice - coupon.value.split('-')[1];
+                //         }
+                //         if (result.totalVipPrice >= coupon.value.split('-')[0]) {
+                //             result.totalVipPrice = result.totalVipPrice - coupon.value.split('-')[1];
+                //         }
+                //         break;
+                //     default:
+                //         result.totalPrice = result.totalPrice;
+                //         result.totalVipPrice = result.totalVipPrice;
+                // }
             }
+
+            result.totalPrice = Math.round(result.totalPrice * 100) / 100;
+            result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
+
+            //查询配送费
+            let deliveryFee = await DeliveryFees.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    tenantId: ctx.query.tenantId,
+                }
+            })
+
+            if (deliveryFee != null) {
+                let distanceAndPrice = await DistanceAndPrices.findOne({
+                    where: {
+                        deliveryFeeId: deliveryFee.deliveryFeeId,
+                        tenantId: ctx.query.tenantId,
+                    }
+                })
+                result.deliveryFee = distanceAndPrice.deliveryFee;
+            }
+
+
             // //判断vip
             // if (orders[0].phone != null) {
             //     let vips = await Vips.findAll({
@@ -750,26 +765,89 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
 
-    async getOrderPriceByTradeNo(tradeNo, tenantId) {
-        let orders = await Orders.findAll({
-            where: {
-                trade_no: tradeNo,
-                tenantId: tenantId
-            },
-            paranoid: false
-        })
-
+    //通过订单查询支付金额
+    async getOrderPriceByOrder(orders, tenantId) {
         let totalPrice = 0;
+        let totalVipPrice = 0;
+        let total_amount = 0;
+
         let food;
-        for (let i = 0; i < orders.length; i++) {
+        for (var i = 0; i < orders.length; i++) {
             food = await Foods.findOne({
                 where: {
                     id: orders[i].FoodId,
-                    tenantId: tenantId
+                    tenantId: orders[i].tenantId
                 }
             })
+
             totalPrice += food.price * orders[i].num;//原价
+            totalVipPrice += food.vipPrice * orders[i].num;//会员价
         }
-        return Promise.resolve(totalPrice);
-    }
+
+        //判断vip
+        if (orders[0].phone != null) {
+            var vips = await Vips.findAll({
+                where: {
+                    phone: orders[0].phone,
+                    tenantId: orders[0].tenantId
+                }
+            })
+            if (vips.length > 0) {
+                total_amount = Math.round(totalVipPrice * 100) / 100
+            } else {
+                total_amount = Math.round(totalPrice * 100) / 100;
+            }
+        } else {
+            total_amount = Math.round(totalPrice * 100) / 100;
+        }
+
+        //通过订单号获取优惠券
+        let coupon = await Coupons.findOne({
+            where: {
+                trade_no: orders[0].trade_no,
+                phone: orders[0].phone,
+                tenantId: orders[0].tenantId,
+                status: 0
+            }
+        })
+
+        if (coupon != null) {
+            switch (coupon.couponType) {
+                case 'amount':
+                    total_amount = ((total_amount - coupon.value) <= 0) ? 0.01 : (total_amount - coupon.value);
+                    break;
+                case 'discount':
+                    total_amount = total_amount * coupon.value;
+                    break;
+                case 'reduce':
+                    if (total_amount >= coupon.value.split('-')[0]) {
+                        total_amount = total_amount - coupon.value.split('-')[1];
+                    }
+                    break;
+                default:
+                    total_amount = total_amount;
+            }
+        }
+
+        //查询配送费
+        let deliveryFee = await DeliveryFees.findOne({
+            where: {
+                trade_no: orders[0].trade_no,
+                tenantId: orders[0].tenantId,
+            }
+        })
+
+        if (deliveryFee != null) {
+            let distanceAndPrice = await DistanceAndPrices.findOne({
+                where: {
+                    deliveryFeeId: deliveryFee.deliveryFeeId,
+                    tenantId: orders[0].tenantId,
+                }
+            })
+            total_amount = parseFloat(total_amount) + parseFloat(distanceAndPrice.deliveryFee);
+        }
+
+        return Math.round(total_amount *100) /100;
+    },
+
 }

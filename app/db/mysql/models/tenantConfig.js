@@ -26,6 +26,28 @@ module.exports = function (sequelize, DataTypes) {
         vipRemindFee: shortDataTypes.Double(100000),
         //主页图
         homeImage: shortDataTypes.String(),
+
+        //经度
+        longitude: {
+            type: Sequelize.STRING,
+            defaultValue:""
+        },
+
+        //纬度
+        latitude: {
+            type: Sequelize.STRING,
+            defaultValue:""
+        },
+
+        //公告
+        officialNews: {
+            type: Sequelize.STRING,
+            defaultValue:""
+        },
+
+        //是否选择人数
+        needChoosePeopleNumberPage:shortDataTypes.Bool(),
+
         //营业起始时间
         startTime: shortDataTypes.String(),
         //营业结束时间

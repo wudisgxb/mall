@@ -45,7 +45,7 @@ module.exports = {
             ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有任何评价");
             return;
         }
- 		for (let i = 0; i < merchantRatings.length; i++) {
+        for (let i = 0; i < merchantRatings.length; i++) {
             merchantRatings[i].userName = merchantRatings[i].userName.slice(0, 3) + '****' + merchantRatings[i].userName.slice(-4);
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchantRatings);

@@ -8,9 +8,12 @@ var Foods = db.models.Foods;
 var Vips = db.models.Vips;
 var PaymentReqs = db.models.PaymentReqs;
 var Tables = db.models.Tables;
-let Consignees=db.models.Consignees
+let Consignees = db.models.Consignees
 const Coupons = db.models.Coupons
-
+const DistanceAndPrices = db.models.DistanceAndPrices
+const DeliveryFees = db.models.DeliveryFees
+const vipManager = require('../customer/vip');
+const amoutManager = require('../amount/amountManager')
 
 module.exports ={
 
@@ -188,11 +191,11 @@ module.exports ={
             result[k].totalNum = totalNum;
             result[k].totalPrice = Math.round(totalPrice * 100) / 100;
             result[k].dinersNum = orders[0].diners_num;
-            result[k].paymentMethod = orders[0].paymentMethod==0?"支付宝":"微信";//支付方式
+            result[k].paymentMethod = orders[0].paymentMethod;//支付方式
             result[k].status = orders[0].status;
             result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[0].phone;
-            result[k].consigneeName = (consigneesName==null?null:consigneesName.name);
+            result[k].consigneeName = (consigneesName == null ? null : consigneesName.name);
             result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
             //根据订单号找退款信息
             let tmp = await Orders.findAll({
@@ -201,6 +204,8 @@ module.exports ={
                     tenantId: ctx.query.tenantId,
                 }
             });
+            let refund_amount = 0;
+
             if (tmp[0].trade_no != null && tmp[0].trade_no != '') {
                 // console.log("OOOOOOOOOOOOOOOOOsss||" + tmp[0].trade_no);
                 // console.log("tenantId = " + ctx.query.tenantId);
@@ -211,55 +216,46 @@ module.exports ={
                     }
                 });
                 //console.log("changdu:" + paymentReqs.length);
-                if(paymentReqs[k]!=null){
+                if (paymentReqs[k] != null) {
                     result[k].trade_no = tmp[0].trade_no;
                     result[k].total_amount = paymentReqs[0].total_amount;
                     result[k].actual_amount = paymentReqs[0].actual_amount;
                     result[k].refund_amount = paymentReqs[0].refund_amount;
                     result[k].refund_reason = paymentReqs[0].refund_reason;
+
+                    refund_amount = paymentReqs[0].refund_amount;
                 }
+
             }
 
+            let amount = await amoutManager.getTransAccountAmount(ctx.query.tenantId, consigneesId.consigneeId, tradeNoArray[k], orders[0].paymentMethod, refund_amount);
 
-            //通过订单号获取优惠券
-            let coupon = await Coupons.findOne({
-                where: {
-                    trade_no: orders[0].trade_no,
-                    phone: orders[0].phone,
-                    tenantId: orders[0].tenantId,
-                    //status: 0
-                }
-            })
-
-            if (coupon != null) {
-                result[k].couponType = coupon.couponType;
-                result[k].couponValue = coupon.value;
-
-                // if (coupon.couponType == 'amount') {
-                //     result[k].totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
-                //     result[k].totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
-                // } else {
-                //     result[k].totalPrice = result.totalPrice * coupon.value;
-                //     result[k].totalVipPrice = result.totalVipPrice * coupon.value;
-                // }
-            }
-
-            //判断vip
-            if (orders[0].phone != null) {
-                let vips = await Vips.findAll({
-                    where: {
-                        phone: orders[0].phone,
-                        tenantId: ctx.query.tenantId
-                    }
-                })
-                if (vips.length > 0) {
-                    delete result[k].totalPrice;
-                } else {
-                    delete result[k].totalVipPrice;
-                }
+            //简单异常处理
+            if (amount.totalAmount >0) {
+                result[k].totalPrice =  amount.totalPrice;
+                result[k].platformCouponFee = amount.platformCouponFee;
+                result[k].merchantCouponFee = amount.merchantCouponFee;
+                result[k].deliveryFee = amount.deliveryFee;
+                result[k].refund_amount = refund_amount;
+                result[k].platformAmount  = amount.platformAmount;
+                result[k].merchantAmount = amount.merchantAmount;
+                result[k].consigneeAmount = amount.consigneeAmount;
+                result[k].couponType = amount.couponType;
+                result[k].couponValue = amount.couponValue;
             } else {
-                delete result[k].totalVipPrice;
+                result[k].totalPrice = 0;
+                result[k].platformCouponFee = 0;
+                result[k].merchantCouponFee = 0;
+                result[k].deliveryFee = 0;
+                result[k].refund_amount = 0;
+                result[k].platformAmount  = 0;
+                result[k].merchantAmount = 0;
+                result[k].consigneeAmount = 0;
+                result[k].couponType = null;
+                result[k].couponValue = null
             }
+
+
         }
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS,result)
     },

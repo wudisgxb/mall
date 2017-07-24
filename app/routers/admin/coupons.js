@@ -2,12 +2,12 @@ let coupon = require('../../controller/admin/coupon');
 
 const router = new (require('koa-router'))()
 
-router.post('/api/v3/admin/coupon', coupon.saveAdminCoupon);
+router.post('/api/test/admin/coupon', coupon.saveAdminCoupon);
 
-router.put('/api/v3/admin/coupon', coupon.updateAdminCoupon);
+router.put('/api/test/admin/coupon', coupon.updateAdminCoupon);
 
-router.get('/api/v3/admin/coupon', coupon.getAdminCoupon);
+router.get('/api/test/admin/coupon', coupon.getAdminCoupon);
 
-router.delete('/api/v3/admin/coupon', coupon.deleteAdminCoupon);
+router.delete('/api/test/admin/coupon', coupon.deleteAdminCoupon);
 
 module.exports = router

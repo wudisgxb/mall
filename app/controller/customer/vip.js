@@ -1,6 +1,8 @@
-let db = require('../../db/mysql/index');
+const db = require('../../db/mysql/index');
 const ApiResult = require('../../db/mongo/ApiResult')
-let Vips = db.models.Vips;
+const Vips = db.models.Vips;
+const TenantConfigs = db.models.TenantConfigs;
+
 module.exports = {
 
     async checkUserVip (ctx, next) {
@@ -21,6 +23,45 @@ module.exports = {
         } else {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result, false)
         }
+    },
+
+    async isVip (phone,tenantId,totalPrice) {
+
+        let isVip = false;
+
+        if (phone == null) {
+            return isVip;
+        }
+
+        let tenantConfig = await TenantConfigs.findOne({
+            where: {
+                tenantId: tenantId
+            }
+        });
+
+        if (tenantConfig.needVip == false){
+            return isVip;
+        }
+
+        let vip = await Vips.findOne({
+            where: {
+                phone: phone,
+                tenantId: tenantId
+            }
+        })
+        if (vip == null) {
+            if (totalPrice >= tenantConfig.vipFee) {
+                await Vips.create({
+                    phone: phone,
+                    vipLevel: 0,
+                    vipName: "ÄäÃû",
+                    tenantId: tenantId
+                    // todo: ok?
+                });
+                isVip = true;
+            }
+        }
+        return isVip;
     },
 
 

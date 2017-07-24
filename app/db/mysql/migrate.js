@@ -514,8 +514,8 @@ function * update() {
 }
 
 co(function *() {
-    yield init();
-    //yield update();
+    //yield init();
+    yield update();
 
     console.log('finished ...');
     process.exit(0)

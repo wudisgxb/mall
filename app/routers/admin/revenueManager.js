@@ -6,5 +6,5 @@ var revenueManager = require('../../controller/admin/revenueManager')
 const router = new (require('koa-router'))()
 
 //查询收退款信息
-router.get('/api/v3/admin/receivablesInfo', revenueManager.getAdminReceivablesInfo);
+router.get('/api/test/admin/receivablesInfo', revenueManager.getAdminReceivablesInfo);
 module.exports = router

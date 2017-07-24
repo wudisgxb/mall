@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "migrate": "node app/db/mysql/migrate.js"
+    "migrate": "node app/db/mysql/migrate.js",
+    "statisticsMigrate": "node app/db/statisticsMySql/statisticsMigrate.js"
   },
   "dependencies": {
     "axios": "^0.15.3",

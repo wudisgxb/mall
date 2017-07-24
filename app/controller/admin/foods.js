@@ -59,7 +59,7 @@ module.exports = {
                 vipPrice: body.food.vipPrice,
                 sellCount: 100,
                 foodNum:body.food.foodNum,
-                // rating: body.food.rating,
+                rating: body.food.rating,
                 info: body.food.info,
                 unit: body.food.unit,
                 taste: JSON.stringify(body.food.taste),
@@ -216,10 +216,7 @@ module.exports = {
             results.push(resultId[k])
         }
         for(let i=0;i<results.length;i++){
-            // console.log(results[i].id);
             for(let j=0;j<foodsJson.length;j++){
-                // console.log(foodsJson[j].id);
-                // console.log((foodsJson[j].id)==(results[i].id));
                 if(foodsJson[j].id==(results[i].id)){
                     foodsJson.splice(j,1);
                 }

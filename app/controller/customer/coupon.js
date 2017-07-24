@@ -11,10 +11,9 @@ module.exports = {
     async bindCoupon (ctx, next) {
         ctx.checkBody('tenantId').notEmpty();
         //ctx.checkBody('consigneeId').notEmpty();
-        ctx.checkBody('couponType').notEmpty();
-        ctx.checkBody('couponValue').notEmpty();
+        ctx.checkBody('coupons').notEmpty();
         ctx.checkBody('phoneNumber').notEmpty();
-        ctx.checkBody('couponFrom').notEmpty();
+        ctx.checkBody('couponRate').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
@@ -23,15 +22,20 @@ module.exports = {
 
         let body = ctx.request.body;
 
-        let couponLimits = await CouponLimits.findOne({});
+        let couponLimit = await CouponLimits.findOne({
+            where: {
+                tenantId: body.tenantId
+            }
+        });
 
-        let couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+        //let couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
         let coupon = await Coupons.findAll({
             where: {
                 phone: body.phoneNumber,
+                tenantId: body.tenantId,
                 createdAt: {
-                    $gte: new Date(new Date() - couponLimits.invalidTime)
+                    $gte: new Date(new Date() - couponLimit.invalidTime)
                 },
                 status: 0
                 // createdAt: {
@@ -41,37 +45,50 @@ module.exports = {
             }
         });
 
-        if (coupon.length >= couponLimits.numLimit) {
+        if (coupon.length >= couponLimit.numLimit) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, '优惠券领用次数超限');
         } else {
-            await Coupons.create({
-                couponKey: couponKey,
-                phone: body.phoneNumber,
-                tenantId: body.tenantId,
-                consigneeId: body.consigneeId,
-                couponType: body.couponType,
-                value: body.couponValue,
-                status: 0
-            });
+            body.coupons.forEach(async function (e) {
+                var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+                await Coupons.create({
+                    couponKey: couponKey,
+                    phone: body.phoneNumber,
+                    tenantId: body.tenantId,
+                    consigneeId: body.consigneeId,
+                    couponType: e.couponType,
+                    value: e.couponValue,
+                    couponRate: body.couponRate,
+                    status: 0
+                });
+            })
+
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
         }
     },
     //查看优惠券是否能领取
     async isCouponReceivable (ctx, next) {
         ctx.checkQuery('phoneNumber').notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
+        //ctx.checkBody('consigneeId').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
 
-        let couponLimits = await CouponLimits.findOne({});
+        let couponLimit = await CouponLimits.findOne({
+            where: {
+                tenantId: ctx.query.tenantId
+            }
+        });
 
         let coupon = await Coupons.findAll({
             where: {
                 phone: ctx.query.phoneNumber,
+                tenantId: ctx.query.tenantId,
+                //consigneeId: body.consigneeId,
                 createdAt: {
-                    $gte: new Date(new Date() - couponLimits.invalidTime)
+                    $gte: new Date(new Date() - couponLimit.invalidTime)
                 },
                 status: 0
                 // createdAt: {
@@ -81,7 +98,7 @@ module.exports = {
             }
         });
 
-        if (coupon.length >= couponLimits.numLimit) {
+        if (coupon.length >= couponLimit.numLimit) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, '优惠券领用次数超限');
             return;
         }
@@ -100,7 +117,12 @@ module.exports = {
             return;
         }
 
-        let couponLimits = await CouponLimits.findOne({});
+        //通过租户id获取第一个,一个租户只能1个限制
+        let couponLimit = await CouponLimits.findOne({
+            where: {
+                tenantId: ctx.query.tenantId,
+            }
+        });
 
         //通过手机号查询可用优惠券
         let coupons = await Coupons.findAll({
@@ -116,12 +138,85 @@ module.exports = {
         });
 
         for (var i = 0; i < coupons.length; i++) {
-            if ((Date.now() - coupons[i].createdAt.getTime()) > couponLimits.invalidTime) {
+            if ((Date.now() - coupons[i].createdAt.getTime()) > couponLimit.invalidTime) {
                 coupons.splice(i, 1);
                 i = i - 1;
             }
         }
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, coupons);
+        let retCoupons = [];
+        let copyCoupon = {};
+        
+        coupons.forEach(function (e) {
+            var coupon = new Object();
+            coupon.couponKey = e.couponKey;
+            coupon.couponRate = e.couponRate;
+            coupon.couponType = e.couponType;
+            coupon.value = e.value;
+            coupon.createdAt = e.createdAt;
+            coupon.InvalidDate = new Date(e.createdAt.getTime() + couponLimit.invalidTime);
+
+            retCoupons.push(coupon);
+        })
+        
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, retCoupons);
     },
+
+    //优惠券绑定订单号
+    async couponBindTradeNo (ctx, next) {
+        ctx.checkBody('couponKey').notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
+        //ctx.checkBody('consigneeId').notEmpty();
+        ctx.checkBody('phoneNumber').notEmpty();
+        ctx.checkBody('tradeNo').notEmpty();
+
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+
+        let body = ctx.request.body;
+
+        if (body.couponKey != '') {
+            let coupon = await Coupons.findOne({
+                where: {
+                    couponKey: body.couponKey,
+                    tenantId: body.tenantId,
+                    //consigneeId: body.consigneeId,
+                    phone: body.phoneNumber,
+                    status: 0,
+                }
+            })
+
+            if (coupon != null) {
+                coupon.trade_no = body.tradeNo;
+                await coupon.save();
+            } else {
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'优惠券不存在！');
+                return;
+            }
+        } else {
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no: body.tradeNo,
+                    tenantId: body.tenantId,
+                    //consigneeId: body.consigneeId,
+                    phone: body.phoneNumber,
+                    status: 0,
+                }
+            })
+
+            if (coupon != null) {
+                coupon.trade_no = null;
+                await coupon.save();
+            } else {
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'优惠券不存在！');
+                return;
+            }
+        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
+    },
+
 }

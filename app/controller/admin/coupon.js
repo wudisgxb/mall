@@ -3,7 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const Coupons = db.models.Coupons;
-const coupon = require('../../controller/customer/coupon');
+const Tool = require('../../Tool/tool');
 
 module.exports = {
 
@@ -11,7 +11,8 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
         ctx.checkBody('couponType').notEmpty()
-        ctx.checkBody('value').notEmpty();
+        ctx.checkBody('couponValue').notEmpty();
+        ctx.checkBody('couponRate').notEmpty();
         ctx.checkBody('time').notEmpty();
 
         if (ctx.errors) {
@@ -29,8 +30,9 @@ module.exports = {
             tenantId: body.tenantId,
             consigneeId: body.consigneeId,
             time: body.time,
+            couponRate:body.couponRate,
             couponType: body.couponType,
-            value: body.value,
+            value: body.couponValue,
             status: 0
         });
 
@@ -41,7 +43,8 @@ module.exports = {
         ctx.checkBody('consigneeId').notEmpty();
         ctx.checkBody('couponKey').notEmpty();
         ctx.checkBody('couponType').notEmpty()
-        ctx.checkBody('value').notEmpty();
+        ctx.checkBody('couponValue').notEmpty();
+        ctx.checkBody('couponRate').notEmpty();
         ctx.checkBody('time').notEmpty();
 
         if (ctx.errors) {
@@ -58,7 +61,8 @@ module.exports = {
         })
         if (coupon != null) {
             coupon.couponType = body.couponType;
-            coupon.value = body.value;
+            coupon.value = body.couponValue;
+            coupon.couponRate = body.couponRate;
             coupon.time = body.time;
             await coupon.save();
         } else {
@@ -70,7 +74,7 @@ module.exports = {
     },
     async getAdminCoupon (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
-        ctx.checkQuery('consigneeId').notEmpty();
+        //ctx.checkQuery('consigneeId').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
@@ -80,7 +84,7 @@ module.exports = {
         let coupons = await Coupons.findAll({
             where: {
                 tenantId: ctx.query.tenantId,
-                consigneeId: ctx.query.consigneeId,
+                //consigneeId: ctx.query.consigneeId,
                 status: 0
             }
         });

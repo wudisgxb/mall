@@ -40,28 +40,28 @@ module.exports = {
     async getadminLong(ctx, next){
         ctx.checkBody('userName').notEmpty();
         ctx.checkBody('password').notEmpty();
-        ctx.checkBody('captcha').notEmpty();
-        ctx.checkBody('key').notEmpty();
+        //ctx.checkBody('captcha').notEmpty();
+        //ctx.checkBody('key').notEmpty();
         let body = ctx.request.body;
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
-        //根据key查询Captcha中的记录
-        let captcha =await Captcha.findOne({
-            where:{
-                key : body.key,
-            }
-        })
-        //根据现在的时间减去创建的时间-创建时间如果大于5分钟
-        if((new Date()-captcha.createdAt)>5*1000*60){
-            //将验证码超时，请重新获取传给前端，并跳出
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"验证码超时，请重新获取" );
-            return;
-        }
+        // //根据key查询Captcha中的记录
+        // let captcha =await Captcha.findOne({
+        //     where:{
+        //         key : body.key,
+        //     }
+        // })
+        // //根据现在的时间减去创建的时间-创建时间如果大于5分钟
+        // if((new Date()-captcha.createdAt)>5*1000*60){
+        //     //将验证码超时，请重新获取传给前端，并跳出
+        //     ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"验证码超时，请重新获取" );
+        //     return;
+        // }
         let c;
         //判断输入的验证码和数据库中的验证码是否匹配
-        if(body.captcha.toLowerCase()==captcha.captcha.toLowerCase()){
+        //if(body.captcha.toLowerCase()==captcha.captcha.toLowerCase()){
             //如果匹配查询用户名密码是否正确
             c = await Admins.findOne({
                 where:{
@@ -80,13 +80,12 @@ module.exports = {
                     id:c.id,
                     tenantId:c.tenantId
                 })
-                return;
             }
-        }
-         else {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"图形验证码错误！请重新输入！")
-            return;
-        }
+        // }
+        //  else {
+        //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"图形验证码错误！请重新输入！")
+        //     return;
+        // }
 
     }
 }
