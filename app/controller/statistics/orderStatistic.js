@@ -13,6 +13,8 @@ let getQuarterEchats = require('../echats/quarterEchats')
 let getYearEchat = require('../echats/yearEchat')
 
 const getstatistics = (function () {
+    // 查询平均消费
+    let getAvgConsumption = async function (tena
     // 设置Order表
     let setOrders = async function (json) {
         await StatisticsOrders.create({
@@ -27,9 +29,7 @@ const getstatistics = (function () {
             merchantCouponFee:json.merchantCouponFee,
             phone:json.phone,
         })
-    }
-    // 查询平均消费
-    let getAvgConsumption = async function (tenantId,startTime,endTime,type) {
+    }ntId,startTime,endTime,type) {
         //type==1为每日平均消费
         if(type==1){
             let result=[];
@@ -50,9 +50,22 @@ const getstatistics = (function () {
                     numPrice = consumption[j].totalPrice+numPrice
                 }
                 result.push({
-                    numPrice : numPrice,
-                    property : consumption.length,
-                    AvgConsumption : numPrice/consumption.length
+                    numPrice : {
+                        name : "价格",
+                        value : numPrice
+                    },
+                    property : {
+                        name : "人数",
+                        value : consumption.length,
+                    },
+                    AvgConsumption : {
+                        name : "平均价格",
+                        value : numPrice/consumption.length
+                    },
+                    time : {
+                        name : "现在时间",
+                        value : new Date(i)
+                    }
                 })
             }
             return result;
@@ -76,9 +89,22 @@ const getstatistics = (function () {
                     numPrice = consumption[j].totalPrice+numPrice
                 }
                 result.push({
-                    numPrice : numPrice,
-                    property : consumption.length,
-                    AvgConsumption : numPrice/consumption.length
+                    numPrice : {
+                        name : "价格",
+                        value : numPrice
+                    },
+                    property : {
+                        name : "人数",
+                        value : consumption.length,
+                    },
+                    AvgConsumption : {
+                        name : "平均价格",
+                        value : numPrice/consumption.length
+                    },
+                    time:{
+                        name : "时间",
+                        value : getMonthEchats[i].start
+                    }
                 })
             }
             return result;
@@ -101,10 +127,26 @@ const getstatistics = (function () {
                 for(let j = 0; j < consumption.length; j++){
                     numPrice = consumption[j].totalPrice+numPrice
                 }
+                let year = parseInt(getQuarterEchats[i].start.substring(0,4))
+                let quart = (parseInt(getQuarterEchats[i].start.substring(5))+2)/3
+
                 result.push({
-                    numPrice : numPrice,
-                    property : consumption.length,
-                    AvgConsumption : numPrice/consumption.length
+                    numPrice : {
+                        name : "价格",
+                        value : numPrice
+                    },
+                    property : {
+                        name : "人数",
+                        value : consumption.length,
+                    },
+                    AvgConsumption : {
+                        name : "平均价格",
+                        value : numPrice/consumption.length
+                    },
+                    time:{
+                        name:"时间",
+                        value : year+"年，第"+quart+"季度"
+                    }
                 })
             }
             return result;
@@ -127,10 +169,24 @@ const getstatistics = (function () {
                 for(let j = 0; j < consumption.length; j++){
                     numPrice = consumption[j].totalPrice+numPrice
                 }
+                let year = parseInt(getYearEchat[i].start.substring(0,4));
                 result.push({
-                    numPrice : numPrice,
-                    property : consumption.length,
-                    AvgConsumption : numPrice/consumption.length
+                    numPrice : {
+                        name : "价格",
+                        value : numPrice
+                    },
+                    property : {
+                        name : "人数",
+                        value : consumption.length,
+                    },
+                    AvgConsumption : {
+                        name : "平均价格",
+                        value : numPrice/consumption.length
+                    },
+                    time : {
+                        name : "时间",
+                        value : year+"年"
+                    }
                 })
             }
             return result;
@@ -178,9 +234,22 @@ const getstatistics = (function () {
                     numPrice+=statisticsOrders[k].totalPrice
                 }
                 result.push({
-                    numPrice : numPrice,
-                    property : consumption.length,
-                    AvgConsumption : numPrice/consumption.length
+                    numPrice : {
+                        name : "价格",
+                        value : numPrice
+                    },
+                    property : {
+                        name : "人数",
+                        value : consumption.length,
+                    },
+                    AvgConsumption : {
+                        name : "平均价格",
+                        value : numPrice/consumption.length
+                    },
+                    time : {
+                        name : "时间",
+                        value : getDayEchat[i].start
+                    }
                 })
             }
             return result;
@@ -225,9 +294,23 @@ const getstatistics = (function () {
                     numPrice+=statisticsOrders[k].totalPrice
                 }
                 result.push({
-                    numPrice : numPrice,
-                    property : consumption.length,
-                    AvgConsumption : numPrice/consumption.length
+                    numPrice : {
+                        name : "价格",
+                        value : numPrice
+                    },
+                    property : {
+                        name : "人数",
+                        value : consumption.length,
+                    },
+                    AvgConsumption : {
+                        name : "平均价格",
+                        value : numPrice/consumption.length
+                    },
+                    time : {
+                        name : "时间",
+                        value : getMonthEchats[i].start
+                    }
+
                 })
             }
             return result;
@@ -271,10 +354,25 @@ const getstatistics = (function () {
                     })
                     numPrice+=statisticsOrders[k].totalPrice
                 }
+                let year = parseInt(getQuarterEchats[i].start.substring(0,4))
+                let quart = (parseInt(getQuarterEchats[i].start.substring(5))+2)/3
                 result.push({
-                    numPrice : numPrice,
-                    property : consumption.length,
-                    AvgConsumption : numPrice/consumption.length
+                    numPrice : {
+                        name : "价格",
+                        value : numPrice
+                    },
+                    property : {
+                        name : "人数",
+                        value : consumption.length,
+                    },
+                    AvgConsumption : {
+                        name : "平均价格",
+                        value : numPrice/consumption.length
+                    },
+                    time :{
+                        name : "时间",
+                        value : year+"年，第"+quart+"季度"
+                    }
                 })
             }
             return result;
@@ -318,10 +416,24 @@ const getstatistics = (function () {
                     })
                     numPrice+=statisticsOrders[k].totalPrice
                 }
+                let year = parseInt(getYearEchat[i].start.substring(0,4));
                 result.push({
-                    numPrice : numPrice,
-                    property : consumption.length,
-                    AvgConsumption : numPrice/consumption.length
+                    numPrice : {
+                        name : "价格",
+                        value : numPrice
+                    },
+                    property : {
+                        name : "人数",
+                        value : consumption.length,
+                    },
+                    AvgConsumption : {
+                        name : "平均价格",
+                        value : numPrice/consumption.length
+                    },
+                    time : {
+                        name : "时间",
+                        value : year+"年"
+                    }
                 })
             }
             return result;
@@ -345,21 +457,78 @@ const getstatistics = (function () {
         }
         let result=[];
         for (let i = 0; i < getTime.length; i++){
-            let statisticsOrders = await StatisticsOrders.findAll({
+            let statisticsOrder = await StatisticsOrders.findAll({
                 where:{
                     tenantId:tenantId,
                     createdAt:{
-                        $gt:new Date(getTime[i].start),
+                        $gt : new Date(getTime[i].start),
                         $lt : new Date(getTime[i].end)
                     }
                 }
             })
-            for (let j = 0;j<statisticsOrders.length;i++){
+            for (let j = 0;j<statisticsOrder.length;j++){
                 result.push({
                     totalPrice:{
                         name : "订单价格",
-                        value : statisticsOrders[j].totalPrice
+                        value : statisticsOrder[j].totalPrice
                     },
+                    merchantAmount:{
+                        name:"转给商户的钱",
+                        value:statisticsOrder[j].merchantAmount
+                    },
+                    consigneeAmount:{
+                        name:"转给代售的钱",
+                        value:statisticsOrder[j].consigneeAmount
+                    },
+                    platformAmount:{
+                        name:"转给平台的钱",
+                        value:statisticsOrder[j].platformAmount
+                    },
+                    deliveryFee:{
+                        name:"配送费",
+                        value:statisticsOrder[j].deliveryFee
+                    },
+                    refund_amount:{
+                        name:"退款",
+                        value:statisticsOrder[j].refund_amount
+                    },
+                    platformCouponFee:{
+                        name:"平台优惠",
+                        value:statisticsOrder[j].platformCouponFee
+                    },
+                    merchantCouponFee:{
+                        name:"商家优惠",
+                        value:statisticsOrder[j].merchantCouponFee
+                    },
+                    phone:{
+                        name:"手机号",
+                        value:statisticsOrder[j].phone
+                    },
+                })
+            }
+        }
+        console.log(result)
+        return result;
+    }
+    // 分成情况
+    let getReat = async function (tenantId,startTime,endTime,type) {
+        let result=[];
+        let getTime=[];
+        if(type==1){
+            getTime = await getDayEchat.getDay(startTime,endTime)
+        }
+        for (let i = 0;i < getTime.length; i++){
+            let statisticsOrders = await StatisticsOrders.findAll({
+                where:{
+                    tenantId:tenantId,
+                    createdAt:{
+                        $gt : new Date(getTime[i].start),
+                        $lt : new Date(getTime[i].end)
+                    }
+                }
+            })
+            for(let j = 0;j < statisticsOrders.length; j++){
+                result.push({
                     merchantAmount:{
                         name:"转给商户的钱",
                         value:statisticsOrders[j].merchantAmount
@@ -372,35 +541,11 @@ const getstatistics = (function () {
                         name:"转给平台的钱",
                         value:statisticsOrders[j].platformAmount
                     },
-                    deliveryFee:{
-                        name:"配送费",
-                        value:statisticsOrders[j].deliveryFee
-                    },
-                    refund_amount:{
-                        name:"退款",
-                        value:statisticsOrders[j].refund_amount
-                    },
-                    platformCouponFee:{
-                        name:"平台优惠",
-                        value:statisticsOrders[j].platformCouponFee
-                    },
-                    merchantCouponFee:{
-                        name:"商家优惠",
-                        value:statisticsOrders[j].merchantCouponFee
-                    },
-                    phone:{
-                        name:"手机号",
-                        value:statisticsOrders[j].phone
-                    }
-
                 })
             }
         }
         return result;
-    }
-    // 分成情况
-    let getReat = async function (tenantId,startTime,endTime,type) {
-        
+
     }
 
 
@@ -408,7 +553,8 @@ const getstatistics = (function () {
         setOrders : setOrders,
         getAvgConsumption : getAvgConsumption,
         getVipAvgConsumption : getVipAvgConsumption,
-        getOrder:getOrder
+        getOrder : getOrder,
+        getReat : getReat
     }
     return instance;
 })();

@@ -15,6 +15,7 @@ const getDayEchats = (function () {
                 end:new Date(i+oneDay)
             })
         }
+        console.log(result.length)
         return result;
     }
     let instance = {
