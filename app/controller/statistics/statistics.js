@@ -2,13 +2,13 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/statisticsMySql/index');
-let Orders = db.models.Orders;
+let statisticsOrders = db.models.Orders;
 
 
 const getFoodNum = (function () {
 
     let test = async function (json) {
-        await  Orders.create({
+        await  statisticsOrders.create({
             num: '123'
         });
     }

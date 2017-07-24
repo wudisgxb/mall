@@ -11,7 +11,7 @@ router.get('/api/test/customer/deal/coupon', coupon.isCouponReceivable);
 router.get('/api/test/customer/eshop/availableCoupon', coupon.getAvailableCoupon);
 router.get('/api/test/customer/deal/availableCoupon', coupon.getAvailableCoupon);
 
-//独立接口 优惠券绑定订单号
+//鐙珛鎺ュ彛 浼樻儬鍒哥粦瀹氳鍗曞彿
 router.post('/api/test/customer/eshop/couponBindTradeNo', coupon.couponBindTradeNo);
 router.post('/api/test/customer/deal/couponBindTradeNo', coupon.couponBindTradeNo);
 
