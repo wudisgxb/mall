@@ -13,7 +13,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-
         let tenantInfo = await TenantConfigs.findOne({
             where: {
                 tenantId: ctx.query.tenantId,

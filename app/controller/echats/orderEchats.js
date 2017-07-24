@@ -1,10 +1,6 @@
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
-let Orders = db.models.Orders;
-let Vips = db.models.Vips;
 let PaymentHistory = db.models.PaymentHistory;
-let GetQuarterEchats = require('../echats/quarterEchats')
-let getFindCount = require('../echats/findCountAll')
 let GetMonthEchats = require('../echats/MonthEchats')
 let GetYearEchat = require('../echats/yearEchat')
 
