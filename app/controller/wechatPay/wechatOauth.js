@@ -330,6 +330,10 @@ module.exports = {
         //根据订单查询需要支付多少
         total_amount = await orderManager.getOrderPriceByOrder(orders);
 
+        //微信新订单号
+
+        let wechat_trade_no = trade_no + String(parseInt(Math.random() * 8999 + 1000));
+
 
 
         //查找主商户名称
@@ -369,13 +373,13 @@ module.exports = {
             openid: token.data.openid,
             body: merchant + '-' + tableName + '账单',
             //  detail: '公众号支付测试',
-            out_trade_no: trade_no,
+            out_trade_no: wechat_trade_no,
             total_fee: parseFloat(total_amount)*100,//分
             trade_type: 'JSAPI',
             spbill_create_ip: ip,
             notify_url: 'http://deal.xiaovbao.cn/api/test/wechatPayNotify'
         })
-        new_params.trade_no = trade_no;
+        new_params.trade_no = wechat_trade_no;
 
         console.log(new_params)
 
@@ -422,6 +426,7 @@ module.exports = {
                 isFinish: false,
                 isInvalid : false,
                 trade_no:trade_no,
+                wechat_trade_no:wechat_trade_no,
                 app_id:app_id,
                 total_amount:total_amount,
                 actual_amount: total_amount,
@@ -448,6 +453,7 @@ module.exports = {
                 isFinish: false,
                 isInvalid: false,
                 trade_no: trade_no,
+                wechat_trade_no:wechat_trade_no,
                 app_id: app_id,
                 total_amount: total_amount,
                 actual_amount: total_amount,
@@ -557,6 +563,8 @@ module.exports = {
         let fn = co.wrap(wxpay.getSign.bind(wxpay));
         const sign = await fn(str,'MD5')
 
+        let trade_no = xml.out_trade_no.substr(0,xml.out_trade_no.length-4);
+
         if (sign !== xml.sign[0]) {
             AlipayErrors.create({
                 errRsp:JSON.stringify(ctx.xmlBody),
@@ -564,7 +572,7 @@ module.exports = {
             });
         } else {
             console.log(JSON.stringify({
-                trade_no : xml.out_trade_no,
+                trade_no : trade_no,
                 app_id : xml.appid,
                 total_amount : xml.total_fee/100,
                 paymentMethod:'微信',
@@ -575,7 +583,7 @@ module.exports = {
             //优惠券使用状态修改
             let coupon = await Coupons.findOne({
                 where: {
-                    trade_no:  xml.out_trade_no,
+                    trade_no:  trade_no,
                     status: 0
                 }
             })
@@ -588,7 +596,7 @@ module.exports = {
 
             let order = await Orders.findAll({
                 where:{
-                    trade_no:xml.out_trade_no
+                    trade_no:trade_no
                 }
             })
             //根据查询到的foodId在菜单中查询当前的菜
@@ -603,7 +611,7 @@ module.exports = {
 
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
-                    trade_no : xml.out_trade_no,
+                    trade_no : trade_no,
                     app_id : xml.appid,
                     total_amount : xml.total_fee/100,
                     paymentMethod:'微信',
@@ -611,7 +619,7 @@ module.exports = {
                     isInvalid : false
                 }
             });
-            console.log("trade_no="+ xml.out_trade_no);
+            console.log("trade_no="+ trade_no);
             console.log("app_id="+ xml.appid);
             console.log("total_amount="+ parseFloat(xml.total_fee));
 
@@ -642,7 +650,7 @@ module.exports = {
                         $or: [{status: 0}, {status: 1}],
                         tenantId:tenantId,
                         consigneeId: consigneeId,
-                        trade_no: xml.out_trade_no,
+                        trade_no: trade_no,
                     }
                 });
 
@@ -672,7 +680,7 @@ module.exports = {
                 //input:tenantId,consigneeId,trade_no
                 //output:object（总金额，租户金额，代售金额）
 
-                let amountJson = await amountManager.getTransAccountAmount(tenantId,consigneeId,xml.out_trade_no,'微信',0);
+                let amountJson = await amountManager.getTransAccountAmount(tenantId,consigneeId,trade_no,'微信',0);
 
                 console.log("amountJson = " + JSON.stringify(amountJson,null,2));
 

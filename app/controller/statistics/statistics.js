@@ -36,7 +36,6 @@ const getFoodNum = (function () {
             a = firstDate.format("yyyy-MM-dd 23:59:59");
         }
 
-
         console.log(b);
         console.log(a);
         let order;
