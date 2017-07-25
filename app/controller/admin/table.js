@@ -24,8 +24,25 @@ module.exports = {
                 exclude: ['createdAt', 'updatedAt']
             }
         })
+        let result=[];
+        let consigneeId;
+        let tenantName;
+        for (let i = 0;i<table.length;i++){
+            tenantName = await Merchant.findOne(table[i].tenantId)
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table);
+            if(table[i].consigneeId!=null){
+                consigneeId= await Consignees.findOne(table[i].consigneeId)
+            }
+            result.push({
+                name:table[i].name,
+                status:table[i].status,
+                info:table[i].info,
+                tenantId:tenantName.name,
+                consigneeId:table[i].consigneeId==null?null:consigneeId.consigneeId
+            })
+        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
     },
     //获取租户下 代售点下桌状态
     // async getAdminTableByConsigneeId (ctx, next) {
@@ -117,7 +134,6 @@ module.exports = {
         // ctx.checkBody('/table/status',true).first().notEmpty();
         ctx.checkBody('/table/info',true).first().notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
-
         ctx.checkBody('tenantId').notEmpty();
 
         let body = ctx.request.body;
@@ -126,11 +142,16 @@ module.exports = {
             ctx.body = ctx.errors;
             return;
         }
+        let consigneeId = await Consignees.findOne({
+            where:{
+                name:body.consigneeId
+            }
+        })
         let tables = await Tables.findAll({
             where: {
                 name: body.table.name,
                 tenantId:body.tenantId,
-                consigneeId:body.consigneeId
+                consigneeId:consigneeId.consigneeId
             }
         })
         if (tables.length > 0) {
@@ -145,7 +166,7 @@ module.exports = {
             status: 0,
             info: body.table.info,
             tenantId: body.tenantId,
-            consigneeId:body.consigneeId
+            consigneeId:consigneeId.consigneeId
             // todo: ok?
             //deletedAt: Date.now()
         });
