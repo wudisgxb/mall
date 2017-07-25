@@ -13,8 +13,6 @@ let getQuarterEchats = require('../echats/quarterEchats')
 let getYearEchat = require('../echats/yearEchat')
 
 const getstatistics = (function () {
-    // 查询平均消费
-    let getAvgConsumption = async function (tena
     // 设置Order表
     let setOrders = async function (json) {
         await StatisticsOrders.create({
@@ -29,7 +27,9 @@ const getstatistics = (function () {
             merchantCouponFee:json.merchantCouponFee,
             phone:json.phone,
         })
-    }ntId,startTime,endTime,type) {
+    }
+    // 查询平均消费
+    let getAvgConsumption = async function (tenantId,startTime,endTime,type) {
         //type==1为每日平均消费
         if(type==1){
             let result=[];
