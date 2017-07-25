@@ -24,6 +24,8 @@ const amountManager = require('../amount/amountManager')
 const orderManager = require('../customer/order');
 const config = require('../../config/config')
 
+const getstatistics = require('../statistics/orderStatistic');
+
 const ip = require('ip').address();
 
 const client = new OAuth(config.wechat.appId, config.wechat.secret)
@@ -563,7 +565,7 @@ module.exports = {
         let fn = co.wrap(wxpay.getSign.bind(wxpay));
         const sign = await fn(str,'MD5')
 
-        let trade_no = xml.out_trade_no.substr(0,xml.out_trade_no.length-4);
+        let trade_no = xml.out_trade_no.toString().substr(0,xml.out_trade_no.toString().length-4);
 
         if (sign !== xml.sign[0]) {
             AlipayErrors.create({
@@ -681,6 +683,16 @@ module.exports = {
                 //output:object（总金额，租户金额，代售金额）
 
                 let amountJson = await amountManager.getTransAccountAmount(tenantId,consigneeId,trade_no,'微信',0);
+
+                try {
+                    amountJson.tenantId = tenantId;
+                    amountJson.consigneeId = consigneeId;
+                    amountJson.phone = orders[0].phone;
+                    amountJson.trade_no = trade_no;
+                    await getstatistics.setOrders(amountJson);
+                }catch(e) {
+                    console.log(e);
+                }
 
                 console.log("amountJson = " + JSON.stringify(amountJson,null,2));
 

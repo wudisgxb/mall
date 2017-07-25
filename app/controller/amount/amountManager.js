@@ -321,7 +321,7 @@ const amountManger = (function () {
             retJson.couponType = couponType;
             retJson.couponValue = couponValue;
 
-                console.log("返回给订单的所有金额:")
+            console.log("返回给订单的所有金额:")
             console.log("totalPrice====" + totalPrice);
             console.log("merchantAmount====" + merchantAmount);
             console.log("consigneeAmount====" + consigneeAmount);
