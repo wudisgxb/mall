@@ -16,7 +16,7 @@ module.exports = function (sequelize, DataTypes) {
         isFinish: shortDataTypes.Bool(),//0-第一次支付，1-非第一次
         isInvalid: shortDataTypes.Bool(),//是否超时失效10min写死
         trade_no: shortDataTypes.String(),
-        wechat_trade_no: shortDataTypes.String(),
+        wechat_trade_no: shortDataTypes.String(255,true),
         app_id: shortDataTypes.String(),
         total_amount: shortDataTypes.String(),//原收金额
         actual_amount: shortDataTypes.String(),//实收金额
