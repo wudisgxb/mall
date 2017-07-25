@@ -118,8 +118,8 @@ module.exports = {
             })
 
             if (coupon != null) {
-                // result.couponType = coupon.couponType;
-                // result.couponValue = coupon.value;
+                result.couponType = coupon.couponType;
+                result.couponValue = coupon.value;
                 result.couponKey = coupon.couponKey;
 
                 // switch (coupon.couponType) {
@@ -604,6 +604,7 @@ module.exports = {
 
         let tableId = table.id;
         let trade_no = ctx.query.tradeNo;
+
         let result = {};
         let orders;
 
@@ -683,8 +684,8 @@ module.exports = {
             })
 
             if (coupon != null) {
-                // result.couponType = coupon.couponType;
-                // result.couponValue = coupon.value;
+                result.couponType = coupon.couponType;
+                result.couponValue = coupon.value;
                 result.couponKey = coupon.couponKey;
 
                 // switch (coupon.couponType) {

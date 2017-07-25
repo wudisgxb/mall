@@ -330,6 +330,8 @@ module.exports = {
         //根据订单查询需要支付多少
         total_amount = await orderManager.getOrderPriceByOrder(orders);
 
+
+
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
             where: {
