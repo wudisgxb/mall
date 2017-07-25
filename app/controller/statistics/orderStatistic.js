@@ -466,6 +466,22 @@ const getstatistics = (function () {
                     }
                 }
             })
+            let time ;
+            if(type==1){
+                time = getTime[i].start
+            }
+            if(type==2){
+                time = getTime[i].start
+            }
+            if(type==3){
+                let year = parseInt(getTime[i].start.substring(0,4))
+                let quarter = (parseInt(getTime[i].start.substring(5))+2)/3
+                time = year+"年"+quarter+"季度"
+            }
+            if(type==4){
+                let year = parseInt(getTime[i].start.substring(0,4))
+                time = year;
+            }
             for (let j = 0;j<statisticsOrder.length;j++){
                 result.push({
                     totalPrice:{
@@ -504,6 +520,10 @@ const getstatistics = (function () {
                         name:"手机号",
                         value:statisticsOrder[j].phone
                     },
+                    tiem:{
+                        name : "时间",
+                        value : time
+                    }
                 })
             }
         }
