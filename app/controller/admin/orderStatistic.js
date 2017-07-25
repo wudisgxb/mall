@@ -30,25 +30,26 @@ module.exports = {
         if(body.status==2){
             orderStatistics = await orderStatistic.getVipAvgConsumption(body.tenantId,body.startTime,body.endTime,body.type)
         }
+        //订单查询
         if(body.status==3){
             orderStatistics = await orderStatistic.getOrder(body.tenantId,body.startTime,body.endTime,body.type)
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderStatistics)
     },
-    
-    async getOrder(ctx, next){
-        ctx.checkBody('tenantId').notEmpty()
-        let body = ctx.request.body
-        if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
-            return;
-        }
-        let orders = await Order.findAll({
-            where:{
-                tenantId:body.tenantId
-            }
-        })
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orders)
-    }
+
+    // async getOrder(ctx, next){
+    //     ctx.checkBody('tenantId').notEmpty()
+    //     let body = ctx.request.body
+    //     if (ctx.errors) {
+    //         ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+    //         return;
+    //     }
+    //     let orders = await Order.findAll({
+    //         where:{
+    //             tenantId:body.tenantId
+    //         }
+    //     })
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orders)
+    // }
 
 }

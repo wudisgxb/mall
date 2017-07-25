@@ -514,8 +514,18 @@ const getstatistics = (function () {
     let getReat = async function (tenantId,startTime,endTime,type) {
         let result=[];
         let getTime=[];
+        let time;
         if(type==1){
             getTime = await getDayEchat.getDay(startTime,endTime)
+        }
+        if(type==2){
+            getTime = await getMonthEchats.getMonth(startTime,endTime)
+        }
+        if(type==3){
+            getTime = await getQuarterEchats.getQuarter(startTime,endTime)
+        }
+        if(type==4){
+            getTime = await getYearEchat.getYear(startTime,endTime)
         }
         for (let i = 0;i < getTime.length; i++){
             let statisticsOrders = await StatisticsOrders.findAll({
@@ -541,11 +551,12 @@ const getstatistics = (function () {
                         name:"转给平台的钱",
                         value:statisticsOrders[j].platformAmount
                     },
+                    type
                 })
             }
+
         }
         return result;
-
     }
 
 
