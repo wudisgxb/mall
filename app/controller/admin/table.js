@@ -18,64 +18,62 @@ module.exports = {
         let table = await Tables.findAll({
             where: {
                 tenantId: ctx.query.tenantId,
-                consigneeId:null
+                // consigneeId:null
             },
             attributes: {
                 exclude: ['createdAt', 'updatedAt']
             }
         })
 
-
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table);
     },
     //获取租户下 代售点下桌状态
-    async getAdminTableByConsigneeId (ctx, next) {
-        ctx.checkQuery('tenantId').notEmpty();
-        // ctx.checkQuery('tableName').notEmpty();
-        //ctx.checkQuery('consigneeId').notEmpty();
-        //ctx.checkQuery('phoneNumber').notEmpty();
-
-        if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
-            return;
-        }
-        //根据tenantId查询consigneeId
-        let consignee = [];
-        let json={}
-        let tables;
-        let merchants;
-        let shoppingCart=[];
-        let shop = [];
-
-        let table = await Tables.findAll({
-            where:{
-                tenantId: ctx.query.tenantId
-            },
-
-        })
-
-        if(table.length<=0){
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有该租户");
-        }
-
-        for(let i = 0; i<table.length;i++){
-            merchants =  await Merchant.findOne({
-                tenantId:table[i].tenantId
-            })
-            if(table[i].tenantId!=null){
-                table[i].tenantId=merchants.name;
-            }
-            tables = await Consignees.findOne({
-                consigneeId:table[i].consigneeId
-            })
-            if(table[i].consigneeId!=null){
-                table[i].consigneeId=tables.name
-            }
-            console.log(tables);
-        }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table)
-    },
+    // async getAdminTableByConsigneeId (ctx, next) {
+    //     ctx.checkQuery('tenantId').notEmpty();
+    //     // ctx.checkQuery('tableName').notEmpty();
+    //     //ctx.checkQuery('consigneeId').notEmpty();
+    //     //ctx.checkQuery('phoneNumber').notEmpty();
+    //
+    //     if (ctx.errors) {
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+    //         return;
+    //     }
+    //     //根据tenantId查询consigneeId
+    //     let consignee = [];
+    //     let json={}
+    //     let tables;
+    //     let merchants;
+    //     let shoppingCart=[];
+    //     let shop = [];
+    //
+    //     let table = await Tables.findAll({
+    //         where:{
+    //             tenantId: ctx.query.tenantId
+    //         },
+    //
+    //     })
+    //
+    //     if(table.length<=0){
+    //         ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"没有该租户");
+    //     }
+    //
+    //     for(let i = 0; i<table.length;i++){
+    //         merchants =  await Merchant.findOne({
+    //             tenantId:table[0].tenantId
+    //         })
+    //         if(table[i].tenantId!=null){
+    //             table[i].tenantId=merchants.name;
+    //         }
+    //         tables = await Consignees.findOne({
+    //             consigneeId:table[i].consigneeId
+    //         })
+    //         if(table[i].consigneeId!=null){
+    //             table[i].consigneeId=tables.name
+    //         }
+    //         console.log(tables);
+    //     }
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, table)
+    // },
     //新增租户下桌状态
     async saveAdminTableByTableName (ctx, next) {
         ctx.checkBody('/table/name',true).first().notEmpty();
@@ -116,7 +114,7 @@ module.exports = {
     //新增租户下 代售点下桌号(即代售 桌号)
     async saveAdminTableByConsigneeId(ctx,next){
         ctx.checkBody('/table/name',true).first().notEmpty();
-        ctx.checkBody('/table/status',true).first().notEmpty();
+        // ctx.checkBody('/table/status',true).first().notEmpty();
         ctx.checkBody('/table/info',true).first().notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
 
