@@ -25,23 +25,28 @@ module.exports = {
             }
         })
         let result=[];
-        let consigneeId;
-        let tenantName;
-        for (let i = 0;i<table.length;i++){
-            tenantName = await Merchant.findOne(table[i].tenantId)
 
+        let tenantName;
+
+        for (let i = 0;i<table.length;i++){
+            let consignee;
+            let consigneeName = null;
             if(table[i].consigneeId!=null){
-                consigneeId= await Consignees.findOne(table[i].consigneeId)
+                consignee = await Consignees.findOne({
+                    where:{
+                        consigneeId : table[i].consigneeId
+                    }
+                })
+                consigneeName = consignee.name
             }
             result.push({
                 name:table[i].name,
                 status:table[i].status,
                 info:table[i].info,
-                tenantId:tenantName.name,
-                consigneeId:table[i].consigneeId==null?null:consigneeId.consigneeId
+                tenantId:table[i].tenantId,
+                consigneeId:consigneeName
             })
         }
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
     },
     //获取租户下 代售点下桌状态

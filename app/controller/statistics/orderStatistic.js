@@ -32,6 +32,7 @@ const getstatistics = (function () {
             tenantId:json.tenantId,
             consigneeId:json.consigneeId,
         })
+        
     }
     // 查询平均消费
     let getAvgConsumption = async function (tenantId,startTime,endTime,type) {
