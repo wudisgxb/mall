@@ -2,16 +2,10 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/statisticsMySql/index');
-let Orders = db.models.Orders;
+let statisticsOrders = db.models.Orders;
 
 
 const getFoodNum = (function () {
-
-    let test = async function (json) {
-        await  Orders.create({
-            num: '123'
-        });
-    }
 
     let getFood = async function (tenantId, foodnums) {
 
@@ -89,7 +83,6 @@ const getFoodNum = (function () {
     }
     let instance = {
         getFood: getFood,
-        test:test
     }
     return instance;
 })();
