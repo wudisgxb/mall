@@ -220,7 +220,6 @@ module.exports = {
                 if(foodsJson[j].id==(results[i].id)){
                     foodsJson.splice(j,1);
                 }
-
             }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsJson);

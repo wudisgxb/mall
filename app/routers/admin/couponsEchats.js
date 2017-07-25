@@ -6,6 +6,6 @@ let couponsEchats = require('../../controller/admin/couponsEchats')
 
 const router = new (require('koa-router'))()
 
-router.post('/api/v3/admin/couponsEchats',couponsEchats.couponsEchats)
+router.post('/api/test/admin/couponsEchats',couponsEchats.couponsEchats)
 
 module.exports = router
