@@ -240,12 +240,16 @@ const amountManger = (function () {
                             merchantAmount = Math.round(merchantAmount * 100) / 100;
                             console.log("TTTTTTTTTTTTTTTTTTTTT2==" + merchantAmount);
 
-
-                            consigneeAmount = ((totalAmount * profitsharing.rate - coupon.value.split('-')[1]) <= 0) ? 0 : (totalAmount * profitsharing.rate - coupon.value.split('-')[1]);
-                            consigneeAmount = Math.round(consigneeAmount * 100) / 100;
-
                             platformCouponFee = coupon.value.split('-')[1] * coupon.couponRate;
                             merchantCouponFee = coupon.value.split('-')[1] * (1 - coupon.couponRate);
+
+                            // consigneeAmount = ((totalAmount * profitsharing.rate - coupon.value.split('-')[1]) <= 0) ? 0 : (totalAmount * profitsharing.rate - coupon.value.split('-')[1]);
+                            // consigneeAmount = Math.round(consigneeAmount * 100) / 100;
+
+                            consigneeAmount = ((totalAmount * profitsharing.rate - platformCouponFee) <= 0) ? 0 : (totalAmount * profitsharing.rate - platformCouponFee);
+                            consigneeAmount = Math.round(consigneeAmount * 100) / 100;
+
+
 
                             if (tenantId  == '18d473e77f459833bb06c60f9a8f0000') {
                                 merchantAmount = (totalAmount - coupon.value.split('-')[1]) * (1 - profitsharing.rate - profitsharing.ownRate) + platformCouponFee;

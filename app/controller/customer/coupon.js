@@ -171,6 +171,7 @@ module.exports = {
         ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('tradeNo').notEmpty();
 
+
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
@@ -178,8 +179,28 @@ module.exports = {
 
         let body = ctx.request.body;
 
+        console.log("111body.tradeNo == " + body.tradeNo);
+        console.log("222body.couponKey == " + body.couponKey);
+
         if (body.couponKey != '') {
+
+            //根据订单号查找绑定优惠券
             let coupon = await Coupons.findOne({
+                where: {
+                    trade_no : body.tradeNo,
+                    tenantId: body.tenantId,
+                    //consigneeId: body.consigneeId,
+                    phone: body.phoneNumber,
+                    status: 0,
+                }
+            })
+
+            if (coupon != null) {
+                coupon.trade_no = null;
+                await coupon.save();
+            }
+
+            coupon = await Coupons.findOne({
                 where: {
                     couponKey: body.couponKey,
                     tenantId: body.tenantId,
@@ -190,6 +211,7 @@ module.exports = {
             })
 
             if (coupon != null) {
+                console.log("KKKKKKKKKKKKKKKKK");
                 coupon.trade_no = body.tradeNo;
                 await coupon.save();
             } else {
@@ -210,9 +232,6 @@ module.exports = {
             if (coupon != null) {
                 coupon.trade_no = null;
                 await coupon.save();
-            } else {
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'优惠券不存在！');
-                return;
             }
         }
 
