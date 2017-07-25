@@ -26,6 +26,8 @@ const getstatistics = (function () {
             platformCouponFee:json.platformCouponFee,
             merchantCouponFee:json.merchantCouponFee,
             phone:json.phone,
+            tenantId:json.tenantId,
+            consigneeId:json.consigneeId,
         })
     }
     // 查询平均消费
