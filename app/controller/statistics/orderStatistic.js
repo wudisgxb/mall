@@ -11,11 +11,14 @@ let getDayEchat = require('../echats/dayEchat')
 let getMonthEchats = require('../echats/MonthEchats')
 let getQuarterEchats = require('../echats/quarterEchats')
 let getYearEchat = require('../echats/yearEchat')
+let getWeeksEchat = require('../echats/getWeeks')
 
 const getstatistics = (function () {
     // 设置Order表
     let setOrders = async function (json) {
         await StatisticsOrders.create({
+            tenantId:json.tenantId,
+            consigneeId:json.consigneeId,
             trade_no:json.trade_no,
             totalPrice:json.totalPrice,
             merchantAmount:json.merchantAmount,
@@ -190,6 +193,10 @@ const getstatistics = (function () {
                 })
             }
             return result;
+        }
+        //每周平均消费
+        if(type==5){
+
         }
 
     }
@@ -557,6 +564,22 @@ const getstatistics = (function () {
                     }
                 }
             })
+
+            if(type==1){
+                time = getTime[i].start
+            }
+            if(type==2){
+                time = getTime[i].start
+            }
+            if(type==3){
+                let year = parseInt(getTime[i].start.substring(0,4))
+                let quarter = (parseInt(getTime[i].start.substring(5))+2)/3
+                time = year+"年"+quarter+"季度"
+            }
+            if(type==4){
+                let year = parseInt(getTime[i].start.substring(0,4))
+                time = year;
+            }
             for(let j = 0;j < statisticsOrders.length; j++){
                 result.push({
                     merchantAmount:{
@@ -571,7 +594,10 @@ const getstatistics = (function () {
                         name:"转给平台的钱",
                         value:statisticsOrders[j].platformAmount
                     },
-                    type
+                    time:{
+                        name:"时间",
+                        value:time
+                    }
                 })
             }
 

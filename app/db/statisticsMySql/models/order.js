@@ -5,9 +5,9 @@ var Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
 
     var Orders = sequelize.define('Orders', {
-        tenantId:shortDataTypes.String(255,true),
-        consigneeId:shortDataTypes.String(255,true),
-        trade_no: shortDataTypes.String(255,true), //转给商户的钱
+        tenantId:shortDataTypes.String(255,true),//商户
+        // consigneeId:shortDataTypes.String(255,true),//代售点
+        trade_no: shortDataTypes.String(255,true), //订单号
         totalPrice: shortDataTypes.String(255,true), //订单价格
         merchantAmount: shortDataTypes.String(255,true), //转给商户的钱
         consigneeAmount: shortDataTypes.String(255,true), //转给代售的钱

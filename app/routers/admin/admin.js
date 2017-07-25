@@ -1,0 +1,7 @@
+let db = require('../../db/mysql/index');
+let Admins = db.models.Adminer;
+const admin = require('../../controller/admin/admin');
+const router = new (require('koa-router'))()
+// todo: redirect
+router.get('/api/test/admin/register', admin.saveregister);
+module.exports = router

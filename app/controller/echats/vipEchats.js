@@ -27,7 +27,8 @@ const getVipEchats = (function () {
                             $gt:new Date(i),
                             $lt:new Date(i+oneDay)
                         }
-                    }
+                    },
+                    paranoid: false
                 });
                 result.push({
                     name:"当日会员增长",

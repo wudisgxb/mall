@@ -19,8 +19,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors)
             return;
         }
-
-
         let orderStatistics=[];
         //平均消费
         if(body.status==1){
@@ -33,6 +31,10 @@ module.exports = {
         //订单查询
         if(body.status==3){
             orderStatistics = await orderStatistic.getOrder(body.tenantId,body.startTime,body.endTime,body.type)
+        }
+        //分成情况
+        if(body.status==4){
+            orderStatistics = await orderStatistic.getReat(body.tenantId,body.startTime,body.endTime,body.type)
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderStatistics)
     },

@@ -31,7 +31,8 @@ const getVipConsumptionEchats = (function () {
                             $lt:new Date(i+oneDay)
                         },
                         status:2,
-                    }
+                    },
+                    paranoid: false
                 })
                 console.log(orders.length)
                 //查询是vip的电话
@@ -52,7 +53,8 @@ const getVipConsumptionEchats = (function () {
                                     $lt:new Date(i+oneDay)
                                 },
                                 status:2
-                            }
+                            },
+                            paranoid: false
                         })
                         //查询不重复的FoodId
                         //
@@ -123,7 +125,8 @@ const getVipConsumptionEchats = (function () {
                             $lt:new Date(getQuarterEchats[i].end)
                         },
                         status:2,
-                    }
+                    },
+                    paranoid: false
                 })
                 console.log(orders.length)
                 //查询是vip的电话
@@ -144,7 +147,8 @@ const getVipConsumptionEchats = (function () {
                                     $lt:new Date(getQuarterEchats[i].end)
                                 },
                                 status:2
-                            }
+                            },
+                            paranoid: false
                         })
                         //查询不重复的FoodId
                         //
@@ -214,7 +218,8 @@ const getVipConsumptionEchats = (function () {
                             $lt:new Date(getMonthEchats[i].end)
                         },
                         status:2,
-                    }
+                    },
+                    paranoid: false
                 })
                 console.log(orders.length)
                 //查询是vip的电话
@@ -235,7 +240,8 @@ const getVipConsumptionEchats = (function () {
                                     $lt:new Date(getMonthEchats[i].end)
                                 },
                                 status:2
-                            }
+                            },
+                            paranoid: false
                         })
                         //查询不重复的FoodId
                         //
@@ -298,7 +304,8 @@ const getVipConsumptionEchats = (function () {
                         createdAt : {
                             $gt:new Date(getYearEchat[i].start),
                             $lt:new Date(getYearEchat[i].end)
-                        }
+                        },
+                        paranoid: false
                     }
                 })
                 for (let j = 0;j<OrderEchats.length;j++){
