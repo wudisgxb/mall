@@ -77,8 +77,6 @@ module.exports ={
     },
     //async getAdminOrder(ctx, next){},
     async getAdminOrder(ctx,next){
-
-
         ctx.checkQuery('tenantId').notEmpty();
         let result = [];
         let foodJson = [];
