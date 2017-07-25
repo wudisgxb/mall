@@ -563,7 +563,7 @@ module.exports = {
         let fn = co.wrap(wxpay.getSign.bind(wxpay));
         const sign = await fn(str,'MD5')
 
-        let trade_no = xml.out_trade_no.substr(0,xml.out_trade_no.length-4);
+        let trade_no = xml.out_trade_no.toString().substr(0,xml.out_trade_no.toString().length-4);
 
         if (sign !== xml.sign[0]) {
             AlipayErrors.create({
