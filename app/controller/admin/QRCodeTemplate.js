@@ -24,6 +24,18 @@ module.exports = {
         let QRCodeTemplateId = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
         let couponType;
         let couponValue;
+        if(body.coupons.length==0){
+            await QRCodeTemplates.create({
+                QRCodeTemplateId: QRCodeTemplateId,
+                bizType: body.bizType,
+                tenantId: body.tenantId,
+                consigneeId: body.consigneeId,
+                tableName: body.tableName,
+                couponType: couponType,
+                couponValue: couponValue,
+                couponRate: body.couponRate,
+            });
+        }
         for (let i = 0; i<body.coupons.length;i++){
             couponType =body.coupons[i].couponType
             couponValue = body.coupons[i].couponValue
@@ -89,7 +101,6 @@ module.exports = {
                 tenantId: ctx.query.tenantId,
             }
         });
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,qrCodeTemplates);
     },
     async deleteQRCodeTemplate(ctx, next){
