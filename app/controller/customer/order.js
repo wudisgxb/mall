@@ -670,6 +670,7 @@ module.exports = {
             let phone = ctx.query.phoneNumber;
 
             let isVip = await vipManager.isVip(phone,orders[0].tenantId,result.totalPrice);
+            console.log("111111111111111111111111===" + isVip)
             result.isVip = isVip;
 
             //通过订单号获取优惠券
