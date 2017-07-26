@@ -21,21 +21,18 @@ module.exports = {
         let body = ctx.request.body;
 
         let couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
-        for (let i = 0; i <body.coupons.length;i++){
-            let couponType = body.coupons[i].couponType;
-            let couponValue = body.coupons[i].couponValue;
-            await Coupons.create({
-                couponKey: couponKey,
-                phone: body.phone,
-                tenantId: body.tenantId,
-                consigneeId: body.consigneeId,
-                time: body.time,
-                couponValue:couponValue,
-                couponType:couponType,
-                couponRate:body.couponRate,
-                status: 0
-            });
-        }
+        await Coupons.create({
+            couponKey: couponKey,
+            phone: body.phone,
+            tenantId: body.tenantId,
+            consigneeId: body.consigneeId,
+            time: body.time,
+            couponValue:body.couponValue,
+            couponType:body.couponType,
+            couponRate:body.couponRate,
+            status: 0
+        });
+
 
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
