@@ -39,11 +39,17 @@ module.exports = {
                 })
                 consigneeName = consignee.name
             }
+            let tenantName;
+            tenantName = await Merchant.findOne({
+                where:{
+                    tenantId:table[i].tenantId
+                }
+            })
             result.push({
                 name:table[i].name,
                 status:table[i].status,
                 info:table[i].info,
-                tenantId:table[i].tenantId,
+                tenantId:tenantName.name,
                 consigneeId:consigneeName
             })
         }

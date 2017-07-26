@@ -121,5 +121,6 @@ module.exports = {
         await qrCodeTemplate.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     }
-
 }
+
+

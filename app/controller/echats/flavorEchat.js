@@ -1,8 +1,9 @@
 const db = require('../../db/statisticsMySql/index');
 const dbc = require('../../db/MySql/index')
-const  Foods = dbc.models.Foods;
+// const  Foods = dbc.models.Foods;
 const Orders = dbc.models.Orders;
-const Foods = db.models.Foods;
+const FoodsOfTMenus = dbc.models.FoodsOfTMenus;
+const Menus = db.models.Menus;
 
 const getFindCount = (function () {
 
@@ -28,20 +29,49 @@ const getFindCount = (function () {
                 }
             }
             //根据foodId找到数量
+            let result = [];
             for (let k = 0; k < food.length;k++){
-                let orderNum = await Orders.sum('num',{
+                let foods = await Foods.findOne({
                     where:{
-                        tenantId:food,
+                        id:food[i]
+                    }
+                })
+                //根据food[i]查找到数量
+                let num = await Orders.sum('num',{
+                    where:{
+                        FoodId:food[i],
                         createdAt:{
                             $gt:getTime[i].start,
                             $lt:getTime[i].end
                         }
                     }
                 })
+                let foodsofmenus = await FoodsOfTMenus.findOne({
+                    where:{
+                        FoodId:food[i]
+                    }
+                })
+                let menus = await Menus.findById(foodsofmenus.MenuId)
+                result.push({
+                    menusName:menus.name,
+                    foodsName:foods.name,
+                    num:num
+                })
             }
-
-
-
+            let menuNum = [];
+            for(let j=0;j<result.length;j++){
+                let num = 0;
+                if(!menuNum.contains(result[j].menusName)){
+                    menuNum.push({
+                        name:result[j].menusName,
+                        num : 0
+                    })
+                    result[j].splice()
+                }
+            }
+            for(let k = 0;k<menuNum.length;k++){
+                
+            }
         }
 
     }
