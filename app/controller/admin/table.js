@@ -6,7 +6,7 @@ let Tables = db.models.Tables;
 const ShoppingCarts = db.models.ShoppingCarts;
 const Orders = db.models.Orders;
 const Consignees = db.models.Consignees;
-const Merchant = db.models.Merchants;
+const Merchants = db.models.Merchants;
 
 module.exports = {
     //获取租户下桌状态
@@ -24,10 +24,14 @@ module.exports = {
                 exclude: ['createdAt', 'updatedAt']
             }
         })
+        let tenant = await Merchants.findOne({
+            where:{
+                tenantId:ctx.query.tenantId
+            }
+        })
+        console.log(tenant)
+        let tenantName = tenant.name
         let result=[];
-
-        let tenantName;
-
         for (let i = 0;i<table.length;i++){
             let consignee;
             let consigneeName = null;
@@ -39,17 +43,12 @@ module.exports = {
                 })
                 consigneeName = consignee.name
             }
-            let tenantName;
-            tenantName = await Merchant.findOne({
-                where:{
-                    tenantId:table[i].tenantId
-                }
-            })
             result.push({
+                id:table[i].id,
                 name:table[i].name,
                 status:table[i].status,
                 info:table[i].info,
-                tenantId:tenantName.name,
+                tenantId:tenantName,
                 consigneeId:consigneeName
             })
         }
