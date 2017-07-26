@@ -8,6 +8,7 @@ var fs = require('fs');
 const path = require('path');
 const db = require('../db/mysql/index');
 const Orders = db.models.Orders;
+const ShoppingCarts = db.models.ShoppingCarts;
 const PaymentReqs = db.models.PaymentReqs;
 const Consignees = db.models.Consignees;
 const TenantConfigs = db.models.TenantConfigs;
@@ -920,13 +921,14 @@ module.exports = async function tasks(app) {
             }
         }
     }
-    
+
+    //订单超时
     let orderInvalid = async function () {
         let rule     = new schedule.RecurrenceRule();
         let times    = [1,6,11,16,21,26,31,36,41,46,51,56];
         rule.minute  = times;
 
-        //5分钟订单失效检查,代售点的订单10分钟失效
+        //5分钟订单失效检查,代售点的订单10分钟失效，购物车也是
         schedule.scheduleJob(rule, async function(){
             var orders = await Orders.findAll({
                 where:{
@@ -965,7 +967,36 @@ module.exports = async function tasks(app) {
 
     }
 
+    //购物车超时
+    let shoppingCartInvalid = async function () {
+        let rule     = new schedule.RecurrenceRule();
+        let times    = [1,6,11,16,21,26,31,36,41,46,51,56];
+        rule.minute  = times;
+
+        //5分钟购物车失效检查,代售点购物车20分钟失效，
+        schedule.scheduleJob(rule, async function(){
+            var shoppingCarts = await ShoppingCarts.findAll({
+                where:{
+                    'consigneeId':{
+                        $ne:null
+                    }
+                }
+            });
+            for (var i = 0;i<shoppingCarts.length;i++) {
+                if((Date.now() - shoppingCarts[i].createdAt.getTime()) > 20*60*1000) {
+                    //获取订单号
+                    console.log("购物车失效：手机号："+ shoppingCarts[i].phone);
+                    console.log("购物车失效：租户ID："+ shoppingCarts[i].tenantId);
+                    console.log("购物车失效：代售ID："+ shoppingCarts[i].consigneeId);
+
+                    await shoppingCarts[i].destroy();
+                }
+            }
+        });
+    }
+
     await timeTransferAccounts();
     await orderInvalid();
+    await shoppingCartInvalid();
 
 }
