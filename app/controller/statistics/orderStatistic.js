@@ -635,6 +635,20 @@ const getstatistics = (function () {
                     }
                 }
             })
+            let time ;
+            if(type==1){
+                let start = (i*3+1)
+                let end = (i+1)*3
+                time =start+"-"+end
+            }
+            if(type==2){
+                let start =i+1
+                time = "第"+start+"周"
+            }
+            if(type==3){
+                let start = i+1
+                time = "第"+start+"个月"
+            }
             result.push({
                 merchantPayment:{
                     name :"商家实际支付",
@@ -666,7 +680,7 @@ const getstatistics = (function () {
                 },
                 time:{
                     name:"时间",
-                    value : getTime[i].start
+                    value :time
                 }
             })
 
