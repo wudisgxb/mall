@@ -31,8 +31,6 @@ module.exports = {
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
                 tableName: body.tableName,
-                couponType: couponType,
-                couponValue: couponValue,
                 couponRate: body.couponRate,
             });
         }
