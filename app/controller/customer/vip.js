@@ -60,6 +60,8 @@ module.exports = {
                 });
                 isVip = true;
             }
+        } else {
+            isVip = true;
         }
         return isVip;
     },

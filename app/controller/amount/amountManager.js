@@ -159,7 +159,9 @@ const amountManger = (function () {
                     tenantId: tenantId,
                 }
             })
-            deliveryFee = distanceAndPrice.deliveryFee;
+            if (distanceAndPrice != null) {
+                deliveryFee = distanceAndPrice.deliveryFee;
+            }
         }
 
         if (paymentMethod == '支付宝') {
