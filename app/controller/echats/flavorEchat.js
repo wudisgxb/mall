@@ -23,9 +23,21 @@ const getFindCount = (function () {
                 }
             })
             for (let j = 0;j<orderMenus.length;j++){
-                if(food.contains()){
-
+                if(!food.contains(orderMenus[i].FoodId)){
+                    food.push(orderMenus[i].FoodId)
                 }
+            }
+            //根据foodId找到数量
+            for (let k = 0; k < food.length;k++){
+                let orderNum = await Orders.sum('num',{
+                    where:{
+                        tenantId:food,
+                        createdAt:{
+                            $gt:getTime[i].start,
+                            $lt:getTime[i].end
+                        }
+                    }
+                })
             }
 
 

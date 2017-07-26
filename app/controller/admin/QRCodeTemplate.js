@@ -32,9 +32,9 @@ module.exports = {
                 bizType: body.bizType,
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
-                tableName: couponType,
-                couponType: couponValue,
-                couponValue: body.couponValue,
+                tableName: body.tableName,
+                couponType: couponType,
+                couponValue: couponValue,
                 couponRate: body.couponRate,
             });
         }
