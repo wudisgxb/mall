@@ -36,6 +36,7 @@ module.exports = {
         if(body.status==4){
             orderStatistics = await orderStatistic.getReat(body.tenantId,body.startTime,body.endTime,body.type)
         }
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderStatistics)
     },
 

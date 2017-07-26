@@ -109,11 +109,11 @@ module.exports ={
                 tenantId: ctx.query.tenantId
             }
         })
-        // 判断order是否为空
-        if(order.length==0){
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"未找到当前订单")
-            return;
-        }
+        //判断order是否为空
+        // if(order.length==0){
+        //     ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"未找到当前订单")
+        //     return;
+        // }
         let tradeNoArray = [];//订单号
         for (var i = 0; i < order.length; i++) {
             if (!tradeNoArray.contains(order[i].trade_no)) {
