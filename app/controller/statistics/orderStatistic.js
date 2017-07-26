@@ -11,7 +11,9 @@ let getDayEchat = require('../echats/dayEchat')
 let getMonthEchats = require('../echats/MonthEchats')
 let getQuarterEchats = require('../echats/quarterEchats')
 let getYearEchat = require('../echats/yearEchat')
+let getHounthEchats = require('../echats/HounthEchats')
 let getWeeksEchat = require('../echats/getWeeks')
+let AnYearEchats = require('../echats/anYearEchats')
 
 const getstatistics = (function () {
     // 设置Order表
@@ -32,7 +34,7 @@ const getstatistics = (function () {
             tenantId:json.tenantId,
             consigneeId:json.consigneeId,
         })
-        
+
     }
     // 查询平均消费
     let getAvgConsumption = async function (tenantId,startTime,endTime,type) {
@@ -476,6 +478,7 @@ const getstatistics = (function () {
                     }
                 }
             })
+
             let time ;
             if(type==1){
                 time = getTime[i].start
@@ -536,6 +539,138 @@ const getstatistics = (function () {
                     }
                 })
             }
+        }
+        console.log(result)
+        return result;
+    }
+
+    //统计小票
+    let getOrderNum = async function (tenantId,startTime,endTime,type) {
+        let getTime = [];
+        if(type==1){
+            getTime = await getHounthEchats.getHounth(startTime,endTime)
+        }
+        if(type==2){
+            getTime = await getDayEchat.getDay(startTime,endTime)
+        }
+        if(type==3){
+            getTime = await AnYearEchats.getAnYear(startTime,endTime)
+        }
+        // if(type==4){
+        //     getTime = await getQuarterEchats.getQuarter(startTime,endTime)
+        // }
+        let result=[];
+        for (let i = 0; i < getTime.length; i++){
+            let statisticsOrder = await StatisticsOrders.findAll({
+                where:{
+                    tenantId:tenantId,
+                    createdAt:{
+                        $gt : new Date(getTime[i].start),
+                        $lt : new Date(getTime[i].end)
+                    }
+                }
+            })
+            //总营收
+            let totalPrice = await StatisticsOrders.sum("totalPrice",{
+                    where:{
+                        tenantId:tenantId,
+                        createdAt:{
+                            $gt : new Date(getTime[i].start),
+                            $lt : new Date(getTime[i].end)
+                        }
+                    }
+
+            })
+            let merchantCouponFee = await StatisticsOrders.sum("merchantCouponFee",{
+                    where:{
+                        tenantId:tenantId,
+                        createdAt:{
+                            $gt : new Date(getTime[i].start),
+                            $lt : new Date(getTime[i].end)
+                        }
+                    }
+                })
+            let platformCouponFee = await StatisticsOrders.sum("platformCouponFee", {
+                    where:{
+                        tenantId:tenantId,
+                        createdAt:{
+                            $gt : new Date(getTime[i].start),
+                            $lt : new Date(getTime[i].end)
+                        }
+                    }
+                })
+            let platformAmount = await StatisticsOrders.sum("platformAmount",{
+                    where:{
+                        tenantId:tenantId,
+                        createdAt:{
+                            $gt : new Date(getTime[i].start),
+                            $lt : new Date(getTime[i].end)
+                        }
+                    }
+                })
+            let merchantAmount = await StatisticsOrders.sum("merchantAmount",{
+                    where:{
+                        tenantId:tenantId,
+                        createdAt:{
+                            $gt : new Date(getTime[i].start),
+                            $lt : new Date(getTime[i].end)
+                        }
+                    }
+            })
+            let refund_Amount = await StatisticsOrders.sum("refund_amount",{
+                where:{
+                    tenantId:tenantId,
+                    createdAt:{
+                        $gt : new Date(getTime[i].start),
+                        $lt : new Date(getTime[i].end)
+                    }
+                }
+            })
+            let deliveryFee = await StatisticsOrders.sum("deliveryFee",{
+                where:{
+                    tenantId:tenantId,
+                    createdAt:{
+                        $gt : new Date(getTime[i].start),
+                        $lt : new Date(getTime[i].end)
+                    }
+                }
+            })
+            result.push({
+                merchantPayment:{
+                    name :"商家实际支付",
+                    value : totalPrice-platformCouponFee-merchantCouponFee-refund_Amount+deliveryFee
+                },
+                merchantAmount :{
+                    name : "商家实收",
+                    value : merchantAmount==null?0:merchantAmount
+                },
+                platformAmount:{
+                    name : "平台服务费",
+                    value : platformAmount==null?0:platformAmount
+                },
+                platformCouponFee:{
+                    name : "平台优惠",
+                    value : platformCouponFee==null?0:platformCouponFee
+                },
+                merchantCouponFee:{
+                    name : "商家优惠",
+                    value : merchantCouponFee==null?0:merchantCouponFee
+                },
+                totalPrice:{
+                    name : "总营收",
+                    value : totalPrice==null?0:totalPrice
+                },
+                num:{
+                    name : "统计当前时间的订单数量",
+                    value : statisticsOrder.length
+                },
+                time:{
+                    name:"时间",
+                    value : getTime[i].start
+                }
+            })
+
+
         }
         console.log(result)
         return result;
@@ -614,7 +749,8 @@ const getstatistics = (function () {
         getAvgConsumption : getAvgConsumption,
         getVipAvgConsumption : getVipAvgConsumption,
         getOrder : getOrder,
-        getReat : getReat
+        getReat : getReat,
+        getOrderNum:getOrderNum
     }
     return instance;
 })();

@@ -29,13 +29,17 @@ module.exports = {
             orderStatistics = await orderStatistic.getVipAvgConsumption(body.tenantId,body.startTime,body.endTime,body.type)
         }
         //订单查询
-        if(body.status==3){
+        if(body.status==4){
             orderStatistics = await orderStatistic.getOrder(body.tenantId,body.startTime,body.endTime,body.type)
         }
-        //分成情况
-        if(body.status==4){
-            orderStatistics = await orderStatistic.getReat(body.tenantId,body.startTime,body.endTime,body.type)
+        //统计订单
+        if(body.status==3){
+            orderStatistics = await orderStatistic.getOrderNum(body.tenantId,body.startTime,body.endTime,body.type)
         }
+        //分成情况
+        // if(body.status==4){
+        //     orderStatistics = await orderStatistic.getReat(body.tenantId,body.startTime,body.endTime,body.type)
+        // }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderStatistics)
     },
