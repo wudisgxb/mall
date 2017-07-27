@@ -15,36 +15,36 @@ module.exports = {
         ctx.checkBody('type').notEmpty()
         ctx.checkBody('status').notEmpty()
         let body = ctx.request.body
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors)
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
-        let orderStatistics=[];
+        let orderStatistics = [];
         //平均消费
-        if(body.status==1){
-            orderStatistics = await orderStatistic.getAvgConsumption(body.tenantId,body.startTime,body.endTime,body.type)
+        if (body.status == 1) {
+            orderStatistics = await orderStatistic.getAvgConsumption(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //vip平均消费
-        if(body.status==2){
-            orderStatistics = await orderStatistic.getVipAvgConsumption(body.tenantId,body.startTime,body.endTime,body.type)
+        if (body.status == 2) {
+            orderStatistics = await orderStatistic.getVipAvgConsumption(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //订单查询
-        if(body.status==4){
-            orderStatistics = await orderStatistic.getOrder(body.tenantId,body.startTime,body.endTime,body.type)
+        if (body.status == 4) {
+            orderStatistics = await orderStatistic.getOrder(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //统计订单
-        if(body.status==3){
-            orderStatistics = await orderStatistic.getOrderNum(body.tenantId,body.startTime,body.endTime,body.type)
+        if (body.status == 3) {
+            orderStatistics = await orderStatistic.getOrderNum(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //分成情况
         // if(body.status==4){
         //     orderStatistics = await orderStatistic.getReat(body.tenantId,body.startTime,body.endTime,body.type)
         // }
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderStatistics)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, orderStatistics)
     },
 
-    async saveOrderStatistic(ctx,next){
+    async saveOrderStatistic(ctx, next){
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('trade_no').notEmpty();
         ctx.checkBody('totalPrice').notEmpty();
@@ -54,24 +54,31 @@ module.exports = {
         ctx.checkBody('refund_amount').notEmpty();
         ctx.checkBody('platfromCouponFee').notEmpty();
         ctx.checkBody('merchantCouponFee').notEmpty();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors)
+        ctx.checkBody('phone').notEmpty();
+        ctx.checkBody('consigneeId').notEmpty();
+
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
         let body = ctx.request.body;
         let jsonOrder = {}
-        jsonOrder ={
-            tenantId:body.tenantId,
-            trade_no:body.trade_no,
-            totalPrice:body.totalPrice,
-            merchantAmount:body.merchantAmount,
-            consigneeAmount:body.consigneeAmount,
-            deliveryFee:body.deliveryFee,
-            refund_amount:body.refund_amount,
-            platfromCouponFee:body.platfromCouponFee,
-            merchantCouponFee:body.merchantCouponFee,
-        }
-        await orderStatistic.setOrders(jsonOrder)
+
+        jsonOrder.tenantId = body.tenantId;
+        jsonOrder.trade_no = body.trade_no;
+        jsonOrder.totalPrice = body.totalPrice;
+        jsonOrder.merchantAmount = body.merchantAmount;
+        jsonOrder.consigneeAmount = body.consigneeAmount;
+        jsonOrder.deliveryFee = body.deliveryFee;
+        jsonOrder.refund_amount = body.refund_amount;
+        jsonOrder.platfromCouponFee = body.platfromCouponFee;
+        jsonOrder.merchantCouponFee = body.merchantCouponFee;
+        jsonOrder.phone = body.phone;
+        jsonOrder.consigneeId = body.consigneeId;
+
+        await orderStatistic.setOrders(jsonOrder);
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
 
 }

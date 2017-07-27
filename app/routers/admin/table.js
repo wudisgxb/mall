@@ -4,7 +4,7 @@
 let table = require('../../controller/admin/table');
 const router = new (require('koa-router'))()
 //获取租户下桌状态
-router.get('/api/test/admin/deal/table',table.getAdminTableByTableName);
+router.get('/api/test/admin/deal/table',table.getAdminTable);
 //获取租户下 代售点下桌状态
 // router.get('/api/test/admin/eshop/table',table.getAdminTableByConsigneeId);
 //新增租户下桌状态

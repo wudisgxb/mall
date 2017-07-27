@@ -9,13 +9,14 @@ const Consignees = db.models.Consignees;
 const Merchants = db.models.Merchants;
 
 module.exports = {
-    //获取租户下桌状态
-    async getAdminTableByTableName (ctx, next) {
+    //获取租户下桌信息
+    async getAdminTable(ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
         }
-        let table = await Tables.findAll({
+        let tables = await Tables.findAll({
             where: {
                 tenantId: ctx.query.tenantId,
                 // consigneeId:null
@@ -24,33 +25,39 @@ module.exports = {
                 exclude: ['createdAt', 'updatedAt']
             }
         })
-        let tenant = await Merchants.findOne({
+
+        if (tables.length == 0) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到桌信息！");
+            return;
+        }
+
+        let merchant = await Merchants.findOne({
             where: {
                 tenantId: ctx.query.tenantId
             }
         })
-        console.log(tenant)
-        let tenantName = tenant.name
+        console.log(merchant)
+        let tenantName = merchant.name
         let result = [];
-        for (let i = 0; i < table.length; i++) {
+        for (let i = 0; i < tables.length; i++) {
             let consignee;
             let consigneeName = null;
-            if (table[i].consigneeId != null) {
+            if (tables[i].consigneeId != null) {
                 consignee = await Consignees.findOne({
                     where: {
-                        consigneeId: table[i].consigneeId
+                        consigneeId: tables[i].consigneeId
                     }
                 })
                 consigneeName = consignee.name
             }
             result.push({
-                id: table[i].id,
-                name: table[i].name,
-                status: table[i].status,
-                info: table[i].info,
+                id: tables[i].id,
+                name: tables[i].name,
+                status: tables[i].status,
+                info: tables[i].info,
                 tenantId: ctx.query.tenantId,
                 tenantName: tenantName,
-                consigneeId: table[i].consigneeId,
+                consigneeId: tables[i].consigneeId,
                 consigneeName: consigneeName
             })
         }

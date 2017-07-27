@@ -38,7 +38,7 @@ module.exports ={
         }
         let tableId = [];
         for(let i =0;i<orders.length;i++){
-            await orders[i].destroy();
+            await orders[i].destory();
             if(!tableId.contains(orders[i].TableId)){
                 tableId.push(orders[i].TableId)
             }

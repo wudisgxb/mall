@@ -1,7 +1,7 @@
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
-let db = require('../../db/statisticsMySql/index');
+let db = require('../../db/mysql/index');
 let Orders = db.models.Orders;
 
 
