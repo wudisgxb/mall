@@ -252,7 +252,7 @@ module.exports = {
         let tables
         //传过来的值为“青豆家”需要根据名字来找到consigneeId
         let consignee = await Consignees.findOne({
-            name: body.condition.consigneeId
+            consigneeId: body.condition.consigneeId
         })
         tables = await Tables.findAll({
             where: {
@@ -317,7 +317,7 @@ module.exports = {
         }
         //传过来的值为“青豆家”需要根据名字来找到consigneeId
         let consignee = await Consignees.findOne({
-            name: ctx.query.consigneeId
+            consigneeId: ctx.query.consigneeId
         })
         let table = await Tables.findOne({
             where: {
