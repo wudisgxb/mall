@@ -200,9 +200,7 @@ const getstatistics = (function () {
             return result;
         }
         //每周平均消费
-        if(type==5){
 
-        }
 
     }
     // 查询vip平均消费
@@ -665,7 +663,7 @@ const getstatistics = (function () {
                 },
                 consigneeAmount :{
                     name : "转给代售的钱",
-                    value : consigneeAmount
+                    value : consigneeAmount==null?0:consigneeAmount
                 },
                 merchantAmount :{
                     name : "商家实收",

@@ -6,6 +6,7 @@ let Coupons = db.models.Coupons;
 let getMonthEchats = require('../echats/MonthEchats')
 let getQuarterEchats = require('../echats/quarterEchats')
 let getYearEchat = require('../echats/yearEchat')
+let OnedayEchat = require('../echats/oneDayEchat')
 
 const getCouponsEchats = (function () {
     let getCoupons = async function (tenantId,startTime,endTime,type) {
@@ -14,26 +15,22 @@ const getCouponsEchats = (function () {
             let result=[];
             //startTime开始时间
             //endTime结束时间
-            const oneDay = 24*60*60*1000;
-
-            for(let i=new Date(startTime).getTime();i<new Date(endTime).getTime();i+=oneDay){
+            let OneDay = await OnedayEchat.getDay(startTime,endTime)
+            for (let i = 0;i<OneDay.length;i++){
                 //当天tenantId的所有记录
                 let coupons = await Coupons.findAll({
                     where:{
                         tenantId:tenantId,
                         createdAt:{
-                            $gte:new Date(i),
-                            $lt:new Date(i+oneDay)
+                            $gte:new Date(OneDay[i].start),
+                            $lt:new Date(OneDay[i].end)
                         },
                         status:1
                     }
                 })
-                let time = new Date(i);
-                time.setDate(time.getDate()+1)
-                let times = time.format("yyyy-MM-dd 0:0:0");
                 result.push({
                     couponsCount:coupons.length,
-                    time:times
+                    time:OneDay[i].start
                 })
             }
             return result;
