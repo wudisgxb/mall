@@ -150,7 +150,7 @@ module.exports ={
                     },
                     trade_no:tradeNoArray[k]
                 },
-                order:["createdAt","desc"]
+                order:["createdAt","DESC"]
             })
 
             for(var j = 0; j < orders.length; j++) {
