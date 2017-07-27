@@ -315,15 +315,12 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        //传过来的值为“青豆家”需要根据名字来找到consigneeId
-        let consignee = await Consignees.findOne({
-            consigneeId: ctx.query.consigneeId
-        })
+
         let table = await Tables.findOne({
             where: {
                 id: ctx.query.tableId,
                 tenantId: ctx.query.tenantId,
-                consigneeId: consignee.consigneeId,
+                consigneeId: ctx.query.consigneeId,
             }
         })
         if (table == null) {
