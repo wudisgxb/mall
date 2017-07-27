@@ -111,7 +111,7 @@ module.exports = {
                         ]
                     }]
                 });
-                
+
                 if (food.length ==0) {
                     continue;
                 }
