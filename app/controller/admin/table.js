@@ -248,12 +248,16 @@ module.exports = {
 
         let table;
         let tables
+        //传过来的值为“青豆家”需要根据名字来找到consigneeId
+        let consignee = await Consignees.findOne({
+            name : body.condition.consigneeId
+        })
         tables = await Tables.findAll({
             where:{
                 info:body.table.info,
                 name:body.table.name,
                 tenantId:body.condition.tenantId,
-                consigneeId:body.condition.consigneeId
+                consigneeId:consignee.consigneeId
             }
         });
         if(tables.length>0){
@@ -309,11 +313,15 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
+        //传过来的值为“青豆家”需要根据名字来找到consigneeId
+        let consignee = await Consignees.findOne({
+            name : ctx.query.consigneeId
+        })
         let table = await Tables.findOne({
             where:{
                 id:ctx.query.tableId,
                 tenantId:ctx.query.tenantId,
-                consigneeId:ctx.query.consigneeId
+                consigneeId:consignee.consigneeId,
             }
         })
         if(table==null){

@@ -533,7 +533,7 @@ const getstatistics = (function () {
                         name:"手机号",
                         value:statisticsOrder[j].phone
                     },
-                    tiem:{
+                    time:{
                         name : "时间",
                         value : time
                     }
@@ -635,6 +635,15 @@ const getstatistics = (function () {
                     }
                 }
             })
+            let consigneeAmount = await StatisticsOrders.sum("consigneeAmount",{
+                where:{
+                    tenantId:tenantId,
+                    createdAt:{
+                        $gt : new Date(getTime[i].start),
+                        $lt : new Date(getTime[i].end)
+                    }
+                }
+            })
             let time ;
             if(type==1){
                 let start = (i*3+1)
@@ -653,6 +662,10 @@ const getstatistics = (function () {
                 merchantPayment:{
                     name :"商家实际支付",
                     value : totalPrice-platformCouponFee-merchantCouponFee-refund_Amount+deliveryFee
+                },
+                consigneeAmount :{
+                    name : "转给代售的钱",
+                    value : consigneeAmount
                 },
                 merchantAmount :{
                     name : "商家实收",
