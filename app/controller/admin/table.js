@@ -104,14 +104,14 @@ module.exports = {
     //新增租户下桌状态
     async saveAdminTableByTableName (ctx, next) {
         ctx.checkBody('/table/name',true).first().notEmpty();
-        ctx.checkBody('/table/status',true).first().notEmpty();
+        // ctx.checkBody('/table/status',true).first().notEmpty();
         ctx.checkBody('/table/info',true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
 
         let body = ctx.request.body;
 
         if (ctx.errors) {
-            ctx.body = ctx.errors;
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors);
             return;
         }
         let tables = await Tables.findAll({
@@ -122,10 +122,7 @@ module.exports = {
             }
         })
         if (tables.length > 0) {
-            ctx.body = {
-                resCode: -1,
-                result: "桌号已存在！"
-            }
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED,"桌号已存在")
             return;
         }
         await Tables.create({
@@ -157,6 +154,10 @@ module.exports = {
                 name:body.consigneeId
             }
         })
+        if(consigneeId==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"查询不到该代售点")
+            return;
+        }
         let tables = await Tables.findAll({
             where: {
                 name: body.table.name,
@@ -165,10 +166,7 @@ module.exports = {
             }
         })
         if (tables.length > 0) {
-            ctx.body = {
-                resCode: -1,
-                result: "桌号已存在！"
-            }
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED,"桌号已存在")
             return;
         }
         await Tables.create({
@@ -257,7 +255,17 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "找不到此代售点");
             return;
         }
-
+        let tables = await Tables.findOne({
+            where:{
+                name:body.table.name,
+                tenantId:body.condition.tenantId,
+                consigneeId:body.condition.consigneeId,
+            }
+        });
+        if(tables!=null){
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED,"桌名已存在，请换一个名字")
+            return;
+        }
         table = await Tables.findOne({
             where:{
                 id:body.condition.id,
@@ -314,7 +322,10 @@ module.exports = {
         let consignee = await Consignees.findOne({
             name : ctx.query.consigneeId
         })
-
+        if(consignee==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到该代售点")
+            return;
+        }
         let table = await Tables.findOne({
             where:{
                 id:ctx.query.tableId,
