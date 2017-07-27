@@ -247,36 +247,33 @@ module.exports = {
         }
 
         let table;
-        let tables
+        // let tables
         //传过来的值为“青豆家”需要根据名字来找到consigneeId
         let consignee = await Consignees.findOne({
             name : body.condition.consigneeId
         })
-        tables = await Tables.findAll({
-            where:{
-                info:body.table.info,
-                name:body.table.name,
-                tenantId:body.condition.tenantId,
-                consigneeId:consignee.consigneeId
-            }
-        });
-        if(tables.length>0){
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "已有此名请重新定义名字");
+
+        if(consignee==null){
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "找不到此代售点");
             return;
         }
+
         table = await Tables.findOne({
             where:{
                 id:body.condition.id,
-                tenantId:body.condition.tenantId,
-                consigneeId:body.condition.consigneeId
             }
         });
+
+        if(table==null){
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "没有此桌");
+            return;
+        }
         if (table != null) {
+            table.consigneeId=consignee.consigneeId
             table.name = body.table.name;
             table.status = 0;
             table.info = body.table.info;
             table.tenantId=body.condition.tenantId;
-
             await table.save();
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
@@ -317,13 +314,15 @@ module.exports = {
         let consignee = await Consignees.findOne({
             name : ctx.query.consigneeId
         })
+
         let table = await Tables.findOne({
             where:{
                 id:ctx.query.tableId,
                 tenantId:ctx.query.tenantId,
-                consigneeId:consignee.consigneeId,
+                consigneeId:consignee.consigneeId==null?null:consignee.consigneeId,
             }
         })
+
         if(table==null){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有该记录")
             return;

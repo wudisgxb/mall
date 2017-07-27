@@ -44,19 +44,34 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderStatistics)
     },
 
-    // async getOrder(ctx, next){
-    //     ctx.checkBody('tenantId').notEmpty()
-    //     let body = ctx.request.body
-    //     if (ctx.errors) {
-    //         ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
-    //         return;
-    //     }
-    //     let orders = await Order.findAll({
-    //         where:{
-    //             tenantId:body.tenantId
-    //         }
-    //     })
-    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orders)
-    // }
+    async saveOrderStatistic(ctx,next){
+        ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('trade_no').notEmpty();
+        ctx.checkBody('totalPrice').notEmpty();
+        ctx.checkBody('merchantAmount').notEmpty();
+        ctx.checkBody('consigneeAmount').notEmpty();
+        ctx.checkBody('deliveryFee').notEmpty();
+        ctx.checkBody('refund_amount').notEmpty();
+        ctx.checkBody('platfromCouponFee').notEmpty();
+        ctx.checkBody('merchantCouponFee').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors)
+            return;
+        }
+        let body = ctx.request.body;
+        let jsonOrder = {}
+        jsonOrder ={
+            tenantId:body.tenantId,
+            trade_no:body.trade_no,
+            totalPrice:body.totalPrice,
+            merchantAmount:body.merchantAmount,
+            consigneeAmount:body.consigneeAmount,
+            deliveryFee:body.deliveryFee,
+            refund_amount:body.refund_amount,
+            platfromCouponFee:body.platfromCouponFee,
+            merchantCouponFee:body.merchantCouponFee,
+        }
+        await orderStatistic.setOrders(jsonOrder)
+    },
 
 }

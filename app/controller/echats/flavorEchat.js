@@ -66,12 +66,18 @@ const getFindCount = (function () {
                         name:result[j].menusName,
                         num : 0
                     })
-                    result[j].splice()
+
                 }
             }
+            let num = 0;
             for(let k = 0;k<menuNum.length;k++){
-                
+                for(let g =0;g<result.length;g++){
+                    if(menuNum[k].name.contains(result[g].menusName)){
+                        menuNum[k].num+=result[g].num
+                    }
+                }
             }
+            return menuNum;
         }
 
     }

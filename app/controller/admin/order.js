@@ -149,7 +149,8 @@ module.exports ={
                         $between:[startTime,endTime]
                     },
                     trade_no:tradeNoArray[k]
-                }
+                },
+                order:["createdAt","desc"]
             })
 
             for(var j = 0; j < orders.length; j++) {

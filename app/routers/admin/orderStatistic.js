@@ -5,6 +5,6 @@ const orderStatistic = require('../../controller/admin/orderStatistic');
 const router = new (require('koa-router'))()
 // todo: redirect
 router.post('/api/test/admin/orderStatistic', orderStatistic.getOrderStatistic);
-// router.post('/api/test/admin/ordersStatistic', orderStatistic.getOrder);
+ router.post('/api/test/admin/ordersStatistic', orderStatistic.saveOrderStatistic);
 
 module.exports = router
