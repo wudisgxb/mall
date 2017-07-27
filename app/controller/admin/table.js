@@ -156,7 +156,7 @@ module.exports = {
         }
         let consigneeId = await Consignees.findOne({
             where: {
-                name: body.consigneeId
+                id: body.consigneeId
             }
         })
         let tables = await Tables.findAll({
