@@ -111,7 +111,10 @@ module.exports = {
                         ]
                     }]
                 });
-
+                
+                if (food.length ==0) {
+                    continue;
+                }
 
                 food.forEach(e => {
                     e.Ratings = e.Ratings.map(rating => {
@@ -207,6 +210,10 @@ module.exports = {
                         ]
                     }]
                 });
+
+                if (food.length ==0) {
+                    continue;
+                }
 
                 food.forEach(e => {
                     e.Ratings = e.Ratings.map(rating => {
