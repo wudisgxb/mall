@@ -17,9 +17,6 @@ const amoutManager = require('../amount/amountManager')
 
 module.exports ={
 
-    async getByphone(ctx,next){
-
-    },
     async deleteAdminOrderTenantId(ctx,next){
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('tradeNo').notEmpty();
@@ -31,7 +28,7 @@ module.exports ={
             where:{
                 tenantId:ctx.query.tenantId,
                 trade_no:ctx.query.tradeNo,
-               //consigneeId:null
+                //consigneeId:null
             }
         })
 
@@ -156,7 +153,6 @@ module.exports ={
                 order:[["createdAt","DESC"]],
                 paranoid: true
             })
-            console.log(orders.length)
 
             for(var j = 0; j < orders.length; j++) {
                 //根据菜单号查询菜单
