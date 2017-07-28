@@ -22,19 +22,19 @@ module.exports = {
         let orderStatistics = [];
         //平均消费
         if (body.status == 1) {
-            orderStatistics = orderStatistic.getAvgConsumption(body.tenantId, body.startTime, body.endTime, body.type)
+            orderStatistics = await orderStatistic.getAvgConsumption(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //vip平均消费
         if (body.status == 2) {
-            orderStatistics = orderStatistic.getVipAvgConsumption(body.tenantId, body.startTime, body.endTime, body.type)
+            orderStatistics = await orderStatistic.getVipAvgConsumption(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //订单查询
         if (body.status == 4) {
-            orderStatistics = orderStatistic.getOrder(body.tenantId, body.startTime, body.endTime, body.type)
+            orderStatistics = await orderStatistic.getOrder(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //统计订单
         if (body.status == 3) {
-            orderStatistics = orderStatistic.getOrderNum(body.tenantId, body.startTime, body.endTime, body.type)
+            orderStatistics = await orderStatistic.getOrderNum(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //分成情况
         // if(body.status==4){
