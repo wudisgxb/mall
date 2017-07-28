@@ -17,6 +17,9 @@ const amoutManager = require('../amount/amountManager')
 
 module.exports ={
 
+    async getByphone(ctx,next){
+
+    },
     async deleteAdminOrderTenantId(ctx,next){
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('tradeNo').notEmpty();
