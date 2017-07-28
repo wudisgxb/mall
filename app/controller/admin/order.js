@@ -108,7 +108,7 @@ module.exports ={
                 },
                 tenantId: ctx.query.tenantId
             },
-            paranoid: true
+            paranoid:false
         })
         //判断order是否为空
         // if(order.length==0){
