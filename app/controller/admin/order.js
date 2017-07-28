@@ -153,7 +153,6 @@ module.exports ={
                 order:[["createdAt","DESC"]],
                 paranoid: true
             })
-            console.log(orders.length)
 
             for(var j = 0; j < orders.length; j++) {
                 //根据菜单号查询菜单

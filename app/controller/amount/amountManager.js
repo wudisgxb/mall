@@ -323,17 +323,17 @@ const amountManger = (function () {
             retJson.couponType = couponType;
             retJson.couponValue = couponValue;
 
-            console.log("返回给订单的所有金额:")
-            console.log("totalPrice====" + totalPrice);
-            console.log("merchantAmount====" + merchantAmount);
-            console.log("consigneeAmount====" + consigneeAmount);
-            console.log("platformCouponFee====" + platformCouponFee);
-            console.log("merchantCouponFee====" + merchantCouponFee);
-            console.log("deliveryFee====" + deliveryFee);
-            console.log("refund_amount====" + refund_amount);
-            console.log("platformAmount====" + platformAmount);
-            console.log("couponType===" + couponType);
-            console.log("couponValue===" + couponValue);
+            // console.log("返回给订单的所有金额:")
+            // console.log("totalPrice====" + totalPrice);
+            // console.log("merchantAmount====" + merchantAmount);
+            // console.log("consigneeAmount====" + consigneeAmount);
+            // console.log("platformCouponFee====" + platformCouponFee);
+            // console.log("merchantCouponFee====" + merchantCouponFee);
+            // console.log("deliveryFee====" + deliveryFee);
+            // console.log("refund_amount====" + refund_amount);
+            // console.log("platformAmount====" + platformAmount);
+            // console.log("couponType===" + couponType);
+            // console.log("couponValue===" + couponValue);
             return retJson;
         }
     }

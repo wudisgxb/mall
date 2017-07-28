@@ -538,7 +538,6 @@ const getstatistics = (function () {
                 })
             }
         }
-        console.log(result)
         return result;
     }
 
@@ -697,7 +696,6 @@ const getstatistics = (function () {
 
 
         }
-        console.log(result)
         return result;
     }
     // 分成情况
