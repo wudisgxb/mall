@@ -129,9 +129,9 @@ module.exports = {
         });
 
         if (ret.length == 0) {
-            ctx.body = {
-                result: "fail"
-            }
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,{result: "fail"})
+
+
         } else {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
         }

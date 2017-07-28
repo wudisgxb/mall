@@ -107,7 +107,8 @@ module.exports ={
                     $between: [startTime, endTime]
                 },
                 tenantId: ctx.query.tenantId
-            }
+            },
+            paranoid: true
         })
         //判断order是否为空
         // if(order.length==0){
@@ -151,6 +152,8 @@ module.exports ={
                     trade_no:tradeNoArray[k]
                 },
                 order:[["createdAt","DESC"]]
+
+
             })
 
             for(var j = 0; j < orders.length; j++) {
@@ -295,6 +298,21 @@ module.exports ={
                 consigneeId:body.condition.consigneeId
             })
         }
+        // await Orders.create({
+        //     num:body.order.num,
+        //     status:body.order.status,
+        //     info:body.order.info,
+        //     phone:body.order.phone,
+        //     diners_num:body.order.diners_num,
+        //     trade_no:body.order.trade_no,
+        //     paymentMethod:body.order.paymentMethod,
+        //     unit:body.order.unit,
+        //     TableId:body.order.TableId,
+        //     FoodId:foodId[i],
+        //     createdAt:body.order.createdAt,
+        //     tenantId:body.condition.tenantId,
+        //     consigneeId:body.condition.consigneeId
+        // })
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
