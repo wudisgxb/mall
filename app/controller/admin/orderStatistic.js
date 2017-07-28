@@ -84,7 +84,7 @@ module.exports = {
     },
 
     async getAllOrderStatistic(ctx, next){
-        ctx,checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
         // ctx,checkQuery('startTime').notEmpty();
         // ctx,checkQuery('endTime').notEmpty();
         if(ctx.errors){
@@ -93,13 +93,50 @@ module.exports = {
         }
         // let result =  getMonthEchats.getMonth(ctx.query.startTime,ctx.query.endTime);
         // for(let i = 0;i<result.length;i++){
-            let StatisticsOrders = await StatisticsOrders.findAll({
+            let statisticsOrders = await StatisticsOrders.findAll({
                 where:{
                     tenantId : ctx.query.tenantId
                 }
             })
         // }
-        ctx.body =  new ApiResult(ApiResult.Result.SUCCESS,StatisticsOrders)
+        ctx.body =  new ApiResult(ApiResult.Result.SUCCESS,statisticsOrders)
+
+    },
+
+    async putOrderStatistic(ctx, next){
+        ctx.checkBody('tenantId').notEmpty();
+
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return;
+        }
+
+        let statisticsOrders = await StatisticsOrders.findAll({
+            where:{
+                tenantId : ctx.query.tenantId
+            }
+        })
+        for (let i =0; i<statisticsOrders.length;i++){
+            let totalPrice = 0
+            let mer = 0
+            if(statisticsOrders[i].totalPrice<2){
+                totalPrice=statisticsOrders[i].totalPrice*100
+                mer = statisticsOrders[i].merchantAmount*100
+            }
+            statisticsOrders[i].trade_no = statisticsOrders[i].trade_no;
+            statisticsOrders[i].totalPrice=totalPrice;
+            statisticsOrders[i].merchantAmount=mer;
+            statisticsOrders[i].consigneeAmount = statisticsOrders[i].consigneeAmount;
+            statisticsOrders[i].platformAmount = statisticsOrders[i].platformAmount;
+            statisticsOrders[i].deliveryFee = statisticsOrders[i].deliveryFee;
+            statisticsOrders[i].refund_amount = statisticsOrders[i].refund_amount;
+            statisticsOrders[i].platfromCouponFee = statisticsOrders[i].platfromCouponFee;
+            statisticsOrders[i].merchantCouponFee = statisticsOrders[i].merchantCouponFee;
+            statisticsOrders[i].phone = statisticsOrders[i].phone;
+            statisticsOrders[i].tenantId = ctx.query.tenantId
+            statisticsOrders[i].consigneeId = statisticsOrders[i].consigneeId
+        }
+        ctx.body =  new ApiResult(ApiResult.Result.SUCCESS)
 
     }
 
