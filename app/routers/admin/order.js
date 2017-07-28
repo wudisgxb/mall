@@ -17,6 +17,5 @@ router.delete('/api/test/admin/deal/order',order.deleteAdminOrderTenantId);
 router.delete('/api/test/admin/eshop/order',order.deleteAdminOrderConsigneeId);
 router.get('/api/test/admin/order',order.getAdminOrder);
 router.post('/api/test/admin/order',order.saveAdminOrder);
-router.get('api/test/admin/eshop/order',order.getByphone)
 
 module.exports = router
