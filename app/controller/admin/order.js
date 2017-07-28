@@ -107,8 +107,7 @@ module.exports ={
                     $between: [startTime, endTime]
                 },
                 tenantId: ctx.query.tenantId
-            },
-            paranoid:false
+            }
         })
         //判断order是否为空
         // if(order.length==0){
@@ -151,9 +150,8 @@ module.exports ={
                     },
                     trade_no:tradeNoArray[k]
                 },
-                order:[["createdAt","DESC"]]
-
-
+                order:[["createdAt","DESC"]],
+                paranoid: true
             })
 
             for(var j = 0; j < orders.length; j++) {
