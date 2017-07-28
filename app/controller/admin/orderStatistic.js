@@ -4,6 +4,8 @@ const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/statisticsMySql/index');
 let Order = db.models.Orders
 let dbv3 = require('../../db/Mysql/index')
+let StatisticsOrders = db.models.Orders;
+let getMonthEchats = require('../echats/MonthEchats')
 
 let orderStatistic = require('../statistics/orderStatistic')
 
@@ -80,5 +82,25 @@ module.exports = {
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
+
+    async getAllOrderStatistic(ctx, next){
+        ctx,checkQuery('tenantId').notEmpty();
+        // ctx,checkQuery('startTime').notEmpty();
+        // ctx,checkQuery('endTime').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return;
+        }
+        // let result =  getMonthEchats.getMonth(ctx.query.startTime,ctx.query.endTime);
+        // for(let i = 0;i<result.length;i++){
+            let StatisticsOrders = await StatisticsOrders.findAll({
+                where:{
+                    tenantId : ctx.query.tenantId
+                }
+            })
+        // }
+        ctx.body =  new ApiResult(ApiResult.Result.SUCCESS,StatisticsOrders)
+
+    }
 
 }

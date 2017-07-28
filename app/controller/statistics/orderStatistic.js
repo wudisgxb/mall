@@ -36,6 +36,7 @@ const getstatistics = (function () {
         })
 
     }
+
     // 查询平均消费
     let getAvgConsumption = async function (tenantId,startTime,endTime,type) {
         //type==1为每日平均消费
@@ -553,9 +554,6 @@ const getstatistics = (function () {
         }
         if(type==3){
             getTime = await AnYearEchats.getAnYear(startTime,endTime)
-        }
-        if(type==4){
-            getTime = await getMonthEchats.getMonth(startTime,endTime)
         }
         // if(type==4){
         //     getTime = await getQuarterEchats.getQuarter(startTime,endTime)
