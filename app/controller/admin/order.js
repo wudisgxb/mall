@@ -151,7 +151,7 @@ module.exports ={
                     trade_no:tradeNoArray[k]
                 },
                 order:[["createdAt","DESC"]],
-                paranoid: true
+                paranoid: false
             })
 
             for(var j = 0; j < orders.length; j++) {
