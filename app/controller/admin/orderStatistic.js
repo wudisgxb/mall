@@ -84,6 +84,7 @@ module.exports = {
     },
 
     async getAllOrderStatistic(ctx, next){
+        console.log(ctx.query)
         ctx.checkQuery('tenantId').notEmpty();
         // ctx,checkQuery('startTime').notEmpty();
         // ctx,checkQuery('endTime').notEmpty();
@@ -93,11 +94,11 @@ module.exports = {
         }
         // let result =  getMonthEchats.getMonth(ctx.query.startTime,ctx.query.endTime);
         // for(let i = 0;i<result.length;i++){
-            let statisticsOrders = await StatisticsOrders.findAll({
-                where:{
-                    tenantId : ctx.query.tenantId
-                }
-            })
+        let statisticsOrders = await StatisticsOrders.findAll({
+            where:{
+                tenantId : ctx.query.tenantId
+            }
+        })
         // }
         ctx.body =  new ApiResult(ApiResult.Result.SUCCESS,statisticsOrders)
 
