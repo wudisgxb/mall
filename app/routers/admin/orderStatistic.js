@@ -6,5 +6,6 @@ const router = new (require('koa-router'))()
 // todo: redirect
 router.post('/api/test/admin/orderStatistic', orderStatistic.getOrderStatistic);
  router.post('/api/test/admin/ordersStatistic', orderStatistic.saveOrderStatistic);
+router.get('/api/test/admin/ordersStatistic',orderStatistic.getAllOrderStatistic)
 
 module.exports = router
