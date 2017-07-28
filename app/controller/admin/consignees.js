@@ -3,6 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 let db = require('../../db/mysql/index');
 let Consignees = db.models.Consignees
 let ProfitSharings=db.models.ProfitSharings
+const Tool = require('../../Tool/tool');
 
 module.exports = {
     async getAdminConsignees(ctx,next){
@@ -58,47 +59,31 @@ module.exports = {
         ctx.checkBody('/consignees/phone',true).first().notEmpty();
         ctx.checkBody('/consignees/wecharPayee_account',true).first().notEmpty();
         ctx.checkBody('/consignees/payee_account',true).first().notEmpty();
-        ctx.checkBody('/profitsharings/tenantId',true).first().notEmpty();
-        ctx.checkBody('/profitsharings/merchantRemark',true).first().notEmpty();
-        ctx.checkBody('/profitsharings/rate',true).first().notEmpty();
-        ctx.checkBody('/profitsharings/ownRate',true).first().notEmpty();
-        ctx.checkBody('/profitsharings/distributionFee',true).first().notEmpty();
-        ctx.checkBody('/profitsharings/consigneeRemark',true).first().notEmpty();
-        ctx.checkBody('/condition/consigneeId',true).first().notEmpty();
+
         if (ctx.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
         let body = ctx.request.body;
-        let consignees = await Consignees.findAll({
-            where : {
-                consigneeId:body.condition.consigneeId
+
+        let consigneeByName = await Consignees.findOne({
+            where:{
+                name:body.consignees.name
             }
-        });
-        console.log(consignees.length)
-        if(consignees.length>0){
-            ctx.body=new ApiResult(ApiResult.Result.EXISTED,"记录已存在");
+        })
+        if(consigneeByName!=null){
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED,"已有此代售名字，请换个名字")
             return;
         }
-
+        let consigneeId =  Tool.allocTenantId();
         await Consignees.create({
-            name:body.consignees.name,
-            phone:body.consignees.phone,
-            wecharPayee_account:body.consignees.wecharPayee_account,
-            payee_account:body.consignees.payee_account,
-            consigneeId:body.condition.consigneeId
+                name : body.consignees.name,
+                phone : body.consignees.phone,
+                wecharPayee_account : body.consignees.wecharPayee_account,
+                payee_account : body.consignees.payee_account,
+                consigneeId : consigneeId
         });
-        await ProfitSharings.create({
-            tenantId:body.profitsharings.tenantId,
-            merchantRemark:body.profitsharings.merchantRemark,
-            consigneeRemark:body.profitsharings.consigneeRemark,
-            consigneeId:body.condition.consigneeId,
-            rate:body.profitsharings.rate,
-            ownRate:body.profitsharings.ownRate,
-            distributionFee:body.profitsharings.distributionFee,
-            ExcludeFoodId:body.profitsharings.ExcludeFoodId,
-        })
-        ctx.body=new ApiResult(ApiResult.Result.SUCCESS);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,{consigneeId:consigneeId})
     },
 
     async deleteAdminConsignees(ctx,next){
@@ -120,6 +105,11 @@ module.exports = {
         }
         await consignees.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
+    },
+
+    async getAllConsignees(ctx,next){
+        let consignees = await Consignees.findAll({});
+        ctx.body=new ApiResult(ApiResult.Result.SUCCESS,consignees);
     },
 
 }
