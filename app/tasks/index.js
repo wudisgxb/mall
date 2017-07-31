@@ -1050,7 +1050,7 @@ module.exports = async function tasks(app) {
             for (var i = 0; i < shoppingCarts.length; i++) {
                 var tenantConfig = await TenantConfigs.findOne({
                     where: {
-                        tenantId: orders[i].tenantId
+                        tenantId: shoppingCarts[i].tenantId
                     }
                 });
                 if (tenantConfig.invaildTime == 0) {
