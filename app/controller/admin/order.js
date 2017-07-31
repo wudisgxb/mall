@@ -107,8 +107,7 @@ module.exports ={
                     $between: [startTime, endTime]
                 },
                 tenantId: ctx.query.tenantId,
-            },
-            paranoid: false
+            }
         })
         //判断order是否为空
         // if(order.length==0){
@@ -135,8 +134,7 @@ module.exports ={
                     //     $between: [startTime, endTime]
                     // },
                     trade_no:tradeNoArray[k]
-                },
-                paranoid: false
+                }
             })
             //根据consigneeId查询consigneeName
             let consigneesName=await Consignees.findOne({
@@ -152,8 +150,7 @@ module.exports ={
                     },
                     trade_no:tradeNoArray[k]
                 },
-                order:[["createdAt","DESC"]],
-                paranoid: false
+                order:[["createdAt","DESC"]]
             })
 
             for(var j = 0; j < orders.length; j++) {
@@ -204,8 +201,7 @@ module.exports ={
                 where: {
                     trade_no: tradeNoArray[k],
                     tenantId: ctx.query.tenantId,
-                },
-                paranoid: false
+                }
             });
             let refund_amount = 0;
 
