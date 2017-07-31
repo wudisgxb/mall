@@ -4,7 +4,9 @@ var Admins = db.models.Adminer;
 const orderStatistic = require('../../controller/admin/orderStatistic');
 const router = new (require('koa-router'))()
 // todo: redirect
-router.post('/api/statistics/admin/orderStatistic', orderStatistic.getOrderStatistic);
-router.post('/api/test/admin/ordersStatistic', orderStatistic.getOrder);
+router.post('/api/test/admin/orderStatistic', orderStatistic.getOrderStatistic);
+ router.post('/api/test/admin/ordersStatistic', orderStatistic.saveOrderStatistic);
+router.get('/api/test/admin/ordersStatistic',orderStatistic.getAllOrderStatistic);
+router.put('/api/test/admin/ordersStatistic',orderStatistic.putOrderStatistic)
 
 module.exports = router

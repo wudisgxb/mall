@@ -24,6 +24,7 @@ const amountManager = require('../amount/amountManager')
 const webSocket = require('../socketManager/socketManager');
 const orderManager = require('../customer/order');
 const config = require('../../config/config');
+const getstatistics = require('../statistics/orderStatistic');
 
 const aliDeal = new Alipay({
     appId: config.alipay.appId,
@@ -526,6 +527,16 @@ module.exports = {
                 let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, ret.out_trade_no, '支付宝', 0);
 
                 console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
+
+                try {
+                    amountJson.tenantId = tenantId;
+                    amountJson.consigneeId = consigneeId;
+                    amountJson.phone = foodOrders[0].phone;
+                    amountJson.trade_no = ret.out_trade_no;
+                    await getstatistics.setOrders(amountJson);
+                }catch(e) {
+                    console.log(e);
+                }
 
 
                 //支付完成推送支付成功消息

@@ -6,7 +6,7 @@ let consumptionEchats = require('../../controller/admin/consumptionEchats')
 
 const router = new (require('koa-router'))()
 
-router.post('/api/v3/admin/consumptionEchats',consumptionEchats.consumptionEchats)
+router.post('/api/test/admin/consumptionEchats',consumptionEchats.consumptionEchats)
 
 module.exports = router
 

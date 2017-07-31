@@ -10,8 +10,7 @@ module.exports = {
     async saveQRCodeTemplate (ctx, next) {
         ctx.checkBody('bizType').notEmpty();
         ctx.checkBody('tableName').notEmpty();
-        ctx.checkBody('couponType').notEmpty()
-        ctx.checkBody('couponValue').notEmpty();
+        ctx.checkBody('coupons').notEmpty()
         ctx.checkBody('couponRate').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
 
@@ -23,18 +22,32 @@ module.exports = {
         let body = ctx.request.body;
 
         let QRCodeTemplateId = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
-
-        await QRCodeTemplates.create({
-            QRCodeTemplateId: QRCodeTemplateId,
-            bizType: body.bizType,
-            tenantId: body.tenantId,
-            consigneeId: body.consigneeId,
-            tableName: body.tableName,
-            couponType: body.couponType,
-            couponValue: body.couponValue,
-            couponRate: body.couponRate,
-        });
-
+        let couponType;
+        let couponValue;
+        if(body.coupons.length==0){
+            await QRCodeTemplates.create({
+                QRCodeTemplateId: QRCodeTemplateId,
+                bizType: body.bizType,
+                tenantId: body.tenantId,
+                consigneeId: body.consigneeId,
+                tableName: body.tableName,
+                couponRate: body.couponRate,
+            });
+        }
+        for (let i = 0; i<body.coupons.length;i++){
+            couponType =body.coupons[i].couponType
+            couponValue = body.coupons[i].couponValue
+            await QRCodeTemplates.create({
+                QRCodeTemplateId: QRCodeTemplateId,
+                bizType: body.bizType,
+                tenantId: body.tenantId,
+                consigneeId: body.consigneeId,
+                tableName: body.tableName,
+                couponType: couponType,
+                couponValue: couponValue,
+                couponRate: body.couponRate,
+            });
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,QRCodeTemplateId);
     },
     async updateQRCodeTemplate (ctx, next) {
@@ -86,7 +99,6 @@ module.exports = {
                 tenantId: ctx.query.tenantId,
             }
         });
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,qrCodeTemplates);
     },
     async deleteQRCodeTemplate(ctx, next){
@@ -109,5 +121,6 @@ module.exports = {
         await qrCodeTemplate.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     }
-
 }
+
+

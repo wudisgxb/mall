@@ -31,7 +31,7 @@ module.exports = {
             results.push(resultId[k])
         }
         let foods;
-        console.log(results)
+        // console.log(results)
         for(let i=0;i<results.length;i++){
             foods = await Foods.findById(results[i].id)
             results[i].name = foods.name;

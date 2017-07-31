@@ -26,6 +26,9 @@ module.exports = function (sequelize, DataTypes) {
         vipRemindFee: shortDataTypes.Double(100000),
         //主页图
         homeImage: shortDataTypes.String(),
+        
+        //订单购物车超时时间
+        invaildTime:shortDataTypes.Double(),
 
         //经度
         longitude: {

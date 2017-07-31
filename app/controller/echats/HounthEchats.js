@@ -1,27 +1,29 @@
 
-const getDayEchats = (function () {
-    let getDay =  function (startTime,endTime) {
+const getHounthEchats = (function () {
+    let getHounth =  function (startTime,endTime) {
         //先得到起始时间的开始时间
         let startDay = new Date(startTime);
         let beginDate = startDay.getTime();
         //先得到起始时间的结束时间
         let endDate = new Date(endTime);
         let finish = endDate.getTime();
-        let oneDay = 24*60*60*1000*7
+        let oneHounth = 60*60*1000
+
         let result = [];
-        for(let i = beginDate;i<=finish;i+=oneDay){
+        for(let i = beginDate;i<finish;i+=oneHounth*3){
             result.push({
                 start:new Date(i),
-                end:new Date((i+oneDay<=finish)?i+oneDay:finish)
+                end:new Date(i+oneHounth*3)
             })
         }
-        console.log(result)
         console.log(result.length)
+        console.log(result)
         return result;
     }
     let instance = {
-        getDay: getDay
+        getHounth: getHounth
     }
+
     return instance;
 })();
-module.exports = getDayEchats;
+module.exports = getHounthEchats;

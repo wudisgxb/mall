@@ -11,11 +11,16 @@ let getDayEchat = require('../echats/dayEchat')
 let getMonthEchats = require('../echats/MonthEchats')
 let getQuarterEchats = require('../echats/quarterEchats')
 let getYearEchat = require('../echats/yearEchat')
+let getHounthEchats = require('../echats/HounthEchats')
+let getWeeksEchat = require('../echats/getWeeks')
+let AnYearEchats = require('../echats/anYearEchats')
 
 const getstatistics = (function () {
     // 设置Order表
     let setOrders = async function (json) {
         await StatisticsOrders.create({
+            tenantId:json.tenantId,
+            consigneeId:json.consigneeId,
             trade_no:json.trade_no,
             totalPrice:json.totalPrice,
             merchantAmount:json.merchantAmount,
@@ -26,8 +31,12 @@ const getstatistics = (function () {
             platformCouponFee:json.platformCouponFee,
             merchantCouponFee:json.merchantCouponFee,
             phone:json.phone,
+            tenantId:json.tenantId,
+            consigneeId:json.consigneeId,
         })
+
     }
+
     // 查询平均消费
     let getAvgConsumption = async function (tenantId,startTime,endTime,type) {
         //type==1为每日平均消费
@@ -191,6 +200,8 @@ const getstatistics = (function () {
             }
             return result;
         }
+        //每周平均消费
+
 
     }
     // 查询vip平均消费
@@ -466,6 +477,23 @@ const getstatistics = (function () {
                     }
                 }
             })
+
+            let time ;
+            if(type==1){
+                time = getTime[i].start
+            }
+            if(type==2){
+                time = getTime[i].start
+            }
+            if(type==3){
+                let year = parseInt(getTime[i].start.substring(0,4))
+                let quarter = (parseInt(getTime[i].start.substring(5))+2)/3
+                time = year+"年"+quarter+"季度"
+            }
+            if(type==4){
+                let year = parseInt(getTime[i].start.substring(0,4))
+                time = year;
+            }
             for (let j = 0;j<statisticsOrder.length;j++){
                 result.push({
                     totalPrice:{
@@ -504,9 +532,99 @@ const getstatistics = (function () {
                         name:"手机号",
                         value:statisticsOrder[j].phone
                     },
+                    time:{
+                        name : "时间",
+                        value : time
+                    }
                 })
             }
         }
+        return result;
+    }
+
+    //统计小票
+    let getOrderNum = async function (tenantId,startTime,endTime,type) {
+        let getTime = [];
+        if(type==1){
+            getTime = await getHounthEchats.getHounth(startTime,endTime)
+        }
+        if(type==2){
+            getTime = await getDayEchat.getDay(startTime,endTime)
+        }
+        if(type==3){
+            getTime = await AnYearEchats.getAnYear(startTime,endTime)
+        }
+        // if(type==4){
+        //     getTime = await getQuarterEchats.getQuarter(startTime,endTime)
+        // }
+        let result=[];
+        for (let i = 0; i < getTime.length; i++){
+            let statisticsOrder = await StatisticsOrders.getBetweenDateByTenantId(tenantId, new Date(getTime[i].start), new Date(getTime[i].end))
+            //总营收
+            let totalPrice = await StatisticsOrders.sumField(tenantId, 'totalPrice', new Date(getTime[i].start), new Date(getTime[i].end))
+            let merchantCouponFee = await StatisticsOrders.sumField(tenantId, 'merchantCouponFee', new Date(getTime[i].start), new Date(getTime[i].end))
+            let platformCouponFee = await StatisticsOrders.sumField(tenantId, 'platformCouponFee', new Date(getTime[i].start), new Date(getTime[i].end))
+            let platformAmount = await StatisticsOrders.sumField(tenantId, 'platformAmount', new Date(getTime[i].start), new Date(getTime[i].end))
+            let merchantAmount = await StatisticsOrders.sumField(tenantId, 'merchantAmount', new Date(getTime[i].start), new Date(getTime[i].end))
+            let refund_Amount = await StatisticsOrders.sumField(tenantId, 'refund_amount', new Date(getTime[i].start), new Date(getTime[i].end))
+            let deliveryFee = await StatisticsOrders.sumField(tenantId, 'deliveryFee', new Date(getTime[i].start), new Date(getTime[i].end))
+            let consigneeAmount = await StatisticsOrders.sumField(tenantId, 'consigneeAmount', new Date(getTime[i].start), new Date(getTime[i].end))
+            let time ;
+            if(type==1){
+                let start = (i*3+1)
+                let end = (i+1)*3
+                time =start+"-"+end
+            }
+            if(type==2){
+                let start =i+1
+                time = "第"+start+"周"
+            }
+            if(type==3){
+                let start = i+1
+                time = "第"+start+"个月"
+            }
+            result.push({
+                merchantPayment:{
+                    name :"商家实际支付",
+                    value : Number(totalPrice-platformCouponFee-merchantCouponFee-refund_Amount+deliveryFee).toFixed(2)
+                },
+                consigneeAmount :{
+                    name : "转给代售的钱",
+                    value : Number(consigneeAmount==null?0:consigneeAmount).toFixed(2)
+                },
+                merchantAmount :{
+                    name : "商家实收",
+                    value : Number(merchantAmount==null?0:merchantAmount).toFixed(2)
+                },
+                platformAmount:{
+                    name : "平台服务费",
+                    value : Number(platformAmount==null?0:platformAmount).toFixed(2)
+                },
+                platformCouponFee:{
+                    name : "平台优惠",
+                    value : Number(platformCouponFee==null?0:platformCouponFee).toFixed(2)
+                },
+                merchantCouponFee:{
+                    name : "商家优惠",
+                    value : Number(merchantCouponFee==null?0:merchantCouponFee).toFixed(2)
+                },
+                totalPrice:{
+                    name : "总营收",
+                    value : Number(totalPrice==null?0:totalPrice).toFixed(2)
+                },
+                num:{
+                    name : "统计当前时间的订单数量",
+                    value : statisticsOrder.length
+                },
+                time:{
+                    name:"时间",
+                    value :time
+                }
+            })
+
+
+        }
+
         console.log(result)
         return result;
     }
@@ -514,8 +632,18 @@ const getstatistics = (function () {
     let getReat = async function (tenantId,startTime,endTime,type) {
         let result=[];
         let getTime=[];
+        let time;
         if(type==1){
             getTime = await getDayEchat.getDay(startTime,endTime)
+        }
+        if(type==2){
+            getTime = await getMonthEchats.getMonth(startTime,endTime)
+        }
+        if(type==3){
+            getTime = await getQuarterEchats.getQuarter(startTime,endTime)
+        }
+        if(type==4){
+            getTime = await getYearEchat.getYear(startTime,endTime)
         }
         for (let i = 0;i < getTime.length; i++){
             let statisticsOrders = await StatisticsOrders.findAll({
@@ -527,6 +655,22 @@ const getstatistics = (function () {
                     }
                 }
             })
+
+            if(type==1){
+                time = getTime[i].start
+            }
+            if(type==2){
+                time = getTime[i].start
+            }
+            if(type==3){
+                let year = parseInt(getTime[i].start.substring(0,4))
+                let quarter = (parseInt(getTime[i].start.substring(5))+2)/3
+                time = year+"年"+quarter+"季度"
+            }
+            if(type==4){
+                let year = parseInt(getTime[i].start.substring(0,4))
+                time = year;
+            }
             for(let j = 0;j < statisticsOrders.length; j++){
                 result.push({
                     merchantAmount:{
@@ -541,11 +685,15 @@ const getstatistics = (function () {
                         name:"转给平台的钱",
                         value:statisticsOrders[j].platformAmount
                     },
+                    time:{
+                        name:"时间",
+                        value:time
+                    }
                 })
             }
+
         }
         return result;
-
     }
 
 
@@ -554,7 +702,8 @@ const getstatistics = (function () {
         getAvgConsumption : getAvgConsumption,
         getVipAvgConsumption : getVipAvgConsumption,
         getOrder : getOrder,
-        getReat : getReat
+        getReat : getReat,
+        getOrderNum:getOrderNum
     }
     return instance;
 })();

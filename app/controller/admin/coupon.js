@@ -11,8 +11,6 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
         ctx.checkBody('couponType').notEmpty()
-        ctx.checkBody('couponValue').notEmpty();
-        ctx.checkBody('couponRate').notEmpty();
         ctx.checkBody('time').notEmpty();
 
         if (ctx.errors) {
@@ -23,18 +21,19 @@ module.exports = {
         let body = ctx.request.body;
 
         let couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
-
         await Coupons.create({
             couponKey: couponKey,
             phone: body.phone,
             tenantId: body.tenantId,
             consigneeId: body.consigneeId,
             time: body.time,
+            couponValue:body.couponValue,
+            couponType:body.couponType,
             couponRate:body.couponRate,
-            couponType: body.couponType,
-            value: body.couponValue,
             status: 0
         });
+
+
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },

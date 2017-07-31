@@ -8,6 +8,8 @@ var fs = require('fs');
 const path = require('path');
 const db = require('../db/mysql/index');
 const Orders = db.models.Orders;
+const Tables = db.models.Tables;
+const ShoppingCarts = db.models.ShoppingCarts;
 const PaymentReqs = db.models.PaymentReqs;
 const Consignees = db.models.Consignees;
 const TenantConfigs = db.models.TenantConfigs;
@@ -37,7 +39,7 @@ module.exports = async function tasks(app) {
 
         rule.minute = 1;
         rule.second = 1;
-        schedule.scheduleJob(rule, async function(){
+        schedule.scheduleJob(rule, async function () {
             await aliTransferAccounts();
             await wechatTransferAccounts();
         });
@@ -495,22 +497,22 @@ module.exports = async function tasks(app) {
 
         let paymentReqs = await PaymentReqs.findAll({
             where: {
-                isFinish : true,
-                isInvalid : false,
-                paymentMethod :'微信',
-                TransferAccountIsFinish:false,
-                consigneeTransferAccountIsFinish:false
+                isFinish: true,
+                isInvalid: false,
+                paymentMethod: '微信',
+                TransferAccountIsFinish: false,
+                consigneeTransferAccountIsFinish: false
             }
         });
 
         //遍历数据库 存储不同的主商户-代售商户
-        for (var i = 0;i<paymentReqs.length;i++) {
+        for (var i = 0; i < paymentReqs.length; i++) {
             tmpJson.consigneeId = paymentReqs[i].consigneeId;
-            tmpJson.tenantId =  paymentReqs[i].tenantId;
-            if (tmpArray.length ==0) {
+            tmpJson.tenantId = paymentReqs[i].tenantId;
+            if (tmpArray.length == 0) {
                 tmpArray.push(tmpJson);
             } else {
-                if(Tool.jsonIsInArray(tmpArray,tmpJson) == false) {
+                if (Tool.jsonIsInArray(tmpArray, tmpJson) == false) {
                     tmpArray.push(tmpJson);
                 }
             }
@@ -523,9 +525,9 @@ module.exports = async function tasks(app) {
         let tenantConfig;
         let consignee;
         if (tmpArray.length > 0) {
-            for (var kk = 0;kk<tmpArray.length;kk++) {
+            for (var kk = 0; kk < tmpArray.length; kk++) {
                 tenantId = tmpArray[kk].tenantId;
-                consigneeId= tmpArray[kk].consigneeId;
+                consigneeId = tmpArray[kk].consigneeId;
                 console.log("tenantId:" + tenantId);
                 console.log("consigneeId:" + consigneeId);
 
@@ -537,7 +539,7 @@ module.exports = async function tasks(app) {
                     where: {
                         tenantId: tenantId,
                         consigneeId: consigneeId,
-                        paymentMethod :'微信',
+                        paymentMethod: '微信',
                         isFinish: true,
                         isInvalid: false,
                         TransferAccountIsFinish: false,
@@ -550,17 +552,17 @@ module.exports = async function tasks(app) {
                 tmpAmountJson.merchantAmount = 0;
                 tmpAmountJson.consigneeAmount = 0;
 
-                for (var i =0;i<paymentReqs.length;i++) {
-                    amountJson = await amountManager.getTransAccountAmount(tenantId,consigneeId,paymentReqs[i].trade_no,'微信',paymentReqs[i].refund_amount);
-                    console.log("amountJson = " + JSON.stringify(amountJson,null,2));
+                for (var i = 0; i < paymentReqs.length; i++) {
+                    amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, paymentReqs[i].trade_no, '微信', paymentReqs[i].refund_amount);
+                    console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
 
-                    tmpAmountJson.totalAmount += (amountJson.totalAmount == null)? 0: amountJson.totalAmount;
-                    tmpAmountJson.merchantAmount += (amountJson.merchantAmount == null)? 0: amountJson.merchantAmount;
-                    tmpAmountJson.consigneeAmount += (amountJson.consigneeAmount == null)? 0: amountJson.consigneeAmount;
+                    tmpAmountJson.totalAmount += (amountJson.totalAmount == null) ? 0 : amountJson.totalAmount;
+                    tmpAmountJson.merchantAmount += (amountJson.merchantAmount == null) ? 0 : amountJson.merchantAmount;
+                    tmpAmountJson.consigneeAmount += (amountJson.consigneeAmount == null) ? 0 : amountJson.consigneeAmount;
                 }
 
 
-                console.log("tmpAmountJson = " + JSON.stringify(tmpAmountJson,null,2));
+                console.log("tmpAmountJson = " + JSON.stringify(tmpAmountJson, null, 2));
 
                 //查找主商户信息
                 tenantConfig = await TenantConfigs.findOne({
@@ -583,25 +585,25 @@ module.exports = async function tasks(app) {
                     console.log("服务器公网IP：" + ip);
                     fn = co.wrap(wxpay.transfers.bind(wxpay))
                     if (consignee == null) {
-                        var  params = {
+                        var params = {
                             partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                            openid : tenantConfig.wecharPayee_account,
+                            openid: tenantConfig.wecharPayee_account,
                             check_name: 'NO_CHECK',
-                            amount: Math.round(tmpAmountJson.merchantAmount*100),
+                            amount: Math.round(tmpAmountJson.merchantAmount * 100),
                             desc: '日收益',
                             spbill_create_ip: ip
                         }
 
                         try {
                             var result = await fn(params);
-                            console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result,null,2));
+                            console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
 
-                            if(result.result_code == 'SUCCESS') {
+                            if (result.result_code == 'SUCCESS') {
                                 paymentReqs = await PaymentReqs.findAll({
                                     where: {
                                         tenantId: tenantId,
                                         consigneeId: consigneeId,
-                                        paymentMethod :'微信',
+                                        paymentMethod: '微信',
                                         isFinish: true,
                                         isInvalid: false,
                                         TransferAccountIsFinish: false,
@@ -628,24 +630,24 @@ module.exports = async function tasks(app) {
                             }
                         });
                         if (profitsharing == null) {
-                            var  params = {
+                            var params = {
                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                openid : tenantConfig.wecharPayee_account,
+                                openid: tenantConfig.wecharPayee_account,
                                 check_name: 'NO_CHECK',
-                                amount: Math.round(tmpAmountJson.merchantAmount*100),
+                                amount: Math.round(tmpAmountJson.merchantAmount * 100),
                                 desc: '日收益',
                                 spbill_create_ip: ip
                             }
 
                             try {
                                 var result = await fn(params);
-                                console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result,null,2));
-                                if(result.result_code == 'SUCCESS') {
+                                console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
+                                if (result.result_code == 'SUCCESS') {
                                     paymentReqs = await PaymentReqs.findAll({
                                         where: {
                                             tenantId: tenantId,
                                             consigneeId: consigneeId,
-                                            paymentMethod :'微信',
+                                            paymentMethod: '微信',
                                             isFinish: true,
                                             isInvalid: false,
                                             TransferAccountIsFinish: false,
@@ -668,59 +670,59 @@ module.exports = async function tasks(app) {
                             console.log("tmpAmountJson.merchantAmount * 100 ===" + tmpAmountJson.merchantAmount * 100);
                             console.log("tmpAmountJson.consigneeAmount * 100 ===" + tmpAmountJson.consigneeAmount * 100);
 
-                            var  params = {
+                            var params = {
                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                openid : tenantConfig.wecharPayee_account,
+                                openid: tenantConfig.wecharPayee_account,
                                 check_name: 'NO_CHECK',
                                 amount: Math.round(tmpAmountJson.merchantAmount * 100),
                                 desc: profitsharing.merchantRemark,
                                 spbill_create_ip: ip
                             }
 
-                            try{
+                            try {
                                 var result1 = await fn(params);
-                                console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result1,null,2));
+                                console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result1, null, 2));
                                 console.log("result.result_code:" + result1.result_code);
                                 if (result1.result_code == 'SUCCESS') {
                                     paymentReqs = await PaymentReqs.findAll({
                                         where: {
-                                            tenantId:tenantId,
-                                            consigneeId:consigneeId,
-                                            paymentMethod :'微信',
-                                            isFinish : true,
-                                            isInvalid : false,
-                                            TransferAccountIsFinish:false,
-                                            consigneeTransferAccountIsFinish:false
+                                            tenantId: tenantId,
+                                            consigneeId: consigneeId,
+                                            paymentMethod: '微信',
+                                            isFinish: true,
+                                            isInvalid: false,
+                                            TransferAccountIsFinish: false,
+                                            consigneeTransferAccountIsFinish: false
                                         }
                                     });
 
-                                    for (var jj = 0 ;jj<paymentReqs.length;jj++) {
+                                    for (var jj = 0; jj < paymentReqs.length; jj++) {
                                         paymentReqs[jj].TransferAccountIsFinish = true;
                                         await paymentReqs[jj].save();
                                     }
 
                                     params = {
                                         partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                        openid : consignee.wecharPayee_account,
+                                        openid: consignee.wecharPayee_account,
                                         check_name: 'NO_CHECK',
-                                        amount: Math.round(tmpAmountJson.consigneeAmount*100),
+                                        amount: Math.round(tmpAmountJson.consigneeAmount * 100),
                                         desc: profitsharing.consigneeRemark,
                                         spbill_create_ip: ip
                                     }
 
                                     var result2 = await fn(params);
-                                    console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result2,null,2));
+                                    console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result2, null, 2));
 
                                     if (result2.result_code == 'SUCCESS') {
-                                        for (var jj = 0 ;jj<paymentReqs.length;jj++) {
+                                        for (var jj = 0; jj < paymentReqs.length; jj++) {
                                             paymentReqs[jj].consigneeTransferAccountIsFinish = true;
                                             await paymentReqs[jj].save();
                                         }
                                     }
-                                    console.log("转账时间:",new Date().format('yyyy-MM-dd hh:mm:ss'));
+                                    console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
                                     console.log("每日微信转账记录2||tenantId:" + tenantId + " merchantAmount:" + tmpAmountJson.merchantAmount + " consigneeId:" + consigneeId + " consigneeAmount:" + tmpAmountJson.consigneeAmount);
                                 }
-                            } catch(e) {
+                            } catch (e) {
                                 console.log(e);
                             }
                         }
@@ -738,22 +740,22 @@ module.exports = async function tasks(app) {
 
         let paymentReqs = await PaymentReqs.findAll({
             where: {
-                isFinish : true,
-                isInvalid : false,
-                paymentMethod :'支付宝',
-                TransferAccountIsFinish:false,
-                consigneeTransferAccountIsFinish:false
+                isFinish: true,
+                isInvalid: false,
+                paymentMethod: '支付宝',
+                TransferAccountIsFinish: false,
+                consigneeTransferAccountIsFinish: false
             }
         });
 
         //遍历数据库 存储不同的主商户-代售商户
-        for (var i = 0;i<paymentReqs.length;i++) {
+        for (var i = 0; i < paymentReqs.length; i++) {
             tmpJson.consigneeId = paymentReqs[i].consigneeId;
-            tmpJson.tenantId =  paymentReqs[i].tenantId;
-            if (tmpArray.length ==0) {
+            tmpJson.tenantId = paymentReqs[i].tenantId;
+            if (tmpArray.length == 0) {
                 tmpArray.push(tmpJson);
             } else {
-                if(Tool.jsonIsInArray(tmpArray,tmpJson) == false) {
+                if (Tool.jsonIsInArray(tmpArray, tmpJson) == false) {
                     tmpArray.push(tmpJson);
                 }
             }
@@ -766,9 +768,9 @@ module.exports = async function tasks(app) {
         let tenantConfig;
         let consignee;
         if (tmpArray.length > 0) {
-            for (var kk = 0;kk<tmpArray.length;kk++) {
+            for (var kk = 0; kk < tmpArray.length; kk++) {
                 tenantId = tmpArray[kk].tenantId;
-                consigneeId= tmpArray[kk].consigneeId;
+                consigneeId = tmpArray[kk].consigneeId;
 
                 console.log("tenantId:" + tenantId);
                 console.log("consigneeId:" + consigneeId);
@@ -781,7 +783,7 @@ module.exports = async function tasks(app) {
                     where: {
                         tenantId: tenantId,
                         consigneeId: consigneeId,
-                        paymentMethod :'支付宝',
+                        paymentMethod: '支付宝',
                         isFinish: true,
                         isInvalid: false,
                         TransferAccountIsFinish: false,
@@ -794,16 +796,16 @@ module.exports = async function tasks(app) {
                 tmpAmountJson.merchantAmount = 0;
                 tmpAmountJson.consigneeAmount = 0;
 
-                for (var i =0;i<paymentReqs.length;i++) {
-                    amountJson = await amountManager.getTransAccountAmount(tenantId,consigneeId,paymentReqs[i].trade_no,'支付宝',paymentReqs[i].refund_amount);
-                    console.log("amountJson = " + JSON.stringify(amountJson,null,2));
+                for (var i = 0; i < paymentReqs.length; i++) {
+                    amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, paymentReqs[i].trade_no, '支付宝', paymentReqs[i].refund_amount);
+                    console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
 
-                    tmpAmountJson.totalAmount += (amountJson.totalAmount == null)? 0: amountJson.totalAmount;
-                    tmpAmountJson.merchantAmount += (amountJson.merchantAmount == null)? 0: amountJson.merchantAmount;
-                    tmpAmountJson.consigneeAmount += (amountJson.consigneeAmount == null)? 0: amountJson.consigneeAmount;
+                    tmpAmountJson.totalAmount += (amountJson.totalAmount == null) ? 0 : amountJson.totalAmount;
+                    tmpAmountJson.merchantAmount += (amountJson.merchantAmount == null) ? 0 : amountJson.merchantAmount;
+                    tmpAmountJson.consigneeAmount += (amountJson.consigneeAmount == null) ? 0 : amountJson.consigneeAmount;
                 }
 
-                console.log("tmpAmountJson = " + JSON.stringify(tmpAmountJson,null,2));
+                console.log("tmpAmountJson = " + JSON.stringify(tmpAmountJson, null, 2));
 
 
                 //查找主商户信息
@@ -825,14 +827,14 @@ module.exports = async function tasks(app) {
 
                 if (tenantConfig != null) {
                     if (consignee == null) {
-                        var result = await transAccountsManager.transferAccounts(tenantConfig.payee_account,tmpAmountJson.merchantAmount,null,'日收益',tenantId);
-                        console.log("无代售0:" + JSON.stringify(result,null,2));
+                        var result = await transAccountsManager.transferAccounts(tenantConfig.payee_account, tmpAmountJson.merchantAmount, null, '日收益', tenantId);
+                        console.log("无代售0:" + JSON.stringify(result, null, 2));
                         if (result.msg == 'Success') {
                             paymentReqs = await PaymentReqs.findAll({
                                 where: {
                                     tenantId: tenantId,
                                     consigneeId: consigneeId,
-                                    paymentMethod :'支付宝',
+                                    paymentMethod: '支付宝',
                                     isFinish: true,
                                     isInvalid: false,
                                     TransferAccountIsFinish: false,
@@ -856,14 +858,14 @@ module.exports = async function tasks(app) {
                             }
                         });
                         if (profitsharing == null) {
-                            var result = await transAccountsManager.transferAccounts(tenantConfig.payee_account,tmpAmountJson.merchantAmount,null,'日收益',tenantId);
-                            console.log("无代售1:" + JSON.stringify(result,null,2));
+                            var result = await transAccountsManager.transferAccounts(tenantConfig.payee_account, tmpAmountJson.merchantAmount, null, '日收益', tenantId);
+                            console.log("无代售1:" + JSON.stringify(result, null, 2));
                             if (result.msg == 'Success') {
                                 paymentReqs = await PaymentReqs.findAll({
                                     where: {
                                         tenantId: tenantId,
                                         consigneeId: consigneeId,
-                                        paymentMethod :'支付宝',
+                                        paymentMethod: '支付宝',
                                         isFinish: true,
                                         isInvalid: false,
                                         TransferAccountIsFinish: false,
@@ -879,40 +881,40 @@ module.exports = async function tasks(app) {
                                 console.log("每日转账记录1||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + tmpAmountJson.merchantAmount);
                             }
                         } else {
-                            var ret1 = await transAccountsManager.transferAccounts(tenantConfig.payee_account,tmpAmountJson.merchantAmount,null,profitsharing.merchantRemark,tenantId);
+                            var ret1 = await transAccountsManager.transferAccounts(tenantConfig.payee_account, tmpAmountJson.merchantAmount, null, profitsharing.merchantRemark, tenantId);
                             if (ret1.msg == 'Success') {
                                 paymentReqs = await PaymentReqs.findAll({
                                     where: {
-                                        tenantId:tenantId,
-                                        consigneeId:consigneeId,
-                                        paymentMethod :'支付宝',
-                                        isFinish : true,
-                                        isInvalid : false,
-                                        TransferAccountIsFinish:false,
-                                        consigneeTransferAccountIsFinish:false
+                                        tenantId: tenantId,
+                                        consigneeId: consigneeId,
+                                        paymentMethod: '支付宝',
+                                        isFinish: true,
+                                        isInvalid: false,
+                                        TransferAccountIsFinish: false,
+                                        consigneeTransferAccountIsFinish: false
                                     }
                                 });
 
-                                for (var jj = 0 ;jj<paymentReqs.length;jj++) {
+                                for (var jj = 0; jj < paymentReqs.length; jj++) {
                                     paymentReqs[jj].TransferAccountIsFinish = true;
                                     await paymentReqs[jj].save();
                                 }
 
 
-                                var ret2 = await transAccountsManager.transferAccounts(consignee.payee_account,tmpAmountJson.consigneeAmount,null,profitsharing.consigneeRemark,tenantId);
+                                var ret2 = await transAccountsManager.transferAccounts(consignee.payee_account, tmpAmountJson.consigneeAmount, null, profitsharing.consigneeRemark, tenantId);
                                 if (ret2.msg == 'Success') {
-                                    for (var jj = 0 ;jj<paymentReqs.length;jj++) {
+                                    for (var jj = 0; jj < paymentReqs.length; jj++) {
                                         paymentReqs[jj].consigneeTransferAccountIsFinish = true;
                                         await paymentReqs[jj].save();
                                     }
                                 } else {
-                                    console.log("代售商户转账失败：" + JSON.stringify(ret2,null,2));
+                                    console.log("代售商户转账失败：" + JSON.stringify(ret2, null, 2));
                                 }
 
-                                console.log("转账时间:",new Date().format('yyyy-MM-dd hh:mm:ss'));
+                                console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
                                 console.log("每日转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + tmpAmountJson.consigneeAmount);
                             } else {
-                                console.log("主商户转账失败：" + JSON.stringify(ret1,null,2))
+                                console.log("主商户转账失败：" + JSON.stringify(ret1, null, 2))
                             }
                         }
                     }
@@ -920,40 +922,41 @@ module.exports = async function tasks(app) {
             }
         }
     }
-    
-    let orderInvalid = async function () {
-        let rule     = new schedule.RecurrenceRule();
-        let times    = [1,6,11,16,21,26,31,36,41,46,51,56];
-        rule.minute  = times;
 
-        //5分钟订单失效检查,代售点的订单10分钟失效
-        schedule.scheduleJob(rule, async function(){
+    //代售订单超时
+    let orderInvalid = async function () {
+        let rule = new schedule.RecurrenceRule();
+        let times = [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56];
+        rule.minute = times;
+
+        //5分钟订单失效检查,代售点的订单10分钟失效，购物车也是
+        schedule.scheduleJob(rule, async function () {
             var orders = await Orders.findAll({
-                where:{
-                    $or:[{status:0},{status:1}],
-                    'consigneeId':{
-                        $ne:null
+                where: {
+                    $or: [{status: 0}, {status: 1}],
+                    'consigneeId': {
+                        $ne: null
                     }
                 }
             });
             var trade_no;
-            for (var i = 0;i<orders.length;i++) {
-                if((Date.now() - orders[i].createdAt.getTime()) > 10*60*1000) {
+            for (var i = 0; i < orders.length; i++) {
+                if ((Date.now() - orders[i].createdAt.getTime()) > 10 * 60 * 1000) {
                     //获取订单号
                     trade_no = orders[i].trade_no;
-                    console.log("超时订单号："+ trade_no)
+                    console.log("超时订单号：" + trade_no)
 
                     await orders[i].destroy();
 
                     var paymentReqs = await PaymentReqs.findAll({
-                        where:{
-                            trade_no:trade_no,
-                            isFinish:false,
-                            isInvalid:false
+                        where: {
+                            trade_no: trade_no,
+                            isFinish: false,
+                            isInvalid: false
                         }
                     });
-                    if (paymentReqs.length >0) {
-                        for(var i =0;i<paymentReqs.length;i++) {
+                    if (paymentReqs.length > 0) {
+                        for (var i = 0; i < paymentReqs.length; i++) {
                             paymentReqs[i].isInvalid = true;
                             await paymentReqs[i].save();
                             console.log("超时订单号支付请求表失效成功！")
@@ -965,7 +968,157 @@ module.exports = async function tasks(app) {
 
     }
 
+    //点餐订单超时
+    let dealOrderInvalid = async function () {
+        let rule = new schedule.RecurrenceRule();
+        let times = [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56];
+        rule.minute = times;
+
+        //5分钟订单失效检查,代售点的订单10分钟失效，购物车也是
+        schedule.scheduleJob(rule, async function () {
+            var orders = await Orders.findAll({
+                where: {
+                    $or: [{status: 0}, {status: 1}],
+                    'consigneeId': null
+                }
+            });
+            var trade_no;
+            for (var i = 0; i < orders.length; i++) {
+                var tenantConfig = await TenantConfigs.findOne({
+                    where: {
+                        tenantId: orders[i].tenantId
+                    }
+                });
+                if (tenantConfig.invaildTime == 0 && tenantConfig.invaildTime == null) {
+                    continue;
+                }
+
+                if ((Date.now() - orders[i].createdAt.getTime()) > tenantConfig.invaildTime) {
+                    //获取订单号
+                    trade_no = orders[i].trade_no;
+                    console.log("点餐超时订单号：" + trade_no)
+
+                    await orders[i].destroy();
+
+                    //修改桌状态
+                    //获取tableId
+                    let table = await Tables.findOne({
+                        where: {
+                            tenantId: orders[i].tenantId,
+                            id: orders[i].TableId,
+                        }
+                    });
+                    table.status = 0;
+                    await table.save();
+
+                    var paymentReqs = await PaymentReqs.findAll({
+                        where: {
+                            trade_no: trade_no,
+                            isFinish: false,
+                            isInvalid: false
+                        }
+                    });
+                    if (paymentReqs.length > 0) {
+                        for (var i = 0; i < paymentReqs.length; i++) {
+                            paymentReqs[i].isInvalid = true;
+                            await paymentReqs[i].save();
+                            console.log("点餐超时订单号支付请求表失效成功！")
+                        }
+                    }
+                }
+            }
+        });
+
+    }
+
+    //购物车超时
+    let shoppingCartInvalid = async function () {
+        let rule = new schedule.RecurrenceRule();
+        let times = [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56];
+        rule.minute = times;
+
+        //5分钟购物车失效检查,代售点购物车20分钟失效，
+        schedule.scheduleJob(rule, async function () {
+
+            var shoppingCarts = await ShoppingCarts.findAll({
+                where: {
+                    'consigneeId': {
+                        $ne: null
+                    }
+                }
+            });
+            for (var i = 0; i < shoppingCarts.length; i++) {
+                var tenantConfig = await TenantConfigs.findOne({
+                    where: {
+                        tenantId: orders[i].tenantId
+                    }
+                });
+                if (tenantConfig.invaildTime == 0) {
+                    continue;
+                }
+
+                if ((Date.now() - shoppingCarts[i].createdAt.getTime()) > tenantConfig.invaildTime) {
+                    //获取订单号
+                    console.log("购物车失效：手机号：" + shoppingCarts[i].phone);
+                    console.log("购物车失效：租户ID：" + shoppingCarts[i].tenantId);
+                    console.log("购物车失效：代售ID：" + shoppingCarts[i].consigneeId);
+
+                    await shoppingCarts[i].destroy();
+                }
+            }
+        });
+    }
+
+    //点餐购物车超时
+    let dealShoppingCartInvalid = async function () {
+        let rule = new schedule.RecurrenceRule();
+        let times = [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56];
+        rule.minute = times;
+
+        //5分钟购物车失效检查,代售点购物车20分钟失效，
+        schedule.scheduleJob(rule, async function () {
+            var shoppingCarts = await ShoppingCarts.findAll({
+                where: {
+                    'consigneeId': null
+                }
+            });
+            for (var i = 0; i < shoppingCarts.length; i++) {
+                var tenantConfig = await TenantConfigs.findOne({
+                    where: {
+                        tenantId: shoppingCarts[i].tenantId
+                    }
+                });
+                if (tenantConfig.invaildTime == 0 && tenantConfig.invaildTime == null) {
+                    continue;
+                }
+
+                if ((Date.now() - shoppingCarts[i].createdAt.getTime()) > tenantConfig.invaildTime) {
+                    //获取订单号
+                    console.log("点餐购物车失效：手机号：" + shoppingCarts[i].phone);
+                    console.log("点餐购物车失效：租户ID：" + shoppingCarts[i].tenantId);
+
+                    await shoppingCarts[i].destroy();
+
+                    //修改桌状态
+                    //获取tableId
+                    let table = await Tables.findOne({
+                        where: {
+                            tenantId: shoppingCarts[i].tenantId,
+                            id: shoppingCarts[i].TableId,
+                        }
+                    });
+                    table.status = 0;
+                    await table.save();
+                }
+            }
+        });
+    }
+
     await timeTransferAccounts();
     await orderInvalid();
+    await shoppingCartInvalid();
+    await dealOrderInvalid();
+    await dealShoppingCartInvalid();
+
 
 }

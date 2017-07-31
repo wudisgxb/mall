@@ -77,8 +77,6 @@ module.exports ={
     },
     //async getAdminOrder(ctx, next){},
     async getAdminOrder(ctx,next){
-
-
         ctx.checkQuery('tenantId').notEmpty();
         let result = [];
         let foodJson = [];
@@ -111,11 +109,11 @@ module.exports ={
                 tenantId: ctx.query.tenantId
             }
         })
-        // 判断order是否为空
-        if(order.length==0){
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"未找到当前订单")
-            return;
-        }
+        //判断order是否为空
+        // if(order.length==0){
+        //     ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"未找到当前订单")
+        //     return;
+        // }
         let tradeNoArray = [];//订单号
         for (var i = 0; i < order.length; i++) {
             if (!tradeNoArray.contains(order[i].trade_no)) {
@@ -151,7 +149,9 @@ module.exports ={
                         $between:[startTime,endTime]
                     },
                     trade_no:tradeNoArray[k]
-                }
+                },
+                order:[["createdAt","DESC"]],
+                paranoid: true
             })
 
             for(var j = 0; j < orders.length; j++) {
@@ -296,6 +296,21 @@ module.exports ={
                 consigneeId:body.condition.consigneeId
             })
         }
+        // await Orders.create({
+        //     num:body.order.num,
+        //     status:body.order.status,
+        //     info:body.order.info,
+        //     phone:body.order.phone,
+        //     diners_num:body.order.diners_num,
+        //     trade_no:body.order.trade_no,
+        //     paymentMethod:body.order.paymentMethod,
+        //     unit:body.order.unit,
+        //     TableId:body.order.TableId,
+        //     FoodId:foodId[i],
+        //     createdAt:body.order.createdAt,
+        //     tenantId:body.condition.tenantId,
+        //     consigneeId:body.condition.consigneeId
+        // })
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }

@@ -1,8 +1,8 @@
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
-let db = require('../../db/statisticsMySql/index');
-let statisticsOrders = db.models.Orders;
+let db = require('../../db/mysql/index');
+let Orders = db.models.Orders;
 
 
 const getFoodNum = (function () {
@@ -35,7 +35,6 @@ const getFoodNum = (function () {
             firstDate.setDate(0)
             a = firstDate.format("yyyy-MM-dd 23:59:59");
         }
-
 
         console.log(b);
         console.log(a);
