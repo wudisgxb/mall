@@ -213,7 +213,8 @@ module.exports = {
         let body = ctx.request.body;
         let orders = await Orders.findAll({
             where:{
-                tenantId : body.tenantId
+                tenantId : body.tenantId,
+                status:2
             }
         })
         let ArrayTrand_no = [];
@@ -227,10 +228,9 @@ module.exports = {
                 where:{
                     trade_no:ArrayTrand_no[j],
                     status:2
-                },
-                paranoid: false
+                }
             })
-            let retJson = await amountManager.getTransAccountAmount( body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, order.refund_amount);
+            let retJson = await amountManager.getTransAccountAmount( body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, 0);
             // let profitSharings = await ProfitSharings.findOne({
             //     where:{
             //         tenantId : order.tenantId,
@@ -245,8 +245,8 @@ module.exports = {
 
             if(orderstastistic==null){
                 await StatisticsOrders.create({
-                    trade_no:ArrayTrand_no[j],
-                    totalPrice:retJson.totalPrice,
+                    trade_no : ArrayTrand_no[j],
+                    totalPrice : retJson.totalPrice,
                     tenantId : body.tenantId,
                     merchantAmount : retJson.merchantAmount,
                     consigneeAmount : retJson.consigneeAmount,
@@ -255,7 +255,7 @@ module.exports = {
                     refund_amount : retJson.refund_amount,
                     platfromCouponFee : retJson.platformCouponFee,
                     merchantCouponFee : retJson.merchantCouponFee,
-                    phone :order.phone
+                    phone : order.phone
                 })
             }
         }
