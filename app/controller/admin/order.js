@@ -107,8 +107,7 @@ module.exports ={
                     $between: [startTime, endTime]
                 },
                 tenantId: ctx.query.tenantId,
-            },
-            paranoid: false
+            }
         })
         //判断order是否为空
         // if(order.length==0){
@@ -135,15 +134,14 @@ module.exports ={
                     //     $between: [startTime, endTime]
                     // },
                     trade_no:tradeNoArray[k]
-                },
-                paranoid: false
-            })
-            //根据consigneeId查询consigneeName
-            let consigneesName=await Consignees.findOne({
-                where:{
-                    consigneeId:consigneesId.consigneeId
                 }
             })
+            //根据consigneeId查询consigneeName
+            // let consigneesName=await Consignees.findOne({
+            //     where:{
+            //         consigneeId:consigneesId.consigneeId
+            //     }
+            // })
             //根据创建时间和订单号查询所有记录
             orders = await Orders.findAll({
                 where: {
@@ -152,8 +150,7 @@ module.exports ={
                     },
                     trade_no:tradeNoArray[k]
                 },
-                order:[["createdAt","DESC"]],
-                paranoid: false
+                order:[["createdAt","DESC"]]
             })
 
             for(var j = 0; j < orders.length; j++) {
@@ -197,15 +194,14 @@ module.exports ={
             result[k].status = orders[0].status;
             result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[0].phone;
-            result[k].consigneeName = (consigneesName == null ? null : consigneesName.name);
+            result[k].consigneeName = consigneesId.consigneeId//(consigneesName == null ? null : consigneesName.name);
             result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
             //根据订单号找退款信息
             let tmp = await Orders.findAll({
                 where: {
                     trade_no: tradeNoArray[k],
                     tenantId: ctx.query.tenantId,
-                },
-                paranoid: false
+                }
             });
             let refund_amount = 0;
 
