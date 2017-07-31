@@ -123,8 +123,7 @@ module.exports = {
         let statisticsOrders = await StatisticsOrders.findAll({
             where: {
                 tenantId: body.tenantId
-            },
-            raw: true
+            }
         })
 
         if (statisticsOrders.length == 0) {
@@ -167,7 +166,7 @@ module.exports = {
             } else if ((totalPrice > 210) && (random < 60 && random > 0)) {
                 couponFee = 30
             }
-            await statisticsOrders[i].update({
+            await StatisticsOrders.update({
                 trade_no: statisticsOrders[i].trade_no,
                 totalPrice: totalPrice,//(totalPrice==0?80:totalPrice);
                 merchantAmount: mer,//(mer==0?80:mer);
