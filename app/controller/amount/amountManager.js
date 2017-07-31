@@ -222,22 +222,23 @@ const amountManger = (function () {
                         merchantAmount = ((totalAmount * (1 - profitsharing.rate - profitsharing.ownRate) - coupon.value * (1 - coupon.couponRate)) <= 0) ? 0.01 : (totalAmount * (1 - profitsharing.rate - profitsharing.ownRate) - coupon.value * (1 - coupon.couponRate));
                         merchantAmount = Math.round(merchantAmount * 100) / 100;
 
-                        consigneeAmount = ((totalAmount * profitsharing.rate - coupon.value) <= 0) ? 0 : (totalAmount * profitsharing.rate - coupon.value);
-                        consigneeAmount = Math.round(consigneeAmount * 100) / 100;
-
                         platformCouponFee = coupon.value * coupon.couponRate;
                         merchantCouponFee = coupon.value * (1 - coupon.couponRate);
+
+                        consigneeAmount = ((totalAmount * profitsharing.rate - platformCouponFee) <= 0) ? 0 : (totalAmount * profitsharing.rate - platformCouponFee);
+                        consigneeAmount = Math.round(consigneeAmount * 100) / 100;
+
 
                         break;
                     case 'discount':
                         merchantAmount = totalAmount * (1 - profitsharing.rate - profitsharing.ownRate) - totalAmount * (1 - coupon.value) * (1 - coupon.couponRate);
                         merchantAmount = Math.round(merchantAmount * 100) / 100;
 
-                        consigneeAmount = ((totalAmount * profitsharing.rate - totalAmount * (1 - coupon.value)) <= 0) ? 0 : (totalAmount * profitsharing.rate - totalAmount * (1 - coupon.value));
-                        consigneeAmount = Math.round(consigneeAmount * 100) / 100;
+                        platformCouponFee = totalAmount * (1 - coupon.value) * coupon.couponRate;
+                        merchantCouponFee = totalAmount * (1 - coupon.value) * (1 - coupon.couponRate);
 
-                        platformCouponFee = totalAmount * coupon.couponRate;
-                        merchantCouponFee = totalAmount * (1 - coupon.couponRate);
+                        consigneeAmount = ((totalAmount * profitsharing.rate - platformCouponFee) <= 0) ? 0 : (totalAmount * profitsharing.rate - platformCouponFee);
+                        consigneeAmount = Math.round(consigneeAmount * 100) / 100;
 
                         break;
                     case 'reduce':
@@ -257,11 +258,10 @@ const amountManger = (function () {
                             consigneeAmount = Math.round(consigneeAmount * 100) / 100;
 
 
-
-                            if (tenantId  == '18d473e77f459833bb06c60f9a8f0000') {
+                            if (tenantId == '18d473e77f459833bb06c60f9a8f0000') {
                                 merchantAmount = (totalAmount - coupon.value.split('-')[1]) * (1 - profitsharing.rate - profitsharing.ownRate) + platformCouponFee;
                                 console.log("青豆家转账===" + merchantAmount);
-                                
+
                             }
                         }
                         break;

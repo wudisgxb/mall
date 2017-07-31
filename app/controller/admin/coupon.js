@@ -92,8 +92,8 @@ module.exports = {
     },
     async deleteAdminCoupon(ctx, next){
         ctx.checkQuery('couponKey').notEmpty();
-        ctx.checkQuery('tenantId').notEmpty();
-        ctx.checkQuery('consigneeId').notEmpty();
+        //ctx.checkQuery('tenantId').notEmpty();
+        //ctx.checkQuery('consigneeId').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
@@ -103,8 +103,8 @@ module.exports = {
         let coupon = await Coupons.findOne({
             where: {
                 couponKey: ctx.query.couponKey,
-                tenantId: ctx.query.tenantId,
-                consigneeId: ctx.query.consigneeId,
+                //tenantId: ctx.query.tenantId,
+                //consigneeId: ctx.query.consigneeId,
             }
         });
         if (coupon == null) {
