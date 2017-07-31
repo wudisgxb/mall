@@ -6,7 +6,7 @@ let dbv3 = require('../../db/Mysql/index')
 
 let StatisticsOrders = db.models.Orders;
 let Vips = dbv3.models.Vips;
-
+let getOneDayEchat = require('../echats/oneDayEchat')
 let getDayEchat = require('../echats/dayEchat')
 let getMonthEchats = require('../echats/MonthEchats')
 let getQuarterEchats = require('../echats/quarterEchats')
@@ -551,6 +551,9 @@ const getstatistics = (function () {
         if(type==2){
             getTime = await getDayEchat.getDay(startTime,endTime)
         }
+        if(type==4){
+            getTime = await getOneDayEchat.getDay(startTime,endTime)
+        }
         if(type==3){
             getTime = await AnYearEchats.getAnYear(startTime,endTime)
         }
@@ -561,19 +564,19 @@ const getstatistics = (function () {
         for (let i = 0; i < getTime.length; i++){
             let statisticsOrder = await StatisticsOrders.getBetweenDateByTenantId(tenantId, new Date(getTime[i].start), new Date(getTime[i].end))
             //总营收
-            let totalPrice = await StatisticsOrders.sumField(tenantId, 'totalPrice', new Date(getTime[i].start), new Date(getTime[i].end))
-            let merchantCouponFee = await StatisticsOrders.sumField(tenantId, 'merchantCouponFee', new Date(getTime[i].start), new Date(getTime[i].end))
-            let platformCouponFee = await StatisticsOrders.sumField(tenantId, 'platformCouponFee', new Date(getTime[i].start), new Date(getTime[i].end))
-            let platformAmount = await StatisticsOrders.sumField(tenantId, 'platformAmount', new Date(getTime[i].start), new Date(getTime[i].end))
-            let merchantAmount = await StatisticsOrders.sumField(tenantId, 'merchantAmount', new Date(getTime[i].start), new Date(getTime[i].end))
-            let refund_Amount = await StatisticsOrders.sumField(tenantId, 'refund_amount', new Date(getTime[i].start), new Date(getTime[i].end))
-            let deliveryFee = await StatisticsOrders.sumField(tenantId, 'deliveryFee', new Date(getTime[i].start), new Date(getTime[i].end))
-            let consigneeAmount = await StatisticsOrders.sumField(tenantId, 'consigneeAmount', new Date(getTime[i].start), new Date(getTime[i].end))
+            let totalPrice =  StatisticsOrders.sumField(statisticsOrder, 'totalPrice')
+            let merchantCouponFee =  StatisticsOrders.sumField(statisticsOrder, 'merchantCouponFee')
+            let platformCouponFee =  StatisticsOrders.sumField(statisticsOrder, 'platformCouponFee')
+            let platformAmount =  StatisticsOrders.sumField(statisticsOrder, 'platformAmount')
+            let merchantAmount =  StatisticsOrders.sumField(statisticsOrder, 'merchantAmount')
+            let refund_Amount =  StatisticsOrders.sumField(statisticsOrder, 'refund_amount')
+            let deliveryFee =  StatisticsOrders.sumField(statisticsOrder, 'deliveryFee')
+            let consigneeAmount =  StatisticsOrders.sumField(statisticsOrder, 'consigneeAmount')
             let time ;
             if(type==1){
-                let start = (i*3+1)
+                let start = (i*3)
                 let end = (i+1)*3
-                time =start+"-"+end
+                time =start+".30"+((end==24)?" ":("-"+end+".30"))
             }
             if(type==2){
                 let start =i+1
@@ -582,6 +585,10 @@ const getstatistics = (function () {
             if(type==3){
                 let start = i+1
                 time = "第"+start+"个月"
+            }
+            if(type==4){
+                let start = i+1
+                time ="第"+start+"天"
             }
             result.push({
                 merchantPayment:{
@@ -621,8 +628,6 @@ const getstatistics = (function () {
                     value :time
                 }
             })
-
-
         }
 
         console.log(result)
