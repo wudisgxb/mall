@@ -2,10 +2,12 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/statisticsMySql/index');
+let db1 = require('../../db/mysql/index');
 // let Order = db.models.Orders
-let dbv3 = require('../../db/Mysql/index')
-let Orders = dbv3.models.Orders
-let ProfitSharings = dbv3.models.ProfitSharings
+
+// let dbv3 = require('../../db/mysql/index')
+let Orders = db1.models.Orders
+// let ProfitSharings = db1.models.ProfitSharings
 let StatisticsOrders = db.models.Orders;
 let getMonthEchats = require('../echats/MonthEchats')
 let amountManager = require('../amount/amountManager')
@@ -94,19 +96,19 @@ module.exports = {
         ctx.checkQuery('tenantId').notEmpty();
         // ctx,checkQuery('startTime').notEmpty();
         // ctx,checkQuery('endTime').notEmpty();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
         // let result =  getMonthEchats.getMonth(ctx.query.startTime,ctx.query.endTime);
         // for(let i = 0;i<result.length;i++){
         let statisticsOrders = await StatisticsOrders.findAll({
-            where:{
-                tenantId : ctx.query.tenantId
+            where: {
+                tenantId: ctx.query.tenantId
             }
         })
         // }
-        ctx.body =  new ApiResult(ApiResult.Result.SUCCESS,statisticsOrders)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, statisticsOrders)
 
     },
 
@@ -119,18 +121,16 @@ module.exports = {
         }
         let body = ctx.request.body;
         let statisticsOrders = await StatisticsOrders.findAll({
-            where:{
-                tenantId : body.tenantId
+            where: {
+                tenantId: body.tenantId
             },
             raw: true
         })
 
-        if(statisticsOrders.length==0){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没找到数据")
+        if (statisticsOrders.length == 0) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没找到数据")
             return;
         }
-
-
 
 
         // for(let j = 0;j<=8;j++){
@@ -138,8 +138,9 @@ module.exports = {
         // }
         // let phone = subStringPhone+StringPhone
         const days = generateDays(statisticsOrders.length)
-        for (let i =0; i<statisticsOrders.length;i++){
+        for (let i = 0; i < statisticsOrders.length; i++) {
             //电话号码后面8位
+
             // let lastphone = ['0','1','2','3','4','5','6','7','8','9']
             // let phoneNum = 8
             let test = "";
@@ -178,12 +179,28 @@ module.exports = {
                 // consigneeId : statisticsOrders[i].consigneeId,
                 createdTime : days[i],
             })
-
-            // await statisticsOrders[i].save();
         }
 
-        ctx.body =  new ApiResult(ApiResult.Result.SUCCESS,statisticsOrders)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, statisticsOrders)
 
+    },
+
+    async status2Mdf(ctx, next){
+        let body = ctx.request.body;
+
+        await db1.models.Orders.update({
+            deletedAt: null
+        }, {
+            where: {
+                status: 2,
+                deletedAt: {
+                    $ne: null
+                }
+            },
+            paranoid: false
+        });
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
 
     async updateOrder(ctx, next){
@@ -271,7 +288,7 @@ function phone() {
 }
 
 function generateDays(length) {
-    return generateMills(length).map(e => new Date(e+start))
+    return generateMills(length).map(e => new Date(e + start))
 }
 
 function getRandom(min, max) {

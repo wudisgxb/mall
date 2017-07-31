@@ -58,13 +58,6 @@ const amountManger = (function () {
         let isSame = await this.isTenantIdAndConsigneeIdSame(tenantId, consigneeId);
 
         let phone = orders[0].phone;
-        //获取会员信息算会员价
-        let vip = await Vips.findOne({
-            where: {
-                phone: phone,
-                tenantId: tenantId
-            }
-        })
 
         //通过订单号获取优惠券
         let coupon = await Coupons.findOne({
@@ -76,10 +69,22 @@ const amountManger = (function () {
             }
         })
 
-        if (vip != null) {
-            totalAmount = amountJson.totalVipPrice;
-        } else {
+        if (coupon != null) {
             totalAmount = amountJson.totalPrice;
+        } else {
+            //获取会员信息算会员价
+            let vip = await Vips.findOne({
+                where: {
+                    phone: phone,
+                    tenantId: tenantId
+                }
+            })
+
+            if (vip != null) {
+                totalAmount = amountJson.totalVipPrice;
+            } else {
+                totalAmount = amountJson.totalPrice;
+            }
         }
 
         // //couponRate 平台出优惠券比率 比如0.6 商家0.4
