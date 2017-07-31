@@ -153,7 +153,7 @@ module.exports = {
 
             // let subStringPhone = statisticsOrders[i].phone.substring(0,3);
             // let phone = subStringPhone+test;
-            let phone = phone();//电话号码
+            let phone = getphone();//电话号码
             if (statisticsOrders[i].totalPrice < 5) {//价格
                 totalPrice = Number((statisticsOrders[i].totalPrice * 100).toFixed(2))
                 mer = Number((statisticsOrders[i].merchantAmount * 100).toFixed(2))
@@ -268,7 +268,7 @@ module.exports = {
     }
 
 }
-function phone() {
+function getphone() {
     let last = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     let second = ["3", "4", "5", "8"]
     let third = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
