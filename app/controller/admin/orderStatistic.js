@@ -255,7 +255,7 @@ module.exports = {
                     refund_amount : retJson.refund_amount,
                     platfromCouponFee : retJson.platformCouponFee,
                     merchantCouponFee : retJson.merchantCouponFee,
-                    phone : retJson.phone
+                    phone :order.phone
                 })
             }
         }
