@@ -5,8 +5,8 @@ var util = require('util');
 var tool = require('../../Tool/tool');
 var start = new Date('2017-07-01 10:11:34').getTime()
 
-var minMills = 1.8 * 60 * 60 * 1000
-var maxMills = 2.1 * 60 * 60 * 1000
+var minMills = 3 * 60 * 60 * 1000
+var maxMills = 3.5 * 60 * 60 * 1000
 
 
 function * init() {
@@ -98,7 +98,7 @@ function * orderstatistic() {
 
         let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + 6;
 
-        let price = Math.round(Math.random()*80)+50
+        let price = Math.random()
         yield db.models.Orders.create({
             trade_no: trade_no,
             tenantId: "67117f7549025df34395e23893c7b18e",
@@ -137,9 +137,9 @@ function * addressSeed() {
 co(function *() {
     //yield init();
     // yield update();
-    
-    // yield orderstatistic();
-    yield deletestatistic()
+
+    yield orderstatistic();
+    // yield deletestatistic()
 
     console.log('finished ...');
     process.exit(0)

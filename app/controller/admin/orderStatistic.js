@@ -15,8 +15,8 @@ let orderStatistic = require('../statistics/orderStatistic')
 
 var start = new Date('2017-07-01 10:11:34').getTime()
 
-var minMills = 2 * 60 * 60 * 1000
-var maxMills = 2.5 * 60 * 60 * 1000
+var minMills = 3 * 60 * 60 * 1000
+var maxMills = 3.5 * 60 * 60 * 1000
 module.exports = {
     async getOrderStatistic (ctx, next) {
         ctx.checkBody('tenantId').notEmpty()
@@ -136,7 +136,16 @@ module.exports = {
         //     StringPhone = Math.floor(Math.random()*10)+StringPhone
         // }
         // let phone = subStringPhone+StringPhone
-        const days = generateDays(statisticsOrders.length)
+        let days = generateDays(statisticsOrders.length)
+        days = days.map(e => {
+            const hour = e.getHours()
+            if (hour <= 10) {
+                e.setHours(hour + 10)
+            }
+            console.log(e.toString())
+            return e
+        })
+
         for (let i = 0; i < statisticsOrders.length; i++) {
             //电话号码后面8位
 
@@ -147,7 +156,7 @@ module.exports = {
             //     let pos = Math.floor(Math.random()*phoneNum);
             //     test += lastphone[pos];
             // }
-            let totalPrice = 0
+            let totalPrice=0;
             let mer = 0
 
             // let subStringPhone = statisticsOrders[i].phone.substring(0,3);
@@ -156,6 +165,8 @@ module.exports = {
             if (statisticsOrders[i].totalPrice < 5) {//价格
                 totalPrice = Number((statisticsOrders[i].totalPrice * 100).toFixed(2))
                 mer = Number((statisticsOrders[i].merchantAmount * 100).toFixed(2))
+            }else{
+                totalPrice=statisticsOrders[i].totalPrice
             }
             let random = Math.ceil(Math.random() * 100)
             let couponFee = 0;
@@ -166,6 +177,11 @@ module.exports = {
             } else if ((totalPrice > 210) && (random < 60 && random > 0)) {
                 couponFee = 30
             }
+            console.log("-----------------------")
+            console.log(totalPrice)
+            console.log(random);
+            console.log(couponFee);
+            console.log("-----------------------")
             await StatisticsOrders.update({
                 trade_no: statisticsOrders[i].trade_no,
                 totalPrice: totalPrice,//(totalPrice==0?80:totalPrice);
@@ -176,8 +192,10 @@ module.exports = {
                 phone: phone,
                 // tenantId : body.tenantId,
                 // consigneeId : statisticsOrders[i].consigneeId,
-                createdTime: days[i],
-            },{})
+                createdAt: days[i],
+            },{where:{
+                trade_no:statisticsOrders[i].trade_no
+            }})
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, statisticsOrders)
