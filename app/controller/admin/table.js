@@ -48,6 +48,8 @@ module.exports = {
                         consigneeId: tables[i].consigneeId
                     }
                 })
+
+                console.log("consigneeId:" + tables[i].consigneeId)
                 consigneeName = consignee.name
             }
             result.push({
