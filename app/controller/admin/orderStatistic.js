@@ -142,7 +142,7 @@ module.exports = {
             if (hour <= 10) {
                 e.setHours(hour + 10)
             }
-            console.log(e.toString())
+            // console.log(e.toString())
             return e
         })
 
@@ -158,13 +158,17 @@ module.exports = {
             // }
             let totalPrice=0;
             let mer = 0
+            let pla = 0
 
             // let subStringPhone = statisticsOrders[i].phone.substring(0,3);
             // let phone = subStringPhone+test;
             let phone = getphone();//电话号码
+
             if (statisticsOrders[i].totalPrice < 5) {//价格
                 totalPrice = Number((statisticsOrders[i].totalPrice * 100).toFixed(2))
                 mer = Number((statisticsOrders[i].merchantAmount * 100).toFixed(2))
+                pla = Number((statisticsOrders[i].platformAmount * 100).toFixed(2))
+
             }else{
                 totalPrice=statisticsOrders[i].totalPrice
             }
@@ -177,17 +181,17 @@ module.exports = {
             } else if ((totalPrice > 210) && (random < 60 && random > 0)) {
                 couponFee = 30
             }
-            console.log("-----------------------")
-            console.log(totalPrice)
-            console.log(random);
-            console.log(couponFee);
-            console.log("-----------------------")
+            // console.log("-----------------------")
+            // console.log(totalPrice)
+            // console.log(random);
+            // console.log(couponFee);
+            // console.log("-----------------------")
             await StatisticsOrders.update({
                 trade_no: statisticsOrders[i].trade_no,
                 totalPrice: totalPrice,//(totalPrice==0?80:totalPrice);
                 merchantAmount: mer,//(mer==0?80:mer);
-
-                platfromCouponFee: couponFee / 2,
+                platformAmount: pla,
+                platformCouponFee: couponFee / 2,
                 merchantCouponFee: couponFee / 2,
                 phone: phone,
                 // tenantId : body.tenantId,
