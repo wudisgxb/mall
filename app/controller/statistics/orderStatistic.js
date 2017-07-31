@@ -571,9 +571,9 @@ const getstatistics = (function () {
             let consigneeAmount = await StatisticsOrders.sumField(tenantId, 'consigneeAmount', new Date(getTime[i].start), new Date(getTime[i].end))
             let time ;
             if(type==1){
-                let start = (i*3+1)
+                let start = (i*3)
                 let end = (i+1)*3
-                time =start+"-"+end
+                time =start+".30"+((end==24)?" ":("-"+end+".30"))
             }
             if(type==2){
                 let start =i+1
@@ -621,8 +621,6 @@ const getstatistics = (function () {
                     value :time
                 }
             })
-
-
         }
 
         console.log(result)

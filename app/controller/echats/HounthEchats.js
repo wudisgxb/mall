@@ -3,9 +3,16 @@ const getHounthEchats = (function () {
     let getHounth =  function (startTime,endTime) {
         //先得到起始时间的开始时间
         let startDay = new Date(startTime);
+        // let startTime = startDay.format("yyyy-MM-dd 00:30:00");
+        startDay.setHours(0,30,0)
+
+        // let start = new Date(startTime)
         let beginDate = startDay.getTime();
         //先得到起始时间的结束时间
         let endDate = new Date(endTime);
+        // let endTime = endDate.format("yyyy-MM-dd 00:30:00");
+        // let end = new Date(endTime)
+        endDate.setHours(0,30,0)
         let finish = endDate.getTime();
         let oneHounth = 60*60*1000
 
@@ -23,7 +30,6 @@ const getHounthEchats = (function () {
     let instance = {
         getHounth: getHounth
     }
-
     return instance;
 })();
 module.exports = getHounthEchats;
