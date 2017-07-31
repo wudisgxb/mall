@@ -137,11 +137,11 @@ module.exports ={
                 }
             })
             //根据consigneeId查询consigneeName
-            let consigneesName=await Consignees.findOne({
-                where:{
-                    consigneeId:consigneesId.consigneeId
-                }
-            })
+            // let consigneesName=await Consignees.findOne({
+            //     where:{
+            //         consigneeId:consigneesId.consigneeId
+            //     }
+            // })
             //根据创建时间和订单号查询所有记录
             orders = await Orders.findAll({
                 where: {
@@ -194,7 +194,7 @@ module.exports ={
             result[k].status = orders[0].status;
             result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[0].phone;
-            result[k].consigneeName = (consigneesName == null ? null : consigneesName.name);
+            result[k].consigneeName = consigneesId.consigneeId//(consigneesName == null ? null : consigneesName.name);
             result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
             //根据订单号找退款信息
             let tmp = await Orders.findAll({
