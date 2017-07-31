@@ -169,7 +169,9 @@ module.exports = {
                 mer = Number((statisticsOrders[i].merchantAmount * 100).toFixed(2))
                 pla = Number((statisticsOrders[i].platformAmount * 100).toFixed(2))
             }else{
-                totalPrice=statisticsOrders[i].totalPrice
+                totalPrice=statisticsOrders[i].totalPrice;
+                mer = statisticsOrders[i].merchantAmount;
+                pla = statisticsOrders[i].platformAmount;
             }
             let random = Math.ceil(Math.random() * 100)
             let couponFee = 0;
