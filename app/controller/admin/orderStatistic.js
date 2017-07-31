@@ -154,30 +154,30 @@ module.exports = {
             // let subStringPhone = statisticsOrders[i].phone.substring(0,3);
             // let phone = subStringPhone+test;
             let phone = phone();//电话号码
-            if(statisticsOrders[i].totalPrice<5){//价格
-                totalPrice=Number((statisticsOrders[i].totalPrice*100).toFixed(2))
-                mer = Number((statisticsOrders[i].merchantAmount*100).toFixed(2))
+            if (statisticsOrders[i].totalPrice < 5) {//价格
+                totalPrice = Number((statisticsOrders[i].totalPrice * 100).toFixed(2))
+                mer = Number((statisticsOrders[i].merchantAmount * 100).toFixed(2))
             }
-            let random = Math.ceil(Math.random()*100)
+            let random = Math.ceil(Math.random() * 100)
             let couponFee = 0;
-            if((totalPrice>80&&totalPrice<150)&&(random<60&&random>0)){
-                couponFee=10
-            }else if((totalPrice>150&&totalPrice<210)&&(random<60&&random>0)){
+            if ((totalPrice > 80 && totalPrice < 150) && (random < 60 && random > 0)) {
+                couponFee = 10
+            } else if ((totalPrice > 150 && totalPrice < 210) && (random < 60 && random > 0)) {
                 couponFee = 20
-            }else if((totalPrice>210)&&(random<60&&random>0)){
+            } else if ((totalPrice > 210) && (random < 60 && random > 0)) {
                 couponFee = 30
             }
             await statisticsOrders[i].update({
-                trade_no : statisticsOrders[i].trade_no,
-                totalPrice : totalPrice,//(totalPrice==0?80:totalPrice);
-                merchantAmount : mer,//(mer==0?80:mer);
+                trade_no: statisticsOrders[i].trade_no,
+                totalPrice: totalPrice,//(totalPrice==0?80:totalPrice);
+                merchantAmount: mer,//(mer==0?80:mer);
 
-                platfromCouponFee : couponFee/2,
-                merchantCouponFee : couponFee/2,
-                phone : phone,
+                platfromCouponFee: couponFee / 2,
+                merchantCouponFee: couponFee / 2,
+                phone: phone,
                 // tenantId : body.tenantId,
                 // consigneeId : statisticsOrders[i].consigneeId,
-                createdTime : days[i],
+                createdTime: days[i],
             })
         }
 
@@ -212,25 +212,25 @@ module.exports = {
         }
         let body = ctx.request.body;
         let orders = await Orders.findAll({
-            where:{
-                tenantId : body.tenantId
+            where: {
+                tenantId: body.tenantId
             }
         })
         let ArrayTrand_no = [];
-        for(let i = 0;i<orders.length;i++){
-            if(!ArrayTrand_no.contains(orders[i].trade_no)){
+        for (let i = 0; i < orders.length; i++) {
+            if (!ArrayTrand_no.contains(orders[i].trade_no)) {
                 ArrayTrand_no.push(orders[i].trade_no)
             }
         }
-        for(let j = 0;j<ArrayTrand_no.length;j++){
+        for (let j = 0; j < ArrayTrand_no.length; j++) {
             let order = await Orders.findOne({
-                where:{
-                    trade_no:ArrayTrand_no[j],
-                    status:2
+                where: {
+                    trade_no: ArrayTrand_no[j],
+                    status: 2
                 },
                 paranoid: false
             })
-            let retJson = await amountManager.getTransAccountAmount( body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, order.refund_amount);
+            let retJson = await amountManager.getTransAccountAmount(body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, order.refund_amount);
             // let profitSharings = await ProfitSharings.findOne({
             //     where:{
             //         tenantId : order.tenantId,
@@ -238,24 +238,24 @@ module.exports = {
             //     }
             // })
             let orderstastistic = await StatisticsOrders.findOne({
-                where:{
-                    trade_no:ArrayTrand_no[j]
+                where: {
+                    trade_no: ArrayTrand_no[j]
                 }
             })
 
-            if(orderstastistic==null){
+            if (orderstastistic == null) {
                 await StatisticsOrders.create({
-                    trade_no:ArrayTrand_no[j],
-                    totalPrice:retJson.totalPrice,
-                    tenantId : body.tenantId,
-                    merchantAmount : retJson.merchantAmount,
-                    consigneeAmount : retJson.consigneeAmount,
-                    platformAmount : retJson.platformAmount,
-                    deliveryFee : retJson.deliveryFee,
-                    refund_amount : retJson.refund_amount,
-                    platfromCouponFee : retJson.platformCouponFee,
-                    merchantCouponFee : retJson.merchantCouponFee,
-                    phone :order.phone
+                    trade_no: ArrayTrand_no[j],
+                    totalPrice: retJson.totalPrice,
+                    tenantId: body.tenantId,
+                    merchantAmount: retJson.merchantAmount,
+                    consigneeAmount: retJson.consigneeAmount,
+                    platformAmount: retJson.platformAmount,
+                    deliveryFee: retJson.deliveryFee,
+                    refund_amount: retJson.refund_amount,
+                    platfromCouponFee: retJson.platformCouponFee,
+                    merchantCouponFee: retJson.merchantCouponFee,
+                    phone: order.phone
                 })
             }
         }
@@ -264,28 +264,28 @@ module.exports = {
 
 }
 function phone() {
-    let last = ["0","1","2","3","4","5","6","7","8","9"]
-    let second = ["3","4","5","8"]
-    let third=["0","1","2","3","4","5","6","7","8","9"]
-    let secondisEight = ["2","6","7","8","9"]
-    let secondisfire = ["5","7"]
-    let secondPhone = second[Math.ceil(Math.random()*3)];
+    let last = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    let second = ["3", "4", "5", "8"]
+    let third = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    let secondisEight = ["2", "6", "7", "8", "9"]
+    let secondisfire = ["5", "7"]
+    let secondPhone = second[Math.ceil(Math.random() * 3)];
     let thirdPhone;
-    if(secondPhone=="3"||secondPhone=="5"){
-        thirdPhone = third[Math.ceil(Math.random()*9)];
+    if (secondPhone == "3" || secondPhone == "5") {
+        thirdPhone = third[Math.ceil(Math.random() * 9)];
     }
-    if(secondPhone=="8"){
-        thirdPhone = secondisEight[Math.ceil(Math.random()*4)];
+    if (secondPhone == "8") {
+        thirdPhone = secondisEight[Math.ceil(Math.random() * 4)];
     }
-    if(secondPhone=="4"){
-        thirdPhone = secondisfire[Math.ceil(Math.random()*1)];
+    if (secondPhone == "4") {
+        thirdPhone = secondisfire[Math.ceil(Math.random() * 1)];
     }
-    let lastPhone=0;
-    for(let i = 0;i<7;i++){
-        lastPhone += last[Math.ceil(Math.random()*9)];
+    let lastPhone = 0;
+    for (let i = 0; i < 7; i++) {
+        lastPhone += last[Math.ceil(Math.random() * 9)];
     }
 
-    let phone = 1+""+secondPhone+thirdPhone+""+lastPhone
+    let phone = 1 + "" + secondPhone + thirdPhone + "" + lastPhone
     return phone;
 }
 
