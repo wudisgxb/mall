@@ -225,8 +225,10 @@ module.exports = {
         for(let j = 0;j<ArrayTrand_no.length;j++){
             let order = await Orders.findOne({
                 where:{
-                    trade_no:ArrayTrand_no[j]
-                }
+                    trade_no:ArrayTrand_no[j],
+                    status:2
+                },
+                paranoid: false
             })
             let retJson = await amountManager.getTransAccountAmount( body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, order.refund_amount);
             // let profitSharings = await ProfitSharings.findOne({
