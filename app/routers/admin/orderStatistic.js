@@ -7,6 +7,9 @@ const router = new (require('koa-router'))()
 router.post('/api/test/admin/orderStatistic', orderStatistic.getOrderStatistic);
  router.post('/api/test/admin/ordersStatistic', orderStatistic.saveOrderStatistic);
 router.get('/api/test/admin/ordersStatistic',orderStatistic.getAllOrderStatistic);
-router.put('/api/test/admin/ordersStatistic',orderStatistic.putOrderStatistic)
+router.put('/api/test/admin/ordersStatistic',orderStatistic.putOrderStatistic);
+
+//开发临时测试，把订单状态2，deletedAt置null
+router.post('/api/test/admin/orderStatus',orderStatistic.status2Mdf);
 
 module.exports = router
