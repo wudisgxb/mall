@@ -178,7 +178,7 @@ module.exports = {
                 // tenantId : body.tenantId,
                 // consigneeId : statisticsOrders[i].consigneeId,
                 createdTime: days[i],
-            })
+            },{})
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, statisticsOrders)
