@@ -2,11 +2,13 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/statisticsMySql/index');
-let Order = db.models.Orders
+// let Order = db.models.Orders
 let dbv3 = require('../../db/Mysql/index')
+let Orders = dbv3.models.Orders
+let ProfitSharings = dbv3.models.ProfitSharings
 let StatisticsOrders = db.models.Orders;
 let getMonthEchats = require('../echats/MonthEchats')
-
+let amountManager = require('../amount/amountManager')
 let orderStatistic = require('../statistics/orderStatistic')
 
 var start = new Date('2017-07-01 10:11:34').getTime()
@@ -138,45 +140,135 @@ module.exports = {
         const days = generateDays(statisticsOrders.length)
         for (let i =0; i<statisticsOrders.length;i++){
             //电话号码后面8位
-            let lastphone = ['0','1','2','3','4','5','6','7','8','9']
-            let phoneNum = 8
+            // let lastphone = ['0','1','2','3','4','5','6','7','8','9']
+            // let phoneNum = 8
             let test = "";
-            for(let j=0;j<phoneNum;j++){
-                let pos = Math.floor(Math.random()*phoneNum);
-                test += lastphone[pos];
-            }
+            // for(let j=0;j<phoneNum;j++){
+            //     let pos = Math.floor(Math.random()*phoneNum);
+            //     test += lastphone[pos];
+            // }
             let totalPrice = 0
             let mer = 0
 
-            let subStringPhone = statisticsOrders[i].phone.substring(0,3);
-            let phone = subStringPhone+test;
-
-            if(statisticsOrders[i].totalPrice<5){
+            // let subStringPhone = statisticsOrders[i].phone.substring(0,3);
+            // let phone = subStringPhone+test;
+            let phone = phone();//电话号码
+            if(statisticsOrders[i].totalPrice<5){//价格
                 totalPrice=Number((statisticsOrders[i].totalPrice*100).toFixed(2))
                 mer = Number((statisticsOrders[i].merchantAmount*100).toFixed(2))
             }
-            statisticsOrders[i].trade_no = statisticsOrders[i].trade_no;
-            statisticsOrders[i].totalPrice=(totalPrice==0?80:totalPrice);
-            statisticsOrders[i].merchantAmount=(mer==0?80:mer);
-            statisticsOrders[i].consigneeAmount = statisticsOrders[i].consigneeAmount;
-            statisticsOrders[i].platformAmount = statisticsOrders[i].platformAmount;
-            statisticsOrders[i].deliveryFee = statisticsOrders[i].deliveryFee;
-            statisticsOrders[i].refund_amount = statisticsOrders[i].refund_amount;
-            statisticsOrders[i].platfromCouponFee = statisticsOrders[i].platfromCouponFee;
-            statisticsOrders[i].merchantCouponFee = statisticsOrders[i].merchantCouponFee;
-            statisticsOrders[i].phone = phone;
-            statisticsOrders[i].tenantId = body.tenantId
-            statisticsOrders[i].consigneeId = statisticsOrders[i].consigneeId
-            // statisticsOrders[i].createdTime = days[i]
-            await statisticsOrders[i].save();
+            let random = Math.ceil(Math.random()*100)
+            let couponFee = 0;
+            if((totalPrice>80&&totalPrice<150)&&(random<60&&random>0)){
+                couponFee=10
+            }else if((totalPrice>150&&totalPrice<210)&&(random<60&&random>0)){
+                couponFee = 20
+            }else if((totalPrice>210)&&(random<60&&random>0)){
+                couponFee = 30
+            }
+            await statisticsOrders[i].update({
+                trade_no : statisticsOrders[i].trade_no,
+                totalPrice : totalPrice,//(totalPrice==0?80:totalPrice);
+                merchantAmount : mer,//(mer==0?80:mer);
+
+                platfromCouponFee : couponFee/2,
+                merchantCouponFee : couponFee/2,
+                phone : phone,
+                // tenantId : body.tenantId,
+                // consigneeId : statisticsOrders[i].consigneeId,
+                createdTime : days[i],
+            })
+
+            // await statisticsOrders[i].save();
         }
 
         ctx.body =  new ApiResult(ApiResult.Result.SUCCESS,statisticsOrders)
 
     },
 
-}
+    async updateOrder(ctx, next){
+        ctx.checkBody('tenantId').notEmpty();
+        // ctx.checkBody('phone').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+            return;
+        }
+        let body = ctx.request.body;
+        let orders = await Orders.findAll({
+            where:{
+                tenantId : body.tenantId
+            }
+        })
+        let ArrayTrand_no = [];
+        for(let i = 0;i<orders.length;i++){
+            if(!ArrayTrand_no.contains(orders[i].trade_no)){
+                ArrayTrand_no.push(orders[i].trade_no)
+            }
+        }
+        for(let j = 0;j<ArrayTrand_no.length;j++){
+            let order = await Orders.findOne({
+                where:{
+                    trade_no:ArrayTrand_no[j]
+                }
+            })
+            let retJson = await amountManager.getTransAccountAmount( body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, order.refund_amount);
+            // let profitSharings = await ProfitSharings.findOne({
+            //     where:{
+            //         tenantId : order.tenantId,
+            //         consigneeId : order.consigneeId,
+            //     }
+            // })
+            let orderstastistic = await StatisticsOrders.findOne({
+                where:{
+                    trade_no:ArrayTrand_no[j]
+                }
+            })
 
+            if(orderstastistic==null){
+                await StatisticsOrders.create({
+                    trade_no:ArrayTrand_no[j],
+                    totalPrice:retJson.totalPrice,
+                    tenantId : body.tenantId,
+                    merchantAmount : retJson.merchantAmount,
+                    consigneeAmount : retJson.consigneeAmount,
+                    platformAmount : retJson.platformAmount,
+                    deliveryFee : retJson.deliveryFee,
+                    refund_amount : retJson.refund_amount,
+                    platfromCouponFee : retJson.platformCouponFee,
+                    merchantCouponFee : retJson.merchantCouponFee,
+                    phone : retJson.phone
+                })
+            }
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    }
+
+}
+function phone() {
+    let last = ["0","1","2","3","4","5","6","7","8","9"]
+    let second = ["3","4","5","8"]
+    let third=["0","1","2","3","4","5","6","7","8","9"]
+    let secondisEight = ["2","6","7","8","9"]
+    let secondisfire = ["5","7"]
+    let secondPhone = second[Math.ceil(Math.random()*3)];
+    let thirdPhone;
+    if(secondPhone=="3"||secondPhone=="5"){
+        thirdPhone = third[Math.ceil(Math.random()*9)];
+    }
+    if(secondPhone=="8"){
+        thirdPhone = secondisEight[Math.ceil(Math.random()*4)];
+    }
+    if(secondPhone=="4"){
+        thirdPhone = secondisfire[Math.ceil(Math.random()*1)];
+    }
+    let lastPhone=0;
+    for(let i = 0;i<7;i++){
+        lastPhone += last[Math.ceil(Math.random()*9)];
+    }
+
+    let phone = 1+""+secondPhone+thirdPhone+""+lastPhone
+    return phone;
+}
 
 function generateDays(length) {
     return generateMills(length).map(e => new Date(e+start))

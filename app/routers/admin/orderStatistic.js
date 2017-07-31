@@ -8,5 +8,6 @@ router.post('/api/test/admin/orderStatistic', orderStatistic.getOrderStatistic);
  router.post('/api/test/admin/ordersStatistic', orderStatistic.saveOrderStatistic);
 router.get('/api/test/admin/ordersStatistic',orderStatistic.getAllOrderStatistic);
 router.put('/api/test/admin/ordersStatistic',orderStatistic.putOrderStatistic)
+router.put('/api/test/admin/orders/ordersStatistic',orderStatistic.updateOrder)
 
 module.exports = router
