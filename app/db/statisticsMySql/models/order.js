@@ -35,7 +35,7 @@ module.exports = function (sequelize, DataTypes) {
                 })
                 let result = []
                 for (const order of allOrders) {
-                    const createTime = new Date(order.createTime)
+                    const createTime = new Date(order.createdAt)
                     if (startDate.getTime() < createTime.getTime() && createTime.getTime() < endDate.getTime()) {
                         result.push(order)
                     }
