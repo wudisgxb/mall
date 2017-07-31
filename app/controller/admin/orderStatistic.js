@@ -168,7 +168,6 @@ module.exports = {
                 totalPrice = Number((statisticsOrders[i].totalPrice * 100).toFixed(2))
                 mer = Number((statisticsOrders[i].merchantAmount * 100).toFixed(2))
                 pla = Number((statisticsOrders[i].platformAmount * 100).toFixed(2))
-
             }else{
                 totalPrice=statisticsOrders[i].totalPrice
             }
@@ -189,7 +188,7 @@ module.exports = {
             await StatisticsOrders.update({
                 trade_no: statisticsOrders[i].trade_no,
                 totalPrice: totalPrice,//(totalPrice==0?80:totalPrice);
-                merchantAmount: mer,//(mer==0?80:mer);
+                merchantAmount: mer-couponFee,//(mer==0?80:mer);
                 platformAmount: pla,
                 platformCouponFee: couponFee / 2,
                 merchantCouponFee: couponFee / 2,
