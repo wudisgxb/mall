@@ -42,8 +42,8 @@ module.exports = function (sequelize, DataTypes) {
                 }
                 return result
             },
-            sumField: async function (tenantId, field, startDate, endDate) {
-                const orders = await Orders.getBetweenDateByTenantId(tenantId, startDate, endDate)
+            sumField:  function (orders, field) {
+               // const orders = await Orders.getBetweenDateByTenantId(tenantId, startDate, endDate)
                 let result = 0
                 for (const order of orders) {
                     result += Number(order[field])
