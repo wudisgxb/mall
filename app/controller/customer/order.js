@@ -786,22 +786,7 @@ module.exports = {
             totalVipPrice += food.vipPrice * orders[i].num;//会员价
         }
 
-        //判断vip
-        if (orders[0].phone != null) {
-            var vips = await Vips.findAll({
-                where: {
-                    phone: orders[0].phone,
-                    tenantId: orders[0].tenantId
-                }
-            })
-            if (vips.length > 0) {
-                total_amount = Math.round(totalVipPrice * 100) / 100
-            } else {
-                total_amount = Math.round(totalPrice * 100) / 100;
-            }
-        } else {
-            total_amount = Math.round(totalPrice * 100) / 100;
-        }
+        total_amount = totalPrice;
 
         //通过订单号获取优惠券
         let coupon = await Coupons.findOne({
@@ -829,7 +814,21 @@ module.exports = {
                 default:
                     total_amount = total_amount;
             }
+        } else {
+            //判断vip
+            var vips = await Vips.findAll({
+                where: {
+                    phone: orders[0].phone,
+                    tenantId: orders[0].tenantId
+                }
+            })
+            if (vips.length > 0) {
+                total_amount = Math.round(totalVipPrice * 100) / 100
+            } else {
+                total_amount = Math.round(totalPrice * 100) / 100;
+            }
         }
+
 
         //查询配送费
         let deliveryFee = await DeliveryFees.findOne({
