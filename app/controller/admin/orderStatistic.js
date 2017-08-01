@@ -40,25 +40,25 @@ module.exports = {
         //     })
         // }
 
-        let coupons = await Coupons.findAll({
+        let vips = await Vips.findAll({
             where:{
                 tenantId : body.tenantId,
             }
         })
        
-        for (var i = 0; i < coupons.length; i++) {
+        for (var i = 0; i < vips.length; i++) {
             let order = await StatisticsOrders.findOne({
                 where:{
-                    phone : coupons[i].phone
+                    phone : vips[i].phone
                 }
             })
-            var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+            // var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
             await Coupons.update({
-                couponKey : couponKey,
+                // couponKey : couponKey,
                 // couponRate : 1,
                 // couponType : "金额",
                 // value : (Number(ordersCoupons[i].merchantCouponFee))+(Number(ordersCoupons[i].platformCouponFee)),
-                status : 1,
+                // status : 1,
                 // phone : ordersCoupons[i].phone,
                 // trade_no : ordersCoupons[i].trade_no,
                 // isTest : true,
