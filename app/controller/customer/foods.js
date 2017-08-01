@@ -221,14 +221,14 @@ module.exports = {
                         return rating
                     })
                 })
-
+                foodArray[j].rest=(food[0].foodNum-food[0].todaySales)>0?(food[0].foodNum-food[0].todaySales):0;
                 foodArray.push(food[0]);
             }
 
             resultArray[i] = {};
             resultArray[i].id = menus[i].id;
 
-            resultArray[i].rest=(food[0].foodNum-food[0].todaySales)>0?(food[0].foodNum-food[0].todaySales):0;
+
 
             // resultArray[i].rest=(food[i].foodNum-food[i].todaySales)>0?(food[i].foodNum-food[i].todaySales):0;
 
