@@ -35,6 +35,7 @@ module.exports = {
             result.vipFee = tenantInfo.vipFee;
             result.vipRemindFee = tenantInfo.vipRemindFee;
             result.homeImage = tenantInfo.homeImage;
+            result.isRealTime = tenantInfo.isRealTime;
             result.longitude  = tenantInfo.longitude ;
             result.latitude = tenantInfo.latitude;
             result.needChoosePeopleNumberPage = tenantInfo.needChoosePeopleNumberPage;
