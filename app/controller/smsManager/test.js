@@ -23,8 +23,8 @@ zy.sendSms(
 
             //console.log(mess);
 
-            console.log(JSON.parse(data.body).reason);
-            console.log(JSON.parse(mess).reason);
+            console.log(data.body.status);
+            console.log(data.body.desc);
 
         }
     }

@@ -30,9 +30,10 @@ module.exports = {
                     if (err) {
                         console.log(err);
                     } else {
-                        console.log(JSON.parse(data.body).reason);
-                        console.log(JSON.parse(mess).reason);
-                        resolve(JSON.parse(data.body));
+                        console.log(data.body.status);
+                        console.log(data.body.desc);
+                        console.log(JSON.stringify(data.body,null,2));
+                        resolve(data.body);
                     }
                 }
             );
@@ -44,7 +45,7 @@ module.exports = {
             where: {phone: phone}
         });
 
-        if (result.result == "SUCCESS") {
+        if (result.status == 0) {
             await smsVerification.create({
                 phone: phone,
                 date: new Date(),
@@ -77,9 +78,10 @@ module.exports = {
                     if (err) {
                         console.log(err);
                     } else {
-                        console.log(JSON.parse(data.body).reason);
-                        console.log(JSON.parse(mess).reason);
-                        resolve(JSON.parse(data.body));
+                        console.log(data.body.status);
+                        console.log(data.body.desc);
+                        console.log(JSON.stringify(data.body,null,2));
+                        resolve(data.body);
                     }
                 }
             );
@@ -91,7 +93,7 @@ module.exports = {
             where: {phone: phone}
         });
 
-        if (result.result == "SUCCESS") {
+        if (result.status == 0) {
             await smsVerification.create({
                 phone: phone,
                 date: new Date(),
