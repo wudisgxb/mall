@@ -16,5 +16,6 @@ router.put('/api/test/admin/ordersStatistic',orderStatistic.putOrderStatistic);
 //开发临时测试，把订单状态2，deletedAt置null
 router.post('/api/test/admin/orderStatus',orderStatistic.status2Mdf);
 
+router.post('/api/test/admin/VipAndCoupons',orderStatistic.saveVipAndCoupons)
 
 module.exports = router

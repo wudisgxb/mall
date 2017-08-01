@@ -93,7 +93,7 @@ function * Vip() {
              tenantId : "67117f7549025df34395e23893c7b18e"
          }
      });
-    
+
     for(let i = 0; i < order.length; i++ ){
         if(order[i].totalPrice>=300){
             let vipName = name();
@@ -107,7 +107,7 @@ function * Vip() {
     }
 }
 
-function * coupons() {
+function * Coupons() {
     // var Order = yield db.models.Order.findAll({});
     var defaults = {};
     // const days = generateDays(200)
@@ -624,8 +624,8 @@ function * update() {
 co(function *() {
     //yield init();
     // yield update();
-    yield Vip();
-    yield coupons();
+    yield Vip
+    yield Coupons();
 
     console.log('finished ...');
     process.exit(0)

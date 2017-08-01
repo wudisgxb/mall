@@ -9,6 +9,8 @@ let db1 = require('../../db/mysql/index');
 let Orders = db1.models.Orders
 // let ProfitSharings = db1.models.ProfitSharings
 let StatisticsOrders = db.models.Orders;
+let Coupons = db1.models.Coupons;
+let Vips = db1.models.Vips;
 let getMonthEchats = require('../echats/MonthEchats')
 let amountManager = require('../amount/amountManager')
 let orderStatistic = require('../statistics/orderStatistic')
@@ -18,6 +20,64 @@ var start = new Date('2017-07-01 10:11:34').getTime()
 var minMills = 3 * 60 * 60 * 1000
 var maxMills = 3.5 * 60 * 60 * 1000
 module.exports = {
+    async saveVipAndCoupons(ctx,next){
+        ctx.checkBody('tenantId').notEmpty();
+        let body = ctx.request.body
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+            return;
+        }
+
+        let vipOrder = await StatisticsOrders.findAll({
+            where:{
+                tenantId : body.tenantId,
+                totalPrice :{
+                    $gt:300
+                }
+            }
+        })
+        console.log("22222")
+        for(let j = 0; j < vipOrder.length; j++ ){
+            let vipName = name();
+            await Vips.create({
+                phone : vipOrder[i].phone,
+                vipLevel : 1 ,
+                vipName : vipName,
+                tenantId:body.tenantId,
+                isTest :true
+            })
+        }
+        console.log("33333")
+        let ordersCoupons = await StatisticsOrders.findAll({
+            where:{
+                tenantId : body.tenantId,
+                merchantCouponFee : {
+                    $gt:1
+                },
+                platformCouponFee:{
+                    $gt:1
+                }
+            }
+
+        })
+        console.log("44444")
+        for (var i = 0; i < ordersCoupons.length; i++) {
+            await Coupons.create({
+                couponKey : "testkey"+(i+100),
+                tenantId : body.tenantId,
+                consigneeId : ordersCoupons[i].consigneeId,
+                couponType : "金额",
+                value : ordersCoupons[i].merchantCouponFee+ordersCoupons[i].platfromCouponFee,
+                status : 2,
+                phone : ordersCoupons[i].phone,
+                trade_no : ordersCoupons[i].trade_no,
+                isTest : true
+            })
+        }
+        console.log("55555")
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    },
+
     async getOrderStatistic (ctx, next) {
         ctx.checkBody('tenantId').notEmpty()
         ctx.checkBody('startTime').notEmpty()
@@ -236,23 +296,38 @@ module.exports = {
         let orders = await Orders.findAll({
             where:{
                 tenantId : body.tenantId,
-                status:2
             }
         })
-        let ArrayTrand_no = [];
-        for (let i = 0; i < orders.length; i++) {
-            if (!ArrayTrand_no.contains(orders[i].trade_no)) {
-                ArrayTrand_no.push(orders[i].trade_no)
+        // let ArrayTrand_no = [];
+        // for (let i = 0; i < orders.length; i++) {
+        //     if (!ArrayTrand_no.contains(orders[i].trade_no)) {
+        //         ArrayTrand_no.push(orders[i].trade_no)
+        //     }
+        // }
+        let days =generateDays(orders.length);
+        days = days.map(e => {
+            const hour = e.getHours()
+            if (hour <= 10) {
+                e.setHours(hour + 10)
             }
-        }
-        for (let j = 0; j < ArrayTrand_no.length; j++) {
-            let order = await Orders.findOne({
-                where:{
-                    trade_no:ArrayTrand_no[j],
-                    status:2
+            // console.log(e.toString())
+            return e
+        })
+        for (let j = 0; j < orders.length; j++) {
+            await Orders.Update({
+                createdAt:days[j]
+            },{
+                where : {
+                    tenantId : body.tenantId
                 }
             })
-            let retJson = await amountManager.getTransAccountAmount( body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, 0);
+            // let order = await Orders.findOne({
+            //     where:{
+            //         trade_no:ArrayTrand_no[j],
+            //         status:2
+            //     }
+            // })
+            // let retJson = await amountManager.getTransAccountAmount( body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, 0);
 
 
 
@@ -262,33 +337,29 @@ module.exports = {
             //         consigneeId : order.consigneeId,
             //     }
             // })
-            let orderstastistic = await StatisticsOrders.findOne({
-                where: {
-                    trade_no: ArrayTrand_no[j]
-                }
-            })
+            // let orderstastistic = await StatisticsOrders.findOne({
+            //     where: {
+            //         trade_no: ArrayTrand_no[j]
+            //     }
+            // })
 
-            if (orderstastistic == null) {
-                await StatisticsOrders.create({
 
-                    trade_no : ArrayTrand_no[j],
-                    totalPrice : retJson.totalPrice,
-                    tenantId : body.tenantId,
-                    merchantAmount : retJson.merchantAmount,
-                    consigneeAmount : retJson.consigneeAmount,
-                    platformAmount : retJson.platformAmount,
-                    deliveryFee : retJson.deliveryFee,
-                    refund_amount : retJson.refund_amount,
-                    platfromCouponFee : retJson.platformCouponFee,
-                    merchantCouponFee : retJson.merchantCouponFee,
-                    phone : order.phone
 
-                })
-            }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
 
+}
+
+function name() {
+    let randomName = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+    let nameLength = Math.ceil(Math.random()*10)
+    let names;
+    for(let i = 0; i<nameLength.length;i++){
+        let name = randomName[Math.ceil(Math.random()*(randomName.length-1))];
+        names=names+name
+    }
+    return names
 }
 function getphone() {
     let last = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
