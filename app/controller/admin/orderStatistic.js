@@ -172,96 +172,113 @@ module.exports = {
     },
 
     async putOrderStatistic(ctx, next){
+        // ctx.checkBody('tenantId').notEmpty();
+        // // ctx.checkBody('phone').notEmpty();
+        // if (ctx.errors) {
+        //     ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+        //     return;
+        // }
+        // let body = ctx.request.body;
+        // let statisticsOrders = await StatisticsOrders.findAll({
+        //     where: {
+        //         tenantId: body.tenantId
+        //     }
+        // })
+        //
+        // if (statisticsOrders.length == 0) {
+        //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没找到数据")
+        //     return;
+        // }
+        //
+        //
+        // // for(let j = 0;j<=8;j++){
+        // //     StringPhone = Math.floor(Math.random()*10)+StringPhone
+        // // }
+        // // let phone = subStringPhone+StringPhone
+        // let days = generateDays(statisticsOrders.length)
+        // days = days.map(e => {
+        //     const hour = e.getHours()
+        //     if (hour <= 10) {
+        //         e.setHours(hour + 10)
+        //     }
+        //     // console.log(e.toString())
+        //     return e
+        // })
+        //
+        // for (let i = 0; i < statisticsOrders.length; i++) {
+        //     //电话号码后面8位
+        //
+        //     // let lastphone = ['0','1','2','3','4','5','6','7','8','9']
+        //     // let phoneNum = 8
+        //     let test = "";
+        //     // for(let j=0;j<phoneNum;j++){
+        //     //     let pos = Math.floor(Math.random()*phoneNum);
+        //     //     test += lastphone[pos];
+        //     // }
+        //     let totalPrice=0;
+        //     let mer = 0
+        //     let pla = 0
+        //
+        //     // let subStringPhone = statisticsOrders[i].phone.substring(0,3);
+        //     // let phone = subStringPhone+test;
+        //     let phone = getphone();//电话号码
+        //
+        //     if (statisticsOrders[i].totalPrice < 5) {//价格
+        //         totalPrice = Number((statisticsOrders[i].totalPrice * 100).toFixed(2))
+        //         mer = Number((statisticsOrders[i].merchantAmount * 100).toFixed(2))
+        //         pla = Number((statisticsOrders[i].platformAmount * 100).toFixed(2))
+        //     }else{
+        //         totalPrice=statisticsOrders[i].totalPrice;
+        //         mer = statisticsOrders[i].merchantAmount;
+        //         pla = statisticsOrders[i].platformAmount;
+        //     }
+        //     let random = Math.ceil(Math.random() * 100)
+        //     let couponFee = 0;
+        //     if ((totalPrice > 80 && totalPrice < 150) && (random < 60 && random > 0)) {
+        //         couponFee = 10
+        //     } else if ((totalPrice > 150 && totalPrice < 210) && (random < 60 && random > 0)) {
+        //         couponFee = 20
+        //     } else if ((totalPrice > 210) && (random < 60 && random > 0)) {
+        //         couponFee = 30
+        //     }
+        //     // console.log("-----------------------")
+        //     // console.log(totalPrice)
+        //     // console.log(random);
+        //     // console.log(couponFee);
+        //     // console.log("-----------------------")
+        //     await StatisticsOrders.update({
+        //         trade_no: statisticsOrders[i].trade_no,
+        //         totalPrice: totalPrice,//(totalPrice==0?80:totalPrice);
+        //         merchantAmount: mer-pla,//(mer==0?80:mer);
+        //         platformAmount: pla,
+        //         platformCouponFee: couponFee / 2,
+        //         merchantCouponFee: couponFee / 2,
+        //         phone: phone,
+        //         // tenantId : body.tenantId,
+        //         // consigneeId : statisticsOrders[i].consigneeId,
+        //         createdAt: days[i],
+        //     },{where:{
+        //         trade_no:statisticsOrders[i].trade_no
+        //     }})
+        // }
         ctx.checkBody('tenantId').notEmpty();
-        // ctx.checkBody('phone').notEmpty();
+        let body = ctx.request.body
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
-        let body = ctx.request.body;
-        let statisticsOrders = await StatisticsOrders.findAll({
-            where: {
-                tenantId: body.tenantId
-            }
-        })
 
-        if (statisticsOrders.length == 0) {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没找到数据")
-            return;
+        let vipOrder = await StatisticsOrders.getTotalPriceByTenantId(body.tenantId)
+        for(let j = 0; j < vipOrder.length; j++ ){
+            let vipName = name();
+            await Vips.create({
+                phone : vipOrder[j].phone,
+                vipLevel : 1 ,
+                vipName : 111,
+                tenantId:body.tenantId,
+                isTest :true
+            })
         }
-
-
-        // for(let j = 0;j<=8;j++){
-        //     StringPhone = Math.floor(Math.random()*10)+StringPhone
-        // }
-        // let phone = subStringPhone+StringPhone
-        let days = generateDays(statisticsOrders.length)
-        days = days.map(e => {
-            const hour = e.getHours()
-            if (hour <= 10) {
-                e.setHours(hour + 10)
-            }
-            // console.log(e.toString())
-            return e
-        })
-
-        for (let i = 0; i < statisticsOrders.length; i++) {
-            //电话号码后面8位
-
-            // let lastphone = ['0','1','2','3','4','5','6','7','8','9']
-            // let phoneNum = 8
-            let test = "";
-            // for(let j=0;j<phoneNum;j++){
-            //     let pos = Math.floor(Math.random()*phoneNum);
-            //     test += lastphone[pos];
-            // }
-            let totalPrice=0;
-            let mer = 0
-            let pla = 0
-
-            // let subStringPhone = statisticsOrders[i].phone.substring(0,3);
-            // let phone = subStringPhone+test;
-            let phone = getphone();//电话号码
-
-            if (statisticsOrders[i].totalPrice < 5) {//价格
-                totalPrice = Number((statisticsOrders[i].totalPrice * 100).toFixed(2))
-                mer = Number((statisticsOrders[i].merchantAmount * 100).toFixed(2))
-                pla = Number((statisticsOrders[i].platformAmount * 100).toFixed(2))
-            }else{
-                totalPrice=statisticsOrders[i].totalPrice;
-                mer = statisticsOrders[i].merchantAmount;
-                pla = statisticsOrders[i].platformAmount;
-            }
-            let random = Math.ceil(Math.random() * 100)
-            let couponFee = 0;
-            if ((totalPrice > 80 && totalPrice < 150) && (random < 60 && random > 0)) {
-                couponFee = 10
-            } else if ((totalPrice > 150 && totalPrice < 210) && (random < 60 && random > 0)) {
-                couponFee = 20
-            } else if ((totalPrice > 210) && (random < 60 && random > 0)) {
-                couponFee = 30
-            }
-            // console.log("-----------------------")
-            // console.log(totalPrice)
-            // console.log(random);
-            // console.log(couponFee);
-            // console.log("-----------------------")
-            await StatisticsOrders.update({
-                trade_no: statisticsOrders[i].trade_no,
-                totalPrice: totalPrice,//(totalPrice==0?80:totalPrice);
-                merchantAmount: mer-pla,//(mer==0?80:mer);
-                platformAmount: pla,
-                platformCouponFee: couponFee / 2,
-                merchantCouponFee: couponFee / 2,
-                phone: phone,
-                // tenantId : body.tenantId,
-                // consigneeId : statisticsOrders[i].consigneeId,
-                createdAt: days[i],
-            },{where:{
-                trade_no:statisticsOrders[i].trade_no
-            }})
-        }
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, statisticsOrders)
 
     },
