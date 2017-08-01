@@ -27,6 +27,24 @@ module.exports = function (sequelize, DataTypes) {
             
         },
         classMethods: {
+            getTotalPriceByTenantId: async function (tenantId) {
+                const allOrders = await Orders.findAll({
+                    where: {
+                        tenantId: tenantId
+                    }
+                })
+
+                let result = []
+                for (const order of allOrders) {
+
+                    const totalPrice = Number(order.totalPrice)
+                    if (totalPrice>10) {
+                        result.push(order)
+                    }
+                }
+
+                return result
+            },
             getBetweenDateByTenantId: async function (tenantId, startDate, endDate) {
                 const allOrders = await Orders.findAll({
                     where: {
@@ -37,6 +55,7 @@ module.exports = function (sequelize, DataTypes) {
                 for (const order of allOrders) {
                     const createTime = new Date(order.createdAt)
                     if (startDate.getTime() < createTime.getTime() && createTime.getTime() < endDate.getTime()) {
+
                         result.push(order)
                     }
                 }
@@ -52,6 +71,7 @@ module.exports = function (sequelize, DataTypes) {
             }
         }
     });
+
     return Orders;
 };
 
