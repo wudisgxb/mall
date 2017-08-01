@@ -103,12 +103,10 @@ module.exports = {
     },
     async deleteQRCodeTemplate(ctx, next){
         ctx.checkQuery('QRCodeTemplateId').notEmpty();
-
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
-
         let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
                 QRCodeTemplateId: ctx.query.QRCodeTemplateId,
