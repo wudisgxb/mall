@@ -17,8 +17,8 @@ let orderStatistic = require('../statistics/orderStatistic')
 
 var start = new Date('2017-07-01 10:11:34').getTime()
 
-var minMills = 1 * 60 * 60 * 1000
-var maxMills = 1.5 * 60 * 60 * 1000
+var minMills = 3 * 60 * 60 * 1000
+var maxMills = 3.5 * 60 * 60 * 1000
 module.exports = {
     async saveVipAndCoupons(ctx,next){
         ctx.checkBody('tenantId').notEmpty();
@@ -311,7 +311,7 @@ module.exports = {
                 createdAt:days[j]
             },{
                 where : {
-                    id : orders[j].id
+                    tenantId : body.tenantId
                 }
             })
             // let order = await Orders.findOne({

@@ -69,22 +69,18 @@ const amountManger = (function () {
             }
         })
 
-        if (coupon != null) {
-            totalAmount = amountJson.totalPrice;
-        } else {
-            //获取会员信息算会员价
-            let vip = await Vips.findOne({
-                where: {
-                    phone: phone,
-                    tenantId: tenantId
-                }
-            })
-
-            if (vip != null) {
-                totalAmount = amountJson.totalVipPrice;
-            } else {
-                totalAmount = amountJson.totalPrice;
+        //获取会员信息算会员价
+        let vip = await Vips.findOne({
+            where: {
+                phone: phone,
+                tenantId: tenantId
             }
+        })
+
+        if (vip != null) {
+            totalAmount = amountJson.totalVipPrice;
+        } else {
+            totalAmount = amountJson.totalPrice;
         }
 
         // //couponRate 平台出优惠券比率 比如0.6 商家0.4
@@ -186,36 +182,57 @@ const amountManger = (function () {
         });
 
 
+        let merchantAmount = 0;
+        let consigneeAmount = 0;
         if (profitsharing == null) {
-            // retJson.totalPrice = amountJson.totalPrice;
-            // retJson.totalAmount = parseFloat(totalAmount) + parseFloat(deliveryFee);//加配送费
-            // retJson.totalAmount = Math.round(retJson.totalAmount * 100) / 100;
-            //
-            // retJson.merchantAmount = parseFloat(totalAmount) + parseFloat(deliveryFee);//加配送费
-            // retJson.merchantAmount = Math.round(retJson.merchantAmount * 100) / 100;
-            //
-            // retJson.consigneeAmount = 0;
-
-            retJson.totalPrice = 0;
-            retJson.totalAmount = 0;
-            retJson.totalAmount = 0;
-
-            retJson.merchantAmount = 0;
-            retJson.consigneeAmount = 0;
-
-            console.log('没找到分润关系')
-            return retJson;
-        } else {
-            let merchantAmount = 0;
-            let consigneeAmount = 0;
             if (coupon != null) {
-                // //优惠券，给代售商的分成减少一半
-                // merchantAmount = totalAmount * (1 - profitsharing.rate - profitsharing.ownRate); //主商户提成+配送费
-                // merchantAmount = Math.round(merchantAmount * 100) / 100;
-                //
-                // consigneeAmount = totalAmount * profitsharing.rate * 0.5;//代售商户提成
-                // consigneeAmount = Math.round(consigneeAmount * 100) / 100;
+                //总金额*自己分润 - 商家承担优惠
+                switch (coupon.couponType) {
+                    case 'amount':
+                        merchantAmount = ((totalAmount - coupon.value * (1 - coupon.couponRate)) <= 0) ? 0.01 : (totalAmount - coupon.value * (1 - coupon.couponRate));
+                        merchantAmount = Math.round(merchantAmount * 100) / 100;
 
+                        platformCouponFee = coupon.value * coupon.couponRate;
+                        merchantCouponFee = coupon.value * (1 - coupon.couponRate);
+
+                        consigneeAmount = 0;
+                        break;
+                    case 'discount':
+                        merchantAmount = totalAmount - totalAmount * (1 - coupon.value) * (1 - coupon.couponRate);
+                        merchantAmount = Math.round(merchantAmount * 100) / 100;
+
+                        platformCouponFee = totalAmount * (1 - coupon.value) * coupon.couponRate;
+                        merchantCouponFee = totalAmount * (1 - coupon.value) * (1 - coupon.couponRate);
+
+                        consigneeAmount = 0;
+
+                        break;
+                    case 'reduce':
+                        if (totalAmount >= coupon.value.split('-')[0]) {
+                            merchantAmount = ((totalAmount - coupon.value.split('-')[1] * (1 - coupon.couponRate)) <= 0) ? 0.01 : (totalAmount - coupon.value.split('-')[1] * (1 - coupon.couponRate));
+                            console.log("TTTTTTTTTTTTTTTTTTTTT1==" + merchantAmount);
+                            merchantAmount = Math.round(merchantAmount * 100) / 100;
+                            console.log("TTTTTTTTTTTTTTTTTTTTT2==" + merchantAmount);
+
+                            platformCouponFee = coupon.value.split('-')[1] * coupon.couponRate;
+                            merchantCouponFee = coupon.value.split('-')[1] * (1 - coupon.couponRate);
+
+                            consigneeAmount = 0;
+                        }
+                        break;
+                    default:
+                        totalAmount = totalAmount;
+                        return retJson;
+                }
+                couponType = coupon.couponType;
+                couponValue = coupon.value;
+            } else {
+                //全转给商家
+                merchantAmount = totalAmount;
+                consigneeAmount = 0;
+            }
+        } else {
+            if (coupon != null) {
                 //总金额*自己分润 - 商家承担优惠
                 switch (coupon.couponType) {
                     case 'amount':
@@ -271,24 +288,6 @@ const amountManger = (function () {
                 }
                 couponType = coupon.couponType;
                 couponValue = coupon.value;
-
-                // //平台付
-                // if (coupon.couponRate == '1') {
-                //     //代售比率一半给商家
-                //     merchantAmount = totalAmount * (1 - profitsharing.rate * 0.5 - profitsharing.ownRate); //主商户提成
-                //     merchantAmount = Math.round(merchantAmount * 100) / 100;
-                //
-                //     consigneeAmount = total_amount * profitsharing.rate * 0.5;//代售商户提成
-                //     consigneeAmount = Math.round(consigneeAmount * 100) / 100;
-                // } else if (coupon.couponRate == '0') {
-                //     merchantAmount = totalAmount * (1 - profitsharing.rate - profitsharing.ownRate); //主商户提成
-                //     merchantAmount = Math.round(merchantAmount * 100) / 100;
-                //
-                //     consigneeAmount = total_amount * profitsharing.rate;//代售商户提成
-                //     consigneeAmount = Math.round(consigneeAmount * 100) / 100;
-                // } else {
-                //
-                // }
             } else {
                 if (isSame == false) {
                     merchantAmount = totalAmount * (1 - profitsharing.rate - profitsharing.ownRate);
@@ -301,47 +300,49 @@ const amountManger = (function () {
                     consigneeAmount = 0;
                 }
             }
-
-            platformAmount = amountJson.totalPrice - (platformCouponFee + merchantCouponFee) - merchantAmount - consigneeAmount;
-            platformAmount = Math.round(platformAmount * 100) / 100;
-
-            platformCouponFee = Math.round(platformCouponFee * 100) / 100;
-            merchantCouponFee = Math.round(merchantCouponFee * 100) / 100;
-
-            let totalPrice = Math.round(amountJson.totalPrice * 100) / 100;
-
-            retJson.totalAmount = parseFloat(totalAmount) + parseFloat(deliveryFee);//加配送费
-            retJson.totalAmount = Math.round(retJson.totalAmount * 100) / 100;
-
-            retJson.merchantAmount = parseFloat(merchantAmount) + parseFloat(deliveryFee);//加配送费
-            retJson.merchantAmount = Math.round(retJson.merchantAmount * 100) / 100;
-
-            retJson.consigneeAmount = consigneeAmount;
-            retJson.consigneeAmount = Math.round(retJson.consigneeAmount * 100) / 100;
-
-            retJson.totalPrice = totalPrice;
-            retJson.platformCouponFee = platformCouponFee;
-            retJson.merchantCouponFee = merchantCouponFee;
-            retJson.deliveryFee = deliveryFee;
-            retJson.refund_amount = refund_amount;
-            retJson.platformAmount = platformAmount;
-            retJson.couponType = couponType;
-            retJson.couponValue = couponValue;
-
-            // console.log("返回给订单的所有金额:")
-            // console.log("totalPrice====" + totalPrice);
-            // console.log("merchantAmount====" + merchantAmount);
-            // console.log("consigneeAmount====" + consigneeAmount);
-            // console.log("platformCouponFee====" + platformCouponFee);
-            // console.log("merchantCouponFee====" + merchantCouponFee);
-            // console.log("deliveryFee====" + deliveryFee);
-            // console.log("refund_amount====" + refund_amount);
-            // console.log("platformAmount====" + platformAmount);
-            // console.log("couponType===" + couponType);
-            // console.log("couponValue===" + couponValue);
-            return retJson;
         }
+
+        platformAmount = amountJson.totalPrice - (platformCouponFee + merchantCouponFee) - merchantAmount - consigneeAmount;
+        platformAmount = Math.round(platformAmount * 100) / 100;
+
+        platformCouponFee = Math.round(platformCouponFee * 100) / 100;
+        merchantCouponFee = Math.round(merchantCouponFee * 100) / 100;
+
+        let totalPrice = Math.round(amountJson.totalPrice * 100) / 100;
+
+        retJson.totalAmount = parseFloat(totalAmount) + parseFloat(deliveryFee);//加配送费
+        retJson.totalAmount = Math.round(retJson.totalAmount * 100) / 100;
+
+        retJson.merchantAmount = parseFloat(merchantAmount) + parseFloat(deliveryFee);//加配送费
+        retJson.merchantAmount = Math.round(retJson.merchantAmount * 100) / 100;
+
+        retJson.consigneeAmount = consigneeAmount;
+        retJson.consigneeAmount = Math.round(retJson.consigneeAmount * 100) / 100;
+
+        retJson.totalPrice = totalPrice;
+        retJson.platformCouponFee = platformCouponFee;
+        retJson.merchantCouponFee = merchantCouponFee;
+        retJson.deliveryFee = deliveryFee;
+        retJson.refund_amount = refund_amount;
+        retJson.platformAmount = platformAmount;
+        retJson.couponType = couponType;
+        retJson.couponValue = couponValue;
+
+        // console.log("返回给订单的所有金额:")
+        // console.log("totalPrice====" + totalPrice);
+        // console.log("merchantAmount====" + merchantAmount);
+        // console.log("consigneeAmount====" + consigneeAmount);
+        // console.log("platformCouponFee====" + platformCouponFee);
+        // console.log("merchantCouponFee====" + merchantCouponFee);
+        // console.log("deliveryFee====" + deliveryFee);
+        // console.log("refund_amount====" + refund_amount);
+        // console.log("platformAmount====" + platformAmount);
+        // console.log("couponType===" + couponType);
+        // console.log("couponValue===" + couponValue);
+        return retJson;
+
     }
+
 
     //通过订单号获取总金额
     let getAmountByTradeNo = async function (tenantId, consigneeId, trade_no) {
@@ -389,7 +390,10 @@ const amountManger = (function () {
             }
         })
 
-        
+        if (consignee == null) {
+            return false;
+        }
+
         if (tenantConfig.name == consignee.name) {
             return true;
         } else {
