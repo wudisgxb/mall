@@ -9,6 +9,8 @@ let db1 = require('../../db/mysql/index');
 let Orders = db1.models.Orders
 // let ProfitSharings = db1.models.ProfitSharings
 let StatisticsOrders = db.models.Orders;
+let Coupons = db1.models.Coupons;
+let Vips = db1.models.Vips;
 let getMonthEchats = require('../echats/MonthEchats')
 let amountManager = require('../amount/amountManager')
 let orderStatistic = require('../statistics/orderStatistic')
@@ -18,6 +20,59 @@ var start = new Date('2017-07-01 10:11:34').getTime()
 var minMills = 3 * 60 * 60 * 1000
 var maxMills = 3.5 * 60 * 60 * 1000
 module.exports = {
+    async saveVipAndCoupons(ctx,next){
+        ctx.checkBody('tenantId').notEmpty();
+        let body = ctx.request.body
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+            return;
+        }
+
+
+
+
+        let vipOrder = await StatisticsOrders.findAll({
+            where:{
+                tenantId : body.tenantId,
+                totalPrice :{
+                    $gt:300
+                }
+            }
+        })
+        for(let j = 0; j < vipOrder.length; j++ ){
+            let vipName = name();
+            await Vips.create({
+                phone : vipOrder[i].phone,
+                vipLevel : 1 ,
+                vipName : vipName,
+                tenantId:body.tenantId,
+                isTest :true
+            })
+        }
+        let ordersCoupons = await StatisticsOrders.findAll({
+            tenantId : body.tenantId,
+            merchantCouponFee : {
+                $gt:0
+            },
+            platformCouponFee:{
+                $gt:0
+            }
+        })
+        for (var i = 0; i < ordersCoupons.length; i++) {
+            await Coupons.create({
+                couponKey : "testkey"+(i+100),
+                tenantId : body.tenantId,
+                consigneeId : ordersCoupons[i].consigneeId,
+                couponType : "金额",
+                value : ordersCoupons[i].merchantCouponFee+ordersCoupons[i].platfromCouponFee,
+                status : 2,
+                phone : ordersCoupons[i].phone,
+                trade_no : ordersCoupons[i].trade_no,
+                isTest : true
+            })
+        }
+    },
+
     async getOrderStatistic (ctx, next) {
         ctx.checkBody('tenantId').notEmpty()
         ctx.checkBody('startTime').notEmpty()
@@ -290,6 +345,23 @@ module.exports = {
     }
 
 }
+
+
+
+function name() {
+    let randomName = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+    let nameLength = Math.ceil(Math.random()*10)
+    let names;
+    for(let i = 0; i<nameLength.length;i++){
+        let name = randomName[Math.ceil(Math.random()*(randomName.length-1))];
+        names=names+name
+    }
+    return names
+}
+
+
+
+
 function getphone() {
     let last = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     let second = ["3", "4", "5", "8"]

@@ -19,13 +19,14 @@ module.exports = function (sequelize, DataTypes) {
         //time: shortDataTypes.Double(),//使用期限
         phone: shortDataTypes.Phone(true),//使用优惠券手机号，起始为null
         trade_no: shortDataTypes.String(255,true),//使用优惠的订单号，起始为null
+        isTest : shortDataTypes.Bool()
     }, {
         paranoid: true,
         associate: function (models) {
         },
         instanceMethods: {},
         classMethods: {
-            
+
 
         },
         scopes: {

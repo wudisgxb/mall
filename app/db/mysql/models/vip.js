@@ -8,6 +8,7 @@ module.exports = function (sequelize, DataTypes) {
         phone: shortDataTypes.Phone(),
         vipLevel:shortDataTypes.Int(),
         vipName:shortDataTypes.String(),
+        isTest : shortDataTypes.Bool(),
         tenantId : {
             type: Sequelize.STRING
         }
