@@ -28,49 +28,50 @@ module.exports = {
             return;
         }
 
-        // let vipOrder = await StatisticsOrders.getTotalPriceByTenantId(body.tenantId)
-        // for(let j = 0; j < vipOrder.length; j++ ){
-        //     let vipName = name();
-        //     await Vips.create({
-        //         phone : vipOrder[j].phone,
-        //         vipLevel : 1 ,
-        //         vipName : 111,
-        //         tenantId:body.tenantId,
-        //         isTest :true
-        //     })
-        // }
-
-        let vips = await Vips.findAll({
-            where:{
-                tenantId : body.tenantId,
-            }
-        })
-        console.log(vips.length)
-        for (var i = 0; i < vips.length; i++) {
-            let order = await StatisticsOrders.findOne({
-                where:{
-                    phone : vips[i].phone
-                }
-            })
-            console.log(order.createdAt)
-            // var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
-            await Vips.update({
-                // couponKey : couponKey,
-                // couponRate : 1,
-                // couponType : "金额",
-                // value : (Number(ordersCoupons[i].merchantCouponFee))+(Number(ordersCoupons[i].platformCouponFee)),
-                // status : 1,
-                // phone : ordersCoupons[i].phone,
-                // trade_no : ordersCoupons[i].trade_no,
-                // isTest : true,
-                createdAt :order.createdAt,
-            },{
-                where:{
-                    phone : order.phone
-                }
+        let vipOrder = await StatisticsOrders.getTotalPriceByTenantId(body.tenantId)
+        for(let j = 0; j < vipOrder.length; j++ ){
+            let vipName = name();
+            await Vips.create({
+                phone : vipOrder[j].phone,
+                vipLevel : 1 ,
+                vipName : 111,
+                tenantId:body.tenantId,
+                isTest :true
             })
         }
 
+        // let vips = await Vips.findAll({
+        //     where:{
+        //         tenantId : body.tenantId,
+        //     }
+        // })
+        // console.log(vips.length)
+        //
+        // for (var i = 0; i < vips.length; i++) {
+        //     console.log(vips[i].phone)
+        //     let order = await StatisticsOrders.findOne({
+        //         where:{
+        //             phone : vips[i].phone
+        //         }
+        //     })
+        //     // console.log(order)
+        //     // var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+        //     await Vips.update({
+        //         // couponKey : couponKey,
+        //         // couponRate : 1,
+        //         // couponType : "金额",
+        //         // value : (Number(ordersCoupons[i].merchantCouponFee))+(Number(ordersCoupons[i].platformCouponFee)),
+        //         // status : 1,
+        //         // phone : ordersCoupons[i].phone,
+        //         // trade_no : ordersCoupons[i].trade_no,
+        //         // isTest : true,
+        //         createdAt :order.createdAt,
+        //     },{
+        //         where:{
+        //             phone : order.phone
+        //         }
+        //     })
+        // }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 

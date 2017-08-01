@@ -39,7 +39,7 @@ module.exports = function (sequelize, DataTypes) {
                 for (const order of allOrders) {
 
                     const totalPrice = Number(order.totalPrice)
-                    if (totalPrice>150) {
+                    if (totalPrice>10) {
                         result.push(order)
                     }
                 }
