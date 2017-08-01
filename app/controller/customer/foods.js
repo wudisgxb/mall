@@ -56,7 +56,7 @@ module.exports = {
                     'name',
                     'type'
                 ],
-                order :["sort"]
+                order: ["sort"]
             });
         } else {
             let menus = await Menus.findAll({
@@ -68,7 +68,7 @@ module.exports = {
                     'name',
                     'type'
                 ],
-                order :["sort"]
+                order: ["sort"]
             });
         }
 
@@ -112,7 +112,7 @@ module.exports = {
                     }]
                 });
 
-                if (food.length ==0) {
+                if (food.length == 0) {
                     continue;
                 }
 
@@ -158,7 +158,7 @@ module.exports = {
                     'name',
                     'type'
                 ],
-                order :["sort"]
+                order: ["sort"]
             });
         } else {
             menus = await Menus.findAll({
@@ -171,7 +171,7 @@ module.exports = {
                     'name',
                     'type'
                 ],
-                order :["sort"]
+                order: ["sort"]
             });
         }
 
@@ -211,7 +211,7 @@ module.exports = {
                     }]
                 });
 
-                if (food.length ==0) {
+                if (food.length == 0) {
                     continue;
                 }
 
@@ -221,16 +221,11 @@ module.exports = {
                         return rating
                     })
                 })
-                foodArray[j].rest=(food[0].foodNum-food[0].todaySales)>0?(food[0].foodNum-food[0].todaySales):0;
                 foodArray.push(food[0]);
             }
 
             resultArray[i] = {};
             resultArray[i].id = menus[i].id;
-
-
-
-            // resultArray[i].rest=(food[i].foodNum-food[i].todaySales)>0?(food[i].foodNum-food[i].todaySales):0;
 
             resultArray[i].name = menus[i].name;
             resultArray[i].type = menus[i].type;

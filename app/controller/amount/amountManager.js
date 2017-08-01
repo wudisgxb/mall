@@ -274,11 +274,9 @@ const amountManger = (function () {
                             consigneeAmount = ((totalAmount * profitsharing.rate - platformCouponFee) <= 0) ? 0 : (totalAmount * profitsharing.rate - platformCouponFee);
                             consigneeAmount = Math.round(consigneeAmount * 100) / 100;
 
-
                             if (tenantId == '18d473e77f459833bb06c60f9a8f0000') {
                                 merchantAmount = (totalAmount - coupon.value.split('-')[1]) * (1 - profitsharing.rate - profitsharing.ownRate) + platformCouponFee;
                                 console.log("青豆家转账===" + merchantAmount);
-
                             }
                         }
                         break;
