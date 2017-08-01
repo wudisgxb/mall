@@ -389,6 +389,7 @@ const amountManger = (function () {
             }
         })
 
+        
         if (tenantConfig.name == consignee.name) {
             return true;
         } else {

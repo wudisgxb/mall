@@ -318,7 +318,7 @@ module.exports = {
                 createdAt:days[j]
             },{
                 where : {
-                    tenantId : body.tenantId
+                    id : orders[j].id
                 }
             })
             // let order = await Orders.findOne({
