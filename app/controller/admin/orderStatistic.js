@@ -190,7 +190,7 @@ module.exports = {
             await StatisticsOrders.update({
                 trade_no: statisticsOrders[i].trade_no,
                 totalPrice: totalPrice,//(totalPrice==0?80:totalPrice);
-                merchantAmount: mer-couponFee,//(mer==0?80:mer);
+                merchantAmount: mer-pla,//(mer==0?80:mer);
                 platformAmount: pla,
                 platformCouponFee: couponFee / 2,
                 merchantCouponFee: couponFee / 2,

@@ -24,7 +24,10 @@ module.exports = function (sequelize, DataTypes) {
         associate: function (models) {
         },
         instanceMethods: {},
-        classMethods: {},
+        classMethods: {
+            
+
+        },
         scopes: {
             all: {
                 paranoid: false,
