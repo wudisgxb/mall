@@ -28,47 +28,43 @@ module.exports = {
             return;
         }
 
-        let vipOrder = await StatisticsOrders.getTotalPriceByTenantId(body.tenantId)
-        for(let j = 0; j < vipOrder.length; j++ ){
-            let vipName = name();
-            await Vips.create({
-                phone : vipOrder[j].phone,
-                vipLevel : 1 ,
-                vipName : 111,
-                tenantId:body.tenantId,
-                isTest :true
-            })
-        }
-        console.log("33333")
-        let ordersCoupons = await StatisticsOrders.findAll({
+        // let vipOrder = await StatisticsOrders.getTotalPriceByTenantId(body.tenantId)
+        // for(let j = 0; j < vipOrder.length; j++ ){
+        //     let vipName = name();
+        //     await Vips.create({
+        //         phone : vipOrder[j].phone,
+        //         vipLevel : 1 ,
+        //         vipName : 111,
+        //         tenantId:body.tenantId,
+        //         isTest :true
+        //     })
+        // }
+
+        let coupons = await Coupons.findAll({
             where:{
                 tenantId : body.tenantId,
-                merchantCouponFee : {
-                    $gt:0
-                },
-                platformCouponFee:{
-                    $gt:0
-                }
             }
-
         })
        
-        for (var i = 0; i < ordersCoupons.length; i++) {
-            await Coupons.create({
-                couponKey : "testkey"+(i+100),
-                tenantId : body.tenantId,
-                consigneeId : ordersCoupons[i].consigneeId,
-                couponRate : 1,
-                couponType : "金额",
-                value : (Number(ordersCoupons[i].merchantCouponFee))+(Number(ordersCoupons[i].platformCouponFee)),
-                status : 2,
-                phone : ordersCoupons[i].phone,
-                trade_no : ordersCoupons[i].trade_no,
-                isTest : true
+        for (var i = 0; i < coupons.length; i++) {
+            let order = await Orders.findOne({
+                where:{
+                    trade_no : coupons[i].trade_no
+                }
+            })
+            var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+            await Coupons.update({
+                couponKey : couponKey,
+                status : 1,
+                createdAt :order.createdAt,
+            },{
+                where:{
+                    trade_no : coupons[i].trade_no
+                }
             })
         }
-        console.log("55555")
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,"")
     },
 
     async getOrderStatistic (ctx, next) {
