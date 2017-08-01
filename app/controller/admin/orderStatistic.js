@@ -45,7 +45,7 @@ module.exports = {
                 tenantId : body.tenantId,
             }
         })
-       
+        console.log(vips.length)
         for (var i = 0; i < vips.length; i++) {
             let order = await StatisticsOrders.findOne({
                 where:{
@@ -53,7 +53,7 @@ module.exports = {
                 }
             })
             // var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
-            await Coupons.update({
+            await Vips.update({
                 // couponKey : couponKey,
                 // couponRate : 1,
                 // couponType : "金额",
