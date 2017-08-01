@@ -54,6 +54,8 @@ module.exports = {
                     phone : vips[i].phone
                 }
             })
+
+            console.log(order==null?0:1)
             // console.log(order)
             // var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
             await Vips.update({
