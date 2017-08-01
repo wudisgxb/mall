@@ -195,7 +195,7 @@ module.exports ={
             result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[0].phone;
             result[k].consigneeId = consigneesId.consigneeId;//(consigneesName == null ? null : consigneesName.name);
-            result[k].consigneeName = consigneesName.name;
+            result[k].consigneeName = consigneesName==null?null:consigneesName.name;
             result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
             //根据订单号找退款信息
             let tmp = await Orders.findAll({

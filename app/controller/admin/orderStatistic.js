@@ -314,7 +314,7 @@ module.exports = {
             return e
         })
         for (let j = 0; j < orders.length; j++) {
-            await Orders.Update({
+            await Orders.update({
                 createdAt:days[j]
             },{
                 where : {
