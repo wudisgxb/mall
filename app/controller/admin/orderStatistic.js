@@ -47,24 +47,30 @@ module.exports = {
         })
        
         for (var i = 0; i < coupons.length; i++) {
-            let order = await Orders.findOne({
+            let order = await StatisticsOrders.findOne({
                 where:{
-                    trade_no : coupons[i].trade_no
+                    phone : coupons[i].phone
                 }
             })
             var couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
             await Coupons.update({
                 couponKey : couponKey,
+                // couponRate : 1,
+                // couponType : "金额",
+                // value : (Number(ordersCoupons[i].merchantCouponFee))+(Number(ordersCoupons[i].platformCouponFee)),
                 status : 1,
+                // phone : ordersCoupons[i].phone,
+                // trade_no : ordersCoupons[i].trade_no,
+                // isTest : true,
                 createdAt :order.createdAt,
             },{
                 where:{
-                    trade_no : coupons[i].trade_no
+                    phone : order.phone
                 }
             })
         }
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,"")
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
     async getOrderStatistic (ctx, next) {
