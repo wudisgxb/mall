@@ -28,21 +28,13 @@ module.exports = {
             return;
         }
 
-        let vipOrder = await StatisticsOrders.findAll({
-            where:{
-                tenantId : body.tenantId,
-                totalPrice :{
-                    $gt:300
-                }
-            }
-        })
-        console.log("22222")
+        let vipOrder = await StatisticsOrders.getTotalPriceByTenantId(body.tenantId)
         for(let j = 0; j < vipOrder.length; j++ ){
             let vipName = name();
             await Vips.create({
-                phone : vipOrder[i].phone,
+                phone : vipOrder[j].phone,
                 vipLevel : 1 ,
-                vipName : vipName,
+                vipName : 111,
                 tenantId:body.tenantId,
                 isTest :true
             })
@@ -52,22 +44,23 @@ module.exports = {
             where:{
                 tenantId : body.tenantId,
                 merchantCouponFee : {
-                    $gt:1
+                    $gt:0
                 },
                 platformCouponFee:{
-                    $gt:1
+                    $gt:0
                 }
             }
 
         })
-        console.log("44444")
+       
         for (var i = 0; i < ordersCoupons.length; i++) {
             await Coupons.create({
                 couponKey : "testkey"+(i+100),
                 tenantId : body.tenantId,
                 consigneeId : ordersCoupons[i].consigneeId,
+                couponRate : 1,
                 couponType : "金额",
-                value : ordersCoupons[i].merchantCouponFee+ordersCoupons[i].platfromCouponFee,
+                value : (Number(ordersCoupons[i].merchantCouponFee))+(Number(ordersCoupons[i].platformCouponFee)),
                 status : 2,
                 phone : ordersCoupons[i].phone,
                 trade_no : ordersCoupons[i].trade_no,
