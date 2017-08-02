@@ -19,37 +19,40 @@ module.exports = function (sequelize, DataTypes) {
         //是否实时转账
         isRealTime: shortDataTypes.Bool(),
         //是否需要VIP
-        needVip:shortDataTypes.Bool(),
+        needVip: shortDataTypes.Bool(),
         //满多少送会员
         vipFee: shortDataTypes.Double(100000),
         //快满多少提示会员
         vipRemindFee: shortDataTypes.Double(100000),
         //主页图
         homeImage: shortDataTypes.String(),
-        
+
         //订单购物车超时时间
-        invaildTime:shortDataTypes.Double(),
+        invaildTime: shortDataTypes.Double(),
 
         //经度
         longitude: {
             type: Sequelize.STRING,
-            defaultValue:""
+            defaultValue: ""
         },
 
         //纬度
         latitude: {
             type: Sequelize.STRING,
-            defaultValue:""
+            defaultValue: ""
         },
 
         //公告
         officialNews: {
             type: Sequelize.STRING,
-            defaultValue:""
+            defaultValue: ""
         },
 
         //是否选择人数
-        needChoosePeopleNumberPage:shortDataTypes.Bool(),
+        needChoosePeopleNumberPage: shortDataTypes.Bool(),
+
+        //首单折扣（半价）
+        firstDiscount: shortDataTypes.Int(-1),
 
         //营业起始时间
         startTime: shortDataTypes.String(),
