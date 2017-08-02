@@ -51,5 +51,5 @@ const getWeek_EveryYeay = (function () {
         getWeek: getWeek
     }
     return instance;
-    })();
+})();
 module.exports = getWeek_EveryYeay;
