@@ -31,8 +31,8 @@ module.exports = {
             return;
         }
         let consignees = await Consignees.findAll({
-           where : {
-               consigneeId:ctx.query.consigneeId
+            where : {
+                consigneeId:ctx.query.consigneeId
             }
         });
         if(consignees.length==0){
@@ -49,8 +49,8 @@ module.exports = {
         ctx.checkBody('/consignees/payee_account',true).first().notEmpty();
         ctx.checkBody('/condition/consigneeId',true).first().notEmpty();
         ctx.checkBody('/condition/id',true).first().notEmpty();
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         let body = ctx.request.body;
@@ -71,7 +71,7 @@ module.exports = {
         await consignees.save();
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS);
     },
-    
+
     async saveAdminConsignees(ctx,next){
         ctx.checkBody('/consignees/name',true).first().notEmpty();
         ctx.checkBody('/consignees/phone',true).first().notEmpty();
@@ -95,11 +95,11 @@ module.exports = {
         }
         let consigneeId =  Tool.allocTenantId();
         await Consignees.create({
-                name : body.consignees.name,
-                phone : body.consignees.phone,
-                wecharPayee_account : body.consignees.wecharPayee_account,
-                payee_account : body.consignees.payee_account,
-                consigneeId : consigneeId
+            name : body.consignees.name,
+            phone : body.consignees.phone,
+            wecharPayee_account : body.consignees.wecharPayee_account,
+            payee_account : body.consignees.payee_account,
+            consigneeId : consigneeId
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,{consigneeId:consigneeId})
     },
@@ -107,8 +107,8 @@ module.exports = {
     async deleteAdminConsignees(ctx,next){
         ctx.checkQuery('id').notEmpty();
         // ctx.checkQuery('consigneeId').notEmpty();
-        if (this.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, this.errors);
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, ctx.errors);
             return;
         }
         let consignees = await Consignees.findOne({

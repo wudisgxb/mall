@@ -159,10 +159,11 @@ module.exports = {
             //找到此商户下下所有代售点Id
 
             profitSharingId=profitSharings[i].consigneeId;
+            // console.log("consigneeId = " + profitSharingId);
             console.log("consigneeId = " + profitSharingId);
 
             //jsonProFit[i].profitSharingId=profitSharings[i].consigneeId;
-            
+
             consignee = await Consignees.findOne({
                 where : {
                     consigneeId:profitSharingId

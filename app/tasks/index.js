@@ -1094,7 +1094,6 @@ module.exports = async function tasks(app) {
 
                 if ((Date.now() - shoppingCarts[i].createdAt.getTime()) > tenantConfig.invaildTime) {
                     //获取订单号
-                    console.log("点餐购物车失效：手机号：" + shoppingCarts[i].phone);
                     console.log("点餐购物车失效：租户ID：" + shoppingCarts[i].tenantId);
 
                     await shoppingCarts[i].destroy();
