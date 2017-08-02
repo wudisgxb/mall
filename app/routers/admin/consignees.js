@@ -5,6 +5,7 @@ const consignees = require('../../controller/admin/consignees');
 const router = new (require('koa-router'))()
 // todo: redirect
 router.get('/api/test/admin/consignee',consignees.getAdminConsignees);
+router.get('/api/test/admin/consigneeByName',consignees.getAdminConsigneesByName)
 router.get('/api/test/admin/allConsignee',consignees.getAllConsignees);
 router.post('/api/test/admin/consignee',consignees.saveAdminConsignees);
 router.put('/api/test/admin/consignee',consignees.updateAdminConsignees);

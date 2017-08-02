@@ -6,6 +6,24 @@ let ProfitSharings=db.models.ProfitSharings
 const Tool = require('../../Tool/tool');
 
 module.exports = {
+    async getAdminConsigneesByName(ctx,next){
+        ctx.checkQuery('name').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors)
+            return;
+        }
+        let consignees = await Consignees.findOne({
+            where:{
+                name : ctx.query.name
+            }
+        })
+        if(consignees==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此代售点的名字")
+            return;
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consignees)
+    },
+
     async getAdminConsignees(ctx,next){
         ctx.checkQuery('consigneeId').notEmpty()
         if (ctx.errors) {
