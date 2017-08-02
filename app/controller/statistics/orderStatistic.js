@@ -591,7 +591,7 @@ const getstatistics = (function () {
             }
             if(type==4){
                 let start = i+1
-                time ="第"+start+"天"
+                time =getTime[i].start
             }
             result.push({
                 merchantPayment:{
