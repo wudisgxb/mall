@@ -86,7 +86,7 @@ const amountManger = (function () {
         }
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
-        let firstDiscount = await orderManager.getFirstDiscount(phone, tenantId);
+        let firstDiscount = await orderManager.getFirstDiscountByTradeNo(trade_no,tenantId);
 
         if (firstDiscount != -1) {
             console.log("转账firstDiscount=" + firstDiscount);

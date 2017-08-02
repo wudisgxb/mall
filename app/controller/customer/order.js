@@ -124,7 +124,7 @@ module.exports = {
             }
 
             //首单折扣，-1表示不折扣，根据手机号和租户id
-            result.firstDiscount = await this.getFirstDiscount(phone,ctx.query.tenantId);
+            result.firstDiscount = await this.getFirstDiscount(phone, ctx.query.tenantId);
 
 
             result.totalPrice = Math.round(result.totalPrice * 100) / 100;
@@ -655,7 +655,7 @@ module.exports = {
             }
 
             //首单折扣，-1表示不折扣，根据手机号和租户id
-            result.firstDiscount = await this.getFirstDiscount(phone,ctx.query.tenantId);
+            result.firstDiscount = await this.getFirstDiscount(phone, ctx.query.tenantId);
 
             result.totalPrice = Math.round(result.totalPrice * 100) / 100;
             result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
@@ -694,7 +694,7 @@ module.exports = {
     },
 
     //通过订单查询支付金额
-    async getOrderPriceByOrder(orders,firstDiscount) {
+    async getOrderPriceByOrder(orders, firstDiscount) {
         let totalPrice = 0;
         let totalVipPrice = 0;
         let total_amount = 0;
@@ -807,7 +807,34 @@ module.exports = {
             if (paymentReqs.length == 0) {
                 return tenantConfig.firstDiscount;
             } else {
+                if (paymentReqs)
+                    return -1;
+            }
+        }
+    },
+
+    //通过订单号获取首单折扣
+    async getFirstDiscountByTradeNo(trade_no, tenantId) {
+        let tenantConfig = await TenantConfigs.findOne({
+            where: {
+                tenantId: tenantId,
+            }
+        })
+
+        if (tenantConfig.firstDiscount == -1) {
+            return -1;
+        } else {
+            let paymentReq = await PaymentReqs.findOne({
+                where: {
+                    trade_no: trade_no,
+                    tenantId: tenantId
+                }
+            })
+
+            if (paymentReq == null) {
                 return -1;
+            } else {
+                return paymentReq.firstDiscount;
             }
         }
     },
