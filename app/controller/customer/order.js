@@ -805,9 +805,9 @@ module.exports = {
             })
 
             if (paymentReqs.length == 0) {
-                return -1;
-            } else {
                 return tenantConfig.firstDiscount;
+            } else {
+                return -1;
             }
         }
     },
