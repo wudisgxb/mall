@@ -551,7 +551,7 @@ const getstatistics = (function () {
         if(type==2){
             getTime = await getDayEchat.getDay(startTime,endTime)
         }
-        if(type==4){
+        if(type==5){
             getTime = await getOneDayEchat.getDay(startTime,endTime)
         }
         if(type==3){
@@ -633,7 +633,7 @@ const getstatistics = (function () {
             })
         }
 
-        console.log(result)
+        // console.log(result)
         return result;
     }
     // 分成情况
