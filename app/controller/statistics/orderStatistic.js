@@ -591,6 +591,9 @@ const getstatistics = (function () {
                 let start = i+1
                 time =getTime[i].start
             }
+            if(type==5){
+                time = new Date(getTime[i].start)
+            }
             result.push({
                 merchantPayment:{
                     name :"商家实际支付",

@@ -8,7 +8,7 @@ const Tool = require('../../Tool/tool');
 module.exports = {
 
     async saveAdminCoupon (ctx, next) {
-        logger.writeInfo()
+        
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
         ctx.checkBody('couponType').notEmpty()
