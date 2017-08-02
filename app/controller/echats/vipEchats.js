@@ -121,7 +121,7 @@ const getVipEchats = (function () {
                 //季度为月份/3向下取余+1
                 let startYear = parseInt(ccccc[i].start.substring(0,4))
                 let startDates = (parseInt(ccccc[i].start.substring(5))+2)/3
-                console.log(parseInt(ccccc[i].start.substring(5))+2);
+                // console.log(parseInt(ccccc[i].start.substring(5))+2);
                 result.push({
                     name:"vip增长情况",
                     count:vips.length,

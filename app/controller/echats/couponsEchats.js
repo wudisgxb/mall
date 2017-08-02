@@ -77,7 +77,7 @@ const getCouponsEchats = (function () {
                 let startDate = Quaeter[i].start
                 let year = parseInt(startDate.substring(0,4))
                 let time = parseInt(startDate.substring(5,6));
-                console.log(time)
+                // console.log(time)
                 let quaeters = (time+2)/3
 
                 result.push({

@@ -23,8 +23,8 @@ const getHounthEchats = (function () {
                 end:new Date(i+oneHounth*3)
             })
         }
-        console.log(result.length)
-        console.log(result)
+        // console.log(result.length)
+        // console.log(result)
         return result;
     }
     let instance = {

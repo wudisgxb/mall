@@ -259,7 +259,7 @@ module.exports = {
 
         //根据订单查询需要支付多少
         let total_amount = await orderManager.getOrderPriceByOrder(orders);
-        console.log("total_amount========" + total_amount);
+        // console.log("total_amount========" + total_amount);
 
 
         //查找主商户名称

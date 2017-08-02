@@ -21,8 +21,8 @@ const getAnYearEchats = (function () {
                 end:new Date(startYear.toString()+"-"+lastMonth.toString())
             })
         }
-        console.log(result.length)
-        console.log(result)
+        // console.log(result.length)
+        // console.log(result)
         return result;
     }
     let instance = {

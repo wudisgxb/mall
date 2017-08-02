@@ -28,7 +28,7 @@ module.exports = {
             return;
         }
 
-        // let vipOrder = await StatisticsOrders.getTotalPriceByTenantId(body.tenantId)
+        let vipOrder = await StatisticsOrders.getTotalPriceByTenantId(body.tenantId)
         // for(let j = 0; j < vipOrder.length; j++ ){
         //     let vipName = name();
         //     await Vips.create({
@@ -279,7 +279,7 @@ module.exports = {
                 isTest :true
             })
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, statisticsOrders)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
     },
 

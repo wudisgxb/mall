@@ -15,7 +15,7 @@ const getYearEchats = (function () {
                 end:end,
             })
         }
-        console.log(eeeee)
+        // console.log(eeeee)
         return eeeee;
     }
     let instance = {

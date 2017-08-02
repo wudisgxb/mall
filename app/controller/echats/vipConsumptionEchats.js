@@ -34,7 +34,7 @@ const getVipConsumptionEchats = (function () {
                     },
                     paranoid: false
                 })
-                console.log(orders.length)
+                // console.log(orders.length)
                 //查询是vip的电话
                 for (let j=0;j<orders.length;j++){
                     let vip = await Vips.findOne({
@@ -66,14 +66,14 @@ const getVipConsumptionEchats = (function () {
 
                     }
                 }
-                console.log("2222222")
+                // console.log("2222222")
                 for(let x=0;x<vipPhone.length;x++){
-                    console.log(vipPhone[x])
+                    // console.log(vipPhone[x])
                     if(!vipsPhone.contains(vipPhone[x])){
                         vipsPhone.push(vipPhone[x])
                     }
                 }
-                console.log("33333")
+                // console.log("33333")
                 for(let l = 0;l<foodId.length;l++){
                     //根据foodId查询num数量
                     let num = await Orders.sum('num', {
@@ -87,14 +87,14 @@ const getVipConsumptionEchats = (function () {
                         },
                         paranoid: false
                     })
-                    console.log(num)
+                    // console.log(num)
                     let food = await Foods.findOne({
                         where: {
                             id: foodId[l]
                         },
                         paranoid: false
                     })
-                    console.log(food==null)
+                    // console.log(food==null)
                     numprice+=food.vipPrice*num
                 }
                 result.push({
@@ -128,7 +128,7 @@ const getVipConsumptionEchats = (function () {
                     },
                     paranoid: false
                 })
-                console.log(orders.length)
+                // console.log(orders.length)
                 //查询是vip的电话
                 for (let j=0;j<orders.length;j++){
                     let vip = await Vips.findOne({
@@ -160,14 +160,14 @@ const getVipConsumptionEchats = (function () {
 
                     }
                 }
-                console.log("2222222")
+                // console.log("2222222")
                 for(let x=0;x<vipPhone.length;x++){
-                    console.log(vipPhone[x])
+                    // console.log(vipPhone[x])
                     if(!vipsPhone.contains(vipPhone[x])){
                         vipsPhone.push(vipPhone[x])
                     }
                 }
-                console.log("33333")
+                // console.log("33333")
                 for(let l = 0;l<foodId.length;l++){
                     //根据foodId查询num数量
                     let num = await Orders.sum('num', {
@@ -181,14 +181,14 @@ const getVipConsumptionEchats = (function () {
                         },
                         paranoid: false
                     })
-                    console.log(num)
+                    // console.log(num)
                     let food = await Foods.findOne({
                         where: {
                             id: foodId[l]
                         },
                         paranoid: false
                     })
-                    console.log(food==null)
+                    // console.log(food==null)
                     numprice+=food.vipPrice*num
                 }
                 result.push({
@@ -221,7 +221,7 @@ const getVipConsumptionEchats = (function () {
                     },
                     paranoid: false
                 })
-                console.log(orders.length)
+                // console.log(orders.length)
                 //查询是vip的电话
                 for (let j=0;j<orders.length;j++){
                     let vip = await Vips.findOne({
@@ -253,14 +253,14 @@ const getVipConsumptionEchats = (function () {
 
                     }
                 }
-                console.log("2222222")
+                // console.log("2222222")
                 for(let x=0;x<vipPhone.length;x++){
-                    console.log(vipPhone[x])
+                    // console.log(vipPhone[x])
                     if(!vipsPhone.contains(vipPhone[x])){
                         vipsPhone.push(vipPhone[x])
                     }
                 }
-                console.log("33333")
+                // console.log("33333")
                 for(let l = 0;l<foodId.length;l++){
                     //根据foodId查询num数量
                     let num = await Orders.sum('num', {
@@ -274,14 +274,14 @@ const getVipConsumptionEchats = (function () {
                         },
                         paranoid: false
                     })
-                    console.log(num)
+                    // console.log(num)
                     let food = await Foods.findOne({
                         where: {
                             id: foodId[l]
                         },
                         paranoid: false
                     })
-                    console.log(food==null)
+                    // console.log(food==null)
                     numprice+=food.vipPrice*num
                 }
                 result.push({
