@@ -12,6 +12,7 @@ const DeliveryFees = db.models.DeliveryFees;
 const DistanceAndPrices = db.models.DistanceAndPrices;
 const TenantConfigs = db.models.TenantConfigs;
 const Consignees = db.models.Consignees;
+const orderManager = require('../customer/order');
 
 const amountManger = (function () {
 
@@ -35,6 +36,7 @@ const amountManger = (function () {
         let merchantCouponFee = 0;
         let couponType = null;
         let couponValue = null;
+        let firstDiscountAmount = 0;
 
         let retJson = {};
         let orders = await Orders.findAll({
@@ -81,6 +83,16 @@ const amountManger = (function () {
             totalAmount = amountJson.totalVipPrice;
         } else {
             totalAmount = amountJson.totalPrice;
+        }
+
+        //首单折扣，-1表示不折扣，根据手机号和租户id
+        let firstDiscount = await orderManager.getFirstDiscountByTradeNo(trade_no,tenantId);
+
+        if (firstDiscount != -1) {
+            console.log("转账firstDiscount=" + firstDiscount);
+            firstDiscountAmount = totalAmount * (1 - firstDiscount);
+            console.log("firstDiscountAmount=" + firstDiscountAmount);
+            totalAmount = totalAmount * firstDiscount;
         }
 
         // //couponRate 平台出优惠券比率 比如0.6 商家0.4
@@ -300,6 +312,9 @@ const amountManger = (function () {
             }
         }
 
+        //商家优惠 加上首单折扣
+        merchantCouponFee = merchantCouponFee + firstDiscountAmount;
+
         platformAmount = amountJson.totalPrice - (platformCouponFee + merchantCouponFee) - merchantAmount - consigneeAmount;
         platformAmount = Math.round(platformAmount * 100) / 100;
 
@@ -326,17 +341,17 @@ const amountManger = (function () {
         retJson.couponType = couponType;
         retJson.couponValue = couponValue;
 
-        // console.log("返回给订单的所有金额:")
-        // console.log("totalPrice====" + totalPrice);
-        // console.log("merchantAmount====" + merchantAmount);
-        // console.log("consigneeAmount====" + consigneeAmount);
-        // console.log("platformCouponFee====" + platformCouponFee);
-        // console.log("merchantCouponFee====" + merchantCouponFee);
-        // console.log("deliveryFee====" + deliveryFee);
-        // console.log("refund_amount====" + refund_amount);
-        // console.log("platformAmount====" + platformAmount);
-        // console.log("couponType===" + couponType);
-        // console.log("couponValue===" + couponValue);
+        console.log("返回给订单的所有金额:")
+        console.log("totalPrice====" + totalPrice);
+        console.log("merchantAmount====" + merchantAmount);
+        console.log("consigneeAmount====" + consigneeAmount);
+        console.log("platformCouponFee====" + platformCouponFee);
+        console.log("merchantCouponFee====" + merchantCouponFee);
+        console.log("deliveryFee====" + deliveryFee);
+        console.log("refund_amount====" + refund_amount);
+        console.log("platformAmount====" + platformAmount);
+        console.log("couponType===" + couponType);
+        console.log("couponValue===" + couponValue);
         return retJson;
 
     }

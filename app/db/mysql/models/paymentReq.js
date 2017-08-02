@@ -26,6 +26,8 @@ module.exports = function (sequelize, DataTypes) {
         phoneNumber: shortDataTypes.Phone(true),//手机号，代售用，点餐不填
         TransferAccountIsFinish: shortDataTypes.Bool(),//主商户是否转账成功
         consigneeTransferAccountIsFinish: shortDataTypes.Bool(),//代售商户是否转账完成
+        //首单折扣
+        firstDiscount: shortDataTypes.Double(-1),
         tenantId: {
             type: Sequelize.STRING
         }

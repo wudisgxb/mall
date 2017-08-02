@@ -86,8 +86,11 @@ module.exports = {
             return;
         }
 
+        //首单折扣，-1表示不折扣，根据手机号和租户id
+        let firstDiscount = await orderManager.getFirstDiscount(orders[0].phone,ctx.query.tenantId);
+
         //根据订单查询需要支付多少
-        let total_amount = await orderManager.getOrderPriceByOrder(orders);
+        let total_amount = await orderManager.getOrderPriceByOrder(orders,firstDiscount);
 
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
@@ -161,6 +164,7 @@ module.exports = {
                 actual_amount: total_amount,
                 refund_amount: '0',
                 refund_reason: '',
+                firstDiscount:firstDiscount,
                 consigneeId: null,
                 TransferAccountIsFinish: false,
                 consigneeTransferAccountIsFinish: false,
@@ -189,6 +193,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 consigneeId: null,
+                firstDiscount:firstDiscount,
                 TransferAccountIsFinish: false,
                 consigneeTransferAccountIsFinish: false,
                 tenantId: ctx.query.tenantId
@@ -257,8 +262,11 @@ module.exports = {
             return;
         }
 
+        //首单折扣，-1表示不折扣，根据手机号和租户id
+        let firstDiscount = await orderManager.getFirstDiscount(orders[0].phone,ctx.query.tenantId);
+
         //根据订单查询需要支付多少
-        let total_amount = await orderManager.getOrderPriceByOrder(orders);
+        let total_amount = await orderManager.getOrderPriceByOrder(orders,firstDiscount);
         // console.log("total_amount========" + total_amount);
 
 
@@ -340,6 +348,7 @@ module.exports = {
                 actual_amount: total_amount,
                 refund_amount: '0',
                 refund_reason: '',
+                firstDiscount:firstDiscount,
                 consigneeId: ctx.query.consigneeId,
                 phoneNumber: ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,
@@ -366,6 +375,7 @@ module.exports = {
                 actual_amount: total_amount,
                 refund_amount: '0',
                 refund_reason: '',
+                firstDiscount:firstDiscount,
                 consigneeId: ctx.query.consigneeId,
                 phoneNumber: ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,

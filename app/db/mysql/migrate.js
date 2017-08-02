@@ -623,9 +623,7 @@ function * update() {
 
 co(function *() {
     //yield init();
-    // yield update();
-    yield Vip
-    yield Coupons();
+    yield update();
 
     console.log('finished ...');
     process.exit(0)
