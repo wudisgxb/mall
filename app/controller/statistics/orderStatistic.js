@@ -551,15 +551,13 @@ const getstatistics = (function () {
         if(type==2){
             getTime = await getDayEchat.getDay(startTime,endTime)
         }
-        if(type==4){
+        if(type==5){
             getTime = await getOneDayEchat.getDay(startTime,endTime)
         }
         if(type==3){
             getTime = await AnYearEchats.getAnYear(startTime,endTime)
         }
-        if(type==5){
-            
-        }
+
         // if(type==4){
         //     getTime = await getQuarterEchats.getQuarter(startTime,endTime)
         // }
@@ -591,7 +589,10 @@ const getstatistics = (function () {
             }
             if(type==4){
                 let start = i+1
-                time ="第"+start+"天"
+                time =getTime[i].start
+            }
+            if(type==5){
+                time = new Date(getTime[i].start)
             }
             result.push({
                 merchantPayment:{
@@ -633,7 +634,7 @@ const getstatistics = (function () {
             })
         }
 
-        console.log(result)
+        // console.log(result)
         return result;
     }
     // 分成情况

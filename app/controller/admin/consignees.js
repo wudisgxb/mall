@@ -31,8 +31,8 @@ module.exports = {
             return;
         }
         let consignees = await Consignees.findAll({
-           where : {
-               consigneeId:ctx.query.consigneeId
+            where : {
+                consigneeId:ctx.query.consigneeId
             }
         });
         if(consignees.length==0){
@@ -71,7 +71,7 @@ module.exports = {
         await consignees.save();
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS);
     },
-    
+
     async saveAdminConsignees(ctx,next){
         ctx.checkBody('/consignees/name',true).first().notEmpty();
         ctx.checkBody('/consignees/phone',true).first().notEmpty();
@@ -95,11 +95,11 @@ module.exports = {
         }
         let consigneeId =  Tool.allocTenantId();
         await Consignees.create({
-                name : body.consignees.name,
-                phone : body.consignees.phone,
-                wecharPayee_account : body.consignees.wecharPayee_account,
-                payee_account : body.consignees.payee_account,
-                consigneeId : consigneeId
+            name : body.consignees.name,
+            phone : body.consignees.phone,
+            wecharPayee_account : body.consignees.wecharPayee_account,
+            payee_account : body.consignees.payee_account,
+            consigneeId : consigneeId
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,{consigneeId:consigneeId})
     },
