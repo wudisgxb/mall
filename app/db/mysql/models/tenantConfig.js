@@ -52,7 +52,7 @@ module.exports = function (sequelize, DataTypes) {
         needChoosePeopleNumberPage: shortDataTypes.Bool(),
 
         //首单折扣（半价）
-        firstDiscount: shortDataTypes.Int(-1),
+        firstDiscount: shortDataTypes.Double(-1),
 
         //营业起始时间
         startTime: shortDataTypes.String(),
