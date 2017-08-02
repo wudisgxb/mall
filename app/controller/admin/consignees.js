@@ -31,8 +31,8 @@ module.exports = {
         ctx.checkBody('/consignees/payee_account',true).first().notEmpty();
         ctx.checkBody('/condition/consigneeId',true).first().notEmpty();
         ctx.checkBody('/condition/id',true).first().notEmpty();
-        if (this.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,this.errors);
+        if (ctx.errors) {
+            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
             return;
         }
         let body = ctx.request.body;
@@ -89,8 +89,8 @@ module.exports = {
     async deleteAdminConsignees(ctx,next){
         ctx.checkQuery('id').notEmpty();
         // ctx.checkQuery('consigneeId').notEmpty();
-        if (this.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, this.errors);
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, ctx.errors);
             return;
         }
         let consignees = await Consignees.findOne({
