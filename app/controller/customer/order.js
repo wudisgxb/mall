@@ -104,7 +104,7 @@ module.exports = {
             //满多少加会员
             let phone = orders[0].phone;
 
-            let isVip = await vipManager.isVip(phone,orders[0].tenantId,result.totalPrice);
+            let isVip = await vipManager.isVip(phone, orders[0].tenantId, result.totalPrice);
             result.isVip = isVip;
 
             //通过订单号获取优惠券
@@ -121,50 +121,14 @@ module.exports = {
                 result.couponType = coupon.couponType;
                 result.couponValue = coupon.value;
                 result.couponKey = coupon.couponKey;
-
-                // switch (coupon.couponType) {
-                //     case 'amount':
-                //         result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
-                //         result.totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
-                //         break;
-                //     case 'discount':
-                //         result.totalPrice = result.totalPrice * coupon.value;
-                //         result.totalVipPrice = result.totalVipPrice * coupon.value;
-                //         break;
-                //     case 'reduce':
-                //         if (result.totalPrice >= coupon.value.split('-')[0]) {
-                //             result.totalPrice = result.totalPrice - coupon.value.split('-')[1];
-                //         }
-                //         if (result.totalVipPrice >= coupon.value.split('-')[0]) {
-                //             result.totalVipPrice = result.totalVipPrice - coupon.value.split('-')[1];
-                //         }
-                //         break;
-                //     default:
-                //         result.totalPrice = result.totalPrice;
-                //         result.totalVipPrice = result.totalVipPrice;
-                // }
             }
+
+            //首单折扣，-1表示不折扣，根据手机号和租户id
+            result.firstDiscount = await this.getFirstDiscount(phone,ctx.query.tenantId);
+
 
             result.totalPrice = Math.round(result.totalPrice * 100) / 100;
             result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
-
-            // //判断vip
-            // if (orders[0].phone != null) {
-            //     let vips = await Vips.findAll({
-            //         where: {
-            //             phone: orders[0].phone,
-            //             tenantId: ctx.query.tenantId
-            //         }
-            //     })
-            //     if (vips.length > 0) {
-            //         result.discount = Math.round((result.totalPrice - result.totalVipPrice) * 100) / 100;
-            //         delete result.totalPrice;
-            //     } else {
-            //         delete result.totalVipPrice;
-            //     }
-            // } else {
-            //     delete result.totalVipPrice;
-            // }
         }
 
         // 将 相同foodId 合并
@@ -669,7 +633,7 @@ module.exports = {
             //满多少加会员
             let phone = ctx.query.phoneNumber;
 
-            let isVip = await vipManager.isVip(phone,orders[0].tenantId,result.totalPrice);
+            let isVip = await vipManager.isVip(phone, ctx.query.tenantId, result.totalPrice);
             console.log("111111111111111111111111===" + isVip)
             result.isVip = isVip;
 
@@ -679,8 +643,8 @@ module.exports = {
                     trade_no: orders[0].trade_no,
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
-                   // consigneeId: ctx.query.consigneeId,
-                   // status: 0
+                    // consigneeId: ctx.query.consigneeId,
+                    // status: 0
                 }
             })
 
@@ -688,29 +652,10 @@ module.exports = {
                 result.couponType = coupon.couponType;
                 result.couponValue = coupon.value;
                 result.couponKey = coupon.couponKey;
-
-                // switch (coupon.couponType) {
-                //     case 'amount':
-                //         result.totalPrice = ((result.totalPrice - coupon.value) <= 0) ? 0.01 : (result.totalPrice - coupon.value);
-                //         result.totalVipPrice = ((result.totalVipPrice - coupon.value) <= 0) ? 0.01 : (result.totalVipPrice - coupon.value);
-                //         break;
-                //     case 'discount':
-                //         result.totalPrice = result.totalPrice * coupon.value;
-                //         result.totalVipPrice = result.totalVipPrice * coupon.value;
-                //         break;
-                //     case 'reduce':
-                //         if (result.totalPrice >= coupon.value.split('-')[0]) {
-                //             result.totalPrice = result.totalPrice - coupon.value.split('-')[1];
-                //         }
-                //         if (result.totalVipPrice >= coupon.value.split('-')[0]) {
-                //             result.totalVipPrice = result.totalVipPrice - coupon.value.split('-')[1];
-                //         }
-                //         break;
-                //     default:
-                //         result.totalPrice = result.totalPrice;
-                //         result.totalVipPrice = result.totalVipPrice;
-                // }
             }
+
+            //首单折扣，-1表示不折扣，根据手机号和租户id
+            result.firstDiscount = await this.getFirstDiscount(phone,ctx.query.tenantId);
 
             result.totalPrice = Math.round(result.totalPrice * 100) / 100;
             result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
@@ -732,25 +677,6 @@ module.exports = {
                 })
                 result.deliveryFee = distanceAndPrice.deliveryFee;
             }
-
-
-            // //判断vip
-            // if (orders[0].phone != null) {
-            //     let vips = await Vips.findAll({
-            //         where: {
-            //             phone: orders[0].phone,
-            //             tenantId: ctx.query.tenantId
-            //         }
-            //     })
-            //     if (vips.length > 0) {
-            //         result.discount = Math.round((result.totalPrice - result.totalVipPrice) * 100) / 100;
-            //         delete result.totalPrice;
-            //     } else {
-            //         delete result.totalVipPrice;
-            //     }
-            // } else {
-            //     delete result.totalVipPrice;
-            // }
         }
 
         // 将 相同foodId 合并
@@ -768,7 +694,7 @@ module.exports = {
     },
 
     //通过订单查询支付金额
-    async getOrderPriceByOrder(orders, tenantId) {
+    async getOrderPriceByOrder(orders,firstDiscount) {
         let totalPrice = 0;
         let totalVipPrice = 0;
         let total_amount = 0;
@@ -801,6 +727,12 @@ module.exports = {
             }
         } else {
             total_amount = Math.round(totalPrice * 100) / 100;
+        }
+
+        //首单折扣
+        if (firstDiscount != -1) {
+            total_amount = total_amount * firstDiscount;
+            console.log("firstDiscount=" + firstDiscount + " total_amount=" + total_amount);
         }
 
         //通过订单号获取优惠券
@@ -850,7 +782,34 @@ module.exports = {
             total_amount = parseFloat(total_amount) + parseFloat(distanceAndPrice.deliveryFee);
         }
 
-        return Math.round(total_amount *100) /100;
+        return Math.round(total_amount * 100) / 100;
+    },
+
+    //获取首单折扣
+    async getFirstDiscount(phone, tenantId) {
+        let tenantConfig = await TenantConfigs.findOne({
+            where: {
+                tenantId: tenantId,
+            }
+        })
+
+        if (tenantConfig.firstDiscount == -1) {
+            return -1;
+        } else {
+            let paymentReqs = await PaymentReqs.findAll({
+                where: {
+                    phoneNumber: phone,
+                    tenantId: tenantId,
+                    isFinish: 1
+                }
+            })
+
+            if (paymentReqs.length == 0) {
+                return -1;
+            } else {
+                return tenantConfig.firstDiscount;
+            }
+        }
     },
 
 }
