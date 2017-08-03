@@ -5,9 +5,8 @@ var Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
 
     var Orders = sequelize.define('Orders', {
-        orderId : shortDataTypes.Int(unique),
         tenantId:shortDataTypes.String(255,true),//商户
-        consigneeId:shortDataTypes.String(255,true),//代售点
+        // consigneeId:shortDataTypes.String(255,true),//代售点
         trade_no : shortDataTypes.String(255,true), //订单号
         totalPrice : shortDataTypes.String(255,true), //订单价格
         merchantAmount : shortDataTypes.String(255,true), //转给商户的钱
@@ -15,16 +14,11 @@ module.exports = function (sequelize, DataTypes) {
         platformAmount : shortDataTypes.String(255,true), //转给平台的钱
         deliveryFee : shortDataTypes.String(255,true), //配送费
         refund_amount : shortDataTypes.String(255,true), //退款
-        platformCouponFee : shortDataTypes.String(255,true), //平台优惠券优惠数
-        merchantCouponFee : shortDataTypes.String(255,true), //商家优惠券优惠数
-        couponType : shortDataTypes.String(255,true),//优惠券类型
-        foodName : shortDataTypes.String(255,true),//菜名
-        foodId :shortDataTypes.String(255,true),
+        platformCouponFee : shortDataTypes.String(255,true), //平台优惠
+        merchantCouponFee : shortDataTypes.String(255,true), //商家优惠
+        // coupon : shortDataTypes.String(255,true),
         phone : shortDataTypes.Phone(), //手机号
         createTime : shortDataTypes.Date(255,true),//创建统计数据的时间
-        menus : shortDataTypes.Int(255),
-        isVip : shortDataTypes.Bool(),
-        vipPrice : shortDataTypes.String(255,true)
     }, {
         paranoid: true,
         associate: function (models) {
