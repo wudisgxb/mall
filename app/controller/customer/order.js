@@ -814,10 +814,12 @@ module.exports = {
             let paymentReq = await PaymentReqs.findOne({
                 where: {
                     trade_no: tradeNoArray[k],
+                    isFinish: true
                 }
             });
 
             if (paymentReq != null) {
+                result[k].paymentTime = paymentReq.createdAt;
                 result[k].total_amount = paymentReq.total_amount;
                 result[k].actual_amount = paymentReq.actual_amount;
                 result[k].refund_amount = paymentReq.refund_amount;
@@ -829,13 +831,13 @@ module.exports = {
             let amount = await amoutManager.getTransAccountAmount(order.tenantId, ctx.query.consigneeId, tradeNoArray[k], orders[0].paymentMethod, refund_amount);
 
             //简单异常处理
-            if (amount.totalAmount >0) {
-                result[k].totalPrice =  amount.totalPrice;
+            if (amount.totalAmount > 0) {
+                result[k].totalPrice = amount.totalPrice;
                 result[k].platformCouponFee = amount.platformCouponFee;
                 result[k].merchantCouponFee = amount.merchantCouponFee;
                 result[k].deliveryFee = amount.deliveryFee;
                 result[k].refund_amount = refund_amount;
-                result[k].platformAmount  = amount.platformAmount;
+                result[k].platformAmount = amount.platformAmount;
                 result[k].merchantAmount = amount.merchantAmount;
                 result[k].consigneeAmount = amount.consigneeAmount;
                 result[k].couponType = amount.couponType;
@@ -846,7 +848,7 @@ module.exports = {
                 result[k].merchantCouponFee = 0;
                 result[k].deliveryFee = 0;
                 result[k].refund_amount = 0;
-                result[k].platformAmount  = 0;
+                result[k].platformAmount = 0;
                 result[k].merchantAmount = 0;
                 result[k].consigneeAmount = 0;
                 result[k].couponType = null;
