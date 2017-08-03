@@ -3,6 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const QRCodeTemplates = db.models.QRCodeTemplates;
+const Merchants = db.models.Merchants;
 const TenantConfigs = db.models.TenantConfigs;
 const Tool = require('../../Tool/tool');
 
@@ -27,36 +28,64 @@ module.exports = {
             return;
         }
 
-        //获取租户名称
-        let tenantInfo = await TenantConfigs.findOne({
-            where: {
-                tenantId: qrCodeTemplates[0].tenantId,
-            }
-        })
 
 
         let qrCode = {};
+        let qrCodes = [];
+
+        let tenantIdArray = [];//根据租户分组
 
         let coupons = [];
         qrCodeTemplates.forEach(function (e) {
-            qrCode.QRCodeTemplateId = e.QRCodeTemplateId;
-            qrCode.tableName = e.tableName;
-            qrCode.bizType = e.bizType;
-            if (e.couponRate != null) {
-                qrCode.couponRate = e.couponRate;
-            }
-            qrCode.tenantId = e.tenantId;
-            qrCode.merchantName = tenantInfo.name;
-            qrCode.consigneeId = e.consigneeId;
-            if (e.couponType != null && e.couponValue != null) {
-                coupons.push({"couponType" : e.couponType,"couponValue":e.couponValue})
+            if (!tenantIdArray.contains(e.tenantId)) {
+                tenantIdArray.push(e.tenantId);
             }
         })
 
-        if (coupons.length > 0) {
-            qrCode.coupons = coupons;
+        for (var i = 0; i < tenantIdArray.length; i++) {
+            coupons = [];
+            //获取租户名称
+            let merchant = await Merchants.findOne({
+                where: {
+                    tenantId: tenantIdArray[i],
+                }
+            })
+
+            //获取主页图
+            let tenantConfig = await TenantConfigs.findOne({
+                where: {
+                    tenantId: tenantIdArray[i],
+                }
+            })
+            for (var j = 0; j < qrCodeTemplates.length; j++) {
+                if (tenantIdArray[i] == qrCodeTemplates[j].tenantId) {
+                    qrCode = new Object();
+                    qrCode.QRCodeTemplateId = qrCodeTemplates[j].QRCodeTemplateId;
+                    qrCode.tableName = qrCodeTemplates[j].tableName;
+                    qrCode.bizType = qrCodeTemplates[j].bizType;
+                    if (qrCodeTemplates[j].couponRate != null) {
+                        qrCode.couponRate = qrCodeTemplates[j].couponRate;
+                    }
+                    qrCode.tenantId = qrCodeTemplates[j].tenantId;
+                    qrCode.merchantName = merchant.name;
+                    qrCode.industry = merchant.industry;
+                    qrCode.homeImage = tenantConfig.homeImage;
+                    qrCode.consigneeId = qrCodeTemplates[j].consigneeId;
+                    if (qrCodeTemplates[j].couponType != null && qrCodeTemplates[j].couponValue != null) {
+                        coupons.push({"couponType": qrCodeTemplates[j].couponType, "couponValue": qrCodeTemplates[j].couponValue})
+                    }
+                }
+            }
+            if (coupons.length > 0) {
+                qrCode.coupons = coupons;
+            }
+            qrCodes.push(qrCode);
         }
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCode);
+        if (qrCodes.length == 1) {
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodes[0]);
+        } else {
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodes);
+        }
     },
 }

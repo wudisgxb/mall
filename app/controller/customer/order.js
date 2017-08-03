@@ -7,6 +7,7 @@ const Tables = db.models.Tables;
 const ShoppingCarts = db.models.ShoppingCarts;
 const Vips = db.models.Vips;
 const TenantConfigs = db.models.TenantConfigs;
+const Merchants = db.models.Merchants;
 const Coupons = db.models.Coupons;
 const DeliveryFees = db.models.DeliveryFees;
 const DistanceAndPrices = db.models.DistanceAndPrices;
@@ -689,6 +690,140 @@ module.exports = {
 
             return accu
         }, [])
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
+    },
+
+    async getUserEshopConsigneeOrder (ctx, next) {
+        ctx.checkQuery('consigneeId').notEmpty();
+        ctx.checkQuery('phoneNumber').notEmpty();
+        ctx.checkQuery('startTime').notEmpty();
+        ctx.checkQuery('endTime').notEmpty();
+
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
+
+        let startTime = new Date(ctx.query.startTime);
+        let endTime = new Date(ctx.query.endTime);
+
+
+        let result = [];
+        let foodJson = [];
+        let totalNum = 0;
+        let totalPrice = 0;
+        let totalVipPrice = 0;
+
+        let orders;
+        //根据手机号查询代售点下所有订单
+        let order = await Orders.findAll({
+            where: {
+                createdAt: {
+                    $between: [startTime, endTime]
+                },
+                phone: ctx.query.phoneNumber,
+                consigneeId: ctx.query.consigneeId,
+            }
+        })
+
+        let tradeNoArray = [];//订单号
+        for (var i = 0; i < order.length; i++) {
+            if (!tradeNoArray.contains(order[i].trade_no)) {
+                tradeNoArray.push(order[i].trade_no);
+            }
+        }
+        //循环不相同的订单号
+        for (let k = 0; k < tradeNoArray.length; k++) {
+            totalNum = 0;//数量
+            totalPrice = 0;//单价
+            totalVipPrice = 0;//会员价
+            //价格的数组
+            foodJson = [];
+            //根据订单号查询租户id
+            let order = await Orders.findOne({
+                where: {
+                    createdAt: {
+                        $between: [startTime, endTime]
+                    },
+                    trade_no: tradeNoArray[k]
+                }
+            })
+            //根据tenantId查询租户名
+            let merchant = await Merchants.findOne({
+                where: {
+                    tenantId: order.tenantId
+                }
+            })
+            //根据创建时间和订单号查询所有记录
+            orders = await Orders.findAll({
+                where: {
+                    createdAt: {
+                        $between: [startTime, endTime]
+                    },
+                    trade_no: tradeNoArray[k]
+                },
+                order: [["createdAt", "DESC"]]
+            })
+
+            for (var j = 0; j < orders.length; j++) {
+                //根据菜单号查询菜单
+                let food = await Foods.findOne({
+                    where: {
+                        id: orders[j].FoodId,
+                    }
+                })
+
+                foodJson[j] = {};
+                foodJson[j].id = food.id;
+                foodJson[j].name = food.name;
+                foodJson[j].price = food.price;
+                foodJson[j].vipPrice = food.vipPrice;
+                foodJson[j].num = orders[j].num;
+                foodJson[j].unit = orders[j].unit;
+                //总数量为每个循环的数量现价
+                totalNum += orders[j].num;
+                //当前菜的总价格为菜品的价格*订单中购买的数量
+                totalPrice += food.price * orders[j].num;//原价
+                //会员价为菜品的会员价*订单中购买的数量
+                totalVipPrice += food.vipPrice * orders[j].num;//会员价
+            }
+
+            result[k] = {};
+
+            let table = await Tables.findById(orders[0].TableId);
+
+            result[k].tableName = table.name;
+            result[k].trade_no = tradeNoArray[k];
+            result[k].info = orders[0].info;
+            result[k].id = orders[0].id
+            result[k].foods = foodJson;
+            result[k].totalNum = totalNum;
+            result[k].totalPrice = Math.round(totalPrice * 100) / 100;
+            result[k].dinersNum = orders[0].diners_num;
+            result[k].paymentMethod = orders[0].paymentMethod;//支付方式
+            result[k].status = orders[0].status;
+            result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
+            result[k].phone = orders[0].phone;
+            result[k].tenantId = merchant.tenantId;
+            result[k].merchantName = merchant.name;
+            result[k].merchantIndustry = merchant.industry;
+            result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
+
+            let paymentReq = await PaymentReqs.findOne({
+                where: {
+                    trade_no: tradeNoArray[k],
+                }
+            });
+
+            if (paymentReq != null) {
+                result[k].total_amount = paymentReq.total_amount;
+                result[k].actual_amount = paymentReq.actual_amount;
+                result[k].refund_amount = paymentReq.refund_amount;
+                result[k].refund_reason = paymentReq.refund_reason;
+            }
+
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
 
