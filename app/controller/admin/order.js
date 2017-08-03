@@ -198,8 +198,7 @@ module.exports ={
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
 
             let refund_amount = 0;
-
-
+            
             let paymentReq = await PaymentReqs.findOne({
                 where: {
                     trade_no: tradeNoArray[k],

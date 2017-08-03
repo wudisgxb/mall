@@ -18,6 +18,7 @@ const tool = require('../../Tool/tool');
 const ApiResult = require('../../db/mongo/ApiResult');
 const vipManager = require('./vip');
 const Promise = require('Promise');
+const amoutManager = require('../amount/amountManager')
 
 module.exports = {
     async getUserDealOrder (ctx, next) {
@@ -810,6 +811,7 @@ module.exports = {
             result[k].merchantIndustry = merchant.industry;
             result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
 
+            let refund_amount = 0;
             let paymentReq = await PaymentReqs.findOne({
                 where: {
                     trade_no: tradeNoArray[k],
@@ -821,6 +823,34 @@ module.exports = {
                 result[k].actual_amount = paymentReq.actual_amount;
                 result[k].refund_amount = paymentReq.refund_amount;
                 result[k].refund_reason = paymentReq.refund_reason;
+                refund_amount = paymentReq.refund_amount;
+            }
+
+            let amount = await amoutManager.getTransAccountAmount(order.tenantId, ctx.query.consigneeId, tradeNoArray[k], orders[0].paymentMethod, refund_amount);
+
+            //简单异常处理
+            if (amount.totalAmount >0) {
+                result[k].totalPrice =  amount.totalPrice;
+                result[k].platformCouponFee = amount.platformCouponFee;
+                result[k].merchantCouponFee = amount.merchantCouponFee;
+                result[k].deliveryFee = amount.deliveryFee;
+                result[k].refund_amount = refund_amount;
+                result[k].platformAmount  = amount.platformAmount;
+                result[k].merchantAmount = amount.merchantAmount;
+                result[k].consigneeAmount = amount.consigneeAmount;
+                result[k].couponType = amount.couponType;
+                result[k].couponValue = amount.couponValue;
+            } else {
+                result[k].totalPrice = 0;
+                result[k].platformCouponFee = 0;
+                result[k].merchantCouponFee = 0;
+                result[k].deliveryFee = 0;
+                result[k].refund_amount = 0;
+                result[k].platformAmount  = 0;
+                result[k].merchantAmount = 0;
+                result[k].consigneeAmount = 0;
+                result[k].couponType = null;
+                result[k].couponValue = null
             }
 
         }
