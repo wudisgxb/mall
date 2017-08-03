@@ -8,6 +8,7 @@ module.exports = function (sequelize, DataTypes) {
         /**
          * 代售商户名
          */
+        // tenantId : shortDataTypes.String(),
         name: shortDataTypes.String(),
         phone: shortDataTypes.Phone(),
         //微信账号
