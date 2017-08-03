@@ -16,9 +16,11 @@ module.exports = function (sequelize, DataTypes) {
         refund_amount : shortDataTypes.String(255,true), //退款
         platformCouponFee : shortDataTypes.String(255,true), //平台优惠
         merchantCouponFee : shortDataTypes.String(255,true), //商家优惠
-        // coupon : shortDataTypes.String(255,true),
+        // coupon : shortDataTypes.String(255,true),//优惠券类型
+        // foodName : shortDataTypes.String(255,true),//菜名
         phone : shortDataTypes.Phone(), //手机号
         createTime : shortDataTypes.Date(255,true),//创建统计数据的时间
+
     }, {
         paranoid: true,
         associate: function (models) {
