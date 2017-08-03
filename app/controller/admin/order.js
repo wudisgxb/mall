@@ -176,7 +176,7 @@ module.exports ={
                 //会员价为菜品的会员价*订单中购买的数量
                 totalVipPrice += food.vipPrice * orders[j].num;//会员价
             }
-            
+
             result[k] = {};
 
             let table = await Tables.findById(orders[0].TableId);

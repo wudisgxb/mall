@@ -4,6 +4,7 @@ const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const QRCodeTemplates = db.models.QRCodeTemplates;
 const Merchants = db.models.Merchants;
+const TenantConfigs = db.models.TenantConfigs;
 const Tool = require('../../Tool/tool');
 
 module.exports = {
@@ -49,6 +50,13 @@ module.exports = {
                     tenantId: tenantIdArray[i],
                 }
             })
+
+            //获取主页图
+            let tenantConfig = await TenantConfigs.findOne({
+                where: {
+                    tenantId: tenantIdArray[i],
+                }
+            })
             for (var j = 0; j < qrCodeTemplates.length; j++) {
                 if (tenantIdArray[i] == qrCodeTemplates[j].tenantId) {
                     qrCode = new Object();
@@ -61,6 +69,7 @@ module.exports = {
                     qrCode.tenantId = qrCodeTemplates[j].tenantId;
                     qrCode.merchantName = merchant.name;
                     qrCode.industry = merchant.industry;
+                    qrCode.homeImage = tenantConfig.homeImage;
                     qrCode.consigneeId = qrCodeTemplates[j].consigneeId;
                     if (qrCodeTemplates[j].couponType != null && qrCodeTemplates[j].couponValue != null) {
                         coupons.push({"couponType": qrCodeTemplates[j].couponType, "couponValue": qrCodeTemplates[j].couponValue})
