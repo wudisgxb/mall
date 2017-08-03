@@ -479,7 +479,6 @@ module.exports = {
             orders.map(async function (e) {
                 await e.destroy();
             })
-
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
