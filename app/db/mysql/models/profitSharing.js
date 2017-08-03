@@ -7,7 +7,7 @@ module.exports = function (sequelize, DataTypes) {
 
     let ProfitSharings = sequelize.define('ProfitSharings', {
         tenantId: shortDataTypes.String(100, false),
-        consigneeId: shortDataTypes.String(100, false),
+        consigneeName: shortDataTypes.String(100, false),
         //主商户支付备注
         merchantRemark: shortDataTypes.String(100, false),
         //代售商户支付备注
