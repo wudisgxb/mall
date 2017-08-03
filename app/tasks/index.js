@@ -1121,7 +1121,9 @@ module.exports = async function tasks(app) {
 
         //5分钟订单失效检查,代售点的订单10分钟失效，购物车也是
         schedule.scheduleJob(rule, async function () {
-            var orders = await Orders.findAll({
+            await Orders.update({
+                deletedAt: null
+            }, {
                 where: {
                     status: 2,
                     deletedAt: {
@@ -1130,11 +1132,6 @@ module.exports = async function tasks(app) {
                 },
                 paranoid: false
             });
-
-            for (var i = 0; i < orders.length; i++) {
-                orders[i].deletedAt = null;
-                orders[i].save();
-            }
         });
 
     }
