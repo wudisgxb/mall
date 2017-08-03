@@ -948,6 +948,10 @@ module.exports = {
             total_amount = parseFloat(total_amount) + parseFloat(distanceAndPrice.deliveryFee);
         }
 
+        if (total_amount <=0) {
+            total_amount = 0.01;
+        }
+
         return Math.round(total_amount * 100) / 100;
     },
 
