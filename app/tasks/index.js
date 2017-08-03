@@ -1133,6 +1133,7 @@ module.exports = async function tasks(app) {
 
             for (var i = 0; i < orders.length; i++) {
                 orders[i].deletedAt = null;
+                orders[i].save();
             }
         });
 
