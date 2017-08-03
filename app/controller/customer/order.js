@@ -705,6 +705,11 @@ module.exports = {
             return;
         }
 
+
+        let startTime = new Date(ctx.query.startTime);
+        let endTime = new Date(ctx.query.endTime);
+
+
         let result = [];
         let foodJson = [];
         let totalNum = 0;
@@ -716,7 +721,7 @@ module.exports = {
         let order = await Orders.findAll({
             where: {
                 createdAt: {
-                    $between: [ctx.query.startTime, ctx.query.endTime]
+                    $between: [startTime, endTime]
                 },
                 phone: ctx.query.phoneNumber,
                 consigneeId: ctx.query.consigneeId,
@@ -740,7 +745,7 @@ module.exports = {
             let order = await Orders.findOne({
                 where: {
                     createdAt: {
-                        $between: [ctx.query.startTime, ctx.query.endTime]
+                        $between: [startTime, endTime]
                     },
                     trade_no: tradeNoArray[k]
                 }
@@ -755,7 +760,7 @@ module.exports = {
             orders = await Orders.findAll({
                 where: {
                     createdAt: {
-                        $between: [ctx.query.startTime, ctx.query.endTime]
+                        $between: [startTime, endTime]
                     },
                     trade_no: tradeNoArray[k]
                 },
