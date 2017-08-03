@@ -73,6 +73,10 @@ module.exports = {
             qrCodes.push(qrCode);
         }
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodes);
+        if (qrCodes.length == 1) {
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodes[0]);
+        } else {
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodes);
+        }
     },
 }
