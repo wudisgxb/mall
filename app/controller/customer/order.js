@@ -819,7 +819,7 @@ module.exports = {
             });
 
             if (paymentReq != null) {
-                result[k].paymentTime = paymentReq.createdAt;
+                result[k].paymentTime = paymentReq.createdAt.format("yyyy-MM-dd hh:mm:ss");;
                 result[k].total_amount = paymentReq.total_amount;
                 result[k].actual_amount = paymentReq.actual_amount;
                 result[k].refund_amount = paymentReq.refund_amount;
