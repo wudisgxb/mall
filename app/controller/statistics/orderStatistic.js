@@ -557,10 +557,9 @@ const getstatistics = (function () {
         if(type==3){
             getTime = await AnYearEchats.getAnYear(startTime,endTime)
         }
-
-        // if(type==4){
-        //     getTime = await getQuarterEchats.getQuarter(startTime,endTime)
-        // }
+        if(type==4){
+            getTime = await getMonthEchats.getMonth(startTime,endTime)
+        }
         let result=[];
         for (let i = 0; i < getTime.length; i++){
             let statisticsOrder = await StatisticsOrders.getBetweenDateByTenantId(tenantId, new Date(getTime[i].start), new Date(getTime[i].end))
