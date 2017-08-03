@@ -697,6 +697,8 @@ module.exports = {
     async getUserEshopConsigneeOrder (ctx, next) {
         ctx.checkQuery('consigneeId').notEmpty();
         ctx.checkQuery('phoneNumber').notEmpty();
+        ctx.checkQuery('startTime').notEmpty();
+        ctx.checkQuery('endTime').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -713,6 +715,9 @@ module.exports = {
         //根据手机号查询代售点下所有订单
         let order = await Orders.findAll({
             where: {
+                createdAt: {
+                    $between: [ctx.query.startTime, ctx.query.endTime]
+                },
                 phone: ctx.query.phoneNumber,
                 consigneeId: ctx.query.consigneeId,
             }
@@ -731,9 +736,12 @@ module.exports = {
             totalVipPrice = 0;//会员价
             //价格的数组
             foodJson = [];
-            //根据订单号查询consigneeId
+            //根据订单号查询租户id
             let order = await Orders.findOne({
                 where: {
+                    createdAt: {
+                        $between: [ctx.query.startTime, ctx.query.endTime]
+                    },
                     trade_no: tradeNoArray[k]
                 }
             })
@@ -746,6 +754,9 @@ module.exports = {
             //根据创建时间和订单号查询所有记录
             orders = await Orders.findAll({
                 where: {
+                    createdAt: {
+                        $between: [ctx.query.startTime, ctx.query.endTime]
+                    },
                     trade_no: tradeNoArray[k]
                 },
                 order: [["createdAt", "DESC"]]
