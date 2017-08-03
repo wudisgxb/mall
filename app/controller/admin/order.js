@@ -38,7 +38,7 @@ module.exports ={
         }
         let tableId = [];
         for(let i =0;i<orders.length;i++){
-            await orders[i].destory();
+            await orders[i].destroy();
             if(!tableId.contains(orders[i].TableId)){
                 tableId.push(orders[i].TableId)
             }
@@ -178,7 +178,6 @@ module.exports ={
             }
 
             result[k] = {};
-            //result[i].tableId = orders[0].tableId;
 
             let table = await Tables.findById(orders[0].TableId);
 
@@ -188,46 +187,35 @@ module.exports ={
             result[k].id = orders[0].id
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
-            result[k].totalPrice = Math.round(totalPrice * 100) / 100;
+            //result[k].totalPrice = Math.round(totalPrice * 100) / 100;
             result[k].dinersNum = orders[0].diners_num;
             result[k].paymentMethod = orders[0].paymentMethod;//支付方式
             result[k].status = orders[0].status;
             result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[0].phone;
-            result[k].consigneeId = consigneesId.consigneeId;//(consigneesName == null ? null : consigneesName.name);
+            result[k].consigneeId = consigneesId.consigneeId;
             result[k].consigneeName = consigneesName==null?null:consigneesName.name;
-            result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
-            //根据订单号找退款信息
-            let tmp = await Orders.findAll({
-                where: {
-                    trade_no: tradeNoArray[k],
-                    tenantId: ctx.query.tenantId,
-                }
-            });
+            //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
+
             let refund_amount = 0;
 
-            if (tmp[0].trade_no != null && tmp[0].trade_no != '') {
-                // console.log("OOOOOOOOOOOOOOOOOsss||" + tmp[0].trade_no);
-                // console.log("tenantId = " + ctx.query.tenantId);
-                let paymentReqs = await PaymentReqs.findAll({
-                    where: {
-                        trade_no: tmp[0].trade_no,
-                        tenantId: ctx.query.tenantId
-                    }
-                });
-                //console.log("changdu:" + paymentReqs.length);
-                if (paymentReqs[k] != null) {
-                    result[k].trade_no = tmp[0].trade_no;
-                    result[k].total_amount = paymentReqs[0].total_amount;
-                    result[k].actual_amount = paymentReqs[0].actual_amount;
-                    result[k].refund_amount = paymentReqs[0].refund_amount;
-                    result[k].refund_reason = paymentReqs[0].refund_reason;
 
-                    refund_amount = paymentReqs[0].refund_amount;
+            let paymentReq = await PaymentReqs.findOne({
+                where: {
+                    trade_no: tradeNoArray[k],
+                    tenantId: ctx.query.tenantId
                 }
+            });
 
+            if (paymentReq != null) {
+                result[k].total_amount = paymentReq.total_amount;
+                result[k].actual_amount = paymentReq.actual_amount;
+                result[k].refund_amount = paymentReq.refund_amount;
+                result[k].refund_reason = paymentReq.refund_reason;
+
+                refund_amount = paymentReq.refund_amount;
             }
-
+            
             let amount = await amoutManager.getTransAccountAmount(ctx.query.tenantId, consigneesId.consigneeId, tradeNoArray[k], orders[0].paymentMethod, refund_amount);
 
             //简单异常处理

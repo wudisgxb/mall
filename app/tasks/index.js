@@ -1113,11 +1113,37 @@ module.exports = async function tasks(app) {
         });
     }
 
+    //已支付订单不删除
+    let OrderNotInvalid = async function () {
+        let rule = new schedule.RecurrenceRule();
+        let times = [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56];
+        rule.minute = times;
+
+        //5分钟订单失效检查,代售点的订单10分钟失效，购物车也是
+        schedule.scheduleJob(rule, async function () {
+            var orders = await Orders.findAll({
+                where: {
+                    status: 2,
+                    deletedAt: {
+                        $ne: null
+                    }
+                },
+                paranoid: false
+            });
+
+            for (var i = 0; i < orders.length; i++) {
+                orders[i].deletedAt = null;
+                orders[i].save();
+            }
+        });
+
+    }
+
     await timeTransferAccounts();
     await orderInvalid();
     await shoppingCartInvalid();
     await dealOrderInvalid();
     await dealShoppingCartInvalid();
-
-
+    //已支付订单取消删除
+    await OrderNotInvalid();
 }
