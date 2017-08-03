@@ -18,7 +18,6 @@ const tool = require('../../Tool/tool');
 const ApiResult = require('../../db/mongo/ApiResult');
 const vipManager = require('./vip');
 const Promise = require('Promise');
-const amoutManager = require('../amount/amountManager')
 
 module.exports = {
     async getUserDealOrder (ctx, next) {
@@ -825,6 +824,7 @@ module.exports = {
                 result[k].refund_reason = paymentReq.refund_reason;
                 refund_amount = paymentReq.refund_amount;
             }
+            const amoutManager = require('../amount/amountManager')
 
             let amount = await amoutManager.getTransAccountAmount(order.tenantId, ctx.query.consigneeId, tradeNoArray[k], orders[0].paymentMethod, refund_amount);
 
