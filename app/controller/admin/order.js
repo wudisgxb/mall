@@ -176,7 +176,7 @@ module.exports ={
                 //会员价为菜品的会员价*订单中购买的数量
                 totalVipPrice += food.vipPrice * orders[j].num;//会员价
             }
-
+            
             result[k] = {};
 
             let table = await Tables.findById(orders[0].TableId);
@@ -187,7 +187,7 @@ module.exports ={
             result[k].id = orders[0].id
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
-            result[k].totalPrice = Math.round(totalPrice * 100) / 100;
+            //result[k].totalPrice = Math.round(totalPrice * 100) / 100;
             result[k].dinersNum = orders[0].diners_num;
             result[k].paymentMethod = orders[0].paymentMethod;//支付方式
             result[k].status = orders[0].status;
@@ -195,7 +195,7 @@ module.exports ={
             result[k].phone = orders[0].phone;
             result[k].consigneeId = consigneesId.consigneeId;
             result[k].consigneeName = consigneesName==null?null:consigneesName.name;
-            result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
+            //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
 
             let refund_amount = 0;
 

@@ -37,6 +37,7 @@ const amountManger = (function () {
         let couponType = null;
         let couponValue = null;
         let firstDiscountAmount = 0;
+        let tmpTotalPrice = 0;
 
         let retJson = {};
         let orders = await Orders.findAll({
@@ -81,8 +82,10 @@ const amountManger = (function () {
 
         if (vip != null) {
             totalAmount = amountJson.totalVipPrice;
+            tmpTotalPrice = amountJson.totalVipPrice;
         } else {
             totalAmount = amountJson.totalPrice;
+            tmpTotalPrice = amountJson.totalPrice;
         }
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
@@ -315,13 +318,13 @@ const amountManger = (function () {
         //商家优惠 加上首单折扣
         merchantCouponFee = merchantCouponFee + firstDiscountAmount;
 
-        platformAmount = amountJson.totalPrice - (platformCouponFee + merchantCouponFee) - merchantAmount - consigneeAmount;
+        platformAmount = tmpTotalPrice - (platformCouponFee + merchantCouponFee) - merchantAmount - consigneeAmount;
         platformAmount = Math.round(platformAmount * 100) / 100;
 
         platformCouponFee = Math.round(platformCouponFee * 100) / 100;
         merchantCouponFee = Math.round(merchantCouponFee * 100) / 100;
 
-        let totalPrice = Math.round(amountJson.totalPrice * 100) / 100;
+        let totalPrice = Math.round(tmpTotalPrice* 100) / 100;
 
         retJson.totalAmount = parseFloat(totalAmount) + parseFloat(deliveryFee);//加配送费
         retJson.totalAmount = Math.round(retJson.totalAmount * 100) / 100;
