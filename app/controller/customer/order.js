@@ -99,7 +99,7 @@ module.exports = {
             result.time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result.info = orders[0].info;
             result.status = orders[0].status;
-            result.dinersNum = orders[0].diners_num;
+            result.diners_num = orders[0].diners_num;
             result.tradeNo = orders[0].trade_no;
 
             //满多少加会员
@@ -626,7 +626,7 @@ module.exports = {
             result.time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result.info = orders[0].info;
             result.status = orders[0].status;
-            result.dinersNum = orders[0].diners_num;
+            result.diners_num = orders[0].diners_num;
             result.tradeNo = orders[0].trade_no;
 
 
