@@ -985,7 +985,6 @@ module.exports = {
             let deliveryFee = await DeliveryFees.findOne({
                 where: {
                     trade_no: orders[0].trade_no,
-                    phone: phone,
                     tenantId: orders[0].tenantId,
                 }
             })

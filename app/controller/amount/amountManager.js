@@ -88,7 +88,7 @@ const amountManger = (function () {
             tmpTotalPrice = amountJson.totalPrice;
         }
 
-        //首单折扣，-1表示不折扣，根据手机号和租户id
+        //首单折扣，-1表示不折扣，根据手机号和租户id,暂时没用（原青豆家）
         let firstDiscount = await orderManager.getFirstDiscountByTradeNo(trade_no,tenantId);
 
         if (firstDiscount != -1) {
