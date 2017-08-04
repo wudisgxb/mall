@@ -44,7 +44,6 @@ module.exports = {
 
         let tableId = table.id;
         let trade_no = ctx.query.tradeNo;
-        let result = {};
         let orders;
 
         if (trade_no != undefined) {
@@ -66,83 +65,85 @@ module.exports = {
                 }
             })
         }
-        let foodJson = [];
-        let totalNum = 0;
-        let totalPrice = 0;
-        let totalVipPrice = 0;
-        let food;
-        for (let i = 0; i < orders.length; i++) {
-            food = await Foods.findAll({
-                where: {
-                    id: orders[i].FoodId,
-                    tenantId: ctx.query.tenantId
-                }
-            })
-            foodJson[i] = {};
-            foodJson[i].id = food[0].id;
-            foodJson[i].name = food[0].name;
-            foodJson[i].price = food[0].price;
-            foodJson[i].vipPrice = food[0].vipPrice;
-            foodJson[i].num = orders[i].num;
-            foodJson[i].unit = orders[i].unit;
-            totalNum += orders[i].num;
-            totalPrice += food[0].price * orders[i].num;//原价
-            totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
-        }
-        result.tableName = table.name;
-        result.foods = foodJson;
-        result.totalNum = totalNum;
-        result.totalPrice = Math.round(totalPrice * 100) / 100;
-        result.isVip = false;
-        if (orders[0] != null) {
-            result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
-            result.time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
-            result.info = orders[0].info;
-            result.status = orders[0].status;
-            result.diners_num = orders[0].diners_num;
-            result.tradeNo = orders[0].trade_no;
-
-            //满多少加会员
-            let phone = orders[0].phone;
-
-            let isVip = await vipManager.isVip(phone, orders[0].tenantId, result.totalPrice);
-            result.isVip = isVip;
-
-            //通过订单号获取优惠券
-            let coupon = await Coupons.findOne({
-                where: {
-                    trade_no: orders[0].trade_no,
-                    phone: phone,
-                    tenantId: orders[0].tenantId,
-                    status: 0
-                }
-            })
-
-            if (coupon != null) {
-                result.couponType = coupon.couponType;
-                result.couponValue = coupon.value;
-                result.couponKey = coupon.couponKey;
-            }
-
-            //首单折扣，-1表示不折扣，根据手机号和租户id
-            result.firstDiscount = await this.getFirstDiscount(phone, ctx.query.tenantId);
-
-
-            result.totalPrice = Math.round(result.totalPrice * 100) / 100;
-            result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
-        }
-
-        // 将 相同foodId 合并
-        result.foods = result.foods.reduce((accu, curr) => {
-            const exist = accu.find(e => e.id === curr.id)
-            if (exist) {
-                exist.num += curr.num
-            } else {
-                accu.push(curr)
-            }
-
-            return accu
-        }, [])
+        //通过orders构造订单详情
+        let result = await this.getOrderDetailByOrders(orders);
+        // let foodJson = [];
+        // let totalNum = 0;
+        // let totalPrice = 0;
+        // let totalVipPrice = 0;
+        // let food;
+        // for (let i = 0; i < orders.length; i++) {
+        //     food = await Foods.findAll({
+        //         where: {
+        //             id: orders[i].FoodId,
+        //             tenantId: ctx.query.tenantId
+        //         }
+        //     })
+        //     foodJson[i] = {};
+        //     foodJson[i].id = food[0].id;
+        //     foodJson[i].name = food[0].name;
+        //     foodJson[i].price = food[0].price;
+        //     foodJson[i].vipPrice = food[0].vipPrice;
+        //     foodJson[i].num = orders[i].num;
+        //     foodJson[i].unit = orders[i].unit;
+        //     totalNum += orders[i].num;
+        //     totalPrice += food[0].price * orders[i].num;//原价
+        //     totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
+        // }
+        // result.tableName = table.name;
+        // result.foods = foodJson;
+        // result.totalNum = totalNum;
+        // result.totalPrice = Math.round(totalPrice * 100) / 100;
+        // result.isVip = false;
+        // if (orders[0] != null) {
+        //     result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
+        //     result.time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
+        //     result.info = orders[0].info;
+        //     result.status = orders[0].status;
+        //     result.diners_num = orders[0].diners_num;
+        //     result.tradeNo = orders[0].trade_no;
+        //
+        //     //满多少加会员
+        //     let phone = orders[0].phone;
+        //
+        //     let isVip = await vipManager.isVip(phone, orders[0].tenantId, result.totalPrice);
+        //     result.isVip = isVip;
+        //
+        //     //通过订单号获取优惠券
+        //     let coupon = await Coupons.findOne({
+        //         where: {
+        //             trade_no: orders[0].trade_no,
+        //             phone: phone,
+        //             tenantId: orders[0].tenantId,
+        //             status: 0
+        //         }
+        //     })
+        //
+        //     if (coupon != null) {
+        //         result.couponType = coupon.couponType;
+        //         result.couponValue = coupon.value;
+        //         result.couponKey = coupon.couponKey;
+        //     }
+        //
+        //     //首单折扣，-1表示不折扣，根据手机号和租户id
+        //     result.firstDiscount = await this.getFirstDiscount(phone, ctx.query.tenantId);
+        //
+        //
+        //     result.totalPrice = Math.round(result.totalPrice * 100) / 100;
+        //     result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
+        // }
+        //
+        // // 将 相同foodId 合并
+        // result.foods = result.foods.reduce((accu, curr) => {
+        //     const exist = accu.find(e => e.id === curr.id)
+        //     if (exist) {
+        //         exist.num += curr.num
+        //     } else {
+        //         accu.push(curr)
+        //     }
+        //
+        //     return accu
+        // }, [])
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
@@ -569,7 +570,6 @@ module.exports = {
         let tableId = table.id;
         let trade_no = ctx.query.tradeNo;
 
-        let result = {};
         let orders;
 
         if (trade_no != undefined) {
@@ -593,103 +593,107 @@ module.exports = {
                 }
             })
         }
-        let foodJson = [];
-        let totalNum = 0;
-        let totalPrice = 0;
-        let totalVipPrice = 0;
-        let food;
-        for (let i = 0; i < orders.length; i++) {
-            food = await Foods.findAll({
-                where: {
-                    id: orders[i].FoodId,
-                    tenantId: ctx.query.tenantId
-                }
-            })
-            foodJson[i] = {};
-            foodJson[i].id = food[0].id;
-            foodJson[i].name = food[0].name;
-            foodJson[i].price = food[0].price;
-            foodJson[i].vipPrice = food[0].vipPrice;
-            foodJson[i].num = orders[i].num;
-            foodJson[i].unit = orders[i].unit;
-            totalNum += orders[i].num;
-            totalPrice += food[0].price * orders[i].num;//原价
-            totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
-        }
-        result.tableName = table.name;
-        result.foods = foodJson;
-        result.totalNum = totalNum;
-        result.totalPrice = Math.round(totalPrice * 100) / 100;
-        result.isVip = false;
-        if (orders[0] != null) {
-            result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
-            result.time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
-            result.info = orders[0].info;
-            result.status = orders[0].status;
-            result.diners_num = orders[0].diners_num;
-            result.tradeNo = orders[0].trade_no;
+        // let foodJson = [];
+        // let totalNum = 0;
+        // let totalPrice = 0;
+        // let totalVipPrice = 0;
+        // let food;
 
+        //通过orders构造订单详情
+        let result = await this.getOrderDetailByOrders(orders);
 
-            //满多少加会员
-            let phone = ctx.query.phoneNumber;
-
-            let isVip = await vipManager.isVip(phone, ctx.query.tenantId, result.totalPrice);
-            console.log("111111111111111111111111===" + isVip)
-            result.isVip = isVip;
-
-            //通过订单号获取优惠券
-            let coupon = await Coupons.findOne({
-                where: {
-                    trade_no: orders[0].trade_no,
-                    phone: ctx.query.phoneNumber,
-                    tenantId: ctx.query.tenantId,
-                    // consigneeId: ctx.query.consigneeId,
-                    // status: 0
-                }
-            })
-
-            if (coupon != null) {
-                result.couponType = coupon.couponType;
-                result.couponValue = coupon.value;
-                result.couponKey = coupon.couponKey;
-            }
-
-            //首单折扣，-1表示不折扣，根据手机号和租户id
-            result.firstDiscount = await this.getFirstDiscount(phone, ctx.query.tenantId);
-
-            result.totalPrice = Math.round(result.totalPrice * 100) / 100;
-            result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
-
-            //查询配送费
-            let deliveryFee = await DeliveryFees.findOne({
-                where: {
-                    trade_no: orders[0].trade_no,
-                    tenantId: ctx.query.tenantId,
-                }
-            })
-
-            if (deliveryFee != null) {
-                let distanceAndPrice = await DistanceAndPrices.findOne({
-                    where: {
-                        deliveryFeeId: deliveryFee.deliveryFeeId,
-                        tenantId: ctx.query.tenantId,
-                    }
-                })
-                result.deliveryFee = distanceAndPrice.deliveryFee;
-            }
-        }
-
-        // 将 相同foodId 合并
-        result.foods = result.foods.reduce((accu, curr) => {
-            const exist = accu.find(e => e.id === curr.id)
-            if (exist) {
-                exist.num += curr.num
-            } else {
-                accu.push(curr)
-            }
-
-            return accu
-        }, [])
+        // for (let i = 0; i < orders.length; i++) {
+        //     food = await Foods.findAll({
+        //         where: {
+        //             id: orders[i].FoodId,
+        //             tenantId: ctx.query.tenantId
+        //         }
+        //     })
+        //     foodJson[i] = {};
+        //     foodJson[i].id = food[0].id;
+        //     foodJson[i].name = food[0].name;
+        //     foodJson[i].price = food[0].price;
+        //     foodJson[i].vipPrice = food[0].vipPrice;
+        //     foodJson[i].num = orders[i].num;
+        //     foodJson[i].unit = orders[i].unit;
+        //     totalNum += orders[i].num;
+        //     totalPrice += food[0].price * orders[i].num;//原价
+        //     totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
+        // }
+        // result.tableName = table.name;
+        // result.foods = foodJson;
+        // result.totalNum = totalNum;
+        // result.totalPrice = Math.round(totalPrice * 100) / 100;
+        // result.isVip = false;
+        // if (orders[0] != null) {
+        //     result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
+        //     result.time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
+        //     result.info = orders[0].info;
+        //     result.status = orders[0].status;
+        //     result.diners_num = orders[0].diners_num;
+        //     result.tradeNo = orders[0].trade_no;
+        //
+        //
+        //     //满多少加会员
+        //     let phone = ctx.query.phoneNumber;
+        //
+        //     let isVip = await vipManager.isVip(phone, ctx.query.tenantId, result.totalPrice);
+        //     console.log("111111111111111111111111===" + isVip)
+        //     result.isVip = isVip;
+        //
+        //     //通过订单号获取优惠券
+        //     let coupon = await Coupons.findOne({
+        //         where: {
+        //             trade_no: orders[0].trade_no,
+        //             phone: ctx.query.phoneNumber,
+        //             tenantId: ctx.query.tenantId,
+        //             // consigneeId: ctx.query.consigneeId,
+        //             // status: 0
+        //         }
+        //     })
+        //
+        //     if (coupon != null) {
+        //         result.couponType = coupon.couponType;
+        //         result.couponValue = coupon.value;
+        //         result.couponKey = coupon.couponKey;
+        //     }
+        //
+        //     //首单折扣，-1表示不折扣，根据手机号和租户id
+        //     result.firstDiscount = await this.getFirstDiscount(phone, ctx.query.tenantId);
+        //
+        //     result.totalPrice = Math.round(result.totalPrice * 100) / 100;
+        //     result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
+        //
+        //     //查询配送费
+        //     let deliveryFee = await DeliveryFees.findOne({
+        //         where: {
+        //             trade_no: orders[0].trade_no,
+        //             tenantId: ctx.query.tenantId,
+        //         }
+        //     })
+        //
+        //     if (deliveryFee != null) {
+        //         let distanceAndPrice = await DistanceAndPrices.findOne({
+        //             where: {
+        //                 deliveryFeeId: deliveryFee.deliveryFeeId,
+        //                 tenantId: ctx.query.tenantId,
+        //             }
+        //         })
+        //         result.deliveryFee = distanceAndPrice.deliveryFee;
+        //     }
+        // }
+        //
+        // // 将 相同foodId 合并
+        // result.foods = result.foods.reduce((accu, curr) => {
+        //     const exist = accu.find(e => e.id === curr.id)
+        //     if (exist) {
+        //         exist.num += curr.num
+        //     } else {
+        //         accu.push(curr)
+        //     }
+        //
+        //     return accu
+        // }, [])
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
 
@@ -709,11 +713,8 @@ module.exports = {
         let endTime = new Date(ctx.query.endTime);
 
 
-        let result = [];
-        let foodJson = [];
-        let totalNum = 0;
-        let totalPrice = 0;
-        let totalVipPrice = 0;
+        let result = {};
+        let results = [];
 
         let orders;
         //根据手机号查询代售点下所有订单
@@ -735,26 +736,6 @@ module.exports = {
         }
         //循环不相同的订单号
         for (let k = 0; k < tradeNoArray.length; k++) {
-            totalNum = 0;//数量
-            totalPrice = 0;//单价
-            totalVipPrice = 0;//会员价
-            //价格的数组
-            foodJson = [];
-            //根据订单号查询租户id
-            let order = await Orders.findOne({
-                where: {
-                    createdAt: {
-                        $between: [startTime, endTime]
-                    },
-                    trade_no: tradeNoArray[k]
-                }
-            })
-            //根据tenantId查询租户名
-            let merchant = await Merchants.findOne({
-                where: {
-                    tenantId: order.tenantId
-                }
-            })
             //根据创建时间和订单号查询所有记录
             orders = await Orders.findAll({
                 where: {
@@ -762,101 +743,14 @@ module.exports = {
                         $between: [startTime, endTime]
                     },
                     trade_no: tradeNoArray[k]
-                },
-                order: [["createdAt", "DESC"]]
+                }
             })
 
-            for (var j = 0; j < orders.length; j++) {
-                //根据菜单号查询菜单
-                let food = await Foods.findOne({
-                    where: {
-                        id: orders[j].FoodId,
-                    }
-                })
-
-                foodJson[j] = {};
-                foodJson[j].id = food.id;
-                foodJson[j].name = food.name;
-                foodJson[j].price = food.price;
-                foodJson[j].vipPrice = food.vipPrice;
-                foodJson[j].num = orders[j].num;
-                foodJson[j].unit = orders[j].unit;
-                //总数量为每个循环的数量现价
-                totalNum += orders[j].num;
-                //当前菜的总价格为菜品的价格*订单中购买的数量
-                totalPrice += food.price * orders[j].num;//原价
-                //会员价为菜品的会员价*订单中购买的数量
-                totalVipPrice += food.vipPrice * orders[j].num;//会员价
-            }
-
-            result[k] = {};
-
-            let table = await Tables.findById(orders[0].TableId);
-
-            result[k].tableName = table.name;
-            result[k].trade_no = tradeNoArray[k];
-            result[k].info = orders[0].info;
-            result[k].id = orders[0].id
-            result[k].foods = foodJson;
-            result[k].totalNum = totalNum;
-            result[k].totalPrice = Math.round(totalPrice * 100) / 100;
-            result[k].dinersNum = orders[0].diners_num;
-            result[k].paymentMethod = orders[0].paymentMethod;//支付方式
-            result[k].status = orders[0].status;
-            result[k].time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
-            result[k].phone = orders[0].phone;
-            result[k].tenantId = merchant.tenantId;
-            result[k].merchantName = merchant.name;
-            result[k].merchantIndustry = merchant.industry;
-            result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
-
-            let refund_amount = 0;
-            let paymentReq = await PaymentReqs.findOne({
-                where: {
-                    trade_no: tradeNoArray[k],
-                    isFinish: true
-                }
-            });
-
-            if (paymentReq != null) {
-                result[k].paymentTime = paymentReq.createdAt.format("yyyy-MM-dd hh:mm:ss");;
-                result[k].total_amount = paymentReq.total_amount;
-                result[k].actual_amount = paymentReq.actual_amount;
-                result[k].refund_amount = paymentReq.refund_amount;
-                result[k].refund_reason = paymentReq.refund_reason;
-                refund_amount = paymentReq.refund_amount;
-            }
-            const amoutManager = require('../amount/amountManager')
-
-            let amount = await amoutManager.getTransAccountAmount(order.tenantId, ctx.query.consigneeId, tradeNoArray[k], orders[0].paymentMethod, refund_amount);
-
-            //简单异常处理
-            if (amount.totalAmount > 0) {
-                result[k].totalPrice = amount.totalPrice;
-                result[k].platformCouponFee = amount.platformCouponFee;
-                result[k].merchantCouponFee = amount.merchantCouponFee;
-                result[k].deliveryFee = amount.deliveryFee;
-                result[k].refund_amount = refund_amount;
-                result[k].platformAmount = amount.platformAmount;
-                result[k].merchantAmount = amount.merchantAmount;
-                result[k].consigneeAmount = amount.consigneeAmount;
-                result[k].couponType = amount.couponType;
-                result[k].couponValue = amount.couponValue;
-            } else {
-                result[k].totalPrice = 0;
-                result[k].platformCouponFee = 0;
-                result[k].merchantCouponFee = 0;
-                result[k].deliveryFee = 0;
-                result[k].refund_amount = 0;
-                result[k].platformAmount = 0;
-                result[k].merchantAmount = 0;
-                result[k].consigneeAmount = 0;
-                result[k].couponType = null;
-                result[k].couponValue = null
-            }
-
+            //通过orders构造订单详情
+            result = await this.getOrderDetailByOrders(orders);
+            results.push(result);
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, results)
     },
 
     //通过订单查询支付金额
@@ -948,7 +842,7 @@ module.exports = {
             total_amount = parseFloat(total_amount) + parseFloat(distanceAndPrice.deliveryFee);
         }
 
-        if (total_amount <=0) {
+        if (total_amount <= 0) {
             total_amount = 0.01;
         }
 
@@ -1007,6 +901,118 @@ module.exports = {
                 return paymentReq.firstDiscount;
             }
         }
+    },
+
+    //通过orders构造订单详情
+    async getOrderDetailByOrders(orders) {
+        let foodJson = [];
+        let totalNum = 0;
+        let totalPrice = 0;
+        let totalVipPrice = 0;
+        let food;
+        let result = {};
+        for (let i = 0; i < orders.length; i++) {
+            food = await Foods.findAll({
+                where: {
+                    id: orders[i].FoodId,
+                    tenantId: orders[i].tenantId
+                }
+            })
+            foodJson[i] = {};
+            foodJson[i].id = food[0].id;
+            foodJson[i].name = food[0].name;
+            foodJson[i].price = food[0].price;
+            foodJson[i].vipPrice = food[0].vipPrice;
+            foodJson[i].num = orders[i].num;
+            foodJson[i].unit = orders[i].unit;
+            totalNum += orders[i].num;
+            totalPrice += food[0].price * orders[i].num;//原价
+            totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
+        }
+
+        let table = await Tables.findById(orders[0].TableId);
+        result.tableName = table.name;
+        result.foods = foodJson;
+        result.totalNum = totalNum;
+        result.totalPrice = Math.round(totalPrice * 100) / 100;
+        result.isVip = false;
+        if (orders[0] != null) {
+            result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
+            result.time = orders[0].createdAt.format("yyyy-MM-dd hh:mm:ss");
+            result.info = orders[0].info;
+            result.status = orders[0].status;
+            result.diners_num = orders[0].diners_num;
+            result.tradeNo = orders[0].trade_no;
+
+            //满多少加会员
+            let phone = orders[0].phone;
+
+            let isVip = await vipManager.isVip(phone, orders[0].tenantId, result.totalPrice);
+            console.log("111111111111111111111111===" + isVip)
+            result.isVip = isVip;
+
+            //通过订单号获取优惠券
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    phone: phone,
+                    tenantId: orders[0].tenantId,
+                }
+            })
+
+            if (coupon != null) {
+                result.couponType = coupon.couponType;
+                result.couponValue = coupon.value;
+                result.couponKey = coupon.couponKey;
+            }
+
+            //根据tenantId查询租户名
+            let merchant = await Merchants.findOne({
+                where: {
+                    tenantId: orders[0].tenantId
+                }
+            })
+            result.merchantName = merchant.name;
+            result.merchantIndustry = merchant.industry;
+
+            //首单折扣，-1表示不折扣，根据手机号和租户id
+            result.firstDiscount = await this.getFirstDiscount(phone, orders[0].tenantId);
+
+            result.totalPrice = Math.round(result.totalPrice * 100) / 100;
+            result.totalVipPrice = Math.round(result.totalVipPrice * 100) / 100;
+
+            //查询配送费
+            let deliveryFee = await DeliveryFees.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    tenantId: orders[0].tenantId,
+                }
+            })
+
+            if (deliveryFee != null) {
+                let distanceAndPrice = await DistanceAndPrices.findOne({
+                    where: {
+                        deliveryFeeId: deliveryFee.deliveryFeeId,
+                        tenantId: orders[0].tenantId,
+                    }
+                })
+                result.deliveryFee = distanceAndPrice.deliveryFee;
+            }
+        }
+
+        // 将 相同foodId 合并
+        result.foods = result.foods.reduce((accu, curr) => {
+            const exist = accu.find(e => e.id === curr.id)
+            if (exist) {
+                exist.num += curr.num
+            } else {
+                accu.push(curr)
+            }
+
+            return accu
+        }, [])
+
+        return result;
     },
 
 }
