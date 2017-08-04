@@ -36,7 +36,7 @@ module.exports = {
                 tenantId: ctx.query.tenantId
             }
         })
-        console.log(merchant)
+
         let tenantName = merchant.name
         let result = [];
         for (let i = 0; i < tables.length; i++) {
