@@ -197,20 +197,8 @@ module.exports ={
             result[k].consigneeName = consigneesName==null?null:consigneesName.name;
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
 
-            // 将 相同foodId 合并
-            result[k].foods = result[k].foods.reduce((accu, curr) => {
-                const exist = accu.find(e => e.id === curr.id)
-                if (exist) {
-                    exist.num += curr.num
-                } else {
-                    accu.push(curr)
-                }
-
-                return accu
-            }, [])
-
             let refund_amount = 0;
-
+            
             let paymentReq = await PaymentReqs.findOne({
                 where: {
                     trade_no: tradeNoArray[k],
