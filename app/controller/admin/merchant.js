@@ -160,7 +160,7 @@ module.exports = {
 
             profitSharingId=profitSharings[i].consigneeId;
             // console.log("consigneeId = " + profitSharingId);
-            console.log("consigneeId = " + profitSharingId);
+            //console.log("consigneeId = " + profitSharingId);
 
             //jsonProFit[i].profitSharingId=profitSharings[i].consigneeId;
 
