@@ -148,7 +148,7 @@ module.exports = {
     //获取租户下所有商品
     async getAdminFoods (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
-        let foodnum = ctx.query.num;
+        // let foodnum = ctx.query.num;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
@@ -164,14 +164,14 @@ module.exports = {
         let foodId;
         let menuName;
         let menuId;
-        let foodsJson = [];
+        let foodsArray = [];
         let i;
 
         for (i = 0; i < foods.length; i++) {
-            foodId = foods[i].id;//foodId=1,2,3,4,5,6,7,8,9
+            foodId = foods[i].id;//foodId=222
             menuId = await Foodsofmenus.findAll({
                 where: {
-                    FoodId: foodId//menuId=1,2,3,4,1,2,3,4,1
+                    FoodId: foodId//menuId=null
                 },
                 attributes: [
                     'MenuId'
@@ -179,7 +179,7 @@ module.exports = {
             });
             if (menuId.length == 0) {
                 continue;
-            }
+            }//null
             menuName = await Menus.findAll({
                 where: {
                     id: menuId[0].MenuId//menuName="冷菜1,热销榜2,热销榜3,热销榜4"
@@ -188,42 +188,43 @@ module.exports = {
                     'name'
                 ]
             });
-            foodsJson[i] = {};
-            foodsJson[i].id = foods[i].id;
-            foodsJson[i].name = foods[i].name;
-            foodsJson[i].foodNum = foods[i].foodNum;
-            foodsJson[i].image = foods[i].image;
-            foodsJson[i].icon = foods[i].icon;
-            foodsJson[i].price = foods[i].price;
-            foodsJson[i].oldPrice = foods[i].oldPrice;
-            foodsJson[i].vipPrice = foods[i].vipPrice;
-            foodsJson[i].isActive = foods[i].isActive;
-            foodsJson[i].taste = JSON.parse(foods[i].taste);
-            foodsJson[i].sellCount = foods[i].sellCount;
-            foodsJson[i].rating = foods[i].rating;
-            foodsJson[i].rest = (foods[0].foodNum - foods[0].todaySales) <= 0 ? 0 : (foods[0].foodNum - foods[0].todaySales);
+            foodsJson = {};
+            foodsJson.id = foods[i].id;
+            foodsJson.name = foods[i].name;
+            foodsJson.foodNum = foods[i].foodNum;
+            foodsJson.image = foods[i].image;
+            foodsJson.icon = foods[i].icon;
+            foodsJson.price = foods[i].price;
+            foodsJson.oldPrice = foods[i].oldPrice;
+            foodsJson.vipPrice = foods[i].vipPrice;
+            foodsJson.isActive = foods[i].isActive;
+            foodsJson.taste = JSON.parse(foods[i].taste);
+            foodsJson.sellCount = foods[i].sellCount;
+            foodsJson.rating = foods[i].rating;
+            foodsJson.rest = (foods[0].foodNum - foods[0].todaySales) <= 0 ? 0 : (foods[0].foodNum - foods[0].todaySales);
             // foodsJson[i].name = foods[i].name;
-            foodsJson[i].info = foods[i].info;
-            foodsJson[i].menuName = menuName[0].name;
-            foodsJson[i].unit = foods[i].unit;
+            foodsJson.info = foods[i].info;
+            foodsJson.menuName = menuName[0].name;
+            foodsJson.unit = foods[i].unit;
+            foodsArray.push(foodsJson)
         }
-        let results = [];
-        let result = [];
-        let resultId;
-        result = await getFoodNum.getFood(ctx.query.tenantId, foodnum);
-
-        resultId = result.sort((a, b)=>b.num - a.num);
-        for (let k = 0; k < foodnum; k++) {
-            results.push(resultId[k])
-        }
-        for (let i = 0; i < results.length; i++) {
-            for (let j = 0; j < foodsJson.length; j++) {
-                if (foodsJson[j].id == (results[i].id)) {
-                    foodsJson.splice(j, 1);
-                }
-            }
-        }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsJson);
+        // let results = [];
+        // let result = [];
+        // let resultId;
+        // result = await getFoodNum.getFood(ctx.query.tenantId, foodnum);
+        //
+        // resultId = result.sort((a, b)=>b.num - a.num);
+        // for (let k = 0; k < foodnum; k++) {
+        //     results.push(resultId[k])
+        // }
+        // for (let i = 0; i < results.length; i++) {
+        //     for (let j = 0; j < foodsJson.length; j++) {
+        //         if (foodsJson[j].id == (results[i].id)) {
+        //             foodsJson.splice(j, 1);
+        //         }
+        //     }
+        // }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsArray);
     },
 
     // async deleteFoods(ctx, next){
