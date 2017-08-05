@@ -116,7 +116,14 @@ module.exports = {
                     continue;
                 }
 
+                food = JSON.parse(JSON.stringify(food));
+
+
                 food.forEach(e => {
+                    //首杯半价（青豆家写死）
+                    if (e.id == 26) {
+                        e.coupon = "首杯半价";
+                    }
                     e.Ratings = e.Ratings.map(rating => {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
                         return rating
@@ -216,15 +223,15 @@ module.exports = {
                 }
 
                 food.forEach(e => {
-                    e.Ratings = e.Ratings.map(rating => {
-                        rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
-                        return rating
-                    })
-
                     //首杯半价（青豆家写死）
                     if (e.id == 26) {
                         e.coupon = "首杯半价";
                     }
+                    
+                    e.Ratings = e.Ratings.map(rating => {
+                        rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
+                        return rating
+                    })
                 })
                 foodArray.push(food[0]);
             }
