@@ -72,9 +72,13 @@ var Date = (defaultValue) => {
     }
 };
 
-var Bool = () => {
+var Bool = (defaultValue) => {
+    if (typeof defaultValue === 'undefined') {
+        defaultValue = false;
+    }
     return {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue
     }
 };
 

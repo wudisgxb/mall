@@ -337,8 +337,15 @@ module.exports = {
         //首单折扣，-1表示不折扣，根据手机号和租户id
         let firstDiscount = await orderManager.getFirstDiscount(orders[0].phone, ctx.query.tenantId);
 
+        //首杯半价
+        let firstOrderDiscount = await orderManager.getFirstOrderDiscount(orders);
+        let firstOrder = false;
+        if (firstOrderDiscount != 0) {
+            firstOrder = true;
+        }
+
         //根据订单查询需要支付多少
-        total_amount = await orderManager.getOrderPriceByOrder(orders, firstDiscount);
+        total_amount = await orderManager.getOrderPriceByOrder(orders,firstDiscount,firstOrderDiscount);
 
         //微信新订单号
 
@@ -442,6 +449,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 firstDiscount: firstDiscount,
+                firstOrder:firstOrder,
                 consigneeId: ctx.query.consigneeId,
                 phoneNumber: ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,
@@ -470,6 +478,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 firstDiscount: firstDiscount,
+                firstOrder:firstOrder,
                 consigneeId: ctx.query.consigneeId,
                 phoneNumber: ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,

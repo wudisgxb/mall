@@ -238,20 +238,20 @@ module.exports = {
 
         //查询是否有临时支付请求，有的话使其失效
         /*
-        let paymentReqs = await PaymentReqs.findAll({
-            where: {
-                tableId: table.id,
-                isFinish: false,
-                isInvalid: false,
-                tenantId: body.tenantId
-            }
-        });
+         let paymentReqs = await PaymentReqs.findAll({
+         where: {
+         tableId: table.id,
+         isFinish: false,
+         isInvalid: false,
+         tenantId: body.tenantId
+         }
+         });
 
-        for (i = 0; i < paymentReqs.length; i++) {
-            paymentReqs[i].isInvalid = true;
-            paymentReqs[i].save();
-        }
-        */
+         for (i = 0; i < paymentReqs.length; i++) {
+         paymentReqs[i].isInvalid = true;
+         paymentReqs[i].save();
+         }
+         */
 
         // //下单订单号绑定优惠券，支付回调去修改优惠券使用状态
         // if (body.couponKey != null) {
@@ -374,20 +374,20 @@ module.exports = {
 
         //查询是否有临时支付请求，有的话使其失效
         /*
-        let paymentReqs = await PaymentReqs.findAll({
-            where: {
-                tableId: table.id,
-                isFinish: false,
-                isInvalid: false,
-                tenantId: body.tenantId
-            }
-        });
+         let paymentReqs = await PaymentReqs.findAll({
+         where: {
+         tableId: table.id,
+         isFinish: false,
+         isInvalid: false,
+         tenantId: body.tenantId
+         }
+         });
 
-        for (i = 0; i < paymentReqs.length; i++) {
-            paymentReqs[i].isInvalid = true;
-            paymentReqs[i].save();
-        }
-        */
+         for (i = 0; i < paymentReqs.length; i++) {
+         paymentReqs[i].isInvalid = true;
+         paymentReqs[i].save();
+         }
+         */
         //下单订单号绑定优惠券，支付回调去修改优惠券使用状态
         if (body.couponKey != null) {
             let coupon = await Coupons.findOne({
@@ -757,10 +757,14 @@ module.exports = {
     },
 
     //通过订单查询支付金额
-    async getOrderPriceByOrder(orders, firstDiscount) {
+    async getOrderPriceByOrder(orders, firstDiscount, firstOrderDiscount) {
         let totalPrice = 0;
         let totalVipPrice = 0;
         let total_amount = 0;
+
+        if (firstOrderDiscount == null) {
+            firstDiscount = 0;
+        }
 
         let food;
         for (var i = 0; i < orders.length; i++) {
@@ -797,6 +801,9 @@ module.exports = {
             total_amount = total_amount * firstDiscount;
             console.log("firstDiscount=" + firstDiscount + " total_amount=" + total_amount);
         }
+
+        //首杯半价
+        total_amount = total_amount - firstOrderDiscount;
 
         //通过订单号获取优惠券
         let coupon = await Coupons.findOne({
@@ -880,6 +887,46 @@ module.exports = {
         }
     },
 
+    //通过订单号获取首杯折扣(暂时写死)
+    async getFirstOrderDiscountByTradeNo(trade_no, tenantId) {
+        let firstOrderDiscount = 0;
+        let paymentReq = await PaymentReqs.findOne({
+            where: {
+                trade_no: trade_no,
+                tenantId: tenantId,
+                firstOrder: true,
+            }
+        })
+
+        if (paymentReq == null) {
+            return firstOrderDiscount;
+        } else {
+            let orders = await Orders.findAll({
+                where: {
+                    trade_no: trade_no,
+                    tenantId: tenantId,
+                }
+            });
+            let food;
+            for (let i = 0; i < orders.length; i++) {
+                food = await Foods.findAll({
+                    where: {
+                        id: orders[i].FoodId,
+                        tenantId: orders[i].tenantId
+                    }
+                })
+
+                //首杯半价(青豆家写死，后面完善)
+                if (food[0].id == 26) {//草莓奶酪
+                    firstOrderDiscount = food[0].price * 0.5;
+                    return Math.round(firstOrderDiscount * 100) / 100;
+                    ;
+                }
+            }
+            return firstOrderDiscount;
+        }
+    },
+
     //通过订单号获取首单折扣
     async getFirstDiscountByTradeNo(trade_no, tenantId) {
         let tenantConfig = await TenantConfigs.findOne({
@@ -906,6 +953,69 @@ module.exports = {
         }
     },
 
+    //通过订单号获取首单折扣
+    async getFirstOrderDiscount(orders) {
+        //首杯半价标记(青豆家写死，后面完善)
+        let firstFlag = 0;
+        let firstOrderDiscount = 0;
+
+        let food;
+        for (let i = 0; i < orders.length; i++) {
+            food = await Foods.findAll({
+                where: {
+                    id: orders[i].FoodId,
+                    tenantId: orders[i].tenantId
+                }
+            })
+
+
+            //首杯半价(青豆家写死，后面完善)
+            if (food[0].id == 26) {//草莓奶酪
+                firstFlag = 1;
+                firstOrderDiscount = food[0].price * 0.5;
+            }
+        }
+        //首杯半价(青豆家写死，后面完善)
+        if (firstFlag == 1) {
+            //判断是否首杯，2个条件判断
+            let paymentReqs = await PaymentReqs.findAll({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    firstOrder: true,
+                    tenantId: orders[0].tenantId,
+                    consigneeId: orders[0].consigneeId,
+                }
+            });
+
+            if (paymentReqs.length > 0) {
+                firstFlag = 2;
+            } else {
+                paymentReqs = await PaymentReqs.findAll({
+                    where: {
+                        isFinish: true,
+                        isInvalid: false,
+                        phone: orders[0].phone,
+                        tenantId: orders[0].tenantId,
+                        consigneeId: orders[0].consigneeId,
+                    }
+                });
+
+                if (paymentReqs.length == 0) {
+                    firstFlag = 2;
+                }
+            }
+        }
+
+        //首杯半价(青豆家写死，后面完善)
+        console.log("firstFlag33================" + firstFlag)
+        if (firstFlag == 2) {
+            console.log("firstOrderDiscount33================" + firstOrderDiscount)
+            return firstOrderDiscount;
+        } else {
+            return 0;
+        }
+    },
+
     //通过orders构造订单详情
     async getOrderDetailByOrders(orders) {
         let foodJson = [];
@@ -914,6 +1024,11 @@ module.exports = {
         let totalVipPrice = 0;
         let food;
         let result = {};
+
+        //首杯半价标记(青豆家写死，后面完善)
+        let firstFlag = 0;
+        let firstOrderDiscount = 0;
+
         for (let i = 0; i < orders.length; i++) {
             food = await Foods.findAll({
                 where: {
@@ -923,6 +1038,12 @@ module.exports = {
             })
             foodJson[i] = {};
             foodJson[i].id = food[0].id;
+
+            //首杯半价(青豆家写死，后面完善)
+            if (food[0].id == 26) {//草莓奶酪
+                firstFlag = 1;
+                firstOrderDiscount = food[0].price * 0.5;
+            }
             foodJson[i].name = food[0].name;
             foodJson[i].price = food[0].price;
             foodJson[i].vipPrice = food[0].vipPrice;
@@ -931,6 +1052,43 @@ module.exports = {
             totalNum += orders[i].num;
             totalPrice += food[0].price * orders[i].num;//原价
             totalVipPrice += food[0].vipPrice * orders[i].num;//会员价
+        }
+        //首杯半价(青豆家写死，后面完善)
+        if (firstFlag == 1) {
+            //判断是否首杯，2个条件判断
+            let paymentReqs = await PaymentReqs.findAll({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    firstOrder: true,
+                    tenantId: orders[0].tenantId,
+                    consigneeId: orders[0].consigneeId,
+                }
+            });
+
+            if (paymentReqs.length > 0) {
+                firstFlag = 2;
+            } else {
+                paymentReqs = await PaymentReqs.findAll({
+                    where: {
+                        isFinish: true,
+                        isInvalid: false,
+                        phone: orders[0].phone,
+                        tenantId: orders[0].tenantId,
+                        consigneeId: orders[0].consigneeId,
+                    }
+                });
+
+                if (paymentReqs.length == 0) {
+                    firstFlag = 2;
+                }
+            }
+        }
+
+        //首杯半价(青豆家写死，后面完善)
+        console.log("firstFlag================" + firstFlag)
+        if (firstFlag == 2) {
+            console.log("firstOrderDiscount================" + firstOrderDiscount)
+            result.firstOrderDiscount = firstOrderDiscount;
         }
 
         let table = await Tables.findById(orders[0].TableId);

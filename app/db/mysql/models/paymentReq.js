@@ -28,6 +28,9 @@ module.exports = function (sequelize, DataTypes) {
         consigneeTransferAccountIsFinish: shortDataTypes.Bool(),//代售商户是否转账完成
         //首单折扣
         firstDiscount: shortDataTypes.Double(-1),
+        //是否首单
+        firstOrder :shortDataTypes.Bool(),
+        
         tenantId: {
             type: Sequelize.STRING
         }
