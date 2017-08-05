@@ -220,6 +220,11 @@ module.exports = {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
                         return rating
                     })
+
+                    //首杯半价（青豆家写死）
+                    if (e.id == 26) {
+                        e.coupon = "首杯半价";
+                    }
                 })
                 foodArray.push(food[0]);
             }
