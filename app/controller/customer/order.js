@@ -920,7 +920,6 @@ module.exports = {
                 if (food[0].id == 26) {//草莓奶酪
                     firstOrderDiscount = food[0].price * 0.5;
                     return Math.round(firstOrderDiscount * 100) / 100;
-                    ;
                 }
             }
             return firstOrderDiscount;
@@ -994,7 +993,7 @@ module.exports = {
                     where: {
                         isFinish: true,
                         isInvalid: false,
-                        phone: orders[0].phone,
+                        phoneNumber: orders[0].phone,
                         tenantId: orders[0].tenantId,
                         consigneeId: orders[0].consigneeId,
                     }
@@ -1072,7 +1071,7 @@ module.exports = {
                     where: {
                         isFinish: true,
                         isInvalid: false,
-                        phone: orders[0].phone,
+                        phoneNumber: orders[0].phone,
                         tenantId: orders[0].tenantId,
                         consigneeId: orders[0].consigneeId,
                     }
