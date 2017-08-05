@@ -1170,7 +1170,7 @@ module.exports = {
                     }
                 });
 
-                result.acutalAmount = paymentReq.acutal_amount;
+                result.actualAmount = paymentReq.actual_amount;
             }
         }
 
