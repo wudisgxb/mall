@@ -237,6 +237,7 @@ module.exports = {
         await table.save();
 
         //查询是否有临时支付请求，有的话使其失效
+        /*
         let paymentReqs = await PaymentReqs.findAll({
             where: {
                 tableId: table.id,
@@ -250,6 +251,7 @@ module.exports = {
             paymentReqs[i].isInvalid = true;
             paymentReqs[i].save();
         }
+        */
 
         // //下单订单号绑定优惠券，支付回调去修改优惠券使用状态
         // if (body.couponKey != null) {
@@ -371,6 +373,7 @@ module.exports = {
         // await table.save();
 
         //查询是否有临时支付请求，有的话使其失效
+        /*
         let paymentReqs = await PaymentReqs.findAll({
             where: {
                 tableId: table.id,
@@ -384,7 +387,7 @@ module.exports = {
             paymentReqs[i].isInvalid = true;
             paymentReqs[i].save();
         }
-
+        */
         //下单订单号绑定优惠券，支付回调去修改优惠券使用状态
         if (body.couponKey != null) {
             let coupon = await Coupons.findOne({
@@ -972,6 +975,7 @@ module.exports = {
                     tenantId: orders[0].tenantId
                 }
             })
+            result.tenantId = orders[0].tenantId;
             result.merchantName = merchant.name;
             result.merchantIndustry = merchant.industry;
 
