@@ -701,7 +701,7 @@ module.exports = {
     },
 
     async getUserEshopConsigneeOrder (ctx, next) {
-        ctx.checkQuery('consigneeId').notEmpty();
+        //ctx.checkQuery('consigneeId').notEmpty();
         ctx.checkQuery('phoneNumber').notEmpty();
         ctx.checkQuery('startTime').notEmpty();
         ctx.checkQuery('endTime').notEmpty();
@@ -727,7 +727,7 @@ module.exports = {
                     $between: [startTime, endTime]
                 },
                 phone: ctx.query.phoneNumber,
-                consigneeId: ctx.query.consigneeId,
+                //consigneeId: ctx.query.consigneeId,
             }
         })
 
