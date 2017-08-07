@@ -603,7 +603,7 @@ module.exports = {
         // let food;
 
         //通过orders构造订单详情
-        let result = await this.getOrderDetailByOrders(orders,trade_no);
+        let result = await this.getOrderDetailByOrders(orders);
 
         // for (let i = 0; i < orders.length; i++) {
         //     food = await Foods.findAll({
@@ -1016,7 +1016,7 @@ module.exports = {
     },
 
     //通过orders构造订单详情
-    async getOrderDetailByOrders(orders,trade_no) {
+    async getOrderDetailByOrders(orders) {
         let foodJson = [];
         let totalNum = 0;
         let totalPrice = 0;
@@ -1161,15 +1161,15 @@ module.exports = {
             }
 
             //支付后查询用户实际支付金额
-            if (trade_no != null) {
-                let paymentReq = await PaymentReqs.findOne({
-                    where: {
-                        trade_no: trade_no,
-                        tenantId: orders[0].tenantId,
-                        consigneeId: orders[0].consigneeId,
-                    }
-                });
+            let paymentReq = await PaymentReqs.findOne({
+                where: {
+                    trade_no: orders[0].trade_no,
+                    tenantId: orders[0].tenantId,
+                    consigneeId: orders[0].consigneeId,
+                }
+            });
 
+            if (paymentReq != null) {
                 result.actualAmount = paymentReq.actual_amount;
             }
         }
