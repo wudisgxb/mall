@@ -10,13 +10,12 @@ const Alipay = require('../alipay/index');
 const Tables = db.models.Tables;
 const TenantConfigs = db.models.TenantConfigs;
 const PaymentReqs = db.models.PaymentReqs;
-const Orders = db.models.Orders;
+const Orders = db.models.NewOrders;
 const Coupons = db.models.Coupons;
 const Consignees = db.models.Consignees;
 const AlipayErrors = db.models.AlipayErrors;
 const Vips = db.models.Vips;
 const Foods = db.models.Foods;
-const order = db.models.Orders;
 const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../infoPush/infoPush');
 const transAccountsManager = require('./transferAccounts')
@@ -72,7 +71,7 @@ module.exports = {
             return;
         }
 
-        let orders = await Orders.findAll({
+        let order = await Orders.findOne({
             where: {
                 TableId: table.id,
                 $or: [{status: 0}, {status: 1}],
@@ -81,16 +80,16 @@ module.exports = {
             }
         })
 
-        if (orders.length == 0) {
+        if (order == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '订单不存在！请重新下单！')
             return;
         }
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
-        let firstDiscount = await orderManager.getFirstDiscount(orders[0].phone,ctx.query.tenantId);
+        let firstDiscount = await orderManager.getFirstDiscount(order.phone, ctx.query.tenantId);
 
         //根据订单查询需要支付多少
-        let total_amount = await orderManager.getOrderPriceByOrder(orders,firstDiscount);
+        let total_amount = await orderManager.getOrderPriceByOrder(order, firstDiscount);
 
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
@@ -124,7 +123,7 @@ module.exports = {
         total_amount = biz_json.total_amount;
 
 
-        orders = await Orders.findAll({
+        let order1 = await Orders.findOne({
             where: {
                 trade_no: trade_no,
                 TableId: table.id,
@@ -138,7 +137,7 @@ module.exports = {
         let paymentReqs = await PaymentReqs.findAll({
             where: {
                 tableId: table.id,
-                paymentMethod: '支付宝',
+                //paymentMethod: '支付宝',
                 total_amount: total_amount,//订单变了价格会变，加上去限制
                 isFinish: false,
                 isInvalid: false,
@@ -148,7 +147,7 @@ module.exports = {
             }
         });
 
-        if (orders.length > 0 && paymentReqs.length > 0) {
+        if (order1 != null && paymentReqs.length > 0) {
             paymentReqs[0].isInvalid = true;
             await paymentReqs[0].save();
 
@@ -164,18 +163,12 @@ module.exports = {
                 actual_amount: total_amount,
                 refund_amount: '0',
                 refund_reason: '',
-                firstDiscount:firstDiscount,
+                firstDiscount: firstDiscount,
                 consigneeId: null,
                 TransferAccountIsFinish: false,
                 consigneeTransferAccountIsFinish: false,
                 tenantId: ctx.query.tenantId
             });
-
-            for (let i = 0; i < orders.length; i++) {
-                //foodOrders[i].trade_no = trade_no;
-                orders[i].paymentMethod = '支付宝';
-                await orders[i].save();
-            }
 
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
 
@@ -193,32 +186,17 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 consigneeId: null,
-                firstDiscount:firstDiscount,
+                firstDiscount: firstDiscount,
                 TransferAccountIsFinish: false,
                 consigneeTransferAccountIsFinish: false,
                 tenantId: ctx.query.tenantId
             });
 
-            orders = await Orders.findAll({
-                where: {
-                    TableId: table.id,
-                    // status:0//未支付
-                    $or: [{status: 0}, {status: 1}],
-                    tenantId: ctx.query.tenantId,
-                    consigneeId: null,
-                }
-            })
-
-            for (let i = 0; i < orders.length; i++) {
-                orders[i].status = 1;//待支付
-                //foodOrders[i].trade_no = trade_no;
-                orders[i].paymentMethod = '支付宝';
-                await orders[i].save();
-            }
+            order.status = 1;//待支付
+            await order.save();
 
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
-
     },
 
     async getUserEshopAlipayReq (ctx, next) {
@@ -248,7 +226,7 @@ module.exports = {
             return;
         }
 
-        let orders = await Orders.findAll({
+        let order = await Orders.findOne({
             where: {
                 trade_no: ctx.query.tradeNo,
                 $or: [{status: 0}, {status: 1}],
@@ -257,16 +235,16 @@ module.exports = {
             }
         })
 
-        if (orders.length == 0) {
+        if (order == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '订单不存在！请重新下单！')
             return;
         }
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
-        let firstDiscount = await orderManager.getFirstDiscount(orders[0].phone,ctx.query.tenantId);
-        
+        let firstDiscount = await orderManager.getFirstDiscount(order.phone, ctx.query.tenantId);
+
         //首杯半价
-        let firstOrderDiscount = await orderManager.getFirstOrderDiscount(orders);
+        let firstOrderDiscount = await orderManager.getFirstOrderDiscount(order);
 
         let firstOrder = false;
         if (firstOrderDiscount != 0) {
@@ -274,7 +252,7 @@ module.exports = {
         }
 
         //根据订单查询需要支付多少
-        let total_amount = await orderManager.getOrderPriceByOrder(orders,firstDiscount,firstOrderDiscount);
+        let total_amount = await orderManager.getOrderPriceByOrder(order, firstDiscount, firstOrderDiscount);
         // console.log("total_amount========" + total_amount);
 
 
@@ -311,12 +289,12 @@ module.exports = {
 
 
         console.log("支付宝需要支付金额 ====" + total_amount);
-        
+
         //判断是否再次生成params
         //tableId and order状态不等于1-待支付状态（order满足一个就行）
         //且未超时失效
 
-         orders = await Orders.findAll({
+        let order1 = await Orders.findOne({
             where: {
                 TableId: table.id,
                 status: 1,//待支付
@@ -330,7 +308,7 @@ module.exports = {
         let paymentReqs = await PaymentReqs.findAll({
             where: {
                 tableId: table.id,
-                paymentMethod: '支付宝',
+                //paymentMethod: '支付宝',
                 total_amount: total_amount,//订单变了价格会变，加上去限制
                 isFinish: false,
                 isInvalid: false,
@@ -340,7 +318,7 @@ module.exports = {
             }
         });
 
-        if (orders.length > 0 && paymentReqs.length > 0) {
+        if (order1 != null && paymentReqs.length > 0) {
             paymentReqs[0].isInvalid = true;
             await paymentReqs[0].save();
 
@@ -356,8 +334,8 @@ module.exports = {
                 actual_amount: total_amount,
                 refund_amount: '0',
                 refund_reason: '',
-                firstDiscount:firstDiscount,
-                firstOrder:firstOrder,
+                firstDiscount: firstDiscount,
+                firstOrder: firstOrder,
                 consigneeId: ctx.query.consigneeId,
                 phoneNumber: ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,
@@ -365,11 +343,6 @@ module.exports = {
                 tenantId: ctx.query.tenantId
             });
 
-            for (let i = 0; i < orders.length; i++) {
-                //foodOrders[i].trade_no = trade_no;
-                orders[i].paymentMethod = '支付宝';
-                await orders[i].save();
-            }
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         } else {
             await PaymentReqs.create({
@@ -384,8 +357,8 @@ module.exports = {
                 actual_amount: total_amount,
                 refund_amount: '0',
                 refund_reason: '',
-                firstDiscount:firstDiscount,
-                firstOrder:firstOrder,
+                firstDiscount: firstDiscount,
+                firstOrder: firstOrder,
                 consigneeId: ctx.query.consigneeId,
                 phoneNumber: ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,
@@ -393,27 +366,10 @@ module.exports = {
                 tenantId: ctx.query.tenantId
             });
 
-            orders = await Orders.findAll({
-                where: {
-                    TableId: table.id,
-                    // status:0//未支付
-                    $or: [{status: 0}, {status: 1}],
-                    tenantId: ctx.query.tenantId,
-                    consigneeId: ctx.query.consigneeId,
-                    phone: ctx.query.phoneNumber,
-                }
-            })
-
-            for (let i = 0; i < orders.length; i++) {
-                orders[i].status = 1;//待支付
-                //foodOrders[i].trade_no = trade_no;
-                orders[i].paymentMethod = '支付宝';
-                await orders[i].save();
-            }
-
+            order.status = 1;//待支付
+            await order.save();
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
-
     },
 
     async alipay(ctx, next) {
@@ -506,7 +462,7 @@ module.exports = {
                 }
 
                 //order状态改成2-已支付
-                let foodOrders = await Orders.findAll({
+                let order = await Orders.findOne({
                     where: {
                         TableId: tableId,
                         paymentMethod: '支付宝',
@@ -517,9 +473,23 @@ module.exports = {
                     }
                 });
 
-                for (var i = 0; i < foodOrders.length; i++) {
-                    foodOrders[i].status = 2;
-                    await foodOrders[i].save();
+                order.status = 2;
+                await order.save();
+
+                //如果订单超时删除，恢复
+                if (order.deletedAt != null) {
+                    await Orders.update({
+                        deletedAt: null
+                    }, {
+                        where: {
+                            trade_no: ret.out_trade_no,
+                            status: 2,
+                            deletedAt: {
+                                $ne: null
+                            }
+                        },
+                        paranoid: false
+                    });
                 }
 
                 //支付请求表 isFinish改成true
@@ -551,10 +521,10 @@ module.exports = {
                 try {
                     amountJson.tenantId = tenantId;
                     amountJson.consigneeId = consigneeId;
-                    amountJson.phone = foodOrders[0].phone;
+                    amountJson.phone = order.phone;
                     amountJson.trade_no = ret.out_trade_no;
                     await getstatistics.setOrders(amountJson);
-                }catch(e) {
+                } catch (e) {
                     console.log(e);
                 }
 
@@ -569,10 +539,6 @@ module.exports = {
                 }
                 infoPushManager.infoPush(content, tenantId);
 
-                // //四舍五入 千分之0.994转账
-                // let total_amount = Math.round(ret.total_amount * 99.4) / 100;
-                // console.log("aaaaaaaaa0000a||" + total_amount);
-                // console.log("aaaaaaaaa0000b||" + JSON.stringify(total_amount));
                 let result;
                 if (tenantConfig != null) {
                     if (tenantConfig.isRealTime) {
@@ -617,37 +583,6 @@ module.exports = {
                     }
                 }
 
-                // //满多少加会员,考虑订单会删除，要加paranoid: false查询delete的
-                // foodOrders = await Orders.findAll({
-                //     where: {
-                //         trade_no: ret.out_trade_no,
-                //     },
-                //     paranoid: false
-                // });
-                // let phone = foodOrders[0].phone;
-                //
-                // let vip = await Vips.findOne({
-                //     where: {
-                //         phone: phone,
-                //         tenantId: foodOrders[0].tenantId
-                //     }
-                // })
-                //
-                // if (vip == null) {
-                //     //根据订单算原始总价格
-                //     let orderPrice = await orderManager.getOrderPriceByTradeNo(ret.out_trade_no, tenantId);
-                //     console.log("orderPrice:" + orderPrice);
-                //     console.log("ret.total_amount" + ret.total_amount);
-                //     if (orderPrice >= tenantConfig.vipFee) {
-                //         await Vips.create({
-                //             phone: phone,
-                //             vipLevel: 0,
-                //             vipName: "匿名",
-                //             tenantId: foodOrders[0].tenantId
-                //             // todo: ok?
-                //         });
-                //     }
-                // }
             } else {
                 AlipayErrors.create({
                     errRsp: JSON.stringify(response),

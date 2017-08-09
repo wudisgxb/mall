@@ -1,7 +1,7 @@
 const db = require('../../db/mysql/index');
 const Tables = db.models.Tables;
 const ShoppingCarts = db.models.ShoppingCarts;
-const Orders = db.models.Orders;
+const Orders = db.models.NewOrders;
 const Vips = db.models.Vips;
 const ApiResult = require('../../db/mongo/ApiResult')
 const coupon = require('./coupon')
@@ -96,7 +96,7 @@ module.exports = {
                 return;
             } else {
                 //判断是否订单状态
-                let orders = await Orders.findAll({
+                let order = await Orders.findOne({
                     where: {
                         phone: ctx.query.phoneNumber,
                         tenantId: ctx.query.tenantId,
@@ -105,7 +105,7 @@ module.exports = {
                     }
                 });
                 //下单状态
-                if (orders.length > 0) {
+                if (order != null) {
                     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                         tableStatus:2,
                         isVip:isVip,

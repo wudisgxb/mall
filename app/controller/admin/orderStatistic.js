@@ -3,7 +3,6 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/statisticsMySql/index');
 let db1 = require('../../db/mysql/index');
-// let Order = db.models.Orders
 
 // let dbv3 = require('../../db/mysql/index')
 let Orders = db1.models.Orders

@@ -7,7 +7,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 
 const db = require('../../db/mysql/index');
 const Tables = db.models.Tables;
-const Orders = db.models.Orders;
+const Orders = db.models.NewOrders;
 const PaymentReqs = db.models.PaymentReqs;
 const AlipayErrors = db.models.AlipayErrors;
 const TenantConfigs = db.models.TenantConfigs;
@@ -116,7 +116,7 @@ module.exports = {
         }
 
         let total_amount = 0;
-        let orders = await Orders.findAll({
+        let order = await Orders.findAll({
             where: {
                 //trade_no:trade_no,
                 TableId: table.id,
@@ -126,18 +126,18 @@ module.exports = {
             }
         })
 
-        if (orders.length == 0) {
+        if (order == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '订单不存在！请重新下单！')
             return;
         }
 
-        let trade_no = orders[0].trade_no;
+        let trade_no = order.trade_no;
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
-        let firstDiscount = await orderManager.getFirstDiscount(orders[0].phone, ctx.query.tenantId);
+        let firstDiscount = await orderManager.getFirstDiscount(order.phone, ctx.query.tenantId);
 
         //根据订单查询需要支付多少
-        total_amount = await orderManager.getOrderPriceByOrder(orders, firstDiscount);
+        total_amount = await orderManager.getOrderPriceByOrder(order, firstDiscount);
 
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
@@ -160,7 +160,7 @@ module.exports = {
 
         //存openid
         await User.create({
-            nickname: orders[0].phone,
+            nickname: order.phone,
             headimgurl: '',
             sex: 1,
             openid: token.data.openid,
@@ -192,7 +192,7 @@ module.exports = {
         //tableId and order状态不等于1-待支付状态（order满足一个就行）
         //且未超时失效,微信貌似没有超时的说法，预留着，10分钟
 
-        orders = await Orders.findAll({
+        let order1 = await Orders.findOne({
             where: {
                 trade_no: trade_no,
                 TableId: table.id,
@@ -206,7 +206,7 @@ module.exports = {
         let paymentReqs = await PaymentReqs.findAll({
             where: {
                 tableId: table.id,
-                paymentMethod: '微信',
+                //paymentMethod: '微信',
                 isFinish: false,
                 isInvalid: false,
                 tenantId: ctx.query.tenantId,
@@ -214,7 +214,7 @@ module.exports = {
             }
         });
 
-        if (orders.length > 0 && paymentReqs.length > 0) {
+        if (order1 != null && paymentReqs.length > 0) {
             //判断是否失效 10min,微信不判断超时
             //if((Date.now() - paymentReqs[0].createdAt.getTime()) > 100*60*1000) {
             paymentReqs[0].isInvalid = true;
@@ -239,11 +239,10 @@ module.exports = {
                 tenantId: ctx.query.tenantId
             });
 
-            for (var i = 0; i < orders.length; i++) {
-                //orders[i].trade_no = trade_no;
-                orders[i].paymentMethod = '微信';
-                await orders[i].save();
-            }
+
+            order.paymentMethod = '微信';
+            await order.save();
+
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         } else {
             await PaymentReqs.create({
@@ -265,22 +264,10 @@ module.exports = {
                 tenantId: ctx.query.tenantId
             });
 
-            orders = await Orders.findAll({
-                where: {
-                    TableId: table.id,
-                    // status:0//未支付
-                    $or: [{status: 0}, {status: 1}],
-                    tenantId: ctx.query.tenantId,
-                    consigneeId: null
-                }
-            })
 
-            for (var i = 0; i < orders.length; i++) {
-                orders[i].status = 1;//待支付
-                // orders[i].trade_no = trade_no;
-                orders[i].paymentMethod = '微信';
-                await orders[i].save();
-            }
+            order.status = 1;//待支付
+            order.paymentMethod = '微信';
+            await order.save();
 
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
@@ -316,7 +303,7 @@ module.exports = {
         }
 
         let total_amount = 0;
-        let orders = await Orders.findAll({
+        let order = await Orders.findOne({
             where: {
                 //trade_no:trade_no,
                 TableId: table.id,
@@ -327,25 +314,25 @@ module.exports = {
             }
         })
 
-        if (orders.length == 0) {
+        if (order == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '订单不存在！请重新下单！')
             return;
         }
 
-        let trade_no = orders[0].trade_no;
+        let trade_no = order.trade_no;
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
-        let firstDiscount = await orderManager.getFirstDiscount(orders[0].phone, ctx.query.tenantId);
+        let firstDiscount = await orderManager.getFirstDiscount(order.phone, ctx.query.tenantId);
 
         //首杯半价
-        let firstOrderDiscount = await orderManager.getFirstOrderDiscount(orders);
+        let firstOrderDiscount = await orderManager.getFirstOrderDiscount(order);
         let firstOrder = false;
         if (firstOrderDiscount != 0) {
             firstOrder = true;
         }
 
         //根据订单查询需要支付多少
-        total_amount = await orderManager.getOrderPriceByOrder(orders,firstDiscount,firstOrderDiscount);
+        total_amount = await orderManager.getOrderPriceByOrder(order, firstDiscount, firstOrderDiscount);
 
         //微信新订单号
 
@@ -373,7 +360,7 @@ module.exports = {
 
         //存openid
         await User.create({
-            nickname: orders[0].phone,
+            nickname: order.phone,
             headimgurl: '',
             sex: 1,
             openid: token.data.openid,
@@ -405,7 +392,7 @@ module.exports = {
         //tableId and order状态不等于1-待支付状态（order满足一个就行）
         //且未超时失效,微信貌似没有超时的说法，预留着，10分钟
 
-        orders = await Orders.findAll({
+        let order1 = await Orders.findOne({
             where: {
                 trade_no: trade_no,
                 TableId: table.id,
@@ -420,7 +407,7 @@ module.exports = {
         let paymentReqs = await PaymentReqs.findAll({
             where: {
                 tableId: table.id,
-                paymentMethod: '微信',
+                // paymentMethod: '微信',
                 isFinish: false,
                 isInvalid: false,
                 tenantId: ctx.query.tenantId,
@@ -429,7 +416,7 @@ module.exports = {
             }
         });
 
-        if (orders.length > 0 && paymentReqs.length > 0) {
+        if (order != null && paymentReqs.length > 0) {
             //判断是否失效 10min,微信不判断超时
             //if((Date.now() - paymentReqs[0].createdAt.getTime()) > 100*60*1000) {
             paymentReqs[0].isInvalid = true;
@@ -449,7 +436,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 firstDiscount: firstDiscount,
-                firstOrder:firstOrder,
+                firstOrder: firstOrder,
                 consigneeId: ctx.query.consigneeId,
                 phoneNumber: ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,
@@ -457,11 +444,9 @@ module.exports = {
                 tenantId: ctx.query.tenantId
             });
 
-            for (var i = 0; i < orders.length; i++) {
-                //orders[i].trade_no = trade_no;
-                orders[i].paymentMethod = '微信';
-                await orders[i].save();
-            }
+            order.paymentMethod = '微信';
+            await order.save();
+
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         } else {
             await PaymentReqs.create({
@@ -478,7 +463,7 @@ module.exports = {
                 refund_amount: '0',
                 refund_reason: '',
                 firstDiscount: firstDiscount,
-                firstOrder:firstOrder,
+                firstOrder: firstOrder,
                 consigneeId: ctx.query.consigneeId,
                 phoneNumber: ctx.query.phoneNumber,
                 TransferAccountIsFinish: false,
@@ -486,23 +471,9 @@ module.exports = {
                 tenantId: ctx.query.tenantId
             });
 
-            orders = await Orders.findAll({
-                where: {
-                    TableId: table.id,
-                    // status:0//未支付
-                    $or: [{status: 0}, {status: 1}],
-                    tenantId: ctx.query.tenantId,
-                    consigneeId: ctx.query.consigneeId,
-                    phone: ctx.query.phoneNumber
-                }
-            })
-
-            for (var i = 0; i < orders.length; i++) {
-                orders[i].status = 1;//待支付
-                // orders[i].trade_no = trade_no;
-                orders[i].paymentMethod = '微信';
-                await orders[i].save();
-            }
+            order.status = 1;//待支付
+            order.paymentMethod = '微信';
+            await order.save();
 
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
@@ -510,7 +481,6 @@ module.exports = {
     },
 
     async wechatPayNotify(ctx, next) {
-
         console.log(JSON.stringify(ctx.xmlBody));
         let xmlBody = ctx.xmlBody;
         // var xmlBody = {
@@ -663,20 +633,34 @@ module.exports = {
                 }
 
                 //order状态改成2-已支付
-                let orders = await Orders.findAll({
+                let order = await Orders.findOne({
                     where: {
                         TableId: tableId,
-                        paymentMethod: '微信',
                         $or: [{status: 0}, {status: 1}],
                         tenantId: tenantId,
                         consigneeId: consigneeId,
                         trade_no: trade_no,
-                    }
+                    },
+                    paranoid: false
                 });
 
-                for (var i = 0; i < orders.length; i++) {
-                    orders[i].status = 2;
-                    await orders[i].save();
+                order.status = 2;
+                await order.save();
+
+                //如果订单超时删除，恢复
+                if (order.deletedAt != null) {
+                    await Orders.update({
+                        deletedAt: null
+                    }, {
+                        where: {
+                            trade_no: trade_no,
+                            status: 2,
+                            deletedAt: {
+                                $ne: null
+                            }
+                        },
+                        paranoid: false
+                    });
                 }
 
                 paymentReqs[0].isFinish = true;
@@ -705,7 +689,7 @@ module.exports = {
                 try {
                     amountJson.tenantId = tenantId;
                     amountJson.consigneeId = consigneeId;
-                    amountJson.phone = orders[0].phone;
+                    amountJson.phone = order.phone;
                     amountJson.trade_no = trade_no;
                     await getstatistics.setOrders(amountJson);
                 } catch (e) {

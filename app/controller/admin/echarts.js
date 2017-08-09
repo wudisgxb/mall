@@ -3,7 +3,8 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const PaymentReqs = db.models.PaymentReqs;
-const Orders = db.models.Orders;
+const Orders = db.models.NewOrders;
+const OrderGoods = db.models.OrderGoods;
 const Tool = require('../../Tool/tool')
 
 module.exports = {
@@ -85,7 +86,7 @@ module.exports = {
         //if (body.consigneeId == 'all') {
 
 
-        var orders = await Orders.findAll(
+        let order = await Orders.findAll(
             {
                 where: {
                     createdAt: {
@@ -97,6 +98,12 @@ module.exports = {
                 }
             }
         )
+
+        let orders = await OrderGoods.findAll({
+            where:{
+                trade_no:order.trade_no
+            }
+        })
 
         var foodIdArray = [];//FOODID
 
