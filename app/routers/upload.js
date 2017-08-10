@@ -18,11 +18,11 @@ var newFileName = (filename) => {
     } while (fs.exists(ret));
     return {
         path: ret,
-        url: `test0/upload/${newfilename}`
+        url: `test/upload/${newfilename}`
     };
 };
 
-router.post('/api/test0/upload', async function (ctx, next) {
+router.post('/api/test/upload', async function (ctx, next) {
     const file = ctx.request.body.files.file;
 
     const reader = fs.createReadStream(file.path);
