@@ -39,13 +39,14 @@ const wxpay = new WXPay({
 module.exports = {
     async userDealRedirect(ctx, next) {
         //const path = ctx.query.path
+        //初始回调地址前台做转发用不用改
         const auth_callback_url = `http://deal.xiaovbao.cn/wechatpay`
 
         // const auth_callback_url = 'http://119.29.180.92/user'
 
         console.log(`auth_callback_url: ${auth_callback_url}`)
 
-        const url = client.getAuthorizeURL(auth_callback_url, 'sales', 'snsapi_base')
+        const url = client.getAuthorizeURL(auth_callback_url, 'salesTest', 'snsapi_base')
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
@@ -56,13 +57,14 @@ module.exports = {
 
     async userEshopRedirect(ctx, next) {
         //const path = ctx.query.path
+        //初始回调地址前台做转发用不用改
         const auth_callback_url = `http://deal.xiaovbao.cn/wechatpay`
 
         // const auth_callback_url = 'http://119.29.180.92/user'
 
         console.log(`auth_callback_url: ${auth_callback_url}`)
 
-        const url = client.getAuthorizeURL(auth_callback_url, 'sales', 'snsapi_base')
+        const url = client.getAuthorizeURL(auth_callback_url, 'salesTest', 'snsapi_base')
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
@@ -180,7 +182,7 @@ module.exports = {
             total_fee: parseFloat(total_amount) * 100,//分
             trade_type: 'JSAPI',
             spbill_create_ip: ip,
-            notify_url: 'http://deal.xiaovbao.cn/api/test/wechatPayNotify'
+            notify_url: 'http://deal.xiaovbao.cn/api/test0/wechatPayNotify'
         })
         new_params.trade_no = trade_no;
 
@@ -380,7 +382,7 @@ module.exports = {
             total_fee: parseFloat(total_amount) * 100,//分
             trade_type: 'JSAPI',
             spbill_create_ip: ip,
-            notify_url: 'http://deal.xiaovbao.cn/api/test/wechatPayNotify'
+            notify_url: 'http://deal.xiaovbao.cn/api/test0/wechatPayNotify'
         })
         new_params.trade_no = wechat_trade_no;
 

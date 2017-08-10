@@ -931,7 +931,7 @@ module.exports = async function tasks(app) {
 
         //5分钟订单失效检查,代售点的订单10分钟失效，购物车也是
         schedule.scheduleJob(rule, async function () {
-            var order = await Orders.findOne({
+            var orders = await Orders.findAll({
                 where: {
                     $or: [{status: 0}, {status: 1}],
                     'consigneeId': {
@@ -940,30 +940,30 @@ module.exports = async function tasks(app) {
                 }
             });
             var trade_no;
+            for (var i = 0; i < orders.length; i++) {
+                if ((Date.now() - orders[i].createdAt.getTime()) > 10 * 60 * 1000) {
+                    //获取订单号
+                    trade_no = orders[i].trade_no;
+                    console.log("超时订单号：" + trade_no)
 
-            if ((Date.now() - order.createdAt.getTime()) > 10 * 60 * 1000) {
-                //获取订单号
-                trade_no = order.trade_no;
-                console.log("超时订单号：" + trade_no)
+                    await orders[i].destroy();
 
-                await order.destroy();
-
-                var paymentReqs = await PaymentReqs.findAll({
-                    where: {
-                        trade_no: trade_no,
-                        isFinish: false,
-                        isInvalid: false
-                    }
-                });
-                if (paymentReqs.length > 0) {
-                    for (var i = 0; i < paymentReqs.length; i++) {
-                        paymentReqs[i].isInvalid = true;
-                        await paymentReqs[i].save();
-                        console.log("超时订单号支付请求表失效成功！")
+                    var paymentReqs = await PaymentReqs.findAll({
+                        where: {
+                            trade_no: trade_no,
+                            isFinish: false,
+                            isInvalid: false
+                        }
+                    });
+                    if (paymentReqs.length > 0) {
+                        for (var i = 0; i < paymentReqs.length; i++) {
+                            paymentReqs[i].isInvalid = true;
+                            await paymentReqs[i].save();
+                            console.log("超时订单号支付请求表失效成功！")
+                        }
                     }
                 }
             }
-
         });
 
     }
@@ -976,32 +976,36 @@ module.exports = async function tasks(app) {
 
         //5分钟订单失效检查,代售点的订单10分钟失效，购物车也是
         schedule.scheduleJob(rule, async function () {
-            var order = await Orders.findOne({
+            var orders = await Orders.findAll({
                 where: {
                     $or: [{status: 0}, {status: 1}],
                     'consigneeId': null
                 }
             });
             var trade_no;
-            var tenantConfig = await TenantConfigs.findOne({
-                where: {
-                    tenantId: order.tenantId
+            for (var i = 0; i < orders.length; i++) {
+                var tenantConfig = await TenantConfigs.findOne({
+                    where: {
+                        tenantId: orders[i].tenantId
+                    }
+                });
+                if (tenantConfig.invaildTime == 0 && tenantConfig.invaildTime == null) {
+                    continue;
                 }
-            });
-            if (tenantConfig.invaildTime != 0 && tenantConfig.invaildTime != null) {
-                if ((Date.now() - order.createdAt.getTime()) > tenantConfig.invaildTime) {
+
+                if ((Date.now() - orders[i].createdAt.getTime()) > tenantConfig.invaildTime) {
                     //获取订单号
-                    trade_no = order.trade_no;
+                    trade_no = orders[i].trade_no;
                     console.log("点餐超时订单号：" + trade_no)
 
-                    await order.destroy();
+                    await orders[i].destroy();
 
                     //修改桌状态
                     //获取tableId
                     let table = await Tables.findOne({
                         where: {
-                            tenantId: order.tenantId,
-                            id: order.TableId,
+                            tenantId: orders[i].tenantId,
+                            id: orders[i].TableId,
                         }
                     });
                     table.status = 0;
@@ -1023,8 +1027,6 @@ module.exports = async function tasks(app) {
                     }
                 }
             }
-
-
         });
 
     }
@@ -1117,6 +1119,7 @@ module.exports = async function tasks(app) {
         let times = [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56];
         rule.minute = times;
 
+        //5分钟订单失效检查,代售点的订单10分钟失效，购物车也是
         schedule.scheduleJob(rule, async function () {
             await Orders.update({
                 deletedAt: null

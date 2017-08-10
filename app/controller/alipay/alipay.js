@@ -28,7 +28,7 @@ const getstatistics = require('../statistics/orderStatistic');
 const aliDeal = new Alipay({
     appId: config.alipay.appId,
     notify_url: 'https://deal.xiaovbao.cn/api/test/alipay',//后台回调
-    return_url: 'https://sales.xiaovbao.cn/alipay-callback',//前台回调
+    return_url: 'https://salesTest.xiaovbao.cn/alipay-callback',//前台回调
     rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
     sandbox: false,
@@ -38,7 +38,7 @@ const aliDeal = new Alipay({
 const aliEshop = new Alipay({
     appId: config.alipay.appId,
     notify_url: 'https://deal.xiaovbao.cn/api/test/alipay',
-    return_url: 'https://sales.xiaovbao.cn/alipay-callback',
+    return_url: 'https://salesTest.xiaovbao.cn/alipay-callback',
     rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
     sandbox: false,
