@@ -397,7 +397,7 @@ const amountManger = (function () {
 
     //通过订单号获取总金额
     let getAmountByTradeNo = async function (tenantId, consigneeId, trade_no) {
-        let orderGoods = OrderGoods.findAll({
+        let orderGoods =await OrderGoods.findAll({
             where: {
                 trade_no: trade_no,
                 tenantId: tenantId,

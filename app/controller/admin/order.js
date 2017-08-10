@@ -69,38 +69,34 @@ module.exports = {
     //async getAdminOrder(ctx, next){},
     async getAdminOrder(ctx, next){
         ctx.checkQuery('tenantId').notEmpty();
+        //页码
+        ctx.checkQuery('pageNumber').notEmpty();
+        //每页显示的大小
+        ctx.checkQuery('pageSize').notEmpty();
         let result = [];
         let foodJson = [];
         let totalNum = 0;
         let totalPrice = 0;
         let totalVipPrice = 0;
-        let startTime = null;
-        let endTime = null;
+        // let startTime = null;
+        // let endTime = null;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        if (ctx.query.startTime == null) {
-            startTime = '2000-05-14T06:12:22.000Z'
-        } else {
-            startTime = new Date(ctx.query.startTime);
-        }
-        if (ctx.query.endTime == null) {
-            endTime = '2100-05-14T06:12:22.000Z'
-        } else {
-            endTime = new Date(ctx.query.endTime);
-        }
-
+        let pageNumber = parseInt(ctx.query.pageNumber);
+        let pageSize = parseInt(ctx.query.pageSize);
+        let place = (pageNumber-1)*pageSize
         //根据tenantId，查询当前时间的订单
         let orders = await Orders.findAll({
             where: {
-                createdAt: {
-                    $between: [startTime, endTime]
-                },
-                tenantId: ctx.query.tenantId,
+                tenantId:ctx.query.tenantId ,
             },
-            order: [["createdAt", "DESC"]]
+            order: [["createdAt", "DESC"]],
+            offset : place,
+            limit : pageSize,
         })
+
 
         //循环不相同的订单号
         let order;
@@ -121,9 +117,6 @@ module.exports = {
             //根据创建时间和订单号查询所有记录
             orderGoods = await OrderGoods.findAll({
                 where: {
-                    createdAt: {
-                        $between: [startTime, endTime]
-                    },
                     trade_no: orders[k].trade_no
                 }
             })
@@ -167,7 +160,7 @@ module.exports = {
             result[k].status = orders[k].status;
             result[k].time = orders[k].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[k].phone;
-            result[k].consigneeId = order.consigneeId;
+            result[k].consigneeId =orders[k].consigneeId;
             result[k].consigneeName = consignee == null ? null : consignee.name;
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
 
@@ -192,7 +185,8 @@ module.exports = {
                 console.log("重要信息，未找到支付请求，订单号=========" + orders[k].trade_no);
             }
 
-            let amount = await amoutManager.getTransAccountAmount(ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
+            let amount = await amoutManager.getTransAccountAmount
+            (ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
 
             //简单异常处理
             if (amount.totalAmount > 0) {
