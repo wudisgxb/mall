@@ -11,6 +11,7 @@ const Tables = db.models.Tables;
 const TenantConfigs = db.models.TenantConfigs;
 const PaymentReqs = db.models.PaymentReqs;
 const Orders = db.models.NewOrders;
+const OrderGoods = db.models.OrderGoods;
 const Coupons = db.models.Coupons;
 const Consignees = db.models.Consignees;
 const AlipayErrors = db.models.AlipayErrors;
@@ -27,8 +28,8 @@ const getstatistics = require('../statistics/orderStatistic');
 
 const aliDeal = new Alipay({
     appId: config.alipay.appId,
-    notify_url: 'https://deal.xiaovbao.cn/api/test/alipay',//后台回调
-    return_url: 'https://salesTest.xiaovbao.cn/alipay-callback',//前台回调
+    notify_url: 'https://sales.xiaovbao.cn/api/test/alipay',//后台回调
+    return_url: 'https://sales.xiaovbao.cn/alipay-callback',//前台回调
     rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
     sandbox: false,
@@ -37,8 +38,8 @@ const aliDeal = new Alipay({
 
 const aliEshop = new Alipay({
     appId: config.alipay.appId,
-    notify_url: 'https://deal.xiaovbao.cn/api/test/alipay',
-    return_url: 'https://salesTest.xiaovbao.cn/alipay-callback',
+    notify_url: 'https://sales.xiaovbao.cn/api/test/alipay',
+    return_url: 'https://sales.xiaovbao.cn/alipay-callback',
     rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
     sandbox: false,
@@ -408,19 +409,19 @@ module.exports = {
 
 
             // 根据订单号查询当前订单
-            let order = await Orders.findAll({
+            let orders = await OrderGoods.findAll({
                 where: {
                     trade_no: ret.out_trade_no
                 }
             })
             //根据查询到的foodId在菜单中查询当前的菜
             let rest;
-            for (let i = 0; i < order.length; i++) {
-                let food = await Foods.findById(order[i].FoodId);
+            for (let i = 0; i < orders.length; i++) {
+                let food = await Foods.findById(orders[i].FoodId);
                 //将查询到的数量减去查询到的数量
-                food.sellCount = food.sellCount + order[i].num;
+                food.sellCount = food.sellCount + orders[i].num;
 
-                food.todaySales = food.todaySales + order[i].num;
+                food.todaySales = food.todaySales + orders[i].num;
                 await food.save();
             }
 
@@ -465,7 +466,6 @@ module.exports = {
                 let order = await Orders.findOne({
                     where: {
                         TableId: tableId,
-                        paymentMethod: '支付宝',
                         $or: [{status: 0}, {status: 1}],
                         tenantId: tenantId,
                         consigneeId: consigneeId,

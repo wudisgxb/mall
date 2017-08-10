@@ -161,6 +161,7 @@ module.exports = {
             result[k].time = orders[k].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[k].phone;
             result[k].consigneeId =orders[k].consigneeId;
+            result[k].consigneeId = orders[k].consigneeId;
             result[k].consigneeName = consignee == null ? null : consignee.name;
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
 
