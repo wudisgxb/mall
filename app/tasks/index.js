@@ -25,7 +25,7 @@ const wxpay = new WXPay({
     appId: config.wechat.appId,
     mchId: config.wechat.mchId,
     partnerKey: config.wechat.partnerKey, //微信商户平台API密钥
-    pfx: fs.readFileSync('./app/controller/wechatPay/apiclient_cert.p12'), //微信商户平台证书
+    pfx: fs.readFileSync('./app/config/apiclient_cert.p12'), //微信商户平台证书
 })
 
 
