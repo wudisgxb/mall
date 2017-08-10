@@ -46,7 +46,7 @@ module.exports = {
 
         console.log(`auth_callback_url: ${auth_callback_url}`)
 
-        const url = client.getAuthorizeURL(auth_callback_url, 'salesTest', 'snsapi_base')
+        const url = client.getAuthorizeURL(auth_callback_url, 'sales', 'snsapi_base')
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
@@ -64,7 +64,7 @@ module.exports = {
 
         console.log(`auth_callback_url: ${auth_callback_url}`)
 
-        const url = client.getAuthorizeURL(auth_callback_url, 'salesTest', 'snsapi_base')
+        const url = client.getAuthorizeURL(auth_callback_url, 'sales', 'snsapi_base')
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
