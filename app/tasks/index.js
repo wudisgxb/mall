@@ -553,6 +553,7 @@ module.exports = async function tasks(app) {
                 tmpAmountJson.consigneeAmount = 0;
 
                 for (var i = 0; i < paymentReqs.length; i++) {
+                    console.log("trade_no=======" + paymentReqs[i].trade_no);
                     amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, paymentReqs[i].trade_no, '微信', paymentReqs[i].refund_amount);
                     console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
 
@@ -797,6 +798,7 @@ module.exports = async function tasks(app) {
                 tmpAmountJson.consigneeAmount = 0;
 
                 for (var i = 0; i < paymentReqs.length; i++) {
+                    console.log("trade_no=======" + paymentReqs[i].trade_no);
                     amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, paymentReqs[i].trade_no, '支付宝', paymentReqs[i].refund_amount);
                     console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
 
@@ -945,6 +947,7 @@ module.exports = async function tasks(app) {
                     //获取订单号
                     trade_no = orders[i].trade_no;
                     console.log("超时订单号：" + trade_no)
+
 
                     await orders[i].destroy();
 

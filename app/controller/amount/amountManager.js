@@ -46,11 +46,13 @@ const amountManger = (function () {
                 trade_no: trade_no,
                 tenantId: tenantId,
                 consigneeId: consigneeId
-            }
+            },
+            paranoid: false
         })
 
         //异常情况不转账
         if (order == null) {
+            console.log("order==null; trade_no ====" + trade_no);
             retJson.totalAmount = 0;
             retJson.merchantAmount = 0;
             retJson.consigneeAmount = 0;
@@ -380,6 +382,7 @@ const amountManger = (function () {
         retJson.couponValue = couponValue;
 
         console.log("返回给订单的所有金额:")
+        console.log("trade_no===" + trade_no);
         console.log("totalPrice====" + totalPrice);
         console.log("merchantAmount====" + merchantAmount);
         console.log("consigneeAmount====" + consigneeAmount);
@@ -397,7 +400,7 @@ const amountManger = (function () {
 
     //通过订单号获取总金额
     let getAmountByTradeNo = async function (tenantId, consigneeId, trade_no) {
-        let orderGoods = OrderGoods.findAll({
+        let orderGoods = await OrderGoods.findAll({
             where: {
                 trade_no: trade_no,
                 tenantId: tenantId,
@@ -420,14 +423,13 @@ const amountManger = (function () {
             totalVipPrice += food.vipPrice * orderGoods[i].num;//会员价
         }
 
-
         let json = {};
         json.totalPrice = Math.round(totalPrice * 100) / 100;
         json.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
         return json;
     }
 
-    //通过订单号获取总金额
+    //判断是否给自己代售
     let isTenantIdAndConsigneeIdSame = async function (tenantId, consigneeId) {
         let tenantConfig = await TenantConfigs.findOne({
             where: {

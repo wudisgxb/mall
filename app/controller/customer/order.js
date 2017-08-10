@@ -352,7 +352,8 @@ module.exports = {
                 consigneeId: body.condition.consigneeId,
                 TableId: table.id,
                 phone: body.condition.phoneNumber,
-                tenantId: body.condition.tenantId
+                tenantId: body.condition.tenantId,
+                $or: [{status: 0}, {status: 1}],
             }
         });
 
@@ -434,7 +435,8 @@ module.exports = {
                 consigneeId: ctx.query.consigneeId,
                 TableId: table.id,
                 phone: ctx.query.phoneNumber,
-                tenantId: ctx.query.tenantId
+                tenantId: ctx.query.tenantId,
+                $or: [{status: 0}, {status: 1}],
             }
         });
 

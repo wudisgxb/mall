@@ -8,6 +8,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const db = require('../../db/mysql/index');
 const Tables = db.models.Tables;
 const Orders = db.models.NewOrders;
+const OrderGoods = db.models.OrderGoods;
 const PaymentReqs = db.models.PaymentReqs;
 const AlipayErrors = db.models.AlipayErrors;
 const TenantConfigs = db.models.TenantConfigs;
@@ -182,7 +183,7 @@ module.exports = {
             total_fee: parseFloat(total_amount) * 100,//分
             trade_type: 'JSAPI',
             spbill_create_ip: ip,
-            notify_url: 'http://deal.xiaovbao.cn/api/test0/wechatPayNotify'
+            notify_url: 'http://deal.xiaovbao.cn/api/test/wechatPayNotify'
         })
         new_params.trade_no = trade_no;
 
@@ -382,7 +383,7 @@ module.exports = {
             total_fee: parseFloat(total_amount) * 100,//分
             trade_type: 'JSAPI',
             spbill_create_ip: ip,
-            notify_url: 'http://deal.xiaovbao.cn/api/test0/wechatPayNotify'
+            notify_url: 'http://deal.xiaovbao.cn/api/test/wechatPayNotify'
         })
         new_params.trade_no = wechat_trade_no;
 
@@ -586,17 +587,17 @@ module.exports = {
             }
 
 
-            let order = await Orders.findAll({
+            let orders = await OrderGoods.findAll({
                 where: {
                     trade_no: trade_no
                 }
             })
             //根据查询到的foodId在菜单中查询当前的菜
-            for (let i = 0; i < order.length; i++) {
-                let food = await Foods.findById(order[i].FoodId);
+            for (let i = 0; i < orders.length; i++) {
+                let food = await Foods.findById(orders[i].FoodId);
                 //将查询到的数量减去查询到的数量
-                food.sellCount = food.sellCount + order[i].num;
-                food.todaySales = food.todaySales + order[i].num;
+                food.sellCount = food.sellCount + orders[i].num;
+                food.todaySales = food.todaySales + orders[i].num;
                 await food.save();
             }
 
