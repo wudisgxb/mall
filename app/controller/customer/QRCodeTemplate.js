@@ -3,6 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const QRCodeTemplates = db.models.QRCodeTemplates;
+const PaymentReqs = db.models.PaymentReqs;
 const Merchants = db.models.Merchants;
 const TenantConfigs = db.models.TenantConfigs;
 const Tool = require('../../Tool/tool');
@@ -28,7 +29,22 @@ module.exports = {
             return;
         }
 
+        //青豆家抢购活动，10次
+        if (ctx.query.QRCodeTemplateId == '201708101938208000001') {
+            let paymentReqs = await PaymentReqs.findAll({
+                where: {
+                    consigneeId: '48d473e77f459833bb06c60f9a8f0000',
+                    $or: [{total_amount: '5'}, {total_amount: '15'}, {total_amount: '25'}, {total_amount: '35'}, {total_amount: '45'}, {total_amount: '55'}, {total_amount: '65'}, {total_amount: '75'}],
+                    isFinish: true,
+                    isInvalid: false
+                }
+            });
 
+            if (paymentReqs.length >= 1) {
+                ctx.body = new ApiResult(ApiResult.Result.EXISTED);
+                return;
+            }
+        }
 
         let qrCode = {};
         let qrCodes = [];

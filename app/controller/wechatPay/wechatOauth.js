@@ -21,7 +21,7 @@ const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../../controller/infoPush/infoPush');
 const webSocket = require('../../controller/socketManager/socketManager');
 const amountManager = require('../amount/amountManager')
-
+const transAccounts = require('../customer/transAccount')
 const orderManager = require('../customer/order');
 const config = require('../../config/config')
 
@@ -595,7 +595,6 @@ module.exports = {
             //根据查询到的foodId在菜单中查询当前的菜
             for (let i = 0; i < orders.length; i++) {
                 let food = await Foods.findById(orders[i].FoodId);
-                //将查询到的数量减去查询到的数量
                 food.sellCount = food.sellCount + orders[i].num;
                 food.todaySales = food.todaySales + orders[i].num;
                 await food.save();
@@ -734,6 +733,8 @@ module.exports = {
                                 if (result.result_code == 'SUCCESS') {
                                     paymentReqs[0].TransferAccountIsFinish = true;
                                     await paymentReqs[0].save();
+                                } else {
+                                    await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                                 }
                             } catch (e) {
                                 console.log(e);
@@ -763,6 +764,8 @@ module.exports = {
                                     if (result.result_code == 'SUCCESS') {
                                         paymentReqs[0].TransferAccountIsFinish = true;
                                         await paymentReqs[0].save();
+                                    } else {
+                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                                     }
                                 } catch (e) {
                                     console.log(e);
@@ -802,11 +805,34 @@ module.exports = {
                                         if (result.result_code == 'SUCCESS') {
                                             paymentReqs[0].consigneeTransferAccountIsFinish = true;
                                             await paymentReqs[0].save();
+                                        } else {
+                                            await transAccounts.pendingTransferAccounts(trade_no, consignee.payee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
                                         }
+                                    } else {
+                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                        await transAccounts.pendingTransferAccounts(trade_no, consignee.payee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
                                     }
                                 } catch (e) {
                                     console.log(e);
                                 }
+                            }
+                        }
+                    } else {
+                        if (consignee == null) {
+                            await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
+                        } else {
+                            let profitsharing = await ProfitSharings.findOne({
+                                where: {
+                                    tenantId: tenantId,
+                                    consigneeId: consigneeId
+                                }
+                            });
+
+                            if (profitsharing == null) {
+                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
+                            } else {
+                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                await transAccounts.pendingTransferAccounts(trade_no, consignee.payee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
                             }
                         }
                     }
