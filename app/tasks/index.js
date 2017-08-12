@@ -125,8 +125,8 @@ module.exports = async function tasks(app) {
                     }
                 });
 
-                console.log("租户转账金额：" + merchantAmount);
-                console.log("代售转账金额：" + consigneeAmount);
+                console.log("租户微信转账金额：" + merchantAmount);
+                console.log("代售微信转账金额：" + consigneeAmount);
                 if (tenantConfig != null) {
                     console.log("服务器公网IP：" + ip);
                     fn = co.wrap(wxpay.transfers.bind(wxpay))
@@ -246,7 +246,7 @@ module.exports = async function tasks(app) {
                                 console.log(e);
                             }
                         } else {
-                            console.log("主商户分润：" + amount);
+                            console.log("主商户分润：" + merchantAmount);
                             var params = {
                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                 openid: tenantConfig.wecharPayee_account,
@@ -344,15 +344,6 @@ module.exports = async function tasks(app) {
     }
 
     let aliTransferAccounts = async function () {
-        const ali = new myAlipay({
-            appId: config.alipay.appId,
-            notify_url: 'http://deal.xiaovbao.cn/api/v3/alipay',
-            return_url: 'http://dealclient.xiaovbao.cn/alipay-callback',
-            rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
-            rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
-            sandbox: false,
-            signType: 'RSA2'
-        });
 
         //把需要转账的租户，代售商户查询出来
         let tmpArray = [];//存放租户，代售商户对象的数组
@@ -546,7 +537,7 @@ module.exports = async function tasks(app) {
                                     where:{
                                         tenantId: tenantId,
                                         consigneeId: consigneeId,
-                                        paymentMethod: '微信',
+                                        paymentMethod: '支付宝',
                                         role: '租户',
                                         status: 0
                                     }
