@@ -14,6 +14,7 @@ let getYearEchat = require('../echats/yearEchat')
 let getHounthEchats = require('../echats/HounthEchats')
 let getWeeksEchat = require('../echats/getWeeks')
 let AnYearEchats = require('../echats/anYearEchats')
+let sqlOrder = require('../sql/sql')
 
 const getstatistics = (function () {
     // 设置Order表
@@ -36,7 +37,6 @@ const getstatistics = (function () {
         })
 
     }
-
     // 查询平均消费
     let getAvgConsumption = async function (tenantId,startTime,endTime,type) {
         //type==1为每日平均消费
@@ -703,6 +703,167 @@ const getstatistics = (function () {
         return result;
     }
 
+    //新手购买率和复买率
+    let newPurchaseRate = async function (tenantId,startTime,endTime,type) {
+        let Orders = await StatisticsOrders.findAll({
+            where :{
+                tenantId : tenantId
+            }
+        })
+        //新手数据的数组
+        let statisticsOrderNover =[];
+        let aaa =[]
+        //将所有第一次购买的数据存入数组中
+        for(let j =0;j<Orders.length;j++){
+            if(!statisticsOrderNover.contains(Orders[j].phone)){
+                statisticsOrderNover.push(Orders[j].phone)
+            }else{
+                aaa.push(Orders[j].phone)
+            }
+        }
+        // console.log(statisticsOrderNover)
+        // console.log(aaa)
+        let statisticsOrdersNover =[]
+        for(let z = 0;z<statisticsOrderNover.length;z++){
+            let order = await StatisticsOrders.findOne({
+                where :{
+                    tenantId : tenantId,
+                    phone : statisticsOrderNover[z]
+                }
+            })
+            statisticsOrdersNover.push(order)
+        }
+        let getTime = [];
+        if(type==1){
+            getTime = await getOneDayEchat.getDay(startTime,endTime)
+        }
+        if(type==2){
+            getTime = await getMonthEchats.getMonth(startTime,endTime)
+        }
+        if(type==3){
+            getTime = await getYearEchat.getYear(startTime,endTime)
+        }
+        let result=[];
+        // console.log(statisticsOrdersNover)
+        for (let i = 0; i < getTime.length; i++){
+            //当前时间段的新手
+            let intradayNovice =[]
+            let statisticsOrders = await StatisticsOrders.getBetweenDateByTenantId(tenantId, new Date(getTime[i].start), new Date(getTime[i].end))
+            for(let k = 0; k<statisticsOrders.length; k++){
+                for(let g = 0;g<statisticsOrdersNover.length;g++){
+                    if(statisticsOrders[k].phone ==statisticsOrdersNover[g].phone&&statisticsOrders[k].trade_no ==statisticsOrdersNover[g].trade_no){
+                        intradayNovice.push(statisticsOrders[k].trade_no)
+                    }
+                }
+            }
+            let time;
+            if(type==1){
+                time = getTime[i].start
+            }
+            if(type==2){
+                time = "第"+(getTime[i].start.getMonth()+1)+"月"
+            }
+            if(type==3){
+                time=getTime[i].start.getYear()+"年"
+            }
+            // console.log(statisticsOrders.length)
+            // console.log(intradayNovice.length);
+            // console.log(statisticsOrders)
+            result.push({
+                newPurchaseRate : {
+                    name : "新人购买率",
+                    value : (intradayNovice.length/statisticsOrders.length)*100+"%"
+                },
+                buyAgain:{
+                    name :"重复购买率",
+                    value : (1-intradayNovice.length/statisticsOrders.length)*100+"%"
+                },
+                time : {
+                    name :"时间",
+                    value : time
+                }
+            })
+        }
+        return result
+    }
+    //留存率
+    let Retention =async function (tenantId,startTime,endTime,type) {
+        let orderStatistics = await StatisticsOrders.findAll({
+            where:{
+                tenantId : tenantId
+            }
+        })
+        let statisticsOrderNover = []
+        for (let i = 0;i<orderStatistics.length;i++){
+            // console.log(orderStatistics[i].phone)
+            let orders = await StatisticsOrders.findOne({
+                where:{
+                    phone : orderStatistics[i].phone,
+                    createdAt : {
+                        $lt : orderStatistics[i].createdAt
+                    }
+                }
+            })
+            // console.log(orders)
+            // let order = JSON.stringify(orders)
+            // console.log(order)
+            if(orders == null){
+                statisticsOrderNover.push(orderStatistics[i])
+            }
+        }
+        //得到全是新手的数组
+        // console.log(statisticsOrderNover.length)
+        let startDate = new Date(startTime).getTime()
+        let oneDay = 1000*60*60*24
+        let endDate = oneDay*7
+        let noverPhone = []
+        //当日注册的新手
+        let everyNover=[]
+        for(let k = 0; k < statisticsOrderNover.length; k++ ){
+            let start = new Date(statisticsOrderNover[k].createdAt).getTime()
+            // console.log(start)
+            if(start>startDate&&start<startDate+oneDay){
+                everyNover.push(statisticsOrderNover[k])
+            }
+        }
+        //查看当日用软件的数量，在一周内的留存率
+        let resultNover =[]
+        for(let j = startDate;j<startDate+endDate;j+=oneDay){
+            let result=[]
+            for(let l = 0;l<everyNover.length;l++){
+                let orderstatistic = await StatisticsOrders.findOne({
+                    where : {
+                        phone : everyNover[l].phone,
+                        createdAt : {
+                            $gt : new Date(j),
+                            $lt : new Date(j+oneDay)
+                        }
+                    }
+                })
+                if(orderstatistic!=null){
+                    result.push(orderstatistic)
+                }
+            }
+            let time
+            time =(j-startDate)/oneDay+1
+
+            resultNover.push({
+                time : (time==1?"当日新手用户":time+"日留存"),
+                value : result.length
+            })
+        }
+
+
+        return resultNover;
+    }
+    //查询配送费
+    let xinren = async function (tenantId) {
+        logger.info(tenantId)
+        let sql = await sqlOrder.selectOrOrderStatistic(tenantId)
+        logger.info(sql)
+        let orders = await db.query(sql)
+        return orders
+    }
 
     let instance = {
         setOrders : setOrders,
@@ -710,7 +871,10 @@ const getstatistics = (function () {
         getVipAvgConsumption : getVipAvgConsumption,
         getOrder : getOrder,
         getReat : getReat,
-        getOrderNum:getOrderNum
+        getOrderNum:getOrderNum,
+        newPurchaseRate : newPurchaseRate,
+        Retention : Retention,
+        xinren : xinren
     }
     return instance;
 })();

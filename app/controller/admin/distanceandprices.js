@@ -43,9 +43,9 @@ module.exports = {
         // ctx.checkBody('deliveryFeeId').notEmpty()
         ctx.checkBody('minDistance').notEmpty()
         ctx.checkBody('maxDistance').notEmpty()
-        ctx.checkBody('deliveryFee').notEmpty()
-        ctx.checkBody('startPrice').notEmpty()
-        ctx.checkBody('deliveryTime').notEmpty()
+        ctx.checkBody('deliveryFee').notEmpty()//配送费
+        ctx.checkBody('startPrice').notEmpty()//起送价
+        ctx.checkBody('deliveryTime').notEmpty()//花费时间
         let body= ctx.request.body;
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors)

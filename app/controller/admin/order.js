@@ -69,36 +69,44 @@ module.exports = {
     //async getAdminOrder(ctx, next){},
     async getAdminOrder(ctx, next){
         ctx.checkQuery('tenantId').notEmpty();
-        //页码
-        ctx.checkQuery('pageNumber').notEmpty();
-        //每页显示的大小
-        ctx.checkQuery('pageSize').notEmpty();
         let result = [];
         let foodJson = [];
         let totalNum = 0;
         let totalPrice = 0;
         let totalVipPrice = 0;
-        // let startTime = null;
-        // let endTime = null;
+        let startTime = null;
+        let endTime = null;
+        if(ctx.query.startTime==null){
+            startTime='2000-05-14T06:12:22.000Z'
+        }else{
+            startTime = new Date(ctx.query.startTime);
+        }
+        if(ctx.query.endTime==null){
+            endTime='2100-05-14T06:12:22.000Z'
+        }else{
+            endTime = new Date(ctx.query.endTime);
+        }
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
 
-
+        //页码
         let pageNumber = parseInt(ctx.query.pageNumber);
+        //每页显示的大小
         let pageSize = parseInt(ctx.query.pageSize);
         let place = (pageNumber-1)*pageSize
         //根据tenantId，查询当前时间的订单
-        let orders = await Orders.findAll({
-            where: {
-                tenantId:ctx.query.tenantId ,
-            },
-            order: [["createdAt", "DESC"]],
-            offset : place,
-            limit : pageSize,
-        })
-
+        let orders = [];
+            orders = await Orders.findAll({
+                where: {
+                    tenantId:ctx.query.tenantId ,
+                    createdAt: {
+                        $between: [startTime, endTime]
+                    }
+                }
+            })
+        
 
         //循环不相同的订单号
         let order;

@@ -73,6 +73,20 @@ module.exports = {
         if(body.status == 5){
             orderStatistics = await orderStatistic.getReat(body.tenantId, body.startTime, body.endTime, body.type)
         }
+        //新人购买率
+        if(body.status == 6){
+            orderStatistics = await orderStatistic.newPurchaseRate(body.tenantId, body.startTime, body.endTime, body.type)
+        }
+
+        //重复购买率
+        if(body.status == 7){
+            orderStatistics = await orderStatistic.Retention(body.tenantId, body.startTime, body.endTime, body.type)
+        }
+        if(body.status == 8){
+            orderStatistics = await orderStatistic.xinren(body.tenantId)
+        }
+
+        
         //分成情况
         // if(body.status==4){
         //     orderStatistics = await orderStatistic.getReat(body.tenantId,body.startTime,body.endTime,body.type)
