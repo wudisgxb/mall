@@ -21,7 +21,12 @@ var maxMills = 3.5 * 60 * 60 * 1000
 module.exports = {
     async saveVipAndCoupons(ctx,next){
         ctx.checkBody('tenantId').notEmpty()
-        
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+            return;
+        }
+        let body = ctx.request.body;
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
@@ -141,7 +146,7 @@ module.exports = {
                     $ne: null
                 }
             },
-            paranoid: false
+            
         });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);

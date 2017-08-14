@@ -84,6 +84,8 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
+
+
         let pageNumber = parseInt(ctx.query.pageNumber);
         let pageSize = parseInt(ctx.query.pageSize);
         let place = (pageNumber-1)*pageSize
@@ -213,8 +215,6 @@ module.exports = {
                 result[k].couponType = null;
                 result[k].couponValue = null
             }
-
-
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
@@ -273,5 +273,30 @@ module.exports = {
     //
     //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     // }
-
+    async getAdminOrderByCount(ctx,next){
+        ctx.checkQuery('tenantId').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+        let orderOfCount = await Orders.count({
+            where:{
+                tenantId : ctx.query.tenantId
+            },
+        })
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderOfCount)
+    },
+    async getAdminOrderByCountis(ctx,next){
+        ctx.checkQuery('tenantId').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+        let tenantId = ctx.query.tenantId
+        let orderOfCount = await db.query("select count(*) as count from neworders where tenantId = ? and deletedAt is null",
+            { replacements:[tenantId]})
+        let count =  orderOfCount[0][0].count
+        let pageCount = Math.ceil(count/10)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,pageCount)
+    }
 }

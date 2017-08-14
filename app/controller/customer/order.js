@@ -93,9 +93,9 @@ module.exports = {
         //获取tableId
         let table = await Tables.findOne({
             where: {
-                tenantId: body.tenantId,
-                name: body.tableName,
-                consigneeId: null
+                tenantId : body.tenantId,
+                name : body.tableName,
+                consigneeId : null
             }
         })
 
