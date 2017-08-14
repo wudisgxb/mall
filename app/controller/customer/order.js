@@ -552,7 +552,7 @@ module.exports = {
         let total_amount = 0;
 
         if (firstOrderDiscount == null) {
-            firstDiscount = 0;
+            firstOrderDiscount = 0;
         }
 
         let orders = await OrderGoods.findAll({
@@ -591,6 +591,7 @@ module.exports = {
             total_amount = Math.round(totalPrice * 100) / 100;
         }
 
+
         //首单折扣
         if (firstDiscount != -1) {
             total_amount = total_amount * firstDiscount;
@@ -627,7 +628,6 @@ module.exports = {
                     total_amount = total_amount;
             }
         }
-
 
         //查询配送费
         let deliveryFee = await DeliveryFees.findOne({
