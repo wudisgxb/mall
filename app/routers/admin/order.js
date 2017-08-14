@@ -17,6 +17,11 @@ router.put('/api/test/admin/order',orderCustomer.updateUserEshopOrder)
 router.delete('/api/test/admin/deal/order',order.deleteAdminOrderTenantId);
 router.delete('/api/test/admin/eshop/order',order.deleteAdminOrderConsigneeId);
 router.get('/api/test/admin/order',order.getAdminOrder);
+router.get('/api/test/admin/orderByCount',order.getAdminOrderByCount);
+
+router.get('/api/test/admin/orderByCountis',order.getAdminOrderByCountis);
+
+
 //router.post('/api/test/admin/order',order.saveAdminOrder);
 
 module.exports = router
