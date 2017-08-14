@@ -3,132 +3,102 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const PaymentReqs = db.models.PaymentReqs;
-const Orders = db.models.Orders;
+const Orders = db.models.NewOrders;
+const OrderGoods = db.models.OrderGoods;
 const Tool = require('../../Tool/tool')
 
 module.exports = {
-
-    async countSales (ctx, next) {
+    async savefoodEchats(ctx, next){
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('startTime').notEmpty();
-        ctx.checkBody('endTime').notEmpty();
-
-        if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
-            return;
+        ctx.checkBody('type').notEmpty();
+        let body = ctx.request.body
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR);
         }
-
-        let body = ctx.request.body;
-        let amounts = 0;
-        let array = [];
-
-        for (let i = new Date(body.startTime).getTime(); i <= new Date(body.endTime).getTime(); i = i + 86400000) {
-            if (body.consigneeId == 'all') {
-                amounts = await PaymentReqs.sum(
-                    'actual_amount',
-                    {
-                        where: {
-                            createdAt: {
-                                $lt: new Date(i + 86400000),
-                                $gte: new Date(i)
-                            },
-                            isFinish: true,
-                            tenantId: body.tenantId
-                        }
-                    }
-                )
-            } else {
-                amounts = await PaymentReqs.sum(
-                    'actual_amount',
-                    {
-                        where: {
-                            createdAt: {
-                                $lt: new Date(i + 86400000),
-                                $gte: new Date(i)
-                            },
-                            isFinish: true,
-                            tenantId: body.tenantId,
-                            consigneeId: body.consigneeId
-                        }
-                    }
-                )
-            }
-
-            if (amounts == null) {
-                amounts = 0
-            }
-
-            array.push({
-                time: new Date(i).format("yyyy-MM-dd"),
-                amounts: amounts
-            })
+        let result = await getFoodEchats.getfEchats(body.tenantId,body.startTime,body.type);
+        if(result.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"找不到数据");
         }
-
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, array);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,result);
     },
 
-
-    async countFoods (ctx, next) {
+    async yesterDayFoods(ctx,next){
         ctx.checkBody('tenantId').notEmpty();
-        ctx.checkBody('time').notEmpty();
+        let body = ctx.request.body
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR);
+        }
+        let date = new Date()
+        date.setDate(date.getDate()-1)
+        let startTime = date.format("yyyy-MM-dd 00:00:00")
+        console.log(startTime);
+        let result = await getFoodEchats.getfEchats(body.tenantId,startTime,1);
+        if(result.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"找不到数据");
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,result);
+    },
 
+    async getOrderStatisticByTime (ctx, next) {
+        ctx.checkBody('tenantId').notEmpty()
+        ctx.checkBody('startTime').notEmpty()
+        ctx.checkBody('endTime').notEmpty()
+        ctx.checkBody('type').notEmpty()
+        ctx.checkBody('status').notEmpty()
+        let body = ctx.request.body
         if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
-
-        let body = ctx.request.body;
-        let amounts = 0;
-        let array = [];
-        let foodNumArray = []
-        let paymentReqs;
-        //if (body.consigneeId == 'all') {
-
-
-        var orders = await Orders.findAll(
-            {
-                where: {
-                    createdAt: {
-                        $lt: new Date(new Date(body.time).getTime() + 86400000),
-                        $gte: new Date(new Date(body.time).getTime())
-                    },
-                    status: 2,
-                    tenantId: body.tenantId
-                }
-            }
-        )
-
-        var foodIdArray = [];//FOODID
-
-        for (var j = 0; j < orders.length; j++) {
-            if (!foodIdArray.contains(orders[j].FoodId)) {
-                foodIdArray.push(orders[j].FoodId);
-            }
+        let orderStatistics = [];
+        //平均消费
+        if (body.status == 1) {
+            orderStatistics = await orderStatistic.getAvgConsumption(body.tenantId, body.startTime, body.endTime, body.type)
         }
-
-        for (var k = 0; k < foodIdArray.length; k++) {
-            var num = await Orders.sum(
-                'num',
-                {
-                    where: {
-                        createdAt: {
-                            $lt: new Date(new Date(body.time).getTime() + 86400000),
-                            $gte: new Date(new Date(body.time).getTime())
-                        },
-                        status: 2,
-                        tenantId: body.tenantId,
-                        FoodId: foodIdArray[k]
-                    }
-                }
-            )
-            foodNumArray.push({
-                "foodId": foodIdArray[k],
-                "num": num
-            })
+        //vip平均消费
+        if (body.status == 2) {
+            orderStatistics = await orderStatistic.getVipAvgConsumption(body.tenantId, body.startTime, body.endTime, body.type)
         }
+        //订单查询
+        if (body.status == 4) {
+            orderStatistics = await orderStatistic.getOrder(body.tenantId, body.startTime, body.endTime, body.type)
+        }
+        //统计订单
+        if (body.status == 3) {
+            orderStatistics = await orderStatistic.getOrderNum(body.tenantId, body.startTime, body.endTime, body.type)
+        }
+        //分成情况
+        if(body.status == 5){
+            orderStatistics = await orderStatistic.getReat(body.tenantId, body.startTime, body.endTime, body.type)
+        }
+        //分成情况
+        // if(body.status==4){
+        //     orderStatistics = await orderStatistic.getReat(body.tenantId,body.startTime,body.endTime,body.type)
+        // }
 
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, orderStatistics)
+    },
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodNumArray);
-    }
+    async getAllOrderStatistic(ctx, next){
+        // console.log(ctx.query)
+        ctx.checkQuery('tenantId').notEmpty();
+        // ctx,checkQuery('startTime').notEmpty();
+        // ctx,checkQuery('endTime').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+        // let result =  getMonthEchats.getMonth(ctx.query.startTime,ctx.query.endTime);
+        // for(let i = 0;i<result.length;i++){
+        let statisticsOrders = await StatisticsOrders.findAll({
+            where: {
+                tenantId: ctx.query.tenantId
+            }
+        })
+        // }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, statisticsOrders)
+
+    },
 
 }

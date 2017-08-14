@@ -12,7 +12,6 @@ const getFoodEchats = (function () {
     let getfEchats = async function (tenantId,startTime,type) {
         //type为1是日报表，2为月报表，3为周报表，4为季度报表，5为年报表
         if(type==1){
-            let orderEchats=[];
             let result=[];
             let orders=[]
             let endDate = new Date(startTime).format("yyyy-MM-dd 23:59:59");

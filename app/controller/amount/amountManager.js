@@ -3,7 +3,8 @@ const request = require('request');
 const path = require('path');
 const db = require('../../db/mysql/index');
 
-const Orders = db.models.Orders;
+const Orders = db.models.NewOrders;
+const OrderGoods = db.models.OrderGoods;
 const Foods = db.models.Foods;
 const Vips = db.models.Vips;
 const ProfitSharings = db.models.ProfitSharings;
@@ -40,16 +41,18 @@ const amountManger = (function () {
         let tmpTotalPrice = 0;
 
         let retJson = {};
-        let orders = await Orders.findAll({
+        let order = await Orders.findOne({
             where: {
                 trade_no: trade_no,
                 tenantId: tenantId,
                 consigneeId: consigneeId
-            }
+            },
+            paranoid: false
         })
 
         //异常情况不转账
-        if (orders.length == 0) {
+        if (order == null) {
+            console.log("order==null; trade_no ====" + trade_no);
             retJson.totalAmount = 0;
             retJson.merchantAmount = 0;
             retJson.consigneeAmount = 0;
@@ -60,7 +63,7 @@ const amountManger = (function () {
         //查询代售和租户是否相同
         let isSame = await this.isTenantIdAndConsigneeIdSame(tenantId, consigneeId);
 
-        let phone = orders[0].phone;
+        let phone = order.phone;
 
         //通过订单号获取优惠券
         let coupon = await Coupons.findOne({
@@ -89,7 +92,7 @@ const amountManger = (function () {
         }
 
         //首单折扣，-1表示不折扣，根据手机号和租户id,暂时没用（原青豆家）
-        let firstDiscount = await orderManager.getFirstDiscountByTradeNo(trade_no,tenantId);
+        let firstDiscount = await orderManager.getFirstDiscountByTradeNo(trade_no, tenantId);
 
         if (firstDiscount != -1) {
             console.log("转账firstDiscount=" + firstDiscount);
@@ -281,10 +284,10 @@ const amountManger = (function () {
                             platformCouponFee = coupon.value * coupon.couponRate;
                             merchantCouponFee = coupon.value * (1 - coupon.couponRate);
 
-                            merchantAmount = (((totalAmount-coupon.value) * (1 - profitsharing.rate - profitsharing.ownRate) + platformCouponFee) <= 0) ? 0.01 : ((totalAmount-coupon.value) * (1 - profitsharing.rate - profitsharing.ownRate)+ platformCouponFee);
+                            merchantAmount = (((totalAmount - coupon.value) * (1 - profitsharing.rate - profitsharing.ownRate) + platformCouponFee) <= 0) ? 0.01 : ((totalAmount - coupon.value) * (1 - profitsharing.rate - profitsharing.ownRate) + platformCouponFee);
                             merchantAmount = Math.round(merchantAmount * 100) / 100;
 
-                            consigneeAmount = (((totalAmount-coupon.value) * profitsharing.rate - platformCouponFee) <= 0) ? 0 : ((totalAmount-coupon.value) * profitsharing.rate - platformCouponFee);
+                            consigneeAmount = (((totalAmount - coupon.value) * profitsharing.rate - platformCouponFee) <= 0) ? 0 : ((totalAmount - coupon.value) * profitsharing.rate - platformCouponFee);
                             consigneeAmount = Math.round(consigneeAmount * 100) / 100;
 
                             break;
@@ -324,8 +327,8 @@ const amountManger = (function () {
 
                                 consigneeAmount = (((totalAmount - coupon.value.split('-')[1]) * profitsharing.rate - platformCouponFee) <= 0) ? 0 : ((totalAmount - coupon.value.split('-')[1]) * profitsharing.rate - platformCouponFee);
                                 consigneeAmount = Math.round(consigneeAmount * 100) / 100;
-                                   // console.log("青豆家转账===" + merchantAmount);
-                               // }
+                                // console.log("青豆家转账===" + merchantAmount);
+                                // }
                             }
                             break;
                         default:
@@ -358,7 +361,7 @@ const amountManger = (function () {
         platformCouponFee = Math.round(platformCouponFee * 100) / 100;
         merchantCouponFee = Math.round(merchantCouponFee * 100) / 100;
 
-        let totalPrice = Math.round(tmpTotalPrice* 100) / 100;
+        let totalPrice = Math.round(tmpTotalPrice * 100) / 100;
 
         retJson.totalAmount = parseFloat(totalAmount) + parseFloat(deliveryFee);//加配送费
         retJson.totalAmount = Math.round(retJson.totalAmount * 100) / 100;
@@ -379,6 +382,7 @@ const amountManger = (function () {
         retJson.couponValue = couponValue;
 
         console.log("返回给订单的所有金额:")
+        console.log("trade_no===" + trade_no);
         console.log("totalPrice====" + totalPrice);
         console.log("merchantAmount====" + merchantAmount);
         console.log("consigneeAmount====" + consigneeAmount);
@@ -396,29 +400,28 @@ const amountManger = (function () {
 
     //通过订单号获取总金额
     let getAmountByTradeNo = async function (tenantId, consigneeId, trade_no) {
-        let orders = await Orders.findAll({
+        let orderGoods = await OrderGoods.findAll({
             where: {
                 trade_no: trade_no,
                 tenantId: tenantId,
                 consigneeId: consigneeId
             }
-        })
+        });
 
         let food;
         let totalPrice = 0;
         let totalVipPrice = 0;
-        for (let i = 0; i < orders.length; i++) {
+        for (let i = 0; i < orderGoods.length; i++) {
             food = await Foods.findOne({
                 where: {
-                    id: orders[i].FoodId,
+                    id: orderGoods[i].FoodId,
                     tenantId: tenantId
                 }
             })
 
-            totalPrice += food.price * orders[i].num;//原价
-            totalVipPrice += food.vipPrice * orders[i].num;//会员价
+            totalPrice += food.price * orderGoods[i].num;//原价
+            totalVipPrice += food.vipPrice * orderGoods[i].num;//会员价
         }
-
 
         let json = {};
         json.totalPrice = Math.round(totalPrice * 100) / 100;

@@ -45,7 +45,7 @@ module.exports = {
                 return;
             }
         }
-        
+
         let qrCode = {};
         let qrCodes = [];
 

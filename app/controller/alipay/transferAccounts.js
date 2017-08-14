@@ -14,8 +14,8 @@ const transferAccountsManger = (function () {
             appId: config.alipay.appId,
             notify_url: 'http://deal.xiaovbao.cn/alipay',//暂时乱写的，没用到
             return_url: 'http://deal.xiaovbao.cn/alipay-callback',//暂时乱写的，没用到
-            rsaPrivate: path.resolve('./app/controller/file/pem/sandbox_iobox_private.pem'),
-            rsaPublic: path.resolve('./app/controller/file/pem/sandbox_ali_public.pem'),
+            rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
+            rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
             sandbox: false,
             signType: 'RSA2'
         });

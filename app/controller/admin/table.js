@@ -3,8 +3,6 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 let Tables = db.models.Tables;
-const ShoppingCarts = db.models.ShoppingCarts;
-const Orders = db.models.Orders;
 const Consignees = db.models.Consignees;
 const Merchants = db.models.Merchants;
 

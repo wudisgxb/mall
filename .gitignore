@@ -64,3 +64,4 @@ typings/
 # dotenv environment variables file
 .env
 /app/config
+/app/db/mysql/index.js
