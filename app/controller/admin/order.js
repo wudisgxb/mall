@@ -97,8 +97,9 @@ module.exports = {
         let pageSize = parseInt(ctx.query.pageSize);
         let place = (pageNumber-1)*pageSize
         //根据tenantId，查询当前时间的订单
-        let orders = [];
-            orders = await Orders.findAll({
+        let orders=[]
+        if(ctx.query.pageNumber==null&&ctx.query.pageSize==null){
+             orders = await Orders.findAll({
                 where: {
                     tenantId:ctx.query.tenantId ,
                     createdAt: {
@@ -106,7 +107,16 @@ module.exports = {
                     }
                 }
             })
-        
+        }else{
+            orders = await Orders.findAll({
+                where: {
+                    tenantId:ctx.query.tenantId
+                },
+                order:[['createdAt','DESC']],
+                offset : place,
+                limit : pageSize
+            })
+        }
 
         //循环不相同的订单号
         let order;
@@ -190,7 +200,6 @@ module.exports = {
                 result[k].refund_amount = paymentReq.refund_amount;
                 result[k].refund_reason = paymentReq.refund_reason;
                 result[k].paymentMethod = paymentReq.paymentMethod;//支付方式
-
                 refund_amount = paymentReq.refund_amount;
             } else {
                 console.log("重要信息，未找到支付请求，订单号=========" + orders[k].trade_no);

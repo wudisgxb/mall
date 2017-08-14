@@ -14,7 +14,7 @@ module.exports = function (sequelize, DataTypes) {
         consigneeRemark: shortDataTypes.String(100, false),
         //代售商分成比例
         rate: shortDataTypes.Double(),
-        //服务商分成比例
+        //平台分成比例
         ownRate: shortDataTypes.Double(),
         //配送费
         distributionFee: shortDataTypes.Double(),
