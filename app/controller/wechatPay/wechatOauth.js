@@ -119,7 +119,7 @@ module.exports = {
         }
 
         let total_amount = 0;
-        let order = await Orders.findAll({
+        let order = await Orders.findOne({
             where: {
                 //trade_no:trade_no,
                 TableId: table.id,
