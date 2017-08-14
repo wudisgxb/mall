@@ -54,6 +54,7 @@ module.exports = async function tasks(app) {
         let consigneeAmount = 0;//给代售的转账金额
         let fn;
         let paymentReqs;
+        let payDate = new Date().format("yyyyMMddhhmmss");
 
         let transferAccounts = await TransferAccounts.findAll({
             where: {
@@ -175,6 +176,7 @@ module.exports = async function tasks(app) {
 
                                 for (var k = 0; k < transferAccounts.length; k++) {
                                     transferAccounts[k].status = 1;
+                                    transferAccounts[k].pay_date = payDate;
                                     await transferAccounts[k].save();
                                 }
 
@@ -235,6 +237,7 @@ module.exports = async function tasks(app) {
 
                                     for (var k = 0; k < transferAccounts.length; k++) {
                                         transferAccounts[k].status = 1;
+                                        transferAccounts[k].pay_date = payDate;
                                         await transferAccounts[k].save();
                                     }
 
@@ -290,6 +293,7 @@ module.exports = async function tasks(app) {
 
                                     for (var kk = 0; kk < transferAccounts.length; kk++) {
                                         transferAccounts[kk].status = 1;
+                                        transferAccounts[kk].pay_date = payDate;
                                         await transferAccounts[kk].save();
                                     }
 
@@ -325,6 +329,7 @@ module.exports = async function tasks(app) {
 
                                         for (var kk = 0; kk < transferAccounts.length; kk++) {
                                             transferAccounts[kk].status = 1;
+                                            transferAccounts[kk].pay_date = payDate;
                                             await transferAccounts[kk].save();
                                         }
                                         console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
@@ -351,6 +356,7 @@ module.exports = async function tasks(app) {
         let merchantAmount = 0;//给租户的转账金额
         let consigneeAmount = 0;//给代售的转账金额
         let paymentReqs;
+        let payDate = new Date().format("yyyyMMddhhmmss");
 
         let transferAccounts = await TransferAccounts.findAll({
             where: {
@@ -459,6 +465,7 @@ module.exports = async function tasks(app) {
 
                             for (var k = 0; k < transferAccounts.length; k++) {
                                 transferAccounts[k].status = 1;
+                                transferAccounts[k].pay_date = payDate;
                                 await transferAccounts[k].save();
                             }
 
@@ -507,6 +514,7 @@ module.exports = async function tasks(app) {
 
                                 for (var k = 0; k < transferAccounts.length; k++) {
                                     transferAccounts[k].status = 1;
+                                    transferAccounts[k].pay_date = payDate;
                                     await transferAccounts[k].save();
                                 }
 
@@ -545,6 +553,7 @@ module.exports = async function tasks(app) {
 
                                 for (var kk = 0; kk < transferAccounts.length; kk++) {
                                     transferAccounts[kk].status = 1;
+                                    transferAccounts[kk].pay_date = payDate;
                                     await transferAccounts[kk].save();
                                 }
 
@@ -571,6 +580,7 @@ module.exports = async function tasks(app) {
 
                                     for (var kk = 0; kk < transferAccounts.length; kk++) {
                                         transferAccounts[kk].status = 1;
+                                        transferAccounts[kk].pay_date = payDate;
                                         await transferAccounts[kk].save();
                                     }
 
