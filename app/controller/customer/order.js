@@ -917,7 +917,7 @@ module.exports = {
                 })
 
                 //首杯半价(青豆家写死，后面完善)
-                if (food[0].id == 26) {//草莓奶酪
+                if (food[0].id == 21) {//草莓奶酪
                     firstOrderDiscount = food[0].price * 0.5;
                     return Math.round(firstOrderDiscount * 100) / 100;
                 }
@@ -969,7 +969,7 @@ module.exports = {
 
 
             //首杯半价(青豆家写死，后面完善)
-            if (food[0].id == 26) {//草莓奶酪
+            if (food[0].id == 21) {//草莓奶酪
                 firstFlag = 1;
                 firstOrderDiscount = food[0].price * 0.5;
             }
@@ -1039,7 +1039,7 @@ module.exports = {
             foodJson[i].id = food[0].id;
 
             //首杯半价(青豆家写死，后面完善)
-            if (food[0].id == 26) {//草莓奶酪
+            if (food[0].id == 21) {//草莓奶酪
                 firstFlag = 1;
                 firstOrderDiscount = food[0].price * 0.5;
             }

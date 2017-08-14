@@ -426,7 +426,7 @@ const amountManger = (function () {
         return json;
     }
 
-    //通过订单号获取总金额
+    //判断是否给自己代售
     let isTenantIdAndConsigneeIdSame = async function (tenantId, consigneeId) {
         let tenantConfig = await TenantConfigs.findOne({
             where: {
