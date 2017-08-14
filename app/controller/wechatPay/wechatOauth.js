@@ -142,6 +142,9 @@ module.exports = {
         //根据订单查询需要支付多少
         total_amount = await orderManager.getOrderPriceByOrder(order, firstDiscount);
 
+        //微信新订单号
+        let wechat_trade_no = trade_no + String(parseInt(Math.random() * 8999 + 1000));
+
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
             where: {
@@ -179,13 +182,13 @@ module.exports = {
             openid: token.data.openid,
             body: merchant + '-' + tableName + '账单',
             //  detail: '公众号支付测试',
-            out_trade_no: trade_no,
+            out_trade_no: wechat_trade_no,
             total_fee: parseFloat(total_amount) * 100,//分
             trade_type: 'JSAPI',
             spbill_create_ip: ip,
             notify_url: 'http://deal.xiaovbao.cn/api/test/wechatPayNotify'
         })
-        new_params.trade_no = trade_no;
+        new_params.trade_no = wechat_trade_no;
 
         console.log(new_params)
 
@@ -338,7 +341,6 @@ module.exports = {
         total_amount = await orderManager.getOrderPriceByOrder(order, firstDiscount, firstOrderDiscount);
 
         //微信新订单号
-
         let wechat_trade_no = trade_no + String(parseInt(Math.random() * 8999 + 1000));
 
 
