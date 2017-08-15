@@ -160,5 +160,63 @@ module.exports = {
             excludeFoodId:excludeFoodId
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
+    },
+
+    async updateAdminProfitsharings(ctx,next){
+        ctx.checkBody('tenantId').notEmpty()
+        ctx.checkBody('consigneeId').notEmpty()
+        ctx.checkBody('/profitsharings/rate',true).first().notEmpty()
+        ctx.checkBody('/profitsharings/ownRate',true).first().notEmpty()
+        ctx.checkBody('/profitsharings/excludeFoodId',true).first().notEmpty()
+
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+        let body = ctx.request.body;
+        let profitsharings = await Profitsharings.findOne({
+            where: {
+                tenantId: body.tenantId,
+                consigneeId: body.consigneeId,
+            }
+        })
+        if(profitsharings==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此记录")
+            return
+        }
+
+        let excludeFoodId = JSON.stringify(body.profitsharings.excludeFoodId)
+
+        if(profitsharings!=null){
+            profitsharings.rate = Number(body.profitsharings.rate).toFixed(2)
+            profitsharings.ownRate = Number(body.profitsharings.ownRate).toFixed(2)
+            profitsharings.excludeFoodId = excludeFoodId
+            profitsharings.tenantId = body.tenantId
+            profitsharings.consigneeId = body.consigneeId
+            await profitsharings.save();
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    },
+
+    async deleteAdminProfitsharings(ctx,next){
+        ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('consigneeId').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+            return;
+        }
+        let profitsharings = await Profitsharings.findOne({
+            where: {
+                tenantId: ctx.query.tenantId,
+                consigneeId: ctx.query.consigneeId
+            }
+        })
+        if (profitsharings == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此分润信息")
+            return;
+        }
+        await profitsharings.destroy()
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
+
 }
