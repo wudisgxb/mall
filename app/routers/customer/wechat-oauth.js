@@ -7,7 +7,7 @@ router.get('/api/test/customer/deal/wechatpay/redirctUrl', Oauth.userDealRedirec
 // router.get('/api/v2/oauth/getUser', Oauth.getUser)
 router.get('/api/test/customer/eshop/wechatpay/redirctUrl', Oauth.userEshopRedirect)
 
-router.get('/api/test/customer/eshop/fetch-openid/redirctUrl', Oauth.userEshopOpenIdRedirect);
+router.get('/api/test/customer/eshop/fetch-openid/redirectUrl', Oauth.userEshopOpenIdRedirect);
 
 router.get('/api/test/customer/deal/wechatpay/wap', Oauth.getUserDealWechatPayParams)
 
