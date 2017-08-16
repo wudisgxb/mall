@@ -74,7 +74,20 @@ module.exports = {
                 where: {
                     tenantId: tenantIdArray[i],
                 }
-            })
+            });
+            tenantConfig = JSON.parse(JSON.stringify(tenantConfig));
+            delete tenantConfig.payee_account;
+            delete tenantConfig.wecharPayee_account;
+            delete tenantConfig.id;
+            delete tenantConfig.name;
+            delete tenantConfig.createdAt;
+            delete tenantConfig.updatedAt;
+            delete tenantConfig.isRealTime;
+            delete tenantConfig.needVip;
+            delete tenantConfig.vipFee;
+            delete tenantConfig.vipRemindFee;
+            delete tenantConfig.invaildTime;
+            delete tenantConfig.firstDiscount;
             //根据租户id查找配送费，没有就不填
             let distanceAndPrices = await DistanceAndPrices.findAll({
                 where: {
