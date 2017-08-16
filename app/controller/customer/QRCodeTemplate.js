@@ -111,7 +111,7 @@ module.exports = {
                     qrCode.tenantInfo = tenantConfig;
                     qrCode.consigneeId = qrCodeTemplates[j].consigneeId;
                     //查找代售商户信息
-                    if (qrCodeTemplates[j].consigneeId != null) {
+                    if (qrCodeTemplates[j].consigneeId != null && qrCodeTemplates[j].consigneeId != '') {
                         consignee = await Consignees.findOne({
                             where: {
                                 consigneeId: qrCodeTemplates[j].consigneeId
