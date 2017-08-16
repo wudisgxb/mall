@@ -73,6 +73,22 @@ module.exports = {
         console.log(`start: ${new Date()}`)
     },
 
+    async userEshopOpenIdRedirect(ctx, next) {
+        //const path = ctx.query.path
+        //初始回调地址前台做转发用不用改
+        const auth_callback_url = `http://deal.xiaovbao.cn/wechatpay`
+
+        // const auth_callback_url = 'http://119.29.180.92/user'
+
+        console.log(`auth_callback_url: ${auth_callback_url}`)
+
+        const url = client.getAuthorizeURL(auth_callback_url, 'openid', 'snsapi_base')
+        console.log(`redirect url: ${url}`)
+        // 重定向请求到微信服务器
+        //ctx.redirect(url);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, url)
+        console.log(`start: ${new Date()}`)
+    },
 
     // async getUser(ctx, next) {
     //   console.log(`code: ${ctx.query.code}`)
@@ -88,9 +104,7 @@ module.exports = {
     async getOpenId(ctx, next) {
         const token = await client.getAccessToken(ctx.query.code);
 
-        ctx.body = {
-            openId: token.data.openid
-        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {openId: token.data.openid})
     },
 
     async getUserDealWechatPayParams(ctx, next) {
