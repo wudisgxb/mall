@@ -5,6 +5,8 @@ const db = require('../../db/mysql/index');
 const QRCodeTemplates = db.models.QRCodeTemplates;
 const PaymentReqs = db.models.PaymentReqs;
 const Merchants = db.models.Merchants;
+const Consignees = db.models.Consignees;
+const DistanceAndPrices = db.models.DistanceAndPrices;
 const TenantConfigs = db.models.TenantConfigs;
 const Tool = require('../../Tool/tool');
 
@@ -73,6 +75,14 @@ module.exports = {
                     tenantId: tenantIdArray[i],
                 }
             })
+            //根据租户id查找配送费，没有就不填
+            let distanceAndPrices = await DistanceAndPrices.findAll({
+                where: {
+                    tenantId: tenantIdArray[i]
+                }
+            });
+
+            let consignee;
             for (var j = 0; j < qrCodeTemplates.length; j++) {
                 if (tenantIdArray[i] == qrCodeTemplates[j].tenantId) {
                     qrCode = new Object();
@@ -85,10 +95,25 @@ module.exports = {
                     qrCode.tenantId = qrCodeTemplates[j].tenantId;
                     qrCode.merchantName = merchant.name;
                     qrCode.industry = merchant.industry;
-                    qrCode.homeImage = tenantConfig.homeImage;
+                    qrCode.tenantInfo = tenantConfig;
                     qrCode.consigneeId = qrCodeTemplates[j].consigneeId;
+                    //查找代售商户信息
+                    consignee = await Consignees.findOne({
+                        where: {
+                            consigneeId: qrCodeTemplates[j].consigneeId
+                        }
+                    });
+                    qrCode.consigneeName = consignee.name;
                     if (qrCodeTemplates[j].couponType != null && qrCodeTemplates[j].couponValue != null) {
-                        coupons.push({"couponType": qrCodeTemplates[j].couponType, "couponValue": qrCodeTemplates[j].couponValue})
+                        coupons.push({
+                            "couponType": qrCodeTemplates[j].couponType,
+                            "couponValue": qrCodeTemplates[j].couponValue
+                        })
+                    }
+                    //配送费
+                    if (distanceAndPrices.length > 0) {
+                        qrCode.startPrice = distanceAndPrices[0].startPrice;
+                        qrCode.deliveryFee = distanceAndPrices[0].deliveryFee;
                     }
                 }
             }
