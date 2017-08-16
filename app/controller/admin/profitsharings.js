@@ -42,78 +42,16 @@ module.exports = {
     },
 
     async saveAdminProfitsharings(ctx,next){
-        // ctx.checkBody('tenantId').notEmpty()
-        // ctx.checkBody('consigneeId').notEmpty()
-        // // ctx.checkBody('merchantRemark').notEmpty()
-        // // ctx.checkBody('consigneeRemark').notEmpty()
-        // ctx.checkBody('phone').notEmpty()
-        // ctx.checkBody('wecharPayee_account').notEmpty()
-        // ctx.checkBody('payee_account').notEmpty()
-        // ctx.checkBody('rate').notEmpty()
-        // //ctx.checkBody('ownRate').notEmpty()
-        // // ctx.checkBody('distributionFee').notEmpty()
-        // ctx.checkBody('excludeFoodId').notEmpty()
-        // if (ctx.errors) {
-        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
-        //     return;
-        // }
-        // let body = ctx.request.body;
-        // let profitsharings = await Profitsharings.findOne({
-        //     where: {
-        //         tenantId: body.tenantId,
-        //         consigneeName: body.consigneeName,
-        //     }
-        // })
-        // if (profitsharings != null) {
-        //     ctx.body = new ApiResult(ApiResult.Result.EXISTED, "已有此分润记录");
-        //     return;
-        // }
-        //
-        // let merchant = await Merchant.findOne({
-        //     where:{
-        //         tenantId:body.tenantId
-        //     }
-        // })
-        // if(body.rate>1){
-        //     ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"代售商分成比例不可以超过1")
-        //     return;
-        // }
-        // let excludeFoodId = JSON.stringify(body.excludeFoodId);
-        // let consigneeId = Tool.allocTenantId()
-        // let saveProfitsharing = await Profitsharings.create({
-        //     tenantId : body.tenantId,
-        //     consigneeName : body.consigneeName,
-        //     merchantRemark :merchant.name+"代售-转账",
-        //     consigneeRemark : body.consigneeName+"代收分润",
-        //     rate : body.rate,
-        //     ownRate : 0.1,
-        //     excludeFoodId  : excludeFoodId
-        // })
-        // console.log(saveProfitsharing)
-        // console.log("111111111111111111111111")
-        // let saveConsignee
-        //
-        //  saveConsignee = await consignee.create({
-        //      tenantId : body.tenantId,
-        //      name : body.consigneeName,
-        //      phone : body.phone,
-        //      wecharPayee_account : body.wecharPayee_account,
-        //      payee_account : body.payee_account,
-        //      consigneeId : consigneeId
-        // })
-        //
-        // console.log(saveConsignee)
-        // let merchant = await Merchant.findOne({
-        //     where:{
-        //         tenantId:body.tenantId
-        //     }
-        // })
         ctx.checkBody('tenantId').notEmpty()
-        ctx.checkBody('consigneeId').notEmpty()
-       
+        ctx.checkBody('consigneeName').notEmpty()
+        // ctx.checkBody('merchantRemark').notEmpty()
+        // ctx.checkBody('consigneeRemark').notEmpty()
+        ctx.checkBody('phone').notEmpty()
+        ctx.checkBody('wecharPayee_account').notEmpty()
+        ctx.checkBody('payee_account').notEmpty()
         ctx.checkBody('rate').notEmpty()
-        ctx.checkBody('ownRate').notEmpty()
-        ctx.checkBody('distributionFee').notEmpty()
+        //ctx.checkBody('ownRate').notEmpty()
+        // ctx.checkBody('distributionFee').notEmpty()
         ctx.checkBody('excludeFoodId').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
@@ -123,48 +61,94 @@ module.exports = {
         let profitsharings = await Profitsharings.findOne({
             where: {
                 tenantId: body.tenantId,
-                consigneeId: body.consigneeId,
+                consigneeName: body.consigneeName,
             }
         })
         if (profitsharings != null) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "已有此分润记录");
             return;
         }
+
         let merchant = await Merchant.findOne({
             where:{
                 tenantId:body.tenantId
             }
         })
-        if(merchant==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此租户信息");
-            return;
-        }
-        let consignee = await Consignee.findOne({
-            where:{
-                consigneeId:body.consigneeId
-            }
-        })
-        if(consignee==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此代售点信息");
+        if(body.rate>1){
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"代售商分成比例不可以超过1")
             return;
         }
         let excludeFoodId = JSON.stringify(body.excludeFoodId);
+        let consigneeId = Tool.allocTenantId()
         await Profitsharings.create({
-            tenantId:body.tenantId,
-            consigneeId:body.consigneeId,
-            merchantRemark:merchant.name+"代售-转账",
-            consigneeRemark:consignee.name+"-代售分润",
-            rate:body.rate,
-            ownRate:body.ownRate,
-            distributionFee:body.distributionFee,
-            excludeFoodId:excludeFoodId
+            tenantId : body.tenantId,
+            consigneeName : body.consigneeName,
+            consigneeId : consigneeId,
+            merchantRemark :merchant.name+"代售-转账",
+            consigneeRemark : body.consigneeName+"代收分润",
+            rate : body.rate,
+            ownRate : 0.1,
+            excludeFoodId  : excludeFoodId
         })
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
+        await consignee.create({
+             tenantId : body.tenantId,
+             name : body.consigneeName,
+             phone : body.phone,
+             wecharPayee_account : body.wecharPayee_account,
+             payee_account : body.payee_account,
+             consigneeId : consigneeId
+        })
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consigneeId)
+        // ctx.checkBody('tenantId').notEmpty()
+        // ctx.checkBody('consigneeId').notEmpty()
+        //
+        // ctx.checkBody('rate').notEmpty()
+        // ctx.checkBody('ownRate').notEmpty()
+        // ctx.checkBody('distributionFee').notEmpty()
+        // ctx.checkBody('excludeFoodId').notEmpty()
+        // if (ctx.errors) {
+        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+        //     return;
+        // }
+        // let body = ctx.request.body;
+        // let profitsharings = await Profitsharings.findOne({
+        //     where: {
+        //         tenantId: body.tenantId,
+        //         consigneeId: body.consigneeId,
+        //     }
+        // })
+        // if (profitsharings != null) {
+        //     ctx.body = new ApiResult(ApiResult.Result.EXISTED, "已有此分润记录");
+        //     return;
+        // }
+        // let merchant = await Merchant.findOne({
+        //     where:{
+        //         tenantId:body.tenantId
+        //     }
+        // })
+        // if(merchant==null){
+        //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此租户信息");
+        //     return;
+        // }
+        //
+        // let excludeFoodId = JSON.stringify(body.excludeFoodId);
+        // await Profitsharings.create({
+        //     tenantId:body.tenantId,
+        //     consigneeId:body.consigneeId,
+        //     merchantRemark:merchant.name+"代售-转账",
+        //     consigneeRemark:consignee.name+"-代售分润",
+        //     rate:body.rate,
+        //     ownRate:body.ownRate,
+        //     distributionFee:body.distributionFee,
+        //     excludeFoodId:excludeFoodId
+        // })
+        // ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
 
     async updateAdminProfitsharings(ctx,next){
         ctx.checkBody('tenantId').notEmpty()
         ctx.checkBody('consigneeId').notEmpty()
+        ctx.checkBody('/profitsharings/consigneeName',true).first().notEmpty()
         ctx.checkBody('/profitsharings/rate',true).first().notEmpty()
         ctx.checkBody('/profitsharings/ownRate',true).first().notEmpty()
         ctx.checkBody('/profitsharings/excludeFoodId',true).first().notEmpty()
@@ -190,6 +174,7 @@ module.exports = {
         if(profitsharings!=null){
             profitsharings.rate = Number(body.profitsharings.rate).toFixed(2)
             profitsharings.ownRate = Number(body.profitsharings.ownRate).toFixed(2)
+            profitsharings.consigneeName = body.profitsharings.consigneeName
             profitsharings.excludeFoodId = excludeFoodId
             profitsharings.tenantId = body.tenantId
             profitsharings.consigneeId = body.consigneeId

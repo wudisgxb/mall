@@ -7,6 +7,7 @@ let getFoodNum = require('../../controller/statistics/statistics');
 let Foods = db.models.Foods;
 let Menus = db.models.Menus;
 let Foodsofmenus = db.models.FoodsOfTMenus;
+const Tool = require('../../Tool/tool');
 
 
 module.exports = {
@@ -14,7 +15,7 @@ module.exports = {
     async saveAdminFoods (ctx, next) {
         ctx.checkBody('/food/name', true).first().notEmpty();
         ctx.checkBody('/food/image', true).first().notEmpty();
-        ctx.checkBody('/food/icon', true).first().notEmpty();
+        // ctx.checkBody('/food/icon', true).first().notEmpty();
         ctx.checkBody('/food/price', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/vipPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
@@ -44,16 +45,23 @@ module.exports = {
                 name: body.food.name
             }
         });
+        // logger.info(food.length)
         if (food.length > 0) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "食物已存在！");
             return;
+        }
+        let image
+        if(body.food.image instanceof Array){
+            image = JSON.stringify(body.food.image)
+        }else{
+            image = body.food.image
         }
 
         let foods;
         foods = await Foods.create({
             name: body.food.name,
-            image: body.food.image,
-            icon: body.food.icon,
+            image: image,
+            icon: (body.food.icon==null)?"":body.food.icon,
             price: body.food.price,
             oldPrice: body.food.oldPrice,
             vipPrice: body.food.vipPrice,
@@ -161,6 +169,7 @@ module.exports = {
             }
         });
 
+        
         let foodId;
         let menuName;
         let menuId;
@@ -168,6 +177,18 @@ module.exports = {
         let i;
 
         for (i = 0; i < foods.length; i++) {
+            let images = foods[i].image
+
+            let img
+            try{
+                if(Tool.isArray(JSON.parse(images))){
+                    img =[]
+                    img=JSON.parse(images)
+                }
+            }catch(e) {
+                img=images
+            }
+
             foodId = foods[i].id;//foodId=222
             menuId = await Foodsofmenus.findAll({
                 where: {
@@ -192,8 +213,8 @@ module.exports = {
             foodsJson.id = foods[i].id;
             foodsJson.name = foods[i].name;
             foodsJson.foodNum = foods[i].foodNum;
-            foodsJson.image = foods[i].image;
-            foodsJson.icon = foods[i].icon;
+            foodsJson.image =img;
+            // foodsJson.icon = foods[i].icon;
             foodsJson.price = foods[i].price;
             foodsJson.oldPrice = foods[i].oldPrice;
             foodsJson.vipPrice = foods[i].vipPrice;
@@ -231,5 +252,8 @@ module.exports = {
     //     let foods = await Foods.findAll();
     //
     // },
+}
 
+function isArray(o) {
+    return Object.prototype.toString.call(o) === '[object Array]'
 }

@@ -10,6 +10,7 @@ module.exports = {
     async saveAdminMerchant (ctx, next) {
         ctx.checkBody('/merchant/name',true).first().notEmpty();
         ctx.checkBody('/merchant/phone',true).first().notEmpty();
+        ctx.checkBody('/merchant/address',true).first().notEmpty();
         ctx.checkBody('/merchant/industry',true).first().notEmpty();
         ctx.checkBody('/merchant/tenantId',true).first().notEmpty();
 
@@ -19,18 +20,19 @@ module.exports = {
         }
 
         let body = ctx.request.body;
-        let merchant = await Merchants.findAll({
+        let merchant = await Merchants.findOne({
             where: {
                 tenantId : body.merchant.tenantId,
             }
         });
-        if (merchant.length > 0) {
+        if (merchant!=null) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "菜品已存在，请重新定义")
             return;
         }
-        merchant[0] = await Merchants.create({
+        await Merchants.create({
             name: body.merchant.name,
             phone: body.merchant.phone,
+            address: body.merchant.address,
             industry:body.merchant.industry,
             tenantId: body.merchant.tenantId
             // todo: ok?
@@ -41,6 +43,7 @@ module.exports = {
 
     async updateAdminMerchantById (ctx, next) {
         ctx.checkBody('/merchant/name',true).first().notEmpty();
+        ctx.checkBody('/merchant/address',true).first().notEmpty();
         ctx.checkBody('/merchant/phone',true).first().notEmpty();
         ctx.checkBody('/merchant/industry',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
@@ -56,7 +59,7 @@ module.exports = {
             }
         });
         if (merchantResult.length <= 0) {
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "菜品不存在，请重新定义")
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "租户不存在，请重新定义")
             return;
         }
         let id = merchantResult[0].id
@@ -66,6 +69,7 @@ module.exports = {
             merchants.name = body.merchant.name;
             merchants.phone = body.merchant.phone;
             merchants.industry = body.merchant.industry;
+            merchants.address = body.merchant.address;
             merchants.tenantId = body.condition.tenantId;
             //menus.type = body.type;
             await merchants.save();

@@ -146,7 +146,7 @@ module.exports = {
                 tenantId: body.tenantId,
             });
         }
-
+        //添加默認配送時間
         await Orders.create({
             phone: phone,
             TableId: table.id,
@@ -155,6 +155,8 @@ module.exports = {
             diners_num: body.dinersNum,
             status: 0,
             tenantId: body.tenantId,
+            byzType : "deal",
+            deliveryTime : ""
         });
 
         //清空购物车
@@ -242,6 +244,15 @@ module.exports = {
         } else {
             trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
         }
+        let distanceandprice = null
+        if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
+            let distanceandpriceOne = await DistanceAndPrices.findOne({
+                where : {
+                    deliveryFeeId : body.deliveryFeeId
+                }
+            })
+            distanceandprice = distanceandpriceOne.deliveryTime
+        }
 
         let i;
         for (i = 0; i < foodsJson.length; i++) {
@@ -262,7 +273,9 @@ module.exports = {
             trade_no: trade_no,
             status: 0,
             tenantId: body.tenantId,
-            consigneeId: body.consigneeId
+            consigneeId: body.consigneeId,
+            byzType : "eshop",
+            deliveryTime :distanceandprice
         });
 
         //清空购物车
@@ -644,7 +657,10 @@ module.exports = {
                     tenantId: order.tenantId,
                 }
             })
+
             total_amount = parseFloat(total_amount) + parseFloat(distanceAndPrice.deliveryFee);
+
+
         }
 
         if (total_amount <= 0) {
@@ -930,6 +946,8 @@ module.exports = {
         result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
         result.time = order.createdAt.format("yyyy-MM-dd hh:mm:ss");
         result.info = order.info;
+        result.deliveryTime = order.deliveryTime
+        result.byzType = order.byzType
         result.status = order.status;
         result.diners_num = order.diners_num;
         result.tradeNo = order.trade_no;
@@ -987,7 +1005,11 @@ module.exports = {
                     tenantId: order.tenantId,
                 }
             })
-            result.deliveryFee = distanceAndPrice.deliveryFee;
+            let minusDeliveryFee = distanceAndPrice.deliveryFee
+            // if(totalPrice>distanceAndPrice.startPrice&&distanceAndPrice.isMinusDeliveryFee!="-1"){
+            //     minusDeliveryFee = 0
+            // }
+            result.deliveryFee = minusDeliveryFee;
         }
 
         //支付后查询用户实际支付金额

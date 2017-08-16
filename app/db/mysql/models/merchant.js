@@ -19,6 +19,7 @@ module.exports = function (sequelize, DataTypes) {
         // wecharPayee_account: shortDataTypes.String(100,false),
         // //支付宝账号
         // payee_account: shortDataTypes.String(100,false),
+        address : shortDataTypes.String(100,false),
         tenantId: shortDataTypes.String(100, false),
         //是否订单确认
         needOrderConfirmPage: shortDataTypes.Bool(),

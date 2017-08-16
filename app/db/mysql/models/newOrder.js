@@ -12,6 +12,8 @@ module.exports = function (sequelize, DataTypes) {
             trade_no: shortDataTypes.String(),//支付宝或微信订单号
             consigneeId: shortDataTypes.String(255, true),
             tenantId: shortDataTypes.String(255, true),
+            byzType : shortDataTypes.String(255, true),//类型为deal点餐，eshop代售
+            deliveryTime : shortDataTypes.Int(),//以毫秒的形式输出
         },
         {
             paranoid: true,

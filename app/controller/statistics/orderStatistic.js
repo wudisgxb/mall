@@ -14,7 +14,7 @@ let getYearEchat = require('../echats/yearEchat')
 let getHounthEchats = require('../echats/HounthEchats')
 let getWeeksEchat = require('../echats/getWeeks')
 let AnYearEchats = require('../echats/anYearEchats')
-let sqlOrder = require('../sql/sql')
+
 
 const getstatistics = (function () {
     // 设置Order表
@@ -857,13 +857,7 @@ const getstatistics = (function () {
         return resultNover;
     }
     //查询配送费
-    let xinren = async function (tenantId) {
-        logger.info(tenantId)
-        let sql = await sqlOrder.selectOrOrderStatistic(tenantId)
-        logger.info(sql)
-        let orders = await db.query(sql)
-        return orders
-    }
+
 
     let instance = {
         setOrders : setOrders,
@@ -874,7 +868,7 @@ const getstatistics = (function () {
         getOrderNum:getOrderNum,
         newPurchaseRate : newPurchaseRate,
         Retention : Retention,
-        xinren : xinren
+       
     }
     return instance;
 })();
