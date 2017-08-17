@@ -549,10 +549,8 @@ module.exports = {
             return;
         }
 
-
         let startTime = new Date(ctx.query.startTime);
         let endTime = new Date(ctx.query.endTime);
-
 
         let result = {};
         let results = [];
@@ -567,7 +565,6 @@ module.exports = {
                 //consigneeId: ctx.query.consigneeId,
             }
         })
-
 
         //循环不相同的订单号
         for (let k = 0; k < orders.length; k++) {
@@ -1003,6 +1000,8 @@ module.exports = {
         result.tenantId = order.tenantId;
         result.merchantName = merchant.name;
         result.merchantIndustry = merchant.industry;
+
+        result.consigneeId = order.consigneeId;
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
         result.firstDiscount = await this.getFirstDiscount(phone, order.tenantId);
