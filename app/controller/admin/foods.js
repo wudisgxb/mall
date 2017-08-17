@@ -122,10 +122,17 @@ module.exports = {
                 }
             });
 
+        let image;
+        if(body.food.image instanceof Array){
+            image = JSON.stringify(body.food.image)
+        }else{
+            image = body.food.image
+        }
+
         if (foods != null) {
             foods.id = body.condition.id;
             foods.name = body.food.name;
-            foods.image = JSON.stringify(body.food.image);
+            foods.image = image;
             foods.foodNum = body.food.foodNum;
             foods.icon = (body.food.icon)==null?"": body.food.icon;
             foods.price = body.food.price;
