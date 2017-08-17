@@ -36,8 +36,8 @@ const getFoodNum = (function () {
             a = firstDate.format("yyyy-MM-dd 23:59:59");
         }
 
-        console.log(b);
-        console.log(a);
+        // console.log(b);
+        // console.log(a);
         let order;
         let orderNum;
 
@@ -58,8 +58,8 @@ const getFoodNum = (function () {
                 ArrayFood.push(order[i].FoodId)
             }
         }
-        console.log(111);
-        console.log(ArrayFood);
+        // console.log(111);
+        // console.log(ArrayFood);
 
 
         let resultId = [];
@@ -76,7 +76,7 @@ const getFoodNum = (function () {
             })
             result.push({id, num})
         }
-        console.log(result)
+        // console.log(result)
        
         return result;
     }

@@ -22,7 +22,7 @@ module.exports = {
             return;
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consignees)
-    },
+    },//有
 
     async getAdminConsignees(ctx,next){
         ctx.checkQuery('consigneeId').notEmpty()
@@ -40,7 +40,7 @@ module.exports = {
             return;
         }
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS,consignees);
-    },
+    },//有
 
     async updateAdminConsignees(ctx,next){
         ctx.checkBody('/consignees/name',true).first().notEmpty();
@@ -70,7 +70,7 @@ module.exports = {
         consignees.consigneeId=body.consignees.consigneeId;
         await consignees.save();
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS);
-    },
+    },//有
 
     async saveAdminConsignees(ctx,next){
         ctx.checkBody('/consignees/name',true).first().notEmpty();
@@ -102,7 +102,7 @@ module.exports = {
             consigneeId : consigneeId
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,{consigneeId:consigneeId})
-    },
+    },//有
 
     async deleteAdminConsignees(ctx,next){
         ctx.checkQuery('id').notEmpty();
@@ -128,6 +128,35 @@ module.exports = {
     async getAllConsignees(ctx,next){
         let consignees = await Consignees.findAll({});
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS,consignees);
-    },
+    },//有
+
+    async putAllConsignees(ctx,next){
+        let consignees = await Consignees.findAll({})
+        for(let i=0;i<consignees.length;i++){
+            let profitSharings = await ProfitSharings.findAll({
+                where:{
+                    consigneeId : consignees[i].consigneeId
+                }
+            })
+            if(profitSharings.length==1){
+                await Consignees.update({
+                    tenantId : profitSharings[0].tenantId
+                },{
+                    where :{
+                        consigneeId : profitSharings[0].consigneeId
+                    }
+                })
+            }else if(profitSharings.length>1){
+                await Consignees.update({
+                    tenantId : "all"
+                },{
+                    where :{
+                        consigneeId : profitSharings[0].consigneeId
+                    }
+                })
+            }
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    }
 
 }
