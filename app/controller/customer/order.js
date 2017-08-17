@@ -186,11 +186,11 @@ module.exports = {
         let json = {"tableId": table.id, "status": 2};
         webSocket.sendSocket(JSON.stringify(json));
         //新增
-        let foodsNameNum = []
-        for(let j=0;j<foodsIdNum.length;j++){
-            let foods = await Foods.findId(foodsIdNum[i])
-            foodsNameNum.push(foods.name)
-        }
+        // let foodsNameNum = []
+        // for(let j=0;j<foodsIdNum.length;j++){
+        //     let foods = await Foods.findId(foodsIdNum[i])
+        //     foodsNameNum.push(foods.name)
+        // }
 
         //通知管理台发送消息
         // let jsonOrder = {
