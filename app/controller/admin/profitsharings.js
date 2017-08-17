@@ -7,6 +7,7 @@ let Profitsharings =  db.models.ProfitSharings;
 let Consignee = db.models.Consignees;
 let Merchant = db.models.Merchants;
 let consignee = db.models.Consignees;
+let Tables = db.models.Tables
 
 
 
@@ -64,6 +65,7 @@ module.exports = {
                 consigneeName: body.consigneeName,
             }
         })
+        logger.info((profitsharings == null)==true+"没有此分润记录")
         if (profitsharings != null) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "已有此分润记录");
             return;
@@ -74,6 +76,11 @@ module.exports = {
                 tenantId:body.tenantId
             }
         })
+        if(merchant==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此租户")
+            return
+        }
+
         if(body.rate>1){
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"代售商分成比例不可以超过1")
             return;
@@ -97,6 +104,14 @@ module.exports = {
              wecharPayee_account : body.wecharPayee_account,
              payee_account : body.payee_account,
              consigneeId : consigneeId
+        })
+        logger.info("-------");
+        await Tables.create({
+            tenantId : body.tenantId,
+            consigneeId : consigneeId,
+            status : 0,
+            name : "0号桌",
+            info : "双人桌",
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consigneeId)
         // ctx.checkBody('tenantId').notEmpty()

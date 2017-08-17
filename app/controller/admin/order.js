@@ -67,6 +67,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
     //async getAdminOrder(ctx, next){},
+
     async getAdminOrder(ctx, next){
         ctx.checkQuery('tenantId').notEmpty();
         let result = [];
