@@ -137,7 +137,7 @@ module.exports = {
         }
 
         let i;
-        let foodsIdNum = []
+        // let foodsIdNum = []
         for (i = 0; i < foodsJson.length; i++) {
             await OrderGoods.create({
                 num: foodsJson[i].num,
@@ -146,7 +146,7 @@ module.exports = {
                 trade_no: trade_no,
                 tenantId: body.tenantId,
             });
-            foodsIdNum.push(foodsJson[i].FoodId)
+            // foodsIdNum.push(foodsJson[i].FoodId)
         }
         //添加默認配送時間
         await Orders.create({
@@ -193,14 +193,13 @@ module.exports = {
         }
 
         //通知管理台发送消息
-        let jsonOrder = {
-            "TableId": table.id,
-            "status": 2,
-            "phone" : phone,
-            "FoodName" : foodsNameNum,
-            
-        };
-        webSocket.sendSocket(JSON.stringify(jsonOrder));
+        // let jsonOrder = {
+        //     "TableId": table.id,
+        //     "status": 2,
+        //     "phone" : phone,
+        //     "FoodName" : foodsNameNum
+        // };
+        // webSocket.sendSocket(JSON.stringify(jsonOrder));
         //------
     },
 
