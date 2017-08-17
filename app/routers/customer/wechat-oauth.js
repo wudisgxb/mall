@@ -3,11 +3,11 @@ const Oauth = require('../../controller/wechatPay/wechatOauth')
 const router = new (require('koa-router'))()
 
 
-router.get('/api/test/customer/deal/wechatpay/redirctUrl', Oauth.userDealRedirect)
+router.get('/api/test/customer/deal/wechatpay/redirectUrl', Oauth.userDealRedirect)
 // router.get('/api/v2/oauth/getUser', Oauth.getUser)
-router.get('/api/test/customer/eshop/wechatpay/redirctUrl', Oauth.userEshopRedirect)
+router.get('/api/test/customer/eshop/wechatpay/redirectUrl', Oauth.userEshopRedirect)
 
-router.get('/api/test/customer/eshop/fetch-openid/redirctUrl', Oauth.userEshopOpenIdRedirect);
+router.get('/api/test/customer/eshop/fetch-openid/redirectUrl', Oauth.userEshopOpenIdRedirect);
 
 router.get('/api/test/customer/deal/wechatpay/wap', Oauth.getUserDealWechatPayParams)
 

@@ -31,6 +31,11 @@ module.exports = {
             return;
         }
 
+        if (qrCodeTemplates[0].bizType == 'openId') {
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplates[0]);
+            return;
+        }
+
         //青豆家抢购活动，10次
         if (ctx.query.QRCodeTemplateId == '201708101938208000001') {
             let paymentReqs = await PaymentReqs.findAll({
@@ -111,12 +116,14 @@ module.exports = {
                     qrCode.tenantInfo = tenantConfig;
                     qrCode.consigneeId = qrCodeTemplates[j].consigneeId;
                     //查找代售商户信息
-                    consignee = await Consignees.findOne({
-                        where: {
-                            consigneeId: qrCodeTemplates[j].consigneeId
-                        }
-                    });
-                    qrCode.consigneeName = consignee.name;
+                    if (qrCodeTemplates[j].consigneeId != null && qrCodeTemplates[j].consigneeId != '') {
+                        consignee = await Consignees.findOne({
+                            where: {
+                                consigneeId: qrCodeTemplates[j].consigneeId
+                            }
+                        });
+                        qrCode.consigneeName = consignee.name;
+                    }
                     if (qrCodeTemplates[j].couponType != null && qrCodeTemplates[j].couponValue != null) {
                         coupons.push({
                             "couponType": qrCodeTemplates[j].couponType,
