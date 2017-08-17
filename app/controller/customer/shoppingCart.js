@@ -245,6 +245,18 @@ module.exports = {
             return;
         }
 
+        //查看food是否超库存
+        let food = await Foods.findOne({
+            where: {
+                id: body.food.foodId,
+            }
+        })
+
+        if (body.food.foodCount > food.rest) {
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, '商品库存不够！')
+            return;
+        }
+
         let shoppingCarts = await ShoppingCarts.findAll({
             where: {
                 tableUser: body.condition.tableUser,
@@ -340,8 +352,6 @@ module.exports = {
             foodJson[i].num = shoppingCarts[i].num;
             foodJson[i].unit = shoppingCarts[i].unit;
             foodJson[i].remark = shoppingCarts[i].remark;
-            // foodJson[i].tableUser = shoppingCarts[i].tableUser;
-            // foodJson[i].tableUserNumber = shoppingCarts[i].tableUserNumber;
             totalNum += shoppingCarts[i].num;
 
             totalPrice += food[0].price * shoppingCarts[i].num;
@@ -353,8 +363,6 @@ module.exports = {
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
-        console.log("AAAAAAAAAAAAAAAA||totalPrice=" + totalPrice);
-        console.log("BBBBBBBBBBBBBBBB||totalVipPrice=" + totalVipPrice);
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
 
@@ -471,7 +479,17 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
             return;
         }
+        //查看food是否超库存
+        let food = await Foods.findOne({
+            where: {
+                id: body.food.foodId,
+            }
+        })
 
+        if (body.food.foodCount > food.rest) {
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, '商品库存不够！')
+            return;
+        }
 
         let shoppingCarts = await ShoppingCarts.findAll({
             where: {
