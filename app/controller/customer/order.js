@@ -245,14 +245,15 @@ module.exports = {
             trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
         }
         let distanceandprice = null
-        if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
-            let distanceandpriceOne = await DistanceAndPrices.findOne({
-                where : {
-                    deliveryFeeId : body.deliveryFeeId
-                }
-            })
-            distanceandprice = distanceandpriceOne.deliveryTime
-        }
+
+        // if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
+        //     let distanceandpriceOne = await DistanceAndPrices.findOne({
+        //         where : {
+        //             deliveryFeeId : body.deliveryFeeId
+        //         }
+        //     })
+        //     distanceandprice = distanceandpriceOne.deliveryTime
+        // }
 
         let i;
         for (i = 0; i < foodsJson.length; i++) {

@@ -25,7 +25,7 @@ module.exports = function (sequelize, DataTypes) {
 
         tenantId: shortDataTypes.String(255, true),
         //是否免配送費
-        isMinusDeliveryFee : shortDataTypes.String(255, true),//根據商家的消費金額减配送费
+        // isMinusDeliveryFee : shortDataTypes.String(255, true),//根據商家的消費金額减配送费
     }, {
         paranoid: true,
         associate: function (models) {

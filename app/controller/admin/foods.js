@@ -91,7 +91,7 @@ module.exports = {
     async updateAdminFoodsById (ctx, next) {
         ctx.checkBody('/food/name', true).first().notEmpty();
         ctx.checkBody('/food/image', true).first().notEmpty();
-        ctx.checkBody('/food/icon', true).first().notEmpty();
+        // ctx.checkBody('/food/icon', true).first().notEmpty();
         ctx.checkBody('/food/price', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/vipPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
@@ -101,7 +101,6 @@ module.exports = {
         ctx.checkBody('/food/isActive', true).first().notEmpty();
         ctx.checkBody('/food/foodNum', true).first().notEmpty();
         ctx.checkBody('/food/menuId', true).first().notEmpty();
-        ctx.checkBody('/food/taste', true).first().notEmpty();
         ctx.checkBody('/condition/tenantId', true).first().notEmpty();
         ctx.checkBody('/condition/id', true).first().notEmpty();
 
@@ -116,22 +115,26 @@ module.exports = {
         }
         //let createMenuTask = [];
         let foods;
-        foods = await Foods.findById(
-            body.condition.id
-        );
+        foods = await Foods.findOne({
+                where:{
+                    id : body.condition.id,
+                    tenantId : body.condition.tenantId
+                }
+            });
+
         if (foods != null) {
             foods.id = body.condition.id;
             foods.name = body.food.name;
-            foods.image = body.food.image;
+            foods.image = JSON.stringify(body.food.image);
             foods.foodNum = body.food.foodNum;
-            foods.icon = body.food.icon;
+            foods.icon = (body.food.icon)==null?"": body.food.icon;
             foods.price = body.food.price;
             foods.oldPrice = body.food.oldPrice;
             foods.vipPrice = body.food.vipPrice;
             foods.sellCount = body.food.sellCount;
             foods.rating = body.food.rating;
             foods.info = body.food.info;
-            foods.taste = JSON.stringify(body.food.taste);
+            foods.taste = JSON.stringify(body.food.taste==null?"":body.food.taste);
             foods.unit = body.food.unit;
             foods.isActive = body.food.isActive;
             foods.tenantId = body.condition.tenantId;

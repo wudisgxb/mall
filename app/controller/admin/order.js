@@ -174,7 +174,7 @@ module.exports = {
             result[k].info = orders[k].info;
             result[k].id = orders[k].id;
             result[k].byzType = orders[k].byzType;
-            result[k].deliveryTime = (orders[k].deliveryTime)/60/1000
+            result[k].deliveryTime = orders[k].deliveryTime
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
             //result[k].totalPrice = Math.round(totalPrice * 100) / 100;
@@ -375,7 +375,7 @@ module.exports = {
                 trade_no : body.trade_no
             }
         })
-        ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"配送时间大约为"+(orderDeliveryTime.deliveryTime)/60/1000+"分钟")
+        ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"配送时间大约为"+orderDeliveryTime.deliveryTime)
     },
     //修改类型
     async putAdminOrderByByzType(ctx,next){
@@ -385,6 +385,7 @@ module.exports = {
             return;
         }
         let body = ctx.request.body
+
         await Orders.update({
             byzType : "eshop"
         },{where:{
@@ -399,10 +400,170 @@ module.exports = {
                 consigneeId : null
             }
         })
-
         // logger.info(order);
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+    //超级管理员查询全部
+    async getAllAdminOrderByLimit(ctx, next){
+
+        let result = [];
+        let foodJson = [];
+        let totalNum = 0;
+        let totalPrice = 0;
+        let totalVipPrice = 0;
+        let startTime = null;
+        let endTime = null;
+        if(ctx.query.startTime==null){
+            startTime='2000-05-14T06:12:22.000Z'
+        }else{
+            startTime = new Date(ctx.query.startTime);
+        }
+        if(ctx.query.endTime==null){
+            endTime='2100-05-14T06:12:22.000Z'
+        }else{
+            endTime = new Date(ctx.query.endTime);
+        }
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+
+        //页码
+        let pageNumber = parseInt(ctx.query.pageNumber);
+        //每页显示的大小
+        let pageSize = parseInt(ctx.query.pageSize);
+        let place = (pageNumber-1)*pageSize;
+        //根据tenantId，查询当前时间的订单
+        let orders = await Orders.findAll({
+            where: {
+                createdAt: {
+                    $between: [startTime, endTime]
+                }
+            },
+            order:[['createdAt','DESC']],
+            offset : place,
+            limit : pageSize
+        })
+
+        //循环不相同的订单号
+        let order;
+        let orderGoods;
+        for (let k = 0; k < orders.length; k++) {
+            totalNum = 0;//数量
+            totalPrice = 0;//单价
+            totalVipPrice = 0;//会员价
+            //价格的数组
+            foodJson = [];
+
+            //根据consigneeId查询consigneeName
+            let consignee = await Consignees.findOne({
+                where: {
+                    consigneeId: orders[k].consigneeId
+                }
+            });
+            //根据创建时间和订单号查询所有记录
+            orderGoods = await OrderGoods.findAll({
+                where: {
+                    trade_no: orders[k].trade_no
+                }
+            });
+
+            for (var j = 0; j < orderGoods.length; j++) {
+                //根据菜单号查询菜单
+                let food = await Foods.findOne({
+                    where: {
+                        id: orderGoods[j].FoodId,
+                    }
+                });
+
+                foodJson[j] = {};
+                foodJson[j].id = food.id;
+                foodJson[j].name = food.name;
+                foodJson[j].price = food.price;
+                foodJson[j].vipPrice = food.vipPrice;
+                //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);
+                foodJson[j].num = orderGoods[j].num;
+                foodJson[j].unit = orderGoods[j].unit;
+                //总数量为每个循环的数量现价
+                totalNum += orderGoods[j].num;
+                //当前菜的总价格为菜品的价格*订单中购买的数量
+                totalPrice += food.price * orderGoods[j].num;//原价
+                //会员价为菜品的会员价*订单中购买的数量
+                totalVipPrice += food.vipPrice * orderGoods[j].num;//会员价
+            }
+
+            result[k] = {};
+
+            let table = await Tables.findById(orders[k].TableId);
+
+            result[k].tableName = table.name;
+            result[k].trade_no = orders[k].trade_no;
+            result[k].info = orders[k].info;
+            result[k].id = orders[k].id;
+            result[k].byzType = orders[k].byzType;
+            result[k].deliveryTime = orders[k].deliveryTime
+            result[k].foods = foodJson;
+            result[k].totalNum = totalNum;
+            //result[k].totalPrice = Math.round(totalPrice * 100) / 100;
+            result[k].dinersNum = orders[k].diners_num;
+            result[k].status = orders[k].status;
+            result[k].time = orders[k].createdAt.format("yyyy-MM-dd hh:mm:ss");
+            result[k].phone = orders[k].phone;
+            result[k].consigneeId =orders[k].consigneeId;
+            result[k].consigneeId = orders[k].consigneeId;
+            result[k].consigneeName = consignee == null ? null : consignee.name;
+            //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
+
+            let refund_amount = 0;
+
+            let paymentReq = await PaymentReqs.findOne({
+                where: {
+                    trade_no: orders[k].trade_no,
+                    tenantId: ctx.query.tenantId
+                }
+            });
+
+            if (paymentReq != null) {
+                result[k].total_amount = paymentReq.total_amount;
+                result[k].actual_amount = paymentReq.actual_amount;
+                result[k].refund_amount = paymentReq.refund_amount;
+                result[k].refund_reason = paymentReq.refund_reason;
+                result[k].paymentMethod = paymentReq.paymentMethod;//支付方式
+                refund_amount = paymentReq.refund_amount;
+            } else {
+                console.log("重要信息，未找到支付请求，订单号=========" + orders[k].trade_no);
+            }
+
+            let amount = await amoutManager.getTransAccountAmount
+            (ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
+
+            //简单异常处理
+            if (amount.totalAmount > 0) {
+                result[k].totalPrice = amount.totalPrice;
+                result[k].platformCouponFee = amount.platformCouponFee;
+                result[k].merchantCouponFee = amount.merchantCouponFee;
+                result[k].deliveryFee = amount.deliveryFee;
+                result[k].refund_amount = refund_amount;
+                result[k].platformAmount = amount.platformAmount;
+                result[k].merchantAmount = amount.merchantAmount;
+                result[k].consigneeAmount = amount.consigneeAmount;
+                result[k].couponType = amount.couponType;
+                result[k].couponValue = amount.couponValue;
+            } else {
+                result[k].totalPrice = 0;
+                result[k].platformCouponFee = 0;
+                result[k].merchantCouponFee = 0;
+                result[k].deliveryFee = 0;
+                result[k].refund_amount = 0;
+                result[k].platformAmount = 0;
+                result[k].merchantAmount = 0;
+                result[k].consigneeAmount = 0;
+                result[k].couponType = null;
+                result[k].couponValue = null
+            }
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
+    },
+
 
 };
