@@ -139,10 +139,17 @@ module.exports = {
         let i;
         // let foodsIdNum = []
         for (i = 0; i < foodsJson.length; i++) {
+            let foodName = await Foods.findOne({
+                where:{
+                    id : foodsJson[i].FoodId
+                }
+            })
+
             await OrderGoods.create({
                 num: foodsJson[i].num,
                 unit: foodsJson[i].unit,
                 FoodId: foodsJson[i].FoodId,
+                FoodName : foodName.name,
                 trade_no: trade_no,
                 tenantId: body.tenantId,
             });
@@ -157,7 +164,7 @@ module.exports = {
             diners_num: body.dinersNum,
             status: 0,
             tenantId: body.tenantId,
-            byzType : "deal",
+            bizType : "deal",
             deliveryTime : ""
         });
 
@@ -275,10 +282,15 @@ module.exports = {
 
         let i;
         for (i = 0; i < foodsJson.length; i++) {
+            let foodAllName = await Foods.findById(foodsJson[i].FoodId)
+            console.log("---------------------------------------------------------------")
+            console.log(foodAllName.name)
+            console.log("---------------------------------------------------------------")
             await OrderGoods.create({
                 num: foodsJson[i].num,
                 unit: foodsJson[i].unit,
                 FoodId: foodsJson[i].FoodId,
+                FoodName :foodAllName.name,
                 trade_no: trade_no,
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId
@@ -293,7 +305,7 @@ module.exports = {
             status: 0,
             tenantId: body.tenantId,
             consigneeId: body.consigneeId,
-            byzType : "eshop",
+            bizType : "eshop",
             deliveryTime :distanceandprice
         });
 
@@ -963,7 +975,7 @@ module.exports = {
         result.time = order.createdAt.format("yyyy-MM-dd hh:mm:ss");
         result.info = order.info;
         result.deliveryTime = order.deliveryTime
-        result.byzType = order.byzType
+        result.bizType = order.bizType
         result.status = order.status;
         result.diners_num = order.diners_num;
         result.tradeNo = order.trade_no;

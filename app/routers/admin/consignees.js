@@ -9,7 +9,7 @@ router.get('/api/test/admin/consigneeByName',consignees.getAdminConsigneesByName
 router.get('/api/test/admin/allConsignee',consignees.getAllConsignees);
 router.post('/api/test/admin/consignee',consignees.saveAdminConsignees);
 router.put('/api/test/admin/consignee',consignees.updateAdminConsignees);
-
+// router.get('/api/test/admin/consigneesAll',consignees.getConsignees);
 router.put('/api/test/admin/consignees',consignees.putAllConsignees);
 //router.delete('/api/v3/admin/consignee',consignees.deleteAdminConsignees);
 module.exports = router

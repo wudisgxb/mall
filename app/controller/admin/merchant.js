@@ -151,6 +151,7 @@ module.exports = {
                 tenantId : tenantId
             }
         });
+        console.log(profitSharings)
         //如果没查到显示你所要查询的商户不存在
         if(profitSharings.length==0){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"你所要查询的商户不存在" );
@@ -167,7 +168,7 @@ module.exports = {
             //console.log("consigneeId = " + profitSharingId);
 
             //jsonProFit[i].profitSharingId=profitSharings[i].consigneeId;
-
+            console.log(profitSharingId)
             consignee = await Consignees.findOne({
                 where : {
                     consigneeId:profitSharingId
@@ -177,7 +178,7 @@ module.exports = {
             jsonProFit[i].tenantId=profitSharings[i].tenantId;
 
             jsonProFit[i].consigneeId=profitSharings[i].consigneeId;
-            jsonProFit[i].id=consignee.id;
+            // jsonProFit[i].id=consignee.id;
             jsonProFit[i].rate=profitSharings[i].rate;
             jsonProFit[i].ownRate=profitSharings[i].ownRate;
             jsonProFit[i].merchantRemark=profitSharings[i].merchantRemark;

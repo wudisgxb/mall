@@ -174,7 +174,7 @@ module.exports = {
             result[k].trade_no = orders[k].trade_no;
             result[k].info = orders[k].info;
             result[k].id = orders[k].id;
-            result[k].byzType = orders[k].byzType;
+            result[k].bizType = orders[k].bizType;
             result[k].deliveryTime = orders[k].deliveryTime
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
@@ -379,7 +379,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"配送时间大约为"+orderDeliveryTime.deliveryTime)
     },
     //修改类型
-    async putAdminOrderByByzType(ctx,next){
+    async putAdminOrderByBizType(ctx,next){
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
@@ -388,14 +388,14 @@ module.exports = {
         let body = ctx.request.body
 
         await Orders.update({
-            byzType : "eshop"
+            bizType : "eshop"
         },{where:{
             consigneeId : {
                 $ne : null
             }
         }});
         await Orders.update({
-            byzType : "deal"
+            bizType : "deal"
         },{
             where:{
                 consigneeId : null
@@ -501,7 +501,7 @@ module.exports = {
             result[k].trade_no = orders[k].trade_no;
             result[k].info = orders[k].info;
             result[k].id = orders[k].id;
-            result[k].byzType = orders[k].byzType;
+            result[k].bizType = orders[k].bizType;
             result[k].deliveryTime = orders[k].deliveryTime
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
@@ -514,7 +514,6 @@ module.exports = {
             result[k].consigneeId = orders[k].consigneeId;
             result[k].consigneeName = consignee == null ? null : consignee.name;
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
-
             let refund_amount = 0;
 
             let paymentReq = await PaymentReqs.findOne({

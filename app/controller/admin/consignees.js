@@ -129,34 +129,50 @@ module.exports = {
         let consignees = await Consignees.findAll({});
         ctx.body=new ApiResult(ApiResult.Result.SUCCESS,consignees);
     },//有
-
+    //修改所有的代售点为公有的代售点
     async putAllConsignees(ctx,next){
         let consignees = await Consignees.findAll({})
         for(let i=0;i<consignees.length;i++){
-            let profitSharings = await ProfitSharings.findAll({
+            // let profitSharings = await ProfitSharings.findAll({
+            //     where:{
+            //         consigneeId : consignees[i].consigneeId
+            //     }
+            // })
+            // if(profitSharings.length==1){
+            //     await Consignees.update({
+            //         tenantId : profitSharings[0].tenantId
+            //     },{
+            //         where :{
+            //             consigneeId : profitSharings[0].consigneeId
+            //         }
+            //     })
+            // }else if(profitSharings.length>1){
+            //     await Consignees.update({
+            //         tenantId : "all"
+            //     },{
+            //         where :{
+            //             consigneeId : profitSharings[0].consigneeId
+            //         }
+            //     })
+            // }
+            await Consignees.update({
+                tenantId : "all"
+            },{
                 where:{
-                    consigneeId : consignees[i].consigneeId
+                    id : consignees[i].id
                 }
             })
-            if(profitSharings.length==1){
-                await Consignees.update({
-                    tenantId : profitSharings[0].tenantId
-                },{
-                    where :{
-                        consigneeId : profitSharings[0].consigneeId
-                    }
-                })
-            }else if(profitSharings.length>1){
-                await Consignees.update({
-                    tenantId : "all"
-                },{
-                    where :{
-                        consigneeId : profitSharings[0].consigneeId
-                    }
-                })
-            }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-    }
-
+    },
+    // 查询所有的代售点
+    // async getConsignees(ctx,next){
+    //     // ctx.chenkQuery('tenantId').notEmpty();
+    //     if(ctx.errors){
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+    //         return;
+    //     }
+    //     let consignees = await Consignees.findAll({})
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consignees)
+    // },
 }

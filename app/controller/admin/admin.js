@@ -4,6 +4,7 @@ let db = require('../../db/mysql/index');
 let Tool = require('../../Tool/tool')
 let Captcha = db.models.Captcha
 let Admins = db.models.Adminer
+let Merchants = db.models.Merchants
 
 module.exports = {
     async register (ctx, next) {
@@ -38,6 +39,36 @@ module.exports = {
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
 
+    },
+
+    async getAdminAllTenantId(ctx,next){
+        ctx.checkQuery('tenantId').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors);
+            return
+        }
+        //查询tenantId不为All的所有数据
+        let admins = await Admins.findAll({
+            where:{
+                tenantId:{
+                    $ne : ctx.query.tenantId
+                }
+            }
+        })
+        //根据查询到的tenantId查询租户的名字
+        let merchantAll = []
+        for(let i = 0;i<admins.length;i++){
+
+            let merchant = await Merchants.findOne({
+                where:{
+                    tenantId : admins[i].tenantId
+                }
+            })
+            if(merchant!=null) {
+                merchantAll.push(merchant)
+            }
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,merchantAll);
     }
 }
 
