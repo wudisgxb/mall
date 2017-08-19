@@ -4,6 +4,7 @@ const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const Coupons = db.models.Coupons;
 const CouponLimits = db.models.CouponLimits;
+const Merchants = db.models.Merchants;
 const Tool = require('../../Tool/tool');
 
 module.exports = {
@@ -108,7 +109,7 @@ module.exports = {
 
     //获取可用优惠券
     async getAvailableCoupon (ctx, next) {
-        ctx.checkQuery('tenantId').notEmpty();
+        //ctx.checkQuery('tenantId').notEmpty();
         //ctx.checkQuery('consigneeId').notEmpty();
         ctx.checkQuery('phoneNumber').notEmpty();
 
@@ -117,50 +118,133 @@ module.exports = {
             return;
         }
 
-        //通过租户id获取第一个,一个租户只能1个限制
-        let couponLimit = await CouponLimits.findOne({
-            where: {
-                tenantId: ctx.query.tenantId,
-            }
-        });
+        if (ctx.query.tenantId != null) {
+            //获取租户名称
+            let merchant = await Merchants.findOne({
+                where: {
+                    tenantId: ctx.query.tenantId ,
+                }
+            })
 
-        //通过手机号查询可用优惠券
-        let coupons = await Coupons.findAll({
-            where: {
-                phone: ctx.query.phoneNumber,
-                tenantId: ctx.query.tenantId,
-                //consigneeId: ctx.query.consigneeId,
-                status: 0
-            },
-            attributes: {
-                exclude: ['updatedAt', 'id', 'deletedAt']
-            }
-        });
+            //通过租户id获取第一个,一个租户只能1个限制
+            let couponLimit = await CouponLimits.findOne({
+                where: {
+                    tenantId: ctx.query.tenantId,
+                }
+            });
 
-        for (var i = 0; i < coupons.length; i++) {
-            if ((Date.now() - coupons[i].createdAt.getTime()) > couponLimit.invalidTime) {
-                coupons.splice(i, 1);
-                i = i - 1;
+            //通过手机号查询可用优惠券
+            let coupons = await Coupons.findAll({
+                where: {
+                    phone: ctx.query.phoneNumber,
+                    tenantId: ctx.query.tenantId,
+                    //consigneeId: ctx.query.consigneeId,
+                    status: 0
+                },
+                attributes: {
+                    exclude: ['updatedAt', 'id', 'deletedAt']
+                }
+            });
+
+            for (var i = 0; i < coupons.length; i++) {
+                if ((Date.now() - coupons[i].createdAt.getTime()) > couponLimit.invalidTime) {
+                    coupons.splice(i, 1);
+                    i = i - 1;
+                }
             }
+
+            let retCoupons = [];
+            let copyCoupon = {};
+
+            coupons.forEach(function (e) {
+                var coupon = new Object();
+                coupon.tenantId = ctx.query.tenantId;
+                coupon.merchantName = merchant.name;
+                coupon.couponKey = e.couponKey;
+                coupon.couponRate = e.couponRate;
+                coupon.couponType = e.couponType;
+                coupon.value = e.value;
+                coupon.createdAt = e.createdAt;
+                coupon.InvalidDate = new Date(e.createdAt.getTime() + couponLimit.invalidTime);
+
+                retCoupons.push(coupon);
+            })
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, retCoupons);
+            return;
+        } else {
+            let tenantIdArray = [];
+            //通过手机号查询可用优惠券
+            let coupons = await Coupons.findAll({
+                where: {
+                    phone: ctx.query.phoneNumber,
+                    status: 0
+                },
+                attributes: {
+                    exclude: ['updatedAt', 'id', 'deletedAt']
+                }
+            });
+            coupons.forEach(function (e) {
+                if (!tenantIdArray.contains(e.tenantId)) {
+                    tenantIdArray.push(e.tenantId);
+                }
+            })
+
+            let retCoupons = [];
+            for (var i = 0;i<tenantIdArray.length;i++) {
+
+                //获取租户名称
+                let merchant = await Merchants.findOne({
+                    where: {
+                        tenantId: tenantIdArray[i],
+                    }
+                })
+                //通过租户id获取第一个,一个租户只能1个限制
+                let couponLimit = await CouponLimits.findOne({
+                    where: {
+                        tenantId: tenantIdArray[i],
+                    }
+                });
+
+                //通过手机号查询可用优惠券
+                let coupons = await Coupons.findAll({
+                    where: {
+                        phone: ctx.query.phoneNumber,
+                        tenantId: tenantIdArray[i],
+                        status: 0
+                    },
+                    attributes: {
+                        exclude: ['updatedAt', 'id', 'deletedAt']
+                    }
+                });
+
+                for (var i = 0; i < coupons.length; i++) {
+                    if ((Date.now() - coupons[i].createdAt.getTime()) > couponLimit.invalidTime) {
+                        coupons.splice(i, 1);
+                        i = i - 1;
+                    }
+                }
+
+                let copyCoupon = {};
+
+                coupons.forEach(function (e) {
+                    var coupon = new Object();
+                    coupon.tenantId = tenantIdArray[i];
+                    coupon.merchantName = merchant.name;
+                    coupon.couponKey = e.couponKey;
+                    coupon.couponRate = e.couponRate;
+                    coupon.couponType = e.couponType;
+                    coupon.value = e.value;
+                    coupon.createdAt = e.createdAt;
+                    coupon.InvalidDate = new Date(e.createdAt.getTime() + couponLimit.invalidTime);
+
+                    retCoupons.push(coupon);
+                })
+            }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, retCoupons);
+            return;
         }
 
-        let retCoupons = [];
-        let copyCoupon = {};
-        
-        coupons.forEach(function (e) {
-            var coupon = new Object();
-            coupon.couponKey = e.couponKey;
-            coupon.couponRate = e.couponRate;
-            coupon.couponType = e.couponType;
-            coupon.value = e.value;
-            coupon.createdAt = e.createdAt;
-            coupon.InvalidDate = new Date(e.createdAt.getTime() + couponLimit.invalidTime);
 
-            retCoupons.push(coupon);
-        })
-        
-
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, retCoupons);
     },
 
     //优惠券绑定订单号
