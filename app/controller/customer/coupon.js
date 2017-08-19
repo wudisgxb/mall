@@ -190,18 +190,18 @@ module.exports = {
             })
 
             let retCoupons = [];
-            for (var i = 0;i<tenantIdArray.length;i++) {
+            for (var k = 0;k<tenantIdArray.length;k++) {
 
                 //获取租户名称
                 let merchant = await Merchants.findOne({
                     where: {
-                        tenantId: tenantIdArray[i],
+                        tenantId: tenantIdArray[k],
                     }
                 })
                 //通过租户id获取第一个,一个租户只能1个限制
                 let couponLimit = await CouponLimits.findOne({
                     where: {
-                        tenantId: tenantIdArray[i],
+                        tenantId: tenantIdArray[k],
                     }
                 });
 
@@ -209,7 +209,7 @@ module.exports = {
                 let coupons = await Coupons.findAll({
                     where: {
                         phone: ctx.query.phoneNumber,
-                        tenantId: tenantIdArray[i],
+                        tenantId: tenantIdArray[k],
                         status: 0
                     },
                     attributes: {
@@ -228,7 +228,7 @@ module.exports = {
 
                 coupons.forEach(function (e) {
                     var coupon = new Object();
-                    coupon.tenantId = tenantIdArray[i];
+                    coupon.tenantId = tenantIdArray[k];
                     coupon.merchantName = merchant.name;
                     coupon.couponKey = e.couponKey;
                     coupon.couponRate = e.couponRate;
