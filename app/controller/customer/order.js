@@ -165,7 +165,9 @@ module.exports = {
             status: 0,
             tenantId: body.tenantId,
             bizType : "deal",
-            deliveryTime : ""
+            deliveryTime : "",
+            payTime : new Date()
+
         });
 
         //清空购物车
@@ -306,7 +308,8 @@ module.exports = {
             tenantId: body.tenantId,
             consigneeId: body.consigneeId,
             bizType : "eshop",
-            deliveryTime :distanceandprice
+            deliveryTime :distanceandprice,
+            payTime : new Date(),
         });
 
         //清空购物车

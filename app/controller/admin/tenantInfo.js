@@ -45,7 +45,6 @@ module.exports = {
             result.startTime = tenantInfo.startTime;
             result.endTime = tenantInfo.endTime;
             result.needOrderConfirmPage = merchant.needOrderConfirmPage;
-
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS,result);
         } else {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'没有该租户的基本信息！');
@@ -66,6 +65,13 @@ module.exports = {
         ctx.checkBody('/tenantConfig/homeImage',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
+
+        ctx.checkBody('/tenantConfig/longitude',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/latitude',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/officialNews',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/needChoosePeopleNumberPage',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/firstDiscount',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/invaildTime',true).first().notEmpty();
 
         let body = ctx.request.body;
         if (ctx.errors) {
@@ -93,10 +99,15 @@ module.exports = {
             startTime:body.tenantConfig.startTime,
             endTime:body.tenantConfig.endTime,
             tenantId:body.tenantId,
-            name:body.tenantConfig.name
+            longitude:body.tenantConfig.longitude,
+            latitude:body.tenantConfig.latitude,
+            officialNews:body.tenantConfig.officialNews,
+            needChoosePeopleNumberPage:body.tenantConfig.needChoosePeopleNumberPage,
+            firstDiscount:body.tenantConfig.firstDiscount,
+            invaildTime:body.tenantConfig.invaildTime,
+
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-
     },
 
     //编辑租户信息
@@ -111,6 +122,14 @@ module.exports = {
         ctx.checkBody('/tenantConfig/name',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
+
+        ctx.checkBody('/tenantConfig/longitude',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/latitude',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/officialNews',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/needChoosePeopleNumberPage',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/firstDiscount',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/invaildTime',true).first().notEmpty();
+
         let body = ctx.request.body;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -138,6 +157,12 @@ module.exports = {
         TenantConfig.endTime = body.tenantConfig.endTime;
         TenantConfig.name = body.tenantConfig.name;
         TenantConfig.tenantId = body.condition.tenantId;
+        TenantConfig.longitude=body.tenantConfig.longitude;
+        TenantConfig.latitude=body.tenantConfig.latitude;
+        TenantConfig.officialNews=body.tenantConfig.officialNews;
+        TenantConfig.needChoosePeopleNumberPage=body.tenantConfig.needChoosePeopleNumberPage;
+        TenantConfig.firstDiscount=body.tenantConfig.firstDiscount;
+        TenantConfig.invaildTime=body.tenantConfig.invaildTime;
         await TenantConfig.save();
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)

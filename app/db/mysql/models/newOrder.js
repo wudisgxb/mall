@@ -13,7 +13,10 @@ module.exports = function (sequelize, DataTypes) {
             consigneeId: shortDataTypes.String(255, true),
             tenantId: shortDataTypes.String(255, true),
             bizType : shortDataTypes.String(255, true),//类型为deal点餐，eshop代售
-            deliveryTime : shortDataTypes.Int(),//以毫秒的形式输出
+            deliveryTime : shortDataTypes.String(255,true),//以毫秒的形式输出
+            payTime:shortDataTypes.Date(),//下单时间
+            acceptTime:shortDataTypes.Date(),//接单时间
+            receiveTime:shortDataTypes.Date(),//收货时间
         },
         {
             paranoid: true,

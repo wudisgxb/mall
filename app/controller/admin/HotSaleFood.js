@@ -13,7 +13,6 @@ module.exports = {
         let body = ctx.request.body
         let results=[];
         let result;
-
         let resultId;
         result = await getFoodNum.getFood(body.tenantId,body.num);
         if(result.length==0){
