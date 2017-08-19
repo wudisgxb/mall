@@ -177,6 +177,7 @@ module.exports = {
             let coupons = await Coupons.findAll({
                 where: {
                     phone: ctx.query.phoneNumber,
+                    consigneeId: ctx.query.consigneeId,
                     status: 0
                 },
                 attributes: {
@@ -210,6 +211,7 @@ module.exports = {
                     where: {
                         phone: ctx.query.phoneNumber,
                         tenantId: tenantIdArray[k],
+                        consigneeId: ctx.query.consigneeId,
                         status: 0
                     },
                     attributes: {
