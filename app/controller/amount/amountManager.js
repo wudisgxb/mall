@@ -218,7 +218,7 @@ const amountManger = (function () {
             //首杯半价不享受优惠券
             if (firstOrderFlag == true) {
                 //全转给商家
-                merchantAmount = totalAmount;
+                merchantAmount = totalAmount * (1 - 0.02);
                 consigneeAmount = 0;
             } else {
                 if (coupon != null) {
@@ -256,7 +256,7 @@ const amountManger = (function () {
                             }
                             break;
                         default:
-                            totalAmount = totalAmount;
+                            totalAmount = totalAmount * (1 - 0.02);
                             return retJson;
                     }
                     couponType = coupon.couponType;
@@ -271,7 +271,7 @@ const amountManger = (function () {
             //首杯半价不享受优惠券
             if (firstOrderFlag == true) {
                 //全转给商家
-                merchantAmount = totalAmount;
+                merchantAmount = totalAmount * (1 - 0.02);
                 consigneeAmount = 0;
             } else {
                 if (coupon != null) {
@@ -339,13 +339,15 @@ const amountManger = (function () {
                     couponValue = coupon.value;
                 } else {
                     if (isSame == false) {
-                        merchantAmount = totalAmount * (1 - profitsharing.rate - profitsharing.ownRate);
+                        //不使用优惠券百分之20，按*2去处理
+                        merchantAmount = totalAmount * (1 - profitsharing.rate * 2 - profitsharing.ownRate * 2);
                         merchantAmount = Math.round(merchantAmount * 100) / 100;
 
-                        consigneeAmount = totalAmount * profitsharing.rate;//代售商户提成
+                        consigneeAmount = totalAmount * profitsharing.rate * 2;//代售商户提成
                         consigneeAmount = Math.round(consigneeAmount * 100) / 100;
                     } else {
-                        merchantAmount = totalAmount;
+                        //门店收百分之2，写死
+                        merchantAmount = totalAmount * (1 - 0.02);
                         consigneeAmount = 0;
                     }
                 }
