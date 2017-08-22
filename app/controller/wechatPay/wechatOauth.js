@@ -672,7 +672,9 @@ module.exports = {
                     }, {
                         where: {
                             trade_no: trade_no,
-                            status: 2,
+                            status:{
+                                $gte : 2
+                            } ,
                             deletedAt: {
                                 $ne: null
                             }

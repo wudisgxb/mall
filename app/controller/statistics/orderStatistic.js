@@ -857,7 +857,7 @@ const getstatistics = (function () {
         return resultNover;
     }
     //查询配送费
-
+    
 
     let instance = {
         setOrders : setOrders,
@@ -868,7 +868,7 @@ const getstatistics = (function () {
         getOrderNum:getOrderNum,
         newPurchaseRate : newPurchaseRate,
         Retention : Retention,
-       
+
     }
     return instance;
 })();

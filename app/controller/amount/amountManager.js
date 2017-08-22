@@ -407,7 +407,7 @@ const amountManger = (function () {
                 consigneeId: consigneeId
             }
         });
-
+        // console.log(trade_no)
         let food;
         let totalPrice = 0;
         let totalVipPrice = 0;
@@ -418,7 +418,9 @@ const amountManger = (function () {
                     tenantId: tenantId
                 }
             })
-
+            // console.log(tenantId)
+            // console.log(orderGoods[i].FoodId)
+            // console.log(food)
             totalPrice += food.price * orderGoods[i].num;//原价
             totalVipPrice += food.vipPrice * orderGoods[i].num;//会员价
         }

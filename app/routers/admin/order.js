@@ -22,6 +22,8 @@ router.get('/api/test/admin/orderByLimit',order.getAllAdminOrderByLimit);
 router.post('/api/test/admin/orderByStatus',order.putAdminOrderByStatus);
 router.post('/api/test/admin/orderByDeliveryTime',order.putAdminOrderByDeliveryTime);
 router.post('/api/test/admin/orderByByzType',order.putAdminOrderByBizType);
+router.post('/api/test/admin/orderByTime',order.postAdminOrderTime);
+router.post('/api/test/admin/orderByFoodName',order.postAdminOrderFoodName);
 
 //router.post('/api/test/admin/order',order.saveAdminOrder);
 

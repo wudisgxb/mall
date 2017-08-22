@@ -1239,7 +1239,9 @@ module.exports = async function tasks(app) {
                 deletedAt: null
             }, {
                 where: {
-                    status: 2,
+                    status: {
+                        $gte : 2
+                    },
                     deletedAt: {
                         $ne: null
                     }

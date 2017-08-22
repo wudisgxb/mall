@@ -138,6 +138,7 @@ module.exports = {
 
         let i;
         // let foodsIdNum = []
+        let tasks =[]
         for (i = 0; i < foodsJson.length; i++) {
             let foodName = await Foods.findOne({
                 where:{
@@ -145,16 +146,17 @@ module.exports = {
                 }
             })
 
-            await OrderGoods.create({
-                num: foodsJson[i].num,
-                unit: foodsJson[i].unit,
-                FoodId: foodsJson[i].FoodId,
-                FoodName : foodName.name,
-                trade_no: trade_no,
-                tenantId: body.tenantId,
-            });
+           tasks.push(OrderGoods.create({
+               num: foodsJson[i].num,
+               unit: foodsJson[i].unit,
+               FoodId: foodsJson[i].FoodId,
+               FoodName : foodName.name,
+               trade_no: trade_no,
+               tenantId: body.tenantId,
+           }))
             // foodsIdNum.push(foodsJson[i].FoodId)
         }
+        await tasks;
         //添加默認配送時間
         await Orders.create({
             phone: phone,
@@ -218,13 +220,19 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
-
-        if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+        ctx.checkBody('deliveryFeeId').notEmpty();
+        let body = ctx.request.body;
+        if(body.deliveryFeeId==null){
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"配送Id不可以为空")
             return;
         }
 
-        let body = ctx.request.body;
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+            return;
+        }
+
+
 
         //获取tableId
         let table = await Tables.findOne({
@@ -273,15 +281,16 @@ module.exports = {
         }
         let distanceandprice = null
 
-        // if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
-        //     let distanceandpriceOne = await DistanceAndPrices.findOne({
-        //         where : {
-        //             deliveryFeeId : body.deliveryFeeId
-        //         }
-        //     })
-        //     distanceandprice = distanceandpriceOne.deliveryTime
-        // }
+        if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
+            let distanceandpriceOne = await DistanceAndPrices.findOne({
+                where : {
+                    deliveryFeeId : body.deliveryFeeId
+                }
+            })
+            distanceandprice = distanceandpriceOne.deliveryTime
+        }
 
+        console.log(distanceandprice)
         let i;
         for (i = 0; i < foodsJson.length; i++) {
             let foodAllName = await Foods.findById(foodsJson[i].FoodId)
@@ -298,6 +307,10 @@ module.exports = {
                 consigneeId: body.consigneeId
             });
         }
+        let now = new Date();
+        console.log("-------------------------------------------")
+        console.log(now)
+        console.log("-------------------------------------------")
 
         await Orders.create({
             phone: body.phoneNumber,
@@ -309,7 +322,7 @@ module.exports = {
             consigneeId: body.consigneeId,
             bizType : "eshop",
             deliveryTime :distanceandprice,
-            payTime : new Date(),
+            payTime : now
         });
 
         //清空购物车
@@ -743,21 +756,22 @@ module.exports = {
         if (paymentReq == null) {
             return firstOrderDiscount;
         } else {
-            let orders = await Orders.findAll({
+            let orders = await OrderGoods.findAll({
                 where: {
                     trade_no: trade_no,
                     tenantId: tenantId,
                 }
             });
             let food;
+
             for (let i = 0; i < orders.length; i++) {
+                console.log(orders[i].FoodId)
                 food = await Foods.findAll({
                     where: {
                         id: orders[i].FoodId,
                         tenantId: orders[i].tenantId
                     }
                 })
-
                 //首杯半价(青豆家写死，后面完善)
                 if (food[0].id == 21) {//草莓奶酪
                     firstOrderDiscount = food[0].price * 0.5;

@@ -149,7 +149,7 @@ module.exports = {
                         id: orderGoods[j].FoodId,
                     }
                 });
-
+                // console.log(orderGoods[j].FoodId)
                 foodJson[j] = {};
                 foodJson[j].id = food.id;
                 foodJson[j].name = food.name;
@@ -176,6 +176,9 @@ module.exports = {
             result[k].id = orders[k].id;
             result[k].bizType = orders[k].bizType;
             result[k].deliveryTime = orders[k].deliveryTime
+            result[k].payTime = orders[k].payTime;
+            result[k].acceptTime = orders[k].acceptTime
+            result[k].receiveTime = orders[k].receiveTime
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
             //result[k].totalPrice = Math.round(totalPrice * 100) / 100;
@@ -295,16 +298,25 @@ module.exports = {
     // }
     //根据tenantId查询order总记录
     async getAdminOrderByCount(ctx,next){
-        ctx.checkQuery('tenantId').notEmpty();
+
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
-        let orderOfCount = await Orders.count({
-            where:{
-                tenantId : ctx.query.tenantId
-            }
-        });
+        let orderOfCount
+        if(ctx.query.tenantId !=null&&ctx.query.tenantId !=""){
+            orderOfCount = await Orders.count({
+                where:{
+                    tenantId : ctx.query.tenantId
+                }
+            })
+        }else{
+            orderOfCount = await Orders.count({})
+        }
+        if(orderOfCount==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有当前所有信息")
+            return;
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderOfCount)
     },
     //修改订单状态
@@ -327,13 +339,37 @@ module.exports = {
             return;
         }
 
-        await Orders.update({
-            status : body.status
-        },{
-            where:{
-                trade_no : body.trade_no
-            }
-        })
+        if(body.status==3){
+            await Orders.update({
+                status : body.status,
+                acceptTime : new Date()
+            },{
+                where:{
+                    trade_no : body.trade_no
+                }
+            })
+        }
+        if(body.status==4){
+            await Orders.update({
+                status : body.status,
+                receiveTime : new Date()
+            },{
+                where:{
+                    trade_no : body.trade_no
+                }
+            })
+        }
+        if(body.status==2){
+            await Orders.update({
+                status : body.status,
+                payTime : new Date()
+            },{
+                where:{
+                    trade_no : body.trade_no
+                }
+            })
+        }
+
 
         let orderBystatus = await Orders.findOne({
             where : {
@@ -344,6 +380,28 @@ module.exports = {
             status : orderBystatus.status
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderstatus)
+    },
+
+    //添加下单时间，骑手接单时间，商家收单时间
+    async postAdminOrderTime(ctx,next){
+        let order = await Orders.findAll({})
+        for(let ord of order){
+            await Orders.update({
+                payTime:ord.createdAt,
+                acceptTime : ord.createdAt,
+                receiveTime : ord.createdAt
+            },{
+                where:{
+                    trade_no : ord.trade_no,
+                    createdAt : {
+                        $lt : new Date("2017-8-19")
+                    }
+                }
+            })
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+
+
     },
     //修改配送时间
     async putAdminOrderByDeliveryTime(ctx,next){
@@ -519,7 +577,7 @@ module.exports = {
             let paymentReq = await PaymentReqs.findOne({
                 where: {
                     trade_no: orders[k].trade_no,
-                    tenantId: ctx.query.tenantId
+                    tenantId: orders[k].tenantId
                 }
             });
 
@@ -535,7 +593,7 @@ module.exports = {
             }
 
             let amount = await amoutManager.getTransAccountAmount
-            (ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
+            (orders[k].tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
 
             //简单异常处理
             if (amount.totalAmount > 0) {
@@ -565,5 +623,60 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
 
-
+    async postAdminOrderFoodName(ctx, next){
+        let ordergoods = await OrderGoods.findAll({})
+        let orderg = []
+        for(let i = 0;i<ordergoods.length;i++){
+            if(ordergoods[i].FoodId==null){
+                
+                let foods = await Foods.findAll({
+                    where:{
+                        tenantId : ordergoods[i].tenantId
+                    }
+                })
+               
+                let a = Math.ceil(Math.random()*(foods.length-1))
+                
+                let foodId = foods[a].id
+               
+                orderg.push(
+                    OrderGoods.update({
+                        FoodId : foodId
+                    },{
+                        where:{
+                            id : ordergoods[i].id,
+                            FoodId:null
+                        }
+                    })
+                )
+            }
+        }
+        await orderg
+         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+        // let ordergoods = await OrderGoods.findAll({})
+        // let taske=[]
+        // // console.log(ordergoods.length)
+        // let newDate = new Date().getTime()
+        // for(let i =0;i<ordergoods.length;i++){
+        //     if(ordergoods[i].FoodId==null){
+        //         continue;
+        //     }
+        //     let food = await Foods.findOne({
+        //         where:{
+        //             id : ordergoods[i].FoodId
+        //         },
+        //         attributes:["name"]
+        //     })
+        //     console.log(food.name)
+        //     await OrderGoods.update({
+        //         FoodName :food.name
+        //     },{
+        //         where:{
+        //             id :ordergoods[i].id
+        //         }
+        //     })
+        // }
+        // let endDate = new Date().getTime()
+        // ctx.body = new ApiResult(ApiResult.Result.SUCCESS,endDate-newDate)
+    }
 };

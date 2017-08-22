@@ -29,9 +29,7 @@ module.exports = function (sequelize, DataTypes) {
             ,
             classMethods: {}
         }
-        )
-        ;
-
+    );
     return NewOrders;
 };
 

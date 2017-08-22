@@ -146,7 +146,6 @@ module.exports = {
                     $ne: null
                 }
             },
-            
         });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);

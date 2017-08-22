@@ -64,7 +64,6 @@ module.exports = function (sequelize, DataTypes) {
         instanceMethods: {},
         classMethods: {}
     });
-
     return TenantConfigs;
 };
 
