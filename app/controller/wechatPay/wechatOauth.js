@@ -751,7 +751,7 @@ module.exports = {
                                     await paymentReqs[0].save();
                                 } else {
                                     if (amountJson.totalAmount > 0) {
-                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
+                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                                     }
                                 }
                             } catch (e) {
@@ -784,7 +784,7 @@ module.exports = {
                                         await paymentReqs[0].save();
                                     } else {
                                         if (amountJson.totalAmount > 0) {
-                                            await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
+                                            await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                                         }
                                     }
                                 } catch (e) {
@@ -827,15 +827,15 @@ module.exports = {
                                             await paymentReqs[0].save();
                                         } else {
                                             if (amountJson.consigneeAmount > 0) {
-                                                await transAccounts.pendingTransferAccounts(trade_no, consignee.payee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                                await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
                                             }
                                         }
                                     } else {
                                         if (amountJson.merchantAmount > 0) {
-                                            await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                            await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
                                         }
                                         if (amountJson.consigneeAmount > 0) {
-                                            await transAccounts.pendingTransferAccounts(trade_no, consignee.payee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                            await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
                                         }
                                     }
                                 } catch (e) {
@@ -846,7 +846,7 @@ module.exports = {
                     } else {
                         if (consignee == null) {
                             if (amountJson.totalAmount > 0) {
-                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
+                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                             }
                         } else {
                             let profitsharing = await ProfitSharings.findOne({
@@ -858,14 +858,14 @@ module.exports = {
 
                             if (profitsharing == null) {
                                 if (amountJson.totalAmount > 0) {
-                                    await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
+                                    await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                                 }
                             } else {
                                 if (amountJson.merchantAmount > 0) {
-                                    await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.payee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                    await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
                                 }
                                 if (amountJson.consigneeAmount > 0) {
-                                    await transAccounts.pendingTransferAccounts(trade_no, consignee.payee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                    await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
                                 }
                             }
                         }
