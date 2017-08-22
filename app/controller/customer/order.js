@@ -743,7 +743,7 @@ module.exports = {
         if (paymentReq == null) {
             return firstOrderDiscount;
         } else {
-            let orders = await Orders.findAll({
+            let orders = await OrderGoods.findAll({
                 where: {
                     trade_no: trade_no,
                     tenantId: tenantId,
