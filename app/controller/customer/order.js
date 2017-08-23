@@ -220,12 +220,12 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
-        ctx.checkBody('deliveryFeeId').notEmpty();
+        // ctx.checkBody('deliveryFeeId').notEmpty();
         let body = ctx.request.body;
-        if(body.deliveryFeeId==null){
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"配送Id不可以为空")
-            return;
-        }
+        // if(body.deliveryFeeId==null){
+        //     ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"配送Id不可以为空")
+        //     return;
+        // }
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)

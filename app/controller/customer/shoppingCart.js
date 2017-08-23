@@ -114,7 +114,7 @@ module.exports = {
                 consigneeId: null
             }
         })
-
+        console.log("桌记录"+table)
         if (table == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
             return;
