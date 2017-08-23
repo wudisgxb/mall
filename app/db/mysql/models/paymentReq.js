@@ -70,7 +70,6 @@ module.exports = function (sequelize, DataTypes) {
                 paranoid: false,
             }
         }
-
     });
 
 

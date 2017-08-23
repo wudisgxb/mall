@@ -721,6 +721,7 @@ const getstatistics = (function () {
                 aaa.push(Orders[j].phone)
             }
         }
+        console.log(statisticsOrderNover)
         // console.log(statisticsOrderNover)
         // console.log(aaa)
         let statisticsOrdersNover =[]
@@ -743,6 +744,7 @@ const getstatistics = (function () {
         if(type==3){
             getTime = await getYearEchat.getYear(startTime,endTime)
         }
+        console.log(getTime)
         let result=[];
         // console.log(statisticsOrdersNover)
         for (let i = 0; i < getTime.length; i++){
@@ -761,10 +763,11 @@ const getstatistics = (function () {
                 time = getTime[i].start
             }
             if(type==2){
-                time = "第"+(getTime[i].start.getMonth()+1)+"月"
+                let date = getTime[i].start.substring(5,6)
+                time = "第"+date+"月"
             }
             if(type==3){
-                time=getTime[i].start.getYear()+"年"
+                time=getTime[i].start.substring(0,4)+"年"
             }
             // console.log(statisticsOrders.length)
             // console.log(intradayNovice.length);
@@ -772,11 +775,11 @@ const getstatistics = (function () {
             result.push({
                 newPurchaseRate : {
                     name : "新人购买率",
-                    value : (intradayNovice.length/statisticsOrders.length)*100+"%"
+                    value : (statisticsOrders.length==0?0:(Number(intradayNovice.length)/Number(statisticsOrders.length)*100).toFixed(2))+"%"
                 },
                 buyAgain:{
                     name :"重复购买率",
-                    value : (1-intradayNovice.length/statisticsOrders.length)*100+"%"
+                    value : (statisticsOrders.length==0?0:(Number(1-(intradayNovice.length/statisticsOrders.length))*100).toFixed(2))+"%"
                 },
                 time : {
                     name :"时间",
@@ -857,7 +860,7 @@ const getstatistics = (function () {
         return resultNover;
     }
     //查询配送费
-    
+
 
     let instance = {
         setOrders : setOrders,

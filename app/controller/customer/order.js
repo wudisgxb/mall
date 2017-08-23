@@ -231,9 +231,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
-
-
-
         //获取tableId
         let table = await Tables.findOne({
             where: {
@@ -242,13 +239,14 @@ module.exports = {
                 consigneeId: body.consigneeId
             }
         })
-
+        console.log("桌号"+table)
         if (table == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
             return;
         }
 
         //从购物车获取
+
         let foodsJson = await ShoppingCarts.findAll({
             where: {
                 TableId: table.id,
@@ -257,6 +255,7 @@ module.exports = {
                 tenantId: body.tenantId
             }
         })
+        console.log("购物车"+JSON.stringify(foodsJson))
 
         //取之前的订单号，获取请求参数用一个订单号
         let order = await Orders.findOne({

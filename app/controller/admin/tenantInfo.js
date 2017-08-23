@@ -2,7 +2,7 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
-const TenantConfigs = db.models.TenantConfigs;
+let TenantInfo = db.models.TenantConfigs;
 const Merchants = db.models.Merchants;
 
 module.exports = {
@@ -10,18 +10,17 @@ module.exports = {
     async getTenantInfoByTenantId (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
         if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
 
-        let tenantInfo = await TenantConfigs.findOne({
+        let tenantInfo = await TenantInfo.findOne({
             where: {
                 tenantId: ctx.query.tenantId,
             }
         })
 
         let result = {};
-
         if (tenantInfo != null) {
             let merchant = await Merchants.findOne({
                 where: {
@@ -50,7 +49,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'没有该租户的基本信息！');
         }
 
-
     },
 
     //新增租户信息
@@ -65,7 +63,8 @@ module.exports = {
         ctx.checkBody('/tenantConfig/homeImage',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
-
+        ctx.checkBody('/tenantConfig/needVip',true).first().notEmpty();
+        
         ctx.checkBody('/tenantConfig/longitude',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/latitude',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/officialNews',true).first().notEmpty();
@@ -78,7 +77,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let tenantInfo = await TenantConfigs.findAll({
+        let tenantInfo = await TenantInfo.findAll({
             where: {
                 tenantId: body.tenantId
             }
@@ -88,11 +87,12 @@ module.exports = {
             return;
         }
 
-        let TenantConfig
-        TenantConfig = await TenantConfigs.create({
+        await TenantInfo.create({
+            name : body.tenantConfig.name,
             wecharPayee_account:body.tenantConfig.wecharPayee_account,
             payee_account:body.tenantConfig.payee_account,
             isRealTime:body.tenantConfig.isRealTime,
+            needVip:body.tenantConfig.needVip,
             vipFee:body.tenantConfig.vipFee,
             vipRemindFee:body.tenantConfig.vipRemindFee,
             homeImage:body.tenantConfig.homeImage,
@@ -121,6 +121,7 @@ module.exports = {
         ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty()
         ctx.checkBody('/tenantConfig/name',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/needVip',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
 
         ctx.checkBody('/tenantConfig/longitude',true).first().notEmpty();
@@ -146,7 +147,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到租户信息")
             return;
         }
-
         TenantConfig.wecharPayee_account = body.tenantConfig.wecharPayee_account;
         TenantConfig.payee_account = body.tenantConfig.payee_account;
         TenantConfig.isRealTime = body.tenantConfig.isRealTime;
@@ -155,6 +155,7 @@ module.exports = {
         TenantConfig.homeImage = body.tenantConfig.homeImage;
         TenantConfig.startTime = body.tenantConfig.startTime;
         TenantConfig.endTime = body.tenantConfig.endTime;
+        needVip:body.tenantConfig.needVip,
         TenantConfig.name = body.tenantConfig.name;
         TenantConfig.tenantId = body.condition.tenantId;
         TenantConfig.longitude=body.tenantConfig.longitude;
