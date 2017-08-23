@@ -293,9 +293,9 @@ module.exports = {
         let i;
         for (i = 0; i < foodsJson.length; i++) {
             let foodAllName = await Foods.findById(foodsJson[i].FoodId)
-            console.log("---------------------------------------------------------------")
-            console.log(foodAllName.name)
-            console.log("---------------------------------------------------------------")
+            // console.log("---------------------------------------------------------------")
+            // console.log(foodAllName.name)
+            // console.log("---------------------------------------------------------------")
             await OrderGoods.create({
                 num: foodsJson[i].num,
                 unit: foodsJson[i].unit,
@@ -321,7 +321,7 @@ module.exports = {
             consigneeId: body.consigneeId,
             bizType : "eshop",
             deliveryTime :distanceandprice,
-            payTime : now
+            payTime : new Date()
         });
 
         //清空购物车
