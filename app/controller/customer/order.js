@@ -239,7 +239,7 @@ module.exports = {
                 consigneeId: body.consigneeId
             }
         })
-        console.log("桌号"+table)
+        // console.log("桌号"+table)
         if (table == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
             return;
@@ -280,16 +280,16 @@ module.exports = {
         }
         let distanceandprice = null
 
-        if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
-            let distanceandpriceOne = await DistanceAndPrices.findOne({
-                where : {
-                    deliveryFeeId : body.deliveryFeeId
-                }
-            })
-            distanceandprice = distanceandpriceOne.deliveryTime
-        }
+        // if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
+        //     let distanceandpriceOne = await DistanceAndPrices.findOne({
+        //         where : {
+        //             deliveryFeeId : body.deliveryFeeId
+        //         }
+        //     })
+        //     distanceandprice = distanceandpriceOne.deliveryTime
+        // }
 
-        console.log(distanceandprice)
+        // console.log(distanceandprice)
         let i;
         for (i = 0; i < foodsJson.length; i++) {
             let foodAllName = await Foods.findById(foodsJson[i].FoodId)
