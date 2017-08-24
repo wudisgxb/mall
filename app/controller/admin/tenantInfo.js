@@ -137,7 +137,7 @@ module.exports = {
             return;
         }
 
-        let TenantConfig = await TenantConfigs.findOne({
+        let TenantConfig = await TenantInfo.findOne({
             where: {
                 tenantId: body.condition.tenantId,
             }
@@ -165,7 +165,6 @@ module.exports = {
         TenantConfig.firstDiscount=body.tenantConfig.firstDiscount;
         TenantConfig.invaildTime=body.tenantConfig.invaildTime;
         await TenantConfig.save();
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
 
