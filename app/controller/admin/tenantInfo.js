@@ -63,6 +63,7 @@ module.exports = {
         ctx.checkBody('/tenantConfig/homeImage',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/needVip',true).first().notEmpty();
         
         ctx.checkBody('/tenantConfig/longitude',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/latitude',true).first().notEmpty();
@@ -91,6 +92,7 @@ module.exports = {
             wecharPayee_account:body.tenantConfig.wecharPayee_account,
             payee_account:body.tenantConfig.payee_account,
             isRealTime:body.tenantConfig.isRealTime,
+            needVip:body.tenantConfig.needVip,
             vipFee:body.tenantConfig.vipFee,
             vipRemindFee:body.tenantConfig.vipRemindFee,
             homeImage:body.tenantConfig.homeImage,
@@ -119,6 +121,7 @@ module.exports = {
         ctx.checkBody('/tenantConfig/startTime',true).first().notEmpty()
         ctx.checkBody('/tenantConfig/name',true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime',true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/needVip',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
 
         ctx.checkBody('/tenantConfig/longitude',true).first().notEmpty();
@@ -152,6 +155,7 @@ module.exports = {
         TenantConfig.homeImage = body.tenantConfig.homeImage;
         TenantConfig.startTime = body.tenantConfig.startTime;
         TenantConfig.endTime = body.tenantConfig.endTime;
+        TenantConfig.needVip=body.tenantConfig.needVip;
         TenantConfig.name = body.tenantConfig.name;
         TenantConfig.tenantId = body.condition.tenantId;
         TenantConfig.longitude=body.tenantConfig.longitude;
