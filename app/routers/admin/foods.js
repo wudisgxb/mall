@@ -7,6 +7,8 @@ let foods = require('../../controller/admin/foods');
 
 
 const router = new (require('koa-router'))()
+
+router.put('/api/test/admin/foodBySellCount', foods.updateAdminFoodsBySellCount);
 //新增
 router.post('/api/test/admin/food', foods.saveAdminFoods);
 //编辑

@@ -278,7 +278,15 @@ module.exports = {
         } else {
             trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
         }
-        let distanceandprice = null
+        let distanceandprice = "30分钟"
+        if (body.deliveryFeeId != null && body.deliveryFeeId != "") {
+            let distanceandpriceOne = await DistanceAndPrices.findOne({
+                where : {
+                    deliveryFeeId : body.deliveryFeeId
+                }
+            })
+            distanceandprice = distanceandpriceOne.deliveryTime
+        }
 
         // if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
         //     let distanceandpriceOne = await DistanceAndPrices.findOne({
@@ -700,10 +708,7 @@ module.exports = {
                     tenantId: order.tenantId,
                 }
             })
-
             total_amount = parseFloat(total_amount) + parseFloat(distanceAndPrice.deliveryFee);
-
-
         }
 
         if (total_amount <= 0) {

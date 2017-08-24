@@ -438,7 +438,6 @@ module.exports = {
     },
     //修改类型
     async putAdminOrderByBizType(ctx,next){
-
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
             return;

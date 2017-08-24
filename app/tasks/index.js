@@ -8,6 +8,7 @@ var fs = require('fs');
 const path = require('path');
 const db = require('../db/mysql/index');
 const Orders = db.models.NewOrders;
+const Foods = db.models.Foods
 const Tables = db.models.Tables;
 const ShoppingCarts = db.models.ShoppingCarts;
 const PaymentReqs = db.models.PaymentReqs;
@@ -43,7 +44,22 @@ module.exports = async function tasks(app) {
         schedule.scheduleJob(rule, async function () {
             await aliTransferAccounts();
             await wechatTransferAccounts();
+            await updateFoodSellCount();
         });
+    }
+    
+    let updateFoodSellCount = async function () {
+        let foods = await Foods.findAll({})
+        console.log(foods.length)
+        let foodSellcount = [];
+        for(let i =0;i<foods.length;i++){
+            foodSellcount.push(Foods.update({
+                sellCount : "0"
+            },{where:{
+                id : foods[i].id
+            }}))
+        }
+        await foodSellcount
     }
 
     let wechatTransferAccounts = async function () {

@@ -11,7 +11,20 @@ const Tool = require('../../Tool/tool');
 
 
 module.exports = {
-
+    async updateAdminFoodsBySellCount(ctx, next){
+        let foods = await Foods.findAll({})
+        console.log(foods.length)
+        let foodSellcount = [];
+        for(let i =0;i<foods.length;i++){
+            foodSellcount.push(Foods.update({
+                sellCount : "0"
+            },{where:{
+                id : foods[i].id
+            }}))
+        }
+        await foodSellcount
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    },
     async saveAdminFoods (ctx, next) {
         ctx.checkBody('/food/name', true).first().notEmpty();
         ctx.checkBody('/food/image', true).first().notEmpty();

@@ -114,7 +114,7 @@ module.exports = {
                 consigneeId: null
             }
         })
-
+        console.log(table)
         if (table == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
             return;
@@ -122,8 +122,9 @@ module.exports = {
 
         let tableUserNumber = 1;
         let tableUserNumbers;
-
+        console.log(body.tableUser)
         if (body.tableUser == null) {
+
             body.tableUser = tool.uuid();
             tableUserNumbers = await ShoppingCarts.findAll({
                 where: {
@@ -172,7 +173,7 @@ module.exports = {
                     tenantId: body.tenantId
                 }
             });
-
+            console.log(foodUnits)
             var shoppingCart = await ShoppingCarts.findOne({
                 where:{
                     FoodId: foods[i].foodId,

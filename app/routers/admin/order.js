@@ -19,7 +19,7 @@ router.delete('/api/test/admin/eshop/order',order.deleteAdminOrderConsigneeId);
 router.get('/api/test/admin/order',order.getAdminOrder);
 router.get('/api/test/admin/orderByCount',order.getAdminOrderByCount);
 router.get('/api/test/admin/orderByLimit',order.getAllAdminOrderByLimit);
-router.post('/api/test/admin/orderByStatus',order.putAdminOrderByStatus);
+router.put('/api/test/admin/orderByStatus',order.putAdminOrderByStatus);
 router.post('/api/test/admin/orderByDeliveryTime',order.putAdminOrderByDeliveryTime);
 router.post('/api/test/admin/orderByByzType',order.putAdminOrderByBizType);
 router.post('/api/test/admin/orderByTime',order.postAdminOrderTime);
