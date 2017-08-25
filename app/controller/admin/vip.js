@@ -33,6 +33,8 @@ module.exports = {
             phone: body.vip.phone,
             vipLevel: body.vip.vipLevel,
             vipName: body.vip.name,
+            name : "",
+            birthday : null,
             tenantId: body.tenantId
             // todo: ok?
             //deletedAt: Date.now()
@@ -45,6 +47,8 @@ module.exports = {
         ctx.checkBody('/condition/id',true).first().notEmpty();
         ctx.checkBody('/condition/tenantId',true).first().notEmpty();
         ctx.checkBody('/vip/name',true).first().notEmpty();
+        ctx.checkBody('/vip/realName',true).first().notEmpty();
+        ctx.checkBody('/vip/birthday',true).first().notEmpty();
         ctx.checkBody('/vip/phone',true).first().notEmpty();
         ctx.checkBody('/vip/vipLevel',true).first().notEmpty();
         let body = ctx.request.body;
@@ -58,14 +62,17 @@ module.exports = {
                 tenantId:body.condition.tenantId
             }
         })
-        if (vips != null) {
-            vips.phone = body.vip.phone;
-            vips.vipLevel = body.vip.vipLevel;
-            vips.vipName = body.vip.name;
-            vips.tenantId=body.condition.tenantId;
-            await vips.save();
-
+        if (vips == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此会员")
+            return;
         }
+        vips.phone = body.vip.phone;
+        vips.vipLevel = body.vip.vipLevel;
+        vips.vipName = body.vip.name;
+        vips.name = body.vip.realName;
+        vips.birthday = body.vip.birthday;
+        vips.tenantId=body.condition.tenantId;
+        await vips.save();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
     },
@@ -96,7 +103,7 @@ module.exports = {
     //     //修改字段
     //
     // },
-    
+
 
     async deleteAdminVip(ctx, next){
 

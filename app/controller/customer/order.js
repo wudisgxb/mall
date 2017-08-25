@@ -10,6 +10,7 @@ const Vips = db.models.Vips;
 const TenantConfigs = db.models.TenantConfigs;
 const Merchants = db.models.Merchants;
 const Coupons = db.models.Coupons;
+const customer = require('../admin/customer/customer')
 const DeliveryFees = db.models.DeliveryFees;
 const DistanceAndPrices = db.models.DistanceAndPrices;
 const PaymentReqs = db.models.PaymentReqs;
@@ -180,6 +181,7 @@ module.exports = {
                 tenantId: body.tenantId
             }
         })
+
 
         //修改桌号状态
         table.name = table.name;
@@ -568,6 +570,35 @@ module.exports = {
 
         //通过orders构造订单详情
         let result = await this.getOrderDetailByTradeNo(trade_no);
+        let foodName = await OrderGoods.findAll({
+            where:{
+                trade_no : trade_no
+            }
+        })
+        let FoodNameArray =[];
+        if(foodName.length>0){
+            for(let i = 0;i<foodName.length;i++){
+                FoodNameArray.push(foodName[i].FoodName)
+            }
+        }
+        let customerVips = await Vips.findAll({
+            where:{
+                phone : ctx.query.phoneNumber
+            }
+        });
+        let isVip = false
+        if(customerVips.length>0){
+            isVip =true
+        }
+        let customerJson = {
+            tenantId : ctx.query.tenantId,
+            phone : ctx.query.phoneNumber,
+            status : 2,
+            foodName : JSON.stringify(FoodNameArray),
+            totalPrice :result.totalPrice,
+            isVip : isVip
+        }
+        await customer.savecustomer(customerJson);
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
     },

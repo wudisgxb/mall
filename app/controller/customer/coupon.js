@@ -6,10 +6,13 @@ const Coupons = db.models.Coupons;
 const CouponLimits = db.models.CouponLimits;
 const Merchants = db.models.Merchants;
 const Tool = require('../../Tool/tool');
+const customer = require('../admin/customer/customer')
+const Vips = db.models.Vips
 
 module.exports = {
 
     async bindCoupon (ctx, next) {
+        console.log("44444444444444444444444444444444444444")
         ctx.checkBody('tenantId').notEmpty();
         //ctx.checkBody('consigneeId').notEmpty();
         ctx.checkBody('coupons').notEmpty();
@@ -20,6 +23,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
+        console.log("44444444444444444444444444444444444444")
 
         let body = ctx.request.body;
 
@@ -28,7 +32,25 @@ module.exports = {
                 tenantId: body.tenantId
             }
         });
-
+        let customerVips = await Vips.findAll({
+            where:{
+                phone : body.phoneNumber
+            }
+        });
+        let isVip = false
+        if(customerVips.length>0){
+            isVip =true
+        }
+        let FoodNameArray =[]
+        let customerJson = {
+            tenantId : body.tenantId,
+            phone : body.phoneNumber,
+            status : 1,
+            foodName : JSON.stringify(FoodNameArray),
+            totalPrice :0,
+            isVip : isVip
+        }
+        await customer.savecustomer(customerJson);
         //let couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
         let coupon = await Coupons.findAll({
@@ -63,11 +85,13 @@ module.exports = {
                 });
             })
 
+
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
         }
     },
     //查看优惠券是否能领取
     async isCouponReceivable (ctx, next) {
+        console.log("11111111111111111111111111111")
         ctx.checkQuery('phoneNumber').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
         //ctx.checkBody('consigneeId').notEmpty();
@@ -109,6 +133,7 @@ module.exports = {
 
     //获取可用优惠券
     async getAvailableCoupon (ctx, next) {
+        console.log("2222222222222222222222222222222")
         //ctx.checkQuery('tenantId').notEmpty();
         //ctx.checkQuery('consigneeId').notEmpty();
         ctx.checkQuery('phoneNumber').notEmpty();
@@ -251,6 +276,8 @@ module.exports = {
 
     //优惠券绑定订单号
     async couponBindTradeNo (ctx, next) {
+
+        console.log("333333333333333333333333333333")
         ctx.checkBody('couponKey').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         //ctx.checkBody('consigneeId').notEmpty();
