@@ -47,17 +47,19 @@ module.exports = async function tasks(app) {
             await updateFoodSellCount();
         });
     }
-    
+
     let updateFoodSellCount = async function () {
         let foods = await Foods.findAll({})
         console.log(foods.length)
         let foodSellcount = [];
-        for(let i =0;i<foods.length;i++){
+        for (let i = 0; i < foods.length; i++) {
             foodSellcount.push(Foods.update({
-                sellCount : "0"
-            },{where:{
-                id : foods[i].id
-            }}))
+                sellCount: "0"
+            }, {
+                where: {
+                    id: foods[i].id
+                }
+            }))
         }
         await foodSellcount
     }
@@ -181,7 +183,7 @@ module.exports = async function tasks(app) {
 
                                 //待转账表状态修改从0-1
                                 transferAccounts = await TransferAccounts.findAll({
-                                    where:{
+                                    where: {
                                         tenantId: tenantId,
                                         consigneeId: consigneeId,
                                         paymentMethod: '微信',
@@ -242,7 +244,7 @@ module.exports = async function tasks(app) {
                                     }
 
                                     transferAccounts = await TransferAccounts.findAll({
-                                        where:{
+                                        where: {
                                             tenantId: tenantId,
                                             consigneeId: consigneeId,
                                             paymentMethod: '微信',
@@ -298,7 +300,7 @@ module.exports = async function tasks(app) {
                                     }
 
                                     transferAccounts = await TransferAccounts.findAll({
-                                        where:{
+                                        where: {
                                             tenantId: tenantId,
                                             consigneeId: consigneeId,
                                             paymentMethod: '微信',
@@ -313,43 +315,46 @@ module.exports = async function tasks(app) {
                                         await transferAccounts[kk].save();
                                     }
 
-                                    console.log("代售点分润：" + consigneeAmount);
-                                    params = {
-                                        partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                        openid: consignee.wecharPayee_account,
-                                        check_name: 'NO_CHECK',
-                                        amount: (consigneeAmount * 100).toFixed(0),
-                                        desc: profitsharing.consigneeRemark,
-                                        spbill_create_ip: ip
-                                    }
-
-                                    var result2 = await fn(params);
-                                    console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result2, null, 2));
-                                    console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
-                                    console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
-                                    if (result2.result_code == 'SUCCESS') {
-                                        for (var jj = 0; jj < paymentReqs.length; jj++) {
-                                            paymentReqs[jj].consigneeTransferAccountIsFinish = true;
-                                            await paymentReqs[jj].save();
+                                    if (consigneeAmount != null && consigneeAmount > 0) {
+                                        console.log("代售点分润：" + consigneeAmount);
+                                        params = {
+                                            partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                            openid: consignee.wecharPayee_account,
+                                            check_name: 'NO_CHECK',
+                                            amount: (consigneeAmount * 100).toFixed(0),
+                                            desc: profitsharing.consigneeRemark,
+                                            spbill_create_ip: ip
                                         }
 
-                                        transferAccounts = await TransferAccounts.findAll({
-                                            where:{
-                                                tenantId: tenantId,
-                                                consigneeId: consigneeId,
-                                                paymentMethod: '微信',
-                                                role: '代售',
-                                                status: 0
+                                        var result2 = await fn(params);
+                                        console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result2, null, 2));
+                                        console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
+                                        console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
+                                        if (result2.result_code == 'SUCCESS') {
+                                            for (var jj = 0; jj < paymentReqs.length; jj++) {
+                                                paymentReqs[jj].consigneeTransferAccountIsFinish = true;
+                                                await paymentReqs[jj].save();
                                             }
-                                        })
 
-                                        for (var kk = 0; kk < transferAccounts.length; kk++) {
-                                            transferAccounts[kk].status = 1;
-                                            transferAccounts[kk].pay_date = payDate;
-                                            await transferAccounts[kk].save();
+                                            transferAccounts = await TransferAccounts.findAll({
+                                                where: {
+                                                    tenantId: tenantId,
+                                                    consigneeId: consigneeId,
+                                                    paymentMethod: '微信',
+                                                    role: '代售',
+                                                    status: 0
+                                                }
+                                            })
+
+                                            for (var kk = 0; kk < transferAccounts.length; kk++) {
+                                                transferAccounts[kk].status = 1;
+                                                transferAccounts[kk].pay_date = payDate;
+                                                await transferAccounts[kk].save();
+                                            }
+                                            console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
                                         }
-                                        console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
                                     }
+
                                 }
                             } catch (e) {
                                 console.log(e);
@@ -470,7 +475,7 @@ module.exports = async function tasks(app) {
 
                             //待转账表状态修改从0-1
                             transferAccounts = await TransferAccounts.findAll({
-                                where:{
+                                where: {
                                     tenantId: tenantId,
                                     consigneeId: consigneeId,
                                     paymentMethod: '支付宝',
@@ -519,7 +524,7 @@ module.exports = async function tasks(app) {
 
                                 //待转账表状态修改从0-1
                                 transferAccounts = await TransferAccounts.findAll({
-                                    where:{
+                                    where: {
                                         tenantId: tenantId,
                                         consigneeId: consigneeId,
                                         paymentMethod: '支付宝',
@@ -558,7 +563,7 @@ module.exports = async function tasks(app) {
                                 }
 
                                 transferAccounts = await TransferAccounts.findAll({
-                                    where:{
+                                    where: {
                                         tenantId: tenantId,
                                         consigneeId: consigneeId,
                                         paymentMethod: '支付宝',
@@ -577,32 +582,34 @@ module.exports = async function tasks(app) {
                                 console.log("每日支付宝转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
                                 console.log("consigneeAmount:" + consigneeAmount);
 
-                                var ret2 = await transAccountsManager.transferAccounts(consignee.payee_account, consigneeAmount, null, profitsharing.consigneeRemark, tenantId);
-                                if (ret2.msg == 'Success') {
-                                    for (var jj = 0; jj < paymentReqs.length; jj++) {
-                                        paymentReqs[jj].consigneeTransferAccountIsFinish = true;
-                                        await paymentReqs[jj].save();
-                                    }
-
-                                    transferAccounts = await TransferAccounts.findAll({
-                                        where:{
-                                            tenantId: tenantId,
-                                            consigneeId: consigneeId,
-                                            paymentMethod: '支付宝',
-                                            role: '代售',
-                                            status: 0
+                                if (consigneeAmount != null && consigneeAmount > 0) {
+                                    var ret2 = await transAccountsManager.transferAccounts(consignee.payee_account, consigneeAmount, null, profitsharing.consigneeRemark, tenantId);
+                                    if (ret2.msg == 'Success') {
+                                        for (var jj = 0; jj < paymentReqs.length; jj++) {
+                                            paymentReqs[jj].consigneeTransferAccountIsFinish = true;
+                                            await paymentReqs[jj].save();
                                         }
-                                    })
 
-                                    for (var kk = 0; kk < transferAccounts.length; kk++) {
-                                        transferAccounts[kk].status = 1;
-                                        transferAccounts[kk].pay_date = payDate;
-                                        await transferAccounts[kk].save();
+                                        transferAccounts = await TransferAccounts.findAll({
+                                            where: {
+                                                tenantId: tenantId,
+                                                consigneeId: consigneeId,
+                                                paymentMethod: '支付宝',
+                                                role: '代售',
+                                                status: 0
+                                            }
+                                        })
+
+                                        for (var kk = 0; kk < transferAccounts.length; kk++) {
+                                            transferAccounts[kk].status = 1;
+                                            transferAccounts[kk].pay_date = payDate;
+                                            await transferAccounts[kk].save();
+                                        }
+
+                                        console.log("每日支付宝转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
+                                    } else {
+                                        console.log("代售商户支付宝转账失败：" + JSON.stringify(ret2, null, 2));
                                     }
-
-                                    console.log("每日支付宝转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
-                                } else {
-                                    console.log("代售商户支付宝转账失败：" + JSON.stringify(ret2, null, 2));
                                 }
                             } else {
                                 console.log("主商户支付宝转账失败：" + JSON.stringify(ret1, null, 2))
@@ -1256,7 +1263,7 @@ module.exports = async function tasks(app) {
             }, {
                 where: {
                     status: {
-                        $gte : 2
+                        $gte: 2
                     },
                     deletedAt: {
                         $ne: null
