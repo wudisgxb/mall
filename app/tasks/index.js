@@ -152,7 +152,7 @@ module.exports = async function tasks(app) {
                             partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                             openid: tenantConfig.wecharPayee_account,
                             check_name: 'NO_CHECK',
-                            amount: merchantAmount * 100,
+                            amount: (merchantAmount * 100).toFixed(0),
                             desc: '日收益',
                             spbill_create_ip: ip
                         }
@@ -215,7 +215,7 @@ module.exports = async function tasks(app) {
                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                 openid: tenantConfig.wecharPayee_account,
                                 check_name: 'NO_CHECK',
-                                amount: merchantAmount * 100,
+                                amount: (merchantAmount * 100).toFixed(0),
                                 desc: '日收益',
                                 spbill_create_ip: ip
                             }
@@ -270,7 +270,7 @@ module.exports = async function tasks(app) {
                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                 openid: tenantConfig.wecharPayee_account,
                                 check_name: 'NO_CHECK',
-                                amount: merchantAmount * 100,
+                                amount: (merchantAmount * 100).toFixed(0),
                                 desc: profitsharing.merchantRemark,
                                 spbill_create_ip: ip
                             }
@@ -318,7 +318,7 @@ module.exports = async function tasks(app) {
                                         partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                         openid: consignee.wecharPayee_account,
                                         check_name: 'NO_CHECK',
-                                        amount: consigneeAmount * 100,
+                                        amount: (consigneeAmount * 100).toFixed(0),
                                         desc: profitsharing.consigneeRemark,
                                         spbill_create_ip: ip
                                     }
