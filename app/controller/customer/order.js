@@ -93,9 +93,9 @@ module.exports = {
         //获取tableId
         let table = await Tables.findOne({
             where: {
-                tenantId : body.tenantId,
-                name : body.tableName,
-                consigneeId : null
+                tenantId: body.tenantId,
+                name: body.tableName,
+                consigneeId: null
             }
         })
 
@@ -138,22 +138,22 @@ module.exports = {
 
         let i;
         // let foodsIdNum = []
-        let tasks =[]
+        let tasks = []
         for (i = 0; i < foodsJson.length; i++) {
             let foodName = await Foods.findOne({
-                where:{
-                    id : foodsJson[i].FoodId
+                where: {
+                    id: foodsJson[i].FoodId
                 }
             })
 
-           tasks.push(OrderGoods.create({
-               num: foodsJson[i].num,
-               unit: foodsJson[i].unit,
-               FoodId: foodsJson[i].FoodId,
-               FoodName : foodName.name,
-               trade_no: trade_no,
-               tenantId: body.tenantId,
-           }))
+            tasks.push(OrderGoods.create({
+                num: foodsJson[i].num,
+                unit: foodsJson[i].unit,
+                FoodId: foodsJson[i].FoodId,
+                FoodName: foodName.name,
+                trade_no: trade_no,
+                tenantId: body.tenantId,
+            }))
             // foodsIdNum.push(foodsJson[i].FoodId)
         }
         await tasks;
@@ -166,9 +166,9 @@ module.exports = {
             diners_num: body.dinersNum,
             status: 0,
             tenantId: body.tenantId,
-            bizType : "deal",
-            deliveryTime : "",
-            payTime : new Date()
+            bizType: "deal",
+            deliveryTime: "",
+            payTime: new Date()
 
         });
 
@@ -255,7 +255,7 @@ module.exports = {
                 tenantId: body.tenantId
             }
         })
-        console.log("购物车"+JSON.stringify(foodsJson))
+        console.log("购物车" + JSON.stringify(foodsJson))
 
         //取之前的订单号，获取请求参数用一个订单号
         let order = await Orders.findOne({
@@ -278,14 +278,14 @@ module.exports = {
         } else {
             trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
         }
-        let distanceandprice = "30分钟"
+        let deliveryTime = "30分钟"
         if (body.deliveryFeeId != null && body.deliveryFeeId != "") {
             let distanceandpriceOne = await DistanceAndPrices.findOne({
-                where : {
-                    deliveryFeeId : body.deliveryFeeId
+                where: {
+                    deliveryFeeId: body.deliveryFeeId
                 }
             })
-            distanceandprice = distanceandpriceOne.deliveryTime
+            deliveryTime = distanceandpriceOne.deliveryTime
         }
 
         // if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
@@ -308,7 +308,7 @@ module.exports = {
                 num: foodsJson[i].num,
                 unit: foodsJson[i].unit,
                 FoodId: foodsJson[i].FoodId,
-                FoodName :foodAllName.name,
+                FoodName: foodAllName.name,
                 trade_no: trade_no,
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId
@@ -327,9 +327,9 @@ module.exports = {
             status: 0,
             tenantId: body.tenantId,
             consigneeId: body.consigneeId,
-            bizType : "eshop",
-            deliveryTime :distanceandprice,
-            payTime : new Date()
+            bizType: "eshop",
+            deliveryTime: deliveryTime,
+            payTime: new Date()
         });
 
         //清空购物车
@@ -443,7 +443,7 @@ module.exports = {
 
         //修改订单食物，第一条修改，其他相同的删除
         if (body.food.foodCount > 0) {
-            for (var i =0;i<orderGoods.length;i++) {
+            for (var i = 0; i < orderGoods.length; i++) {
                 if (i == 0) {
                     orderGoods[0].num = body.food.foodCount;
                     await orderGoods[0].save();
@@ -620,8 +620,8 @@ module.exports = {
         }
 
         let orders = await OrderGoods.findAll({
-            where:{
-                trade_no:order.trade_no
+            where: {
+                trade_no: order.trade_no
             }
         })
 
