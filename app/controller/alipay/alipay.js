@@ -21,6 +21,7 @@ const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../infoPush/infoPush');
 const transAccountsManager = require('./transferAccounts')
 const transAccounts = require('../customer/transAccount')
+const customer = require('../admin/customer/customer')
 const amountManager = require('../amount/amountManager')
 const webSocket = require('../socketManager/socketManager');
 const orderManager = require('../customer/order');
@@ -410,6 +411,7 @@ module.exports = {
 
 
             // 根据订单号查询当前订单
+            console.log(ret.out_trade_no)
             let orders = await OrderGoods.findAll({
                 where: {
                     trade_no: ret.out_trade_no
@@ -417,12 +419,13 @@ module.exports = {
             })
             //根据查询到的foodId在菜单中查询当前的菜
             let rest;
+            let FoodNameArray = []
             for (let i = 0; i < orders.length; i++) {
                 let food = await Foods.findById(orders[i].FoodId);
                 food.sellCount = food.sellCount + orders[i].num;
-
                 food.todaySales = food.todaySales + orders[i].num;
                 await food.save();
+                FoodNameArray.push(food.name)
             }
 
             if (coupon != null) {
@@ -517,6 +520,34 @@ module.exports = {
                 let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, ret.out_trade_no, '支付宝', 0);
 
                 console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
+
+
+                console.log(ret.out_trade_no)
+                let orderOne = await Orders.findOne({
+                    where:{
+                        trade_no : ret.out_trade_no
+                    }
+                })
+
+                let customerVips = await Vips.findAll({
+                    where:{
+                        phone : orderOne.phone,
+                        tenantId : tenantId
+                    }
+                });
+                let isVip = false
+                if(customerVips.length>0){
+                    isVip =true
+                }
+                let customerJson = {
+                    tenantId : tenantId,
+                    phone : orderOne.phone,
+                    status : 3,
+                    foodName : JSON.stringify(FoodNameArray),
+                    totalPrice :amountJson.totalPrice,
+                    isVip : isVip
+                }
+                await customer.savecustomer(customerJson);
 
                 try {
                     amountJson.tenantId = tenantId;

@@ -4,19 +4,19 @@ var Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
 
-    var Customer = sequelize.define('Customer', {
-        phone:shortDataTypes.String(255, false),
-        tenantId:shortDataTypes.String(255,false),
-        status:shortDataTypes.Int(10,false),
-        numPrice:shortDataTypes.Double,
-        totalPrice:shortDataTypes.String(),
-        foodName:shortDataTypes.String(),
+    var Customers = sequelize.define('Customers', {
+        phone:shortDataTypes.String(),
+        tenantId:shortDataTypes.String(),
+        status:shortDataTypes.Int(),
+        isVip:shortDataTypes.Bool(),
+        totalPrice:shortDataTypes.Double(),
+        foodName:shortDataTypes.String()
     }, {
         associate: function (models) {
         },
         instanceMethods: {},
         classMethods: {}
     });
-    return Customer;
+    return Customers;
 };
 
