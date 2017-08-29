@@ -1,16 +1,16 @@
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
-let db = require('../../db/mysql/index');
-var util = require('util');
-var moment = require('moment');
+const db = require('../../db/mysql/index');
+const util = require('util');
+const moment = require('moment');
 
-let Foods = db.models.Foods;
-let Menus = db.models.Menus;
-let Foodsofmenus = db.models.FoodsOfTMenus;
-let Ratings = db.models.Ratings;
-let ProfitSharings = db.models.ProfitSharings;
-
+const Foods = db.models.Foods;
+const Menus = db.models.Menus;
+const Foodsofmenus = db.models.FoodsOfTMenus;
+const Ratings = db.models.Ratings;
+const ProfitSharings = db.models.ProfitSharings;
+const promotionManager = require('./promotions');
 
 module.exports = {
     async getEshopUserMenus (ctx, next) {
@@ -20,11 +20,13 @@ module.exports = {
         const {
             id: menuId,
             tenantId,
-            consigneeId
+            consigneeId,
+            qrcodeId:QRCodeTemplateId
         } = ctx.query
 
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('consigneeId').notEmpty();
+        ctx.checkQuery('qrcodeId').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -118,7 +120,6 @@ module.exports = {
 
                 food = JSON.parse(JSON.stringify(food));
 
-
                 food.forEach(e => {
                     //首杯半价（青豆家写死）
                     if (e.id == 21) {
@@ -129,6 +130,8 @@ module.exports = {
                         return rating
                     })
                 })
+
+                food[0].goodsPromotion = await promotionManager.getGoodsPromotion(QRCodeTemplateId, food[0].id, tenantId);
 
                 foodArray.push(food[0]);
             }
@@ -147,8 +150,10 @@ module.exports = {
     async getUserMenus (ctx, next) {
         let menuId = ctx.query.id;
         let tenantId = ctx.query.tenantId;
+        let QRCodeTemplateId = ctx.query.qrcodeId;
 
         ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('qrcodeId').notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -233,6 +238,8 @@ module.exports = {
                         return rating
                     })
                 })
+
+                food[0].goodsPromotion = await promotionManager.getGoodsPromotion(QRCodeTemplateId, food[0].id, tenantId);
                 foodArray.push(food[0]);
             }
 

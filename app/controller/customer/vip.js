@@ -25,7 +25,7 @@ module.exports = {
         }
     },
 
-    async isVip (phone,tenantId,totalPrice) {
+    async isVip (phone, tenantId, totalPrice) {
 
         let isVip = false;
 
@@ -39,7 +39,7 @@ module.exports = {
             }
         });
 
-        if (tenantConfig.needVip == false){
+        if (tenantConfig.needVip == false) {
             return isVip;
         }
 
@@ -54,12 +54,44 @@ module.exports = {
                 await Vips.create({
                     phone: phone,
                     vipLevel: 0,
-                    vipName: "ÄäÃû",
+                    vipName: "test",
                     tenantId: tenantId
                     // todo: ok?
                 });
                 isVip = true;
             }
+        } else {
+            isVip = true;
+        }
+        return isVip;
+    },
+
+    async isVipWithoutPrice(phone, tenantId) {
+
+        let isVip = false;
+
+        if (phone == null) {
+            return isVip;
+        }
+
+        let tenantConfig = await TenantConfigs.findOne({
+            where: {
+                tenantId: tenantId
+            }
+        });
+
+        if (tenantConfig.needVip == false) {
+            return isVip;
+        }
+
+        let vip = await Vips.findOne({
+            where: {
+                phone: phone,
+                tenantId: tenantId
+            }
+        })
+        if (vip == null) {
+            isVip = false;
         } else {
             isVip = true;
         }

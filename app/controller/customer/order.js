@@ -15,6 +15,7 @@ const DeliveryFees = db.models.DeliveryFees;
 const DistanceAndPrices = db.models.DistanceAndPrices;
 const PaymentReqs = db.models.PaymentReqs;
 const webSocket = require('../../controller/socketManager/socketManager');
+const promotionManager = require('./promotions');
 const infoPushManager = require('../../controller/infoPush/infoPush');
 const tool = require('../../Tool/tool');
 const ApiResult = require('../../db/mongo/ApiResult');
@@ -83,6 +84,7 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('dinersNum').notEmpty().isInt().toInt();
+        ctx.checkBody('qrcodeId').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -94,9 +96,9 @@ module.exports = {
         //获取tableId
         let table = await Tables.findOne({
             where: {
-                tenantId : body.tenantId,
-                name : body.tableName,
-                consigneeId : null
+                tenantId: body.tenantId,
+                name: body.tableName,
+                consigneeId: null
             }
         })
 
@@ -138,26 +140,48 @@ module.exports = {
         }
 
         let i;
-        // let foodsIdNum = []
-        let tasks =[]
+        let food;
+        let tasks = [];
+        let goodsPromotionJson = {};
         for (i = 0; i < foodsJson.length; i++) {
-            let foodName = await Foods.findOne({
-                where:{
-                    id : foodsJson[i].FoodId
-                }
-            })
+            food = await Foods.findOne({
+                where: {
+                    id: foodsJson[i].FoodId
+                },
+            });
+            //获取活动价和单品限购,通过二维码ID
+            goodsPromotionJson = await promotionManager.getGoodsPromotion(body.qrcodeId, foodsJson[i].FoodId, body.tenantId);
+            if (goodsPromotionJson != null) {
+                tasks.push(OrderGoods.create({
+                    num: foodsJson[i].num,
+                    unit: foodsJson[i].unit,
+                    FoodId: foodsJson[i].FoodId,
+                    goodsName: food.name,
+                    price: food.price,
+                    vipPrice: food.vipPrice,
+                    activityPrice: goodsPromotionJson.activityPrice,
+                    purchaseLimit: goodsPromotionJson.purchaseLimit,
+                    trade_no: trade_no,
+                    tenantId: body.tenantId,
+                }));
+            } else {
+                tasks.push(OrderGoods.create({
+                    num: foodsJson[i].num,
+                    unit: foodsJson[i].unit,
+                    FoodId: foodsJson[i].FoodId,
+                    goodsName: food.name,
+                    price: food.price,
+                    vipPrice: food.vipPrice,
+                    trade_no: trade_no,
+                    tenantId: body.tenantId,
+                }));
+            }
 
-           tasks.push(OrderGoods.create({
-               num: foodsJson[i].num,
-               unit: foodsJson[i].unit,
-               FoodId: foodsJson[i].FoodId,
-               FoodName : foodName.name,
-               trade_no: trade_no,
-               tenantId: body.tenantId,
-           }))
-            // foodsIdNum.push(foodsJson[i].FoodId)
         }
         await tasks;
+
+        let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
+
         //添加默認配送時間
         await Orders.create({
             phone: phone,
@@ -167,10 +191,11 @@ module.exports = {
             diners_num: body.dinersNum,
             status: 0,
             tenantId: body.tenantId,
-            bizType : "deal",
-            deliveryTime : "",
-            payTime : new Date()
-
+            QRCodeTemplateId: body.QRCodeTemplateId,
+            orderLimit: orderLimit,
+            bizType: "deal",
+            deliveryTime: "",
+            payTime: new Date()
         });
 
         //清空购物车
@@ -181,7 +206,6 @@ module.exports = {
                 tenantId: body.tenantId
             }
         })
-
 
         //修改桌号状态
         table.name = table.name;
@@ -222,17 +246,13 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
-        // ctx.checkBody('deliveryFeeId').notEmpty();
-        let body = ctx.request.body;
-        // if(body.deliveryFeeId==null){
-        //     ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"配送Id不可以为空")
-        //     return;
-        // }
+        ctx.checkBody('qrcodeId').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
+        let body = ctx.request.body;
         //获取tableId
         let table = await Tables.findOne({
             where: {
@@ -257,7 +277,7 @@ module.exports = {
                 tenantId: body.tenantId
             }
         })
-        console.log("购物车"+JSON.stringify(foodsJson))
+        console.log("购物车" + JSON.stringify(foodsJson))
 
         //取之前的订单号，获取请求参数用一个订单号
         let order = await Orders.findOne({
@@ -280,46 +300,75 @@ module.exports = {
         } else {
             trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000) + table.id;
         }
-        let distanceandprice = "30分钟"
+
+        let deliveryTime = "30分钟"
         if (body.deliveryFeeId != null && body.deliveryFeeId != "") {
             let distanceandpriceOne = await DistanceAndPrices.findOne({
-                where : {
-                    deliveryFeeId : body.deliveryFeeId
+                where: {
+                    deliveryFeeId: body.deliveryFeeId
                 }
             })
-            distanceandprice = distanceandpriceOne.deliveryTime
+            deliveryTime = distanceandpriceOne.deliveryTime
         }
 
-        // if(body.deliveryFeeId != null && body.deliveryFeeId != ""){
-        //     let distanceandpriceOne = await DistanceAndPrices.findOne({
-        //         where : {
-        //             deliveryFeeId : body.deliveryFeeId
-        //         }
-        //     })
-        //     distanceandprice = distanceandpriceOne.deliveryTime
-        // }
+        if (body.deliveryFeeId != null && body.deliveryFeeId != "") {
+            let distanceAndPrice = await DistanceAndPrices.findOne({
+                where: {
+                    deliveryFeeId: body.deliveryFeeId
+                }
+            })
+            deliveryTime = distanceAndPrice.deliveryTime
+        }
 
         // console.log(distanceandprice)
         let i;
+        let food;
+        let tasks = [];
+        let goodsPromotionJson = {};
         for (i = 0; i < foodsJson.length; i++) {
-            let foodAllName = await Foods.findById(foodsJson[i].FoodId)
-            // console.log("---------------------------------------------------------------")
-            // console.log(foodAllName.name)
-            // console.log("---------------------------------------------------------------")
-            await OrderGoods.create({
-                num: foodsJson[i].num,
-                unit: foodsJson[i].unit,
-                FoodId: foodsJson[i].FoodId,
-                FoodName :foodAllName.name,
-                trade_no: trade_no,
-                tenantId: body.tenantId,
-                consigneeId: body.consigneeId
+            food = await Foods.findOne({
+                where: {
+                    id: foodsJson[i].FoodId
+                },
             });
+            //获取活动价,通过二维码ID
+            if (body.QRCodeTemplateId == null) {
+                body.QRCodeTemplateId = '201707272116583125109';
+            }
+            goodsPromotionJson = await promotionManager.getGoodsPromotion(body.qrcodeId, foodsJson[i].FoodId, body.tenantId);
+
+            if (goodsPromotionJson != null) {
+                tasks.push(OrderGoods.create({
+                    num: foodsJson[i].num,
+                    unit: foodsJson[i].unit,
+                    FoodId: foodsJson[i].FoodId,
+                    goodsName: food.name,
+                    trade_no: trade_no,
+                    price: food.price,
+                    vipPrice: food.vipPrice,
+                    activityPrice: goodsPromotionJson.activityPrice,
+                    purchaseLimit: goodsPromotionJson.purchaseLimit,
+                    tenantId: body.tenantId,
+                    consigneeId: body.consigneeId
+                }))
+            } else {
+                tasks.push(OrderGoods.create({
+                    num: foodsJson[i].num,
+                    unit: foodsJson[i].unit,
+                    FoodId: foodsJson[i].FoodId,
+                    goodsName: food.name,
+                    trade_no: trade_no,
+                    price: food.price,
+                    vipPrice: food.vipPrice,
+                    tenantId: body.tenantId,
+                    consigneeId: body.consigneeId
+                }))
+            }
+
         }
-        let now = new Date();
-        console.log("-------------------------------------------")
-        console.log(now)
-        console.log("-------------------------------------------")
+        await tasks;
+
+        let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
 
         await Orders.create({
             phone: body.phoneNumber,
@@ -329,9 +378,11 @@ module.exports = {
             status: 0,
             tenantId: body.tenantId,
             consigneeId: body.consigneeId,
-            bizType : "eshop",
-            deliveryTime :distanceandprice,
-            payTime : new Date()
+            QRCodeTemplateId: body.QRCodeTemplateId,
+            orderLimit: orderLimit,
+            bizType: "eshop",
+            deliveryTime: deliveryTime,
+            payTime: new Date()
         });
 
         //清空购物车
@@ -445,7 +496,7 @@ module.exports = {
 
         //修改订单食物，第一条修改，其他相同的删除
         if (body.food.foodCount > 0) {
-            for (var i =0;i<orderGoods.length;i++) {
+            for (var i = 0; i < orderGoods.length; i++) {
                 if (i == 0) {
                     orderGoods[0].num = body.food.foodCount;
                     await orderGoods[0].save();
@@ -569,36 +620,15 @@ module.exports = {
         }
 
         //通过orders构造订单详情
-        let result = await this.getOrderDetailByTradeNo(trade_no);
-        let foodName = await OrderGoods.findAll({
-            where:{
-                trade_no : trade_no
-            }
-        })
-        let FoodNameArray =[];
-        if(foodName.length>0){
-            for(let i = 0;i<foodName.length;i++){
-                FoodNameArray.push(foodName[i].FoodName)
-            }
+        //通过trade_no构造订单详情
+        let result;
+        try {
+            result = await this.getOrderDetailByTradeNo(trade_no);
+        } catch (e) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, e.message);
+            return;
         }
-        let customerVips = await Vips.findAll({
-            where:{
-                phone : ctx.query.phoneNumber
-            }
-        });
-        let isVip = false
-        if(customerVips.length>0){
-            isVip =true
-        }
-        let customerJson = {
-            tenantId : ctx.query.tenantId,
-            phone : ctx.query.phoneNumber,
-            status : 2,
-            foodName : JSON.stringify(FoodNameArray),
-            totalPrice :result.totalPrice,
-            isVip : isVip
-        }
-        await customer.savecustomer(customerJson);
+
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
     },
@@ -634,7 +664,12 @@ module.exports = {
         //循环不相同的订单号
         for (let k = 0; k < orders.length; k++) {
             //通过trade_no构造订单详情
-            result = await this.getOrderDetailByTradeNo(orders[k].trade_no);
+            try {
+                result = await this.getOrderDetailByTradeNo(orders[k].trade_no);
+            } catch (e) {
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, e.message);
+                return;
+            }
             results.push(result);
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, results)
@@ -646,48 +681,76 @@ module.exports = {
         let totalVipPrice = 0;
         let total_amount = 0;
 
+        //是否折扣和优惠券共享
+        let isShared = await promotionManager.getOrderAndGoodsPromotionIsShared(order.trade_no);
+
         if (firstOrderDiscount == null) {
             firstOrderDiscount = 0;
         }
 
-        let orders = await OrderGoods.findAll({
-            where:{
-                trade_no:order.trade_no
+        let orderGoods = await OrderGoods.findAll({
+            where: {
+                trade_no: order.trade_no
             }
         })
 
-        let food;
-        for (var i = 0; i < orders.length; i++) {
-            food = await Foods.findOne({
+        let foodIds = [];
+        for (let k = 0; k < orderGoods.length; k++) {
+            if (!foodIds.contains(orderGoods[k].FoodId)) {
+                foodIds.push(orderGoods[k].FoodId)
+            }
+        }
+
+        let goodsDiscount = 0;
+        let totalGoodsDiscount = 0;
+        for (var i = 0; i < foodIds.length; i++) {
+            orderGoods = await OrderGoods.findAll({
                 where: {
-                    id: orders[i].FoodId,
-                    tenantId: orders[i].tenantId
+                    trade_no: order.trade_no,
+                    FoodId: foodIds[i]
                 }
             })
 
-            totalPrice += food.price * orders[i].num;//原价
-            totalVipPrice += food.vipPrice * orders[i].num;//会员价
+            var foodNum = 0;
+            for (var j = 0; j < orderGoods.length; j++) {
+                foodNum += orderGoods[j].num;
+                totalPrice += orderGoods[0].price * orderGoods[j].num;//原价
+                totalVipPrice += orderGoods[0].vipPrice * orderGoods[j].num;//会员价
+            }
+            //根据订单号和商品id查询商品折扣优惠
+            goodsDiscount = await promotionManager.getGoodsDiscount(order.trade_no, foodIds[i], foodNum);
+            totalGoodsDiscount += goodsDiscount;
         }
+
+        // let food;
+        // for (var i = 0; i < orders.length; i++) {
+        //     food = await Foods.findOne({
+        //         where: {
+        //             id: orders[i].FoodId,
+        //             tenantId: orders[i].tenantId
+        //         }
+        //     })
+        //
+        //     totalPrice += food.price * orders[i].num;//原价
+        //     totalVipPrice += food.vipPrice * orders[i].num;//会员价
+        // }
 
         //判断vip
+        let isVip = false;
         if (order.phone != null) {
-            var vips = await Vips.findAll({
-                where: {
-                    phone: order.phone,
-                    tenantId: order.tenantId
-                }
-            })
-            if (vips.length > 0) {
+            isVip = await vipManager.isVipWithoutPrice(order.phone, order.tenantId)
+            if (isVip == true) {
                 total_amount = Math.round(totalVipPrice * 100) / 100
+                totalGoodsDiscount = 0;//会员不享受活动价
             } else {
-                total_amount = Math.round(totalPrice * 100) / 100;
+                total_amount = Math.round((totalPrice - totalGoodsDiscount) * 100) / 100;
             }
         } else {
-            total_amount = Math.round(totalPrice * 100) / 100;
+            total_amount = Math.round((totalPrice - totalGoodsDiscount) * 100) / 100;
         }
 
 
-        //首单折扣
+        //首单折扣 ,
         if (firstDiscount != -1) {
             total_amount = total_amount * firstDiscount;
             console.log("firstDiscount=" + firstDiscount + " total_amount=" + total_amount);
@@ -696,31 +759,34 @@ module.exports = {
         //首杯半价
         total_amount = total_amount - firstOrderDiscount;
 
-        //通过订单号获取优惠券
-        let coupon = await Coupons.findOne({
-            where: {
-                trade_no: order.trade_no,
-                phone: order.phone,
-                tenantId: order.tenantId,
-                status: 0
-            }
-        })
+        
+        if (isShared == true || totalGoodsDiscount == 0) {
+            //通过订单号获取优惠券
+            let coupon = await Coupons.findOne({
+                where: {
+                    trade_no: order.trade_no,
+                    phone: order.phone,
+                    tenantId: order.tenantId,
+                    status: 0
+                }
+            })
 
-        if (coupon != null) {
-            switch (coupon.couponType) {
-                case 'amount':
-                    total_amount = ((total_amount - coupon.value) <= 0) ? 0.01 : (total_amount - coupon.value);
-                    break;
-                case 'discount':
-                    total_amount = total_amount * coupon.value;
-                    break;
-                case 'reduce':
-                    if (total_amount >= coupon.value.split('-')[0]) {
-                        total_amount = total_amount - coupon.value.split('-')[1];
-                    }
-                    break;
-                default:
-                    total_amount = total_amount;
+            if (coupon != null) {
+                switch (coupon.couponType) {
+                    case 'amount':
+                        total_amount = ((total_amount - coupon.value) <= 0) ? 0.01 : (total_amount - coupon.value);
+                        break;
+                    case 'discount':
+                        total_amount = total_amount * coupon.value;
+                        break;
+                    case 'reduce':
+                        if (total_amount >= coupon.value.split('-')[0]) {
+                            total_amount = total_amount - coupon.value.split('-')[1];
+                        }
+                        break;
+                    default:
+                        total_amount = total_amount;
+                }
             }
         }
 
@@ -871,6 +937,8 @@ module.exports = {
             })
 
 
+            console.log("orderGoods[i].FoodId===" + orderGoods[i].FoodId);
+            console.log("orderGoods[i].tenantId===" + orderGoods[i].tenantId);
             //首杯半价(青豆家写死，后面完善)
             if (food[0].id == 21) {//草莓奶酪
                 firstFlag = 1;
@@ -920,17 +988,18 @@ module.exports = {
 
     //通过tradeNo构造订单详情
     async getOrderDetailByTradeNo(trade_no) {
-        let foodJson = [];
+        let foodArr = [];
         let totalNum = 0;
         let totalPrice = 0;
         let totalVipPrice = 0;
+        let goodsDiscountJson = 0; //商品折扣
+        let totalGoodsDiscount = 0;//商品总折扣
         let food;
         let result = {};
 
         //首杯半价标记(青豆家写死，后面完善)
         let firstFlag = 0;
         let firstOrderDiscount = 0;
-
 
         //获取newOrder表内容
         let order = await Orders.findOne({
@@ -954,30 +1023,72 @@ module.exports = {
             throw new Error('订单不存在!!');
         }
 
-        for (let i = 0; i < orderGoods.length; i++) {
-            food = await Foods.findAll({
+        let foodIds = [];
+        for (let k = 0; k < orderGoods.length; k++) {
+            if (!foodIds.contains(orderGoods[k].FoodId)) {
+                foodIds.push(orderGoods[k].FoodId)
+            }
+        }
+
+        for (var i = 0; i < foodIds.length; i++) {
+            orderGoods = await OrderGoods.findAll({
                 where: {
-                    id: orderGoods[i].FoodId,
-                    tenantId: orderGoods[i].tenantId
+                    trade_no: trade_no,
+                    FoodId: foodIds[i]
                 }
             })
-            foodJson[i] = {};
-            foodJson[i].id = food[0].id;
+            foodArr[i] = {};
+            foodArr[i].id = orderGoods[0].FoodId;
 
-            //首杯半价(青豆家写死，后面完善)
-            if (food[0].id == 21) {//草莓奶酪
-                firstFlag = 1;
-                firstOrderDiscount = food[0].price * 0.5;
+            foodArr[i].name = orderGoods[0].goodsName;
+            foodArr[i].price = orderGoods[0].price;
+            foodArr[i].vipPrice = orderGoods[0].vipPrice;
+            foodArr[i].unit = orderGoods[0].unit;
+            foodArr[i].num = 0;
+
+            for (var j = 0; j < orderGoods.length; j++) {
+                console.log("orderGoods[j].num======" + orderGoods[j].num)
+                foodArr[i].num += orderGoods[j].num;
+                totalNum += orderGoods[j].num;
+                totalPrice += orderGoods[0].price * orderGoods[j].num;//原价
+                totalVipPrice += orderGoods[0].vipPrice * orderGoods[j].num;//会员价
             }
-            foodJson[i].name = food[0].name;
-            foodJson[i].price = food[0].price;
-            foodJson[i].vipPrice = food[0].vipPrice;
-            foodJson[i].num = orderGoods[i].num;
-            foodJson[i].unit = orderGoods[i].unit;
-            totalNum += orderGoods[i].num;
-            totalPrice += food[0].price * orderGoods[i].num;//原价
-            totalVipPrice += food[0].vipPrice * orderGoods[i].num;//会员价
+
+            //根据订单号和商品id查询商品折扣优惠和数量
+            goodsDiscountJson = await promotionManager.getGoodsDiscountAndPurchaseLimit(trade_no, foodIds[i], foodArr[i].num);
+            totalGoodsDiscount += goodsDiscountJson.goodsDiscount;
+            foodArr[i].goodsDiscountJson = goodsDiscountJson;
         }
+
+        // for (let i = 0; i < orderGoods.length; i++) {
+        //     // food = await Foods.findAll({
+        //     //     where: {
+        //     //         id: orderGoods[i].FoodId,
+        //     //         tenantId: orderGoods[i].tenantId
+        //     //     }
+        //     // })
+        //     foodJson[i] = {};
+        //     foodJson[i].id = orderGoods[i].FoodId;
+        //
+        //     //首杯半价(青豆家写死，后面完善)
+        //     if (orderGoods[i].FoodId == 21) {//草莓奶酪
+        //         firstFlag = 1;
+        //         firstOrderDiscount = orderGoods[i].price * 0.5;
+        //     }
+        //     foodJson[i].name = orderGoods[i].goodsName;
+        //     foodJson[i].price = orderGoods[i].price;
+        //     foodJson[i].vipPrice = orderGoods[i].vipPrice;
+        //     foodJson[i].num = orderGoods[i].num;
+        //     foodJson[i].unit = orderGoods[i].unit;
+        //     totalNum += orderGoods[i].num;
+        //     totalPrice += orderGoods[0].price * orderGoods[i].num;//原价
+        //     totalVipPrice += orderGoods[0].vipPrice * orderGoods[i].num;//会员价
+        //
+        //     //根据订单号和商品id查询商品折扣优惠
+        //     goodsDiscount += await promotionManager.getGoodsDiscount(trade_no, orderGoods[i].FoodId);
+        // }
+
+
         //首杯半价(青豆家写死，后面完善)
         if (firstFlag == 1) {
             //判断是否首杯，2个条件判断
@@ -1018,7 +1129,6 @@ module.exports = {
 
         let table = await Tables.findById(order.TableId);
         result.tableName = table.name;
-        result.foods = foodJson;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         result.isVip = false;
@@ -1038,6 +1148,47 @@ module.exports = {
         let isVip = await vipManager.isVip(phone, order.tenantId, result.totalPrice);
         console.log("vipFlag===" + isVip)
         result.isVip = isVip;
+
+        if (isVip == true) {
+            //返回商品总折扣
+            result.totalGoodsDiscount = 0;
+            for (var i = 0; i < foodArr.length; i++) {
+                delete foodArr[i].goodsDiscountJson;
+            }
+            result.foods = foodArr;
+        } else {
+            //返回商品总折扣,分开显示（参考饿了吗）
+            result.totalGoodsDiscount = totalGoodsDiscount;
+            let tmpFoodArr = [];
+            let tmpFoodJson = {};
+            if (totalGoodsDiscount > 0) {
+                for (var i = 0; i < foodArr.length; i++) {
+                    if (foodArr[i].goodsDiscountJson.goodsDiscount > 0) {
+                        if(foodArr[i].num <= foodArr[i].goodsDiscountJson.goodsNum) {
+                            foodArr[i].price = foodArr[i].price - foodArr[i].goodsDiscountJson.goodsDiscount;
+                            tmpFoodArr.push(foodArr[i]);
+                        } else {
+                            tmpFoodJson = new Object();
+                            tmpFoodJson = tool.deepCopy(foodArr[i]);
+                            console.log("foodArr[i].price ==" + foodArr[i].price);
+                            console.log("foodArr[i].goodsDiscountJson.goodsDiscount ==" + foodArr[i].goodsDiscountJson.goodsDiscount);
+                            tmpFoodJson.activityPrice = foodArr[i].price - foodArr[i].goodsDiscountJson.goodsDiscount;
+                            tmpFoodJson.num = foodArr[i].goodsDiscountJson.goodsNum;
+                            tmpFoodArr.push(tmpFoodJson);
+
+                            tmpFoodJson = new Object();
+                            tmpFoodJson = tool.deepCopy(foodArr[i]);
+                            tmpFoodJson.price = foodArr[i].price;
+                            tmpFoodJson.num = foodArr[i].num - foodArr[i].goodsDiscountJson.goodsNum;
+                            tmpFoodArr.push(tmpFoodJson);
+                        }
+                    } else {
+                        tmpFoodArr.push(foodArr[i])
+                    }
+                }
+                result.foods = tmpFoodArr;
+            }
+        }
 
         //通过订单号获取优惠券
         let coupon = await Coupons.findOne({
@@ -1107,17 +1258,31 @@ module.exports = {
             result.actualAmount = paymentReq.actual_amount;
         }
 
-        // 将 相同foodId 合并
-        result.foods = result.foods.reduce((accu, curr) => {
-            const exist = accu.find(e => e.id === curr.id)
-            if (exist) {
-                exist.num += curr.num
+        //是否能用优惠券
+        //是否折扣和优惠券共享
+        //couponFlag表示是否能用优惠券
+        let isShared = await promotionManager.getOrderAndGoodsPromotionIsShared(trade_no);
+        if (isShared == true) {
+            result.canUseCoupon = true;
+        } else {
+            if (totalGoodsDiscount > 0) {
+                result.canUseCoupon = false;
             } else {
-                accu.push(curr)
+                result.canUseCoupon = true;
             }
+        }
 
-            return accu
-        }, [])
+        // // 将 相同foodId 合并
+        // result.foods = result.foods.reduce((accu, curr) => {
+        //     const exist = accu.find(e => e.id === curr.id)
+        //     if (exist) {
+        //         exist.num += curr.num
+        //     } else {
+        //         accu.push(curr)
+        //     }
+        //
+        //     return accu
+        // }, [])
 
         return result;
     },

@@ -4,9 +4,9 @@ const router = new (require('koa-router'))()
 
 router.get('/api/test/customer/deal/order', order.getUserDealOrder.bind(order));
 
-router.post('/api/test/customer/deal/order', order.saveUserDealOrder);
+router.post('/api/test/customer/deal/order', order.saveUserDealOrder.bind(order));
 
-router.post('/api/test/customer/eshop/order', order.saveUserEshopOrder);
+router.post('/api/test/customer/eshop/order', order.saveUserEshopOrder.bind(order));
 
 router.put('/api/test/customer/eshop/order', order.updateUserEshopOrder);
 

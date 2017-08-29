@@ -90,11 +90,41 @@ function *test() {
 
 }
 
-co(function *() {
-    yield orderToNewOrder();
-    //
-     yield orderToOrderGoods();
+//ordergoods表转静态，food价格放进去
+function *orderGood() {
+    let orderGoods = yield db.models.OrderGoods.findAll({
+        where: {},
+        paranoid: false
+    });
 
+    let tasks = [];
+    let startTime = new Date().getTime();
+    console.log("startTime:"+ startTime);
+    for (var i = 0; i < orderGoods.length; i++) {
+        if (orderGoods[i].FoodId != null) {
+            var food = yield db.models.Foods.findOne({
+                where: {
+                    id:orderGoods[i].FoodId
+                },
+            });
+            orderGoods[i].price = food.price;
+            orderGoods[i].vipPrice = food.vipPrice;
+            //yield orderGoods[i].save()
+            tasks.push(orderGoods[i].save());
+        }
+    }
+    yield tasks;
+    let endTime = new Date().getTime();
+    console.log("endTime:"+ endTime);
+    console.log("差值:"+ (endTime - startTime));
+}
+
+co(function *() {
+    //yield orderToNewOrder();
+    //
+    //yield orderToOrderGoods();
+
+    yield orderGood();
     //yield test();
     console.log('finished ...');
     process.exit(0)

@@ -12,7 +12,6 @@ const Vips = db.models.Vips
 module.exports = {
 
     async bindCoupon (ctx, next) {
-        console.log("44444444444444444444444444444444444444")
         ctx.checkBody('tenantId').notEmpty();
         //ctx.checkBody('consigneeId').notEmpty();
         ctx.checkBody('coupons').notEmpty();
@@ -23,7 +22,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
-        console.log("44444444444444444444444444444444444444")
 
         let body = ctx.request.body;
 
@@ -85,13 +83,11 @@ module.exports = {
                 });
             })
 
-
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
         }
     },
     //查看优惠券是否能领取
     async isCouponReceivable (ctx, next) {
-        console.log("11111111111111111111111111111")
         ctx.checkQuery('phoneNumber').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
         //ctx.checkBody('consigneeId').notEmpty();
@@ -133,7 +129,6 @@ module.exports = {
 
     //获取可用优惠券
     async getAvailableCoupon (ctx, next) {
-        console.log("2222222222222222222222222222222")
         //ctx.checkQuery('tenantId').notEmpty();
         //ctx.checkQuery('consigneeId').notEmpty();
         ctx.checkQuery('phoneNumber').notEmpty();
@@ -276,8 +271,6 @@ module.exports = {
 
     //优惠券绑定订单号
     async couponBindTradeNo (ctx, next) {
-
-        console.log("333333333333333333333333333333")
         ctx.checkBody('couponKey').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         //ctx.checkBody('consigneeId').notEmpty();

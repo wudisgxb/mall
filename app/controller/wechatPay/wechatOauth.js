@@ -4,7 +4,7 @@ const WXPay = require('co-wechat-payment')
 const fs = require('fs')
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
-
+const customer = require('../admin/customer/customer')
 const db = require('../../db/mysql/index');
 const Tables = db.models.Tables;
 const Orders = db.models.NewOrders;
@@ -705,6 +705,34 @@ module.exports = {
                 //output:object（总金额，租户金额，代售金额）
 
                 let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
+
+
+
+                let orderOne = await Orders.findOne({
+                    where:{
+                        trade_no : ret.out_trade_no
+                    }
+                })
+
+                let customerVips = await Vips.findAll({
+                    where:{
+                        phone : orderOne.phone,
+                        tenantId : tenantId
+                    }
+                });
+                let isVip = false
+                if(customerVips.length>0){
+                    isVip =true
+                }
+                let customerJson = {
+                    tenantId : tenantId,
+                    phone : orderOne.phone,
+                    status : 3,
+                    foodName : JSON.stringify(FoodNameArray),
+                    totalPrice :amountJson.totalPrice,
+                    isVip : isVip
+                }
+                await customer.savecustomer(customerJson);
 
                 try {
                     amountJson.tenantId = tenantId;

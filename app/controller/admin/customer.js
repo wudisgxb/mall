@@ -6,17 +6,55 @@ let customerSql = require('./customer/customer')
 let Customers = db.models.Customers
 
 module.exports = {
+
+    async getCustomerByCount(ctx,next){
+
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors);
+            return;
+        }
+        let jsonCustomer={}
+        if(ctx.query.tenantId!=null&&ctx.query.phone!=null){
+            jsonCustomer = {
+                tenantId : ctx.query.tenantId,
+                phone : ctx.query.phone
+            }
+        }else if(ctx.query.tenantId!=null&&ctx.query.phone==null){
+            jsonCustomer = {
+                tenantId : ctx.query.tenantId
+            }
+        }else if(ctx.query.tenantId==null&&ctx.query.phone!=null){
+            jsonCustomer = {
+                phone : ctx.query.phone
+            }
+        }
+        let customer = await customerSql.getCount(jsonCustomer)
+        console.log(customer)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
+    },
     async getCustomerBytenantId (ctx, next) {
         ctx.checkBody('tenantId').notEmpty()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return;
         }
+        let limitJson ={}
         let body= ctx.request.body
+        if(body.pageNumber != null){
+            //页码
+            let pageNumber = parseInt(body.pageNumber);
+            //每页显示的大小
+            let pageSize = parseInt(body.pageSize);
+            let place = (pageNumber-1)*pageSize;
+            limitJson={
+                limit : pageSize,
+                offset : place
+            }
+        }
         let jsonCustomer = {
             tenantId : body.tenantId
         }
-        let customer = await customerSql.getcustomer(jsonCustomer)
+        let customer = await customerSql.getcustomer(jsonCustomer,limitJson)
         console.log(customer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
     },
@@ -28,10 +66,22 @@ module.exports = {
             return;
         }
         let body= ctx.request.body
+        let limitJson ={}
+        if(body.pageNumber != null){
+            //页码
+            let pageNumber = parseInt(body.pageNumber);
+            //每页显示的大小
+            let pageSize = parseInt(body.pageSize);
+            let place = (pageNumber-1)*pageSize;
+            limitJson={
+                limit : pageSize,
+                offset : place
+            }
+        }
         let jsonCustomer = {
             phone : body.phone
         }
-        let customer = await customerSql.getcustomer(jsonCustomer)
+        let customer = await customerSql.getcustomer(jsonCustomer,limitJson)
         console.log(customer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
     },

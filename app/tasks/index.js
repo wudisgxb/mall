@@ -141,7 +141,7 @@ module.exports = async function tasks(app) {
                         consigneeId: consigneeId
                     }
                 });
-
+                
                 console.log("租户微信转账金额：" + merchantAmount);
                 console.log("代售微信转账金额：" + consigneeAmount);
                 if (tenantConfig != null) {
