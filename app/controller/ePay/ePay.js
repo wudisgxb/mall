@@ -14,6 +14,8 @@ const transAccountsManager = require('../alipay/transferAccounts')
 const transAccounts = require('../customer/transAccount')
 const config = require('../../config/config');
 const ip = require('ip').address();
+const OAuth = require('co-wechat-oauth')
+const WXPay = require('co-wechat-payment')
 const client = new OAuth(config.wechat.appId, config.wechat.secret);
 
 const wxpay = new WXPay({
