@@ -643,7 +643,7 @@ module.exports = {
         }
         let customerVips = await Vips.findAll({
             where:{
-                phone : order.phone,
+                phone: ctx.query.phoneNumber,
                 tenantId: ctx.query.tenantId,
             }
         });
@@ -653,7 +653,7 @@ module.exports = {
         }
         let customerJson = {
             tenantId : ctx.query.tenantId,
-            phone : order.phone,
+            phone: ctx.query.phoneNumber,
             status : 2,
             foodName : JSON.stringify(ArrayGoodsName),
             totalPrice :result.totalPrice,
