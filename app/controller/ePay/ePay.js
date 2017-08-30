@@ -49,13 +49,13 @@ module.exports = {
         let amount = ctx.query.amount;
         let tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
-        let qrCodeTemplates = await QRCodeTemplates.findAll({
+        let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
                 QRCodeTemplateId: ctx.query.qrcodeId,
             }
         });
 
-        if (qrCodeTemplates.length == 0) {
+        if (qrCodeTemplate  == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "二维码模板未找到！");
             return;
         }
@@ -63,7 +63,7 @@ module.exports = {
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
             where: {
-                tenantId: qrCodeTemplates.tenantId
+                tenantId: qrCodeTemplate.tenantId
             }
         });
 
@@ -211,13 +211,13 @@ module.exports = {
         let amount = ctx.query.amount;
         let tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
-        let qrCodeTemplates = await QRCodeTemplates.findAll({
+        let qrCodeTemplate = await QRCodeTemplates.findAll({
             where: {
                 QRCodeTemplateId: ctx.query.qrcodeId,
             }
         });
 
-        if (qrCodeTemplates.length == 0) {
+        if (qrCodeTemplate == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "二维码模板未找到！");
             return;
         }
@@ -225,7 +225,7 @@ module.exports = {
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
             where: {
-                tenantId: qrCodeTemplates.tenantId
+                tenantId: qrCodeTemplate.tenantId
             }
         });
 
