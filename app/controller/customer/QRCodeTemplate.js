@@ -123,6 +123,8 @@ module.exports = {
                             }
                         });
                         qrCode.consigneeName = consignee.name;
+                        qrCode.consigneeLongitude = consignee.longitude;
+                        qrCode.consigneelatitude = consignee.latitude;
                     }
                     if (qrCodeTemplates[j].couponType != null && qrCodeTemplates[j].couponValue != null) {
                         coupons.push({
