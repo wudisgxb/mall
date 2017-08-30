@@ -1,19 +1,17 @@
-
-
 let db = require('../../../db/mysql/index');
 let Customers = db.models.Customers
 
 
 let customerSql = (function () {
-    let getcustomer = async function (whereJson,limitJson){
+    let getcustomer = async function (whereJson, limitJson) {
         let customer
-        if(limitJson!=null&&limitJson!=""){
+        if (limitJson != null && limitJson != "") {
             customer = await Customers.findAll({
                 where: whereJson,
-                limit : limitJson.limit,
-                offset : limitJson.offset
+                limit: limitJson.limit,
+                offset: limitJson.offset
             })
-        }else{
+        } else {
             customer = await Customers.findAll({
                 where: whereJson
             })
@@ -21,7 +19,7 @@ let customerSql = (function () {
         console.log(customer)
         return customer
     }
-    let getCustomerOne = async function (whereJson){
+    let getCustomerOne = async function (whereJson) {
         let customer = await Customers.findOne({
             where: whereJson
         })
@@ -30,20 +28,20 @@ let customerSql = (function () {
     }
     let getCount = async function (whereJson) {
         let customer = await Customers.count({
-            where:whereJson
+            where: whereJson
         })
         return customer;
     }
 
-    let savecustomer = async function (whereJson){
-         await Customers.create(whereJson)
+    let savecustomer = async function (whereJson) {
+        await Customers.create(whereJson)
     }
 
     let instance = {
         getcustomer: getcustomer,
-        getCustomerOne : getCustomerOne,
-        savecustomer : savecustomer,
-        getCount : getCount
+        getCustomerOne: getCustomerOne,
+        savecustomer: savecustomer,
+        getCount: getCount
     }
     return instance;
 })();
