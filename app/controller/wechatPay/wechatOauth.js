@@ -608,7 +608,7 @@ module.exports = {
                     trade_no: trade_no
                 }
             })
-            let FoodNameArray ={}
+            let FoodNameArray =[]
             //根据查询到的foodId在菜单中查询当前的菜
             for (let i = 0; i < orders.length; i++) {
                 let food = await Foods.findById(orders[i].FoodId);
@@ -617,7 +617,6 @@ module.exports = {
                 await food.save();
                 FoodNameArray.push(orders[i].goodsName)
             }
-
 
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
