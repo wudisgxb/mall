@@ -725,7 +725,7 @@ module.exports = {
                     totalPrice :amountJson.totalPrice,
                     isVip : isVip
                 }
-                await customer.savecustomer(customerJson);
+                await customer.saveCustomer(customerJson);
 
                 try {
                     amountJson.tenantId = tenantId;

@@ -27,7 +27,7 @@ module.exports = function (sequelize, DataTypes) {
         //每单限购总数，建议大于单品限购，
         orderLimit: shortDataTypes.Int(-1),
         //是否与满减共享
-        isShared: shortDataTypes.Bool(),
+        isShared: shortDataTypes.Bool(),//0为不共享，1为共享
     }, {
         paranoid: true,
         associate: function (models) {

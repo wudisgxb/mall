@@ -659,7 +659,7 @@ module.exports = {
             totalPrice :result.totalPrice,
             isVip : isVip
         }
-        await customer.savecustomer(customerJson);
+        await customer.saveCustomer(customerJson);
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
     },
 

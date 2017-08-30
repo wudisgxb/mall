@@ -54,7 +54,7 @@ module.exports = {
         let jsonCustomer = {
             tenantId : body.tenantId
         }
-        let customer = await customerSql.getcustomer(jsonCustomer,limitJson)
+        let customer = await customerSql.getCustomer(jsonCustomer,limitJson)
         console.log(customer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
     },
@@ -81,7 +81,7 @@ module.exports = {
         let jsonCustomer = {
             phone : body.phone
         }
-        let customer = await customerSql.getcustomer(jsonCustomer,limitJson)
+        let customer = await customerSql.getCustomer(jsonCustomer,limitJson)
         console.log(customer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
     },
@@ -138,8 +138,7 @@ module.exports = {
             tenantId : body.customers.tenantId,
             isVip : body.customers.isVip
         }
-        await customerSql.savecustomer(jsonCustomer)
-
+        await customerSql.saveCustomer(jsonCustomer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 

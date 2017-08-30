@@ -448,6 +448,7 @@ module.exports = {
                     }
                 })
                 await OrderGoods.update({
+                    goodsName : food.name,
                     price :food.price,
                     vipPrice : food.vipPrice
                 },{
@@ -643,17 +644,16 @@ module.exports = {
         let orderg = []
         for(let i = 0;i<ordergoods.length;i++){
             if(ordergoods[i].FoodId==null){
-                
                 let foods = await Foods.findAll({
                     where:{
                         tenantId : ordergoods[i].tenantId
                     }
                 })
-               
+
                 let a = Math.ceil(Math.random()*(foods.length-1))
-                
+
                 let foodId = foods[a].id
-               
+
                 orderg.push(
                     OrderGoods.update({
                         FoodId : foodId
