@@ -32,12 +32,12 @@ let customerSql = (function () {
         })
         return customer;
     }
-
     let saveCustomer = async function (whereJson) {
         await Customers.create(whereJson)
     }
 
     let instance = {
+
         getCustomer: getCustomer,
         getCustomerOne: getCustomerOne,
         saveCustomer: saveCustomer,
