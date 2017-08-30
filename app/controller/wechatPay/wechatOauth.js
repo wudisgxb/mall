@@ -708,17 +708,9 @@ module.exports = {
 
                 let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
 
-
-
-                let orderOne = await Orders.findOne({
-                    where:{
-                        trade_no : trade_no
-                    }
-                })
-
                 let customerVips = await Vips.findAll({
                     where:{
-                        phone : orderOne.phone,
+                        phone : order.phone,
                         tenantId : tenantId
                     }
                 });
@@ -728,7 +720,7 @@ module.exports = {
                 }
                 let customerJson = {
                     tenantId : tenantId,
-                    phone : orderOne.phone,
+                    phone : order.phone,
                     status : 3,
                     foodName : JSON.stringify(FoodNameArray),
                     totalPrice :amountJson.totalPrice,

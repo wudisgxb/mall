@@ -521,17 +521,10 @@ module.exports = {
 
                 console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
 
-
-                console.log(ret.out_trade_no)
-                let orderOne = await Orders.findOne({
-                    where:{
-                        trade_no : ret.out_trade_no
-                    }
-                })
-
                 let customerVips = await Vips.findAll({
                     where:{
-                        phone : orderOne.phone
+                        phone : order.phone,
+                        tenantId : tenantId,
                     }
                 });
                 let isVip = false
@@ -540,7 +533,7 @@ module.exports = {
                 }
                 let customerJson = {
                     tenantId : tenantId,
-                    phone : orderOne.phone,
+                    phone : order.phone,
                     status : 3,
                     foodName : JSON.stringify(FoodNameArray),
                     totalPrice :amountJson.totalPrice,
