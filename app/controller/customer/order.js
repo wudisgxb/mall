@@ -181,24 +181,26 @@ module.exports = {
         }
         await tasks;
 
-        let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
+        if (order == null) {
+            let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
 
-        //添加默認配送時間
-        await Orders.create({
-            phone: phone,
-            TableId: table.id,
-            info: body.remark,
-            trade_no: trade_no,
-            diners_num: body.dinersNum,
-            status: 0,
-            tenantId: body.tenantId,
-            QRCodeTemplateId: body.QRCodeTemplateId,
-            orderLimit: orderLimit,
-            bizType: "deal",
-            deliveryTime: "",
-            payTime: new Date()
+            //添加默認配送時間
+            await Orders.create({
+                phone: phone,
+                TableId: table.id,
+                info: body.remark,
+                trade_no: trade_no,
+                diners_num: body.dinersNum,
+                status: 0,
+                tenantId: body.tenantId,
+                QRCodeTemplateId: body.QRCodeTemplateId,
+                orderLimit: orderLimit,
+                bizType: "deal",
+                deliveryTime: "",
+                payTime: new Date()
 
-        });
+            });
+        }
 
         //清空购物车
         await ShoppingCarts.destroy({
@@ -270,7 +272,6 @@ module.exports = {
         }
 
         //从购物车获取
-
         let foodsJson = await ShoppingCarts.findAll({
             where: {
                 TableId: table.id,
@@ -367,22 +368,24 @@ module.exports = {
         }
         await tasks;
 
-        let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
+        if (order == null) {
+            let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
 
-        await Orders.create({
-            phone: body.phoneNumber,
-            TableId: table.id,
-            info: body.remark,
-            trade_no: trade_no,
-            status: 0,
-            tenantId: body.tenantId,
-            consigneeId: body.consigneeId,
-            QRCodeTemplateId: body.QRCodeTemplateId,
-            orderLimit: orderLimit,
-            bizType: "eshop",
-            deliveryTime: deliveryTime,
-            payTime: new Date()
-        });
+            await Orders.create({
+                phone: body.phoneNumber,
+                TableId: table.id,
+                info: body.remark,
+                trade_no: trade_no,
+                status: 0,
+                tenantId: body.tenantId,
+                consigneeId: body.consigneeId,
+                QRCodeTemplateId: body.QRCodeTemplateId,
+                orderLimit: orderLimit,
+                bizType: "eshop",
+                deliveryTime: deliveryTime,
+                payTime: new Date()
+            });
+        }
 
         //清空购物车
         await ShoppingCarts.destroy({
