@@ -179,25 +179,6 @@ module.exports = {
             }
 
         }
-        // let foodsIdNum = []
-        let tasks = []
-        for (i = 0; i < foodsJson.length; i++) {
-            let foodName = await Foods.findOne({
-                where: {
-                    id: foodsJson[i].FoodId
-                }
-            })
-
-            tasks.push(OrderGoods.create({
-                num: foodsJson[i].num,
-                unit: foodsJson[i].unit,
-                FoodId: foodsJson[i].FoodId,
-                FoodName: foodName.name,
-                trade_no: trade_no,
-                tenantId: body.tenantId,
-            }))
-            // foodsIdNum.push(foodsJson[i].FoodId)
-        }
         await tasks;
 
         let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
@@ -353,23 +334,6 @@ module.exports = {
                     id: foodsJson[i].FoodId
                 },
             });
-            let foodAllName = await Foods.findById(foodsJson[i].FoodId);
-            // console.log("---------------------------------------------------------------")
-            // console.log(foodAllName.name)
-            // console.log("---------------------------------------------------------------")
-            await OrderGoods.create({
-                num: foodsJson[i].num,
-                unit: foodsJson[i].unit,
-                FoodId: foodsJson[i].FoodId,
-                FoodName: foodAllName.name,
-                trade_no: trade_no,
-                tenantId: body.tenantId,
-                consigneeId: body.consigneeId
-            });
-            //获取活动价,通过二维码ID
-            if (body.QRCodeTemplateId == null) {
-                body.QRCodeTemplateId = '201707272116583125109';
-            }
             goodsPromotionJson = await promotionManager.getGoodsPromotion(body.qrcodeId, foodsJson[i].FoodId, body.tenantId);
 
             if (goodsPromotionJson != null) {
