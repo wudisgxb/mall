@@ -629,35 +629,35 @@ module.exports = {
         }
 
         let ordergoods = await OrderGoods.findAll({
-            where:{
-                trade_no : trade_no
+            where: {
+                trade_no: trade_no
             }
         })
         let ArrayGoodsName = [];
-        if(ordergoods.length>0){
-            for(let i =0;i<ordergoods.length;i++){
-                for(let j = 0;j<ordergoods[i].num;j++){
+        if (ordergoods.length > 0) {
+            for (let i = 0; i < ordergoods.length; i++) {
+                for (let j = 0; j < ordergoods[i].num; j++) {
                     ArrayGoodsName.push(ordergoods[i].goodsName)
                 }
             }
         }
         let customerVips = await Vips.findAll({
-            where:{
+            where: {
                 phone: ctx.query.phoneNumber,
                 tenantId: ctx.query.tenantId,
             }
         });
         let isVip = false
-        if(customerVips.length>0){
-            isVip =true
+        if (customerVips.length > 0) {
+            isVip = true
         }
         let customerJson = {
-            tenantId : ctx.query.tenantId,
+            tenantId: ctx.query.tenantId,
             phone: ctx.query.phoneNumber,
-            status : 2,
-            foodName : JSON.stringify(ArrayGoodsName),
-            totalPrice :result.totalPrice,
-            isVip : isVip
+            status: 2,
+            foodName: JSON.stringify(ArrayGoodsName),
+            totalPrice: result.totalPrice,
+            isVip: isVip
         }
         await customer.savecustomer(customerJson);
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
@@ -717,7 +717,7 @@ module.exports = {
         if (firstOrderDiscount == null) {
             firstOrderDiscount = 0;
         }
-        
+
         let orderGoods = await OrderGoods.findAll({
             where: {
                 trade_no: order.trade_no
@@ -789,7 +789,7 @@ module.exports = {
         //首杯半价
         total_amount = total_amount - firstOrderDiscount;
 
-        
+
         if (isShared == true || totalGoodsDiscount == 0) {
             //通过订单号获取优惠券
             let coupon = await Coupons.findOne({
@@ -1194,7 +1194,7 @@ module.exports = {
             if (totalGoodsDiscount > 0) {
                 for (var i = 0; i < foodArr.length; i++) {
                     if (foodArr[i].goodsDiscountJson.goodsDiscount > 0) {
-                        if(foodArr[i].num <= foodArr[i].goodsDiscountJson.goodsNum) {
+                        if (foodArr[i].num <= foodArr[i].goodsDiscountJson.goodsNum) {
                             foodArr[i].price = foodArr[i].price - foodArr[i].goodsDiscountJson.goodsDiscount;
                             tmpFoodArr.push(foodArr[i]);
                         } else {
@@ -1217,6 +1217,8 @@ module.exports = {
                     }
                 }
                 result.foods = tmpFoodArr;
+            } else {
+                result.foods = foodArr;
             }
         }
 
