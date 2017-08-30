@@ -261,8 +261,8 @@ const amountManger = (function () {
                     couponType = coupon.couponType;
                     couponValue = coupon.value;
                 } else {
-                    //全转给商家
-                    merchantAmount = totalAmount;
+                    //门店收百分之2，写死
+                    merchantAmount = totalAmount * (1 - 0.02);
                     consigneeAmount = 0;
                 }
             }

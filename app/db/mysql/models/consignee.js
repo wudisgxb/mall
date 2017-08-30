@@ -19,6 +19,17 @@ module.exports = function (sequelize, DataTypes) {
         payee_account: {
             type: Sequelize.STRING,
         },
+        //经度
+        longitude: {
+            type: Sequelize.STRING,
+            defaultValue: ""
+        },
+
+        //纬度
+        latitude: {
+            type: Sequelize.STRING,
+            defaultValue: ""
+        },
         consigneeId: shortDataTypes.String(100, false),
     }, {
         associate: function (models) {
