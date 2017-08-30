@@ -1,4 +1,3 @@
-
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
@@ -12,34 +11,34 @@ let getYearEchat = require('../echats/yearEchat')
 
 //会员按时间段增长的数据
 const getVipEchats = (function () {
-    let getVip = async function (tenantId,startTime,endTime,type) {
+    let getVip = async function (tenantId, startTime, endTime, type) {
         //type为1是每日会员增长数，2每月会员增长数，3为每季度会员增长数，5为每年会员增长数
-        if(type==1){
-            let result=[];
+        if (type == 1) {
+            let result = [];
             //startTime开始时间
             //endTime结束时间
-            const oneDay = 24*60*60*1000;
-            for(let i=new Date(startTime).getTime();i<new Date(endTime).getTime();i+=oneDay){
+            const oneDay = 24 * 60 * 60 * 1000;
+            for (let i = new Date(startTime).getTime(); i < new Date(endTime).getTime(); i += oneDay) {
                 const vips = await Vips.findAndCountAll({
-                    where:{
-                        tenantId:tenantId,
-                        createdAt:{
-                            $gt:new Date(i),
-                            $lt:new Date(i+oneDay)
+                    where: {
+                        tenantId: tenantId,
+                        createdAt: {
+                            $gt: new Date(i),
+                            $lt: new Date(i + oneDay)
                         }
                     },
                     paranoid: false
                 });
                 result.push({
-                    name:"当日会员增长",
-                    count : vips.count,
-                    time : new Date(i)
+                    name: "当日会员增长",
+                    count: vips.count,
+                    time: new Date(i)
                 });
             }
             return result;
         }
 
-        if(type==3){
+        if (type == 3) {
             // //1.将开始时间和结束时间(譬如2016-10和2017-4)相差的值转换成数组
             // //数组[{"start":"2016-10","end":"2016-11"},{"start":"2016-11","end":"2016-12"}，.....]
             // //2.循环遍历数组每一项的会员数
@@ -79,53 +78,53 @@ const getVipEchats = (function () {
             // console.log("------------")
             // console.log(eeeee)
             // console.log("------------")
-            let eeeee =  getMonthEchats.getMonth(startTime,endTime);
-            let result=[];
-            for(let j=0;j<eeeee.length;j++){
-                let vips=[];
+            let eeeee = getMonthEchats.getMonth(startTime, endTime);
+            let result = [];
+            for (let j = 0; j < eeeee.length; j++) {
+                let vips = [];
                 vips = await Vips.findAll({
-                    where:{
-                        createdAt:{
-                            $gt:new Date(eeeee[j].start),
-                            $lt:new Date(eeeee[j].end)
+                    where: {
+                        createdAt: {
+                            $gt: new Date(eeeee[j].start),
+                            $lt: new Date(eeeee[j].end)
                         },
-                        tenantId:tenantId,
+                        tenantId: tenantId,
                     },
                     paranoid: false
                 });
                 result.push({
-                    name:"vip增长情况",
-                    count:vips.length,
-                    time:eeeee[j].start
+                    name: "vip增长情况",
+                    count: vips.length,
+                    time: eeeee[j].start
                 })
 
             }
             return result;
         }
 
-        if(type==2){
-            let ccccc = await getQuarterEchats.getQuarter(startTime,endTime);
+        if (type == 2) {
+            let ccccc = await getQuarterEchats.getQuarter(startTime, endTime);
             let result = [];
-            for(let i = 0;i<ccccc.length;i++){
-                let vips=[];
+            for (let i = 0; i < ccccc.length; i++) {
+                let vips = [];
                 vips = await Vips.findAll({
-                    where:{
-                        createdAt:{
-                            $gt:new Date(ccccc[i].start),
-                            $lt:new Date(ccccc[i].end)
+                    where: {
+                        createdAt: {
+                            $gt: new Date(ccccc[i].start),
+                            $lt: new Date(ccccc[i].end)
                         },
-                        tenantId:tenantId,
+                        tenantId: tenantId,
                     },
                     paranoid: false
                 });
                 //季度为月份/3向下取余+1
-                let startYear = parseInt(ccccc[i].start.substring(0,4))
-                let startDates = (parseInt(ccccc[i].start.substring(5))+2)/3
+                let startYear = parseInt(ccccc[i].start.substring(0, 4))
+                let startDates = (parseInt(ccccc[i].start.substring(5)) + 2) / 3
                 // console.log(parseInt(ccccc[i].start.substring(5))+2);
                 result.push({
-                    name:"vip增长情况",
-                    count:vips.length,
-                    time:startYear+"第"+startDates+"季度"
+                    name: "vip增长情况",
+                    count: vips.length,
+                    time: startYear + "第" + startDates + "季度"
                 })
             }
             return result;
@@ -181,26 +180,26 @@ const getVipEchats = (function () {
             // return result;
         }
 
-        if(type==4){
-            let sss = await getYearEchat.getYear(startTime,endTime)
+        if (type == 4) {
+            let sss = await getYearEchat.getYear(startTime, endTime)
             let result = [];
-            for(let i = 0;i<sss.length;i++){
-                let vips=[];
+            for (let i = 0; i < sss.length; i++) {
+                let vips = [];
                 vips = await Vips.findAll({
-                    where:{
-                        createdAt:{
-                            $gt:new Date(sss[i].start),
-                            $lt:new Date(sss[i].end)
+                    where: {
+                        createdAt: {
+                            $gt: new Date(sss[i].start),
+                            $lt: new Date(sss[i].end)
                         },
-                        tenantId:tenantId,
+                        tenantId: tenantId,
                     },
                     paranoid: false
                 });
-                let startYear = parseInt(sss[i].start.substring(0,4))
+                let startYear = parseInt(sss[i].start.substring(0, 4))
                 result.push({
-                    name:"vip增长情况",
-                    count:vips.length,
-                    time:startYear+"年"
+                    name: "vip增长情况",
+                    count: vips.length,
+                    time: startYear + "年"
                 })
             }
             return result;

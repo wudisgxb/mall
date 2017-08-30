@@ -2,9 +2,9 @@ var JPush = require("../../../node_modules/jpush-sdk/lib/JPush/JPush.js")
 var client = JPush.buildClient('bd59abef4f3868f6c6edd605', '41fdfaa1e56a9f739031ea55')
 
 
-const  infoPushManager = (function(){
+const infoPushManager = (function () {
 
-    let infoPush = function (content,tenantId) {
+    let infoPush = function (content, tenantId) {
         var pushInfo;
         if (typeof content != 'String') {
             pushInfo = JSON.stringify(content);
@@ -14,7 +14,7 @@ const  infoPushManager = (function(){
         //easy push
         console.log("pushInfo: " + content + ",tenantId:" + tenantId);
         client.push().setPlatform(JPush.ALL)
-            //.setAudience(JPush.ALL)
+        //.setAudience(JPush.ALL)
             .setNotification(content)
             .setAudience(JPush.alias(tenantId))
             .send(function (err, res) {
@@ -29,7 +29,7 @@ const  infoPushManager = (function(){
     }
 
     let instance = {
-        infoPush:infoPush
+        infoPush: infoPush
     }
 
     return instance;

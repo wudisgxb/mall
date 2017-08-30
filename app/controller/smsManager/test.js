@@ -1,23 +1,19 @@
-
 var zy = require('./smsSend.js');
 
 
-
 zy.sendSms(
-
     13585130223,
 
     6623,
 
 
+    function (err, data, mess) {
 
-    function(err,data,mess){
-
-        if(err){
+        if (err) {
 
             console.log(err);
 
-        }else{
+        } else {
 
             //console.log(data);
 
@@ -28,5 +24,4 @@ zy.sendSms(
 
         }
     }
-
 );

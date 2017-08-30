@@ -11,16 +11,16 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('num').notEmpty();
         let body = ctx.request.body
-        let results=[];
+        let results = [];
         let result;
         let resultId;
-        result = await getFoodNum.getFood(body.tenantId,body.num);
-        if(result.length==0){
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"上个月没有热销数据")
+        result = await getFoodNum.getFood(body.tenantId, body.num);
+        if (result.length == 0) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "上个月没有热销数据")
             return;
         }
-        if(result.length<body.num){
-            body.num=result.length;
+        if (result.length < body.num) {
+            body.num = result.length;
         }
 
         resultId = result.sort((a, b)=>b.num - a.num);
@@ -29,17 +29,17 @@ module.exports = {
         }
         let foods;
         // console.log(results)
-        for(let i=0;i<results.length;i++){
+        for (let i = 0; i < results.length; i++) {
             foods = await Foods.findById(results[i].id)
             results[i].name = foods.name;
-            results[i].image=foods.image;
-            results[i].taste=foods.taste;
-            results[i].rating=foods.rating;
-            results[i].type=foods.type;
-            results[i].price=foods.price;
-            results[i].nfo=foods.info;
+            results[i].image = foods.image;
+            results[i].taste = foods.taste;
+            results[i].rating = foods.rating;
+            results[i].type = foods.type;
+            results[i].price = foods.price;
+            results[i].nfo = foods.info;
         }
-        ctx.body=new ApiResult(ApiResult.Result.SUCCESS,results)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, results)
     }
 }
 

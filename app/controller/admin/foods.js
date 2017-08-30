@@ -15,12 +15,14 @@ module.exports = {
         let foods = await Foods.findAll({})
         console.log(foods.length)
         let foodSellcount = [];
-        for(let i =0;i<foods.length;i++){
+        for (let i = 0; i < foods.length; i++) {
             foodSellcount.push(Foods.update({
-                sellCount : "0"
-            },{where:{
-                id : foods[i].id
-            }}))
+                sellCount: "0"
+            }, {
+                where: {
+                    id: foods[i].id
+                }
+            }))
         }
         await foodSellcount
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
@@ -64,9 +66,9 @@ module.exports = {
             return;
         }
         let image
-        if(body.food.image instanceof Array){
+        if (body.food.image instanceof Array) {
             image = JSON.stringify(body.food.image)
-        }else{
+        } else {
             image = body.food.image
         }
 
@@ -74,7 +76,7 @@ module.exports = {
         foods = await Foods.create({
             name: body.food.name,
             image: image,
-            icon: (body.food.icon==null)?"":body.food.icon,
+            icon: (body.food.icon == null) ? "" : body.food.icon,
             price: body.food.price,
             oldPrice: body.food.oldPrice,
             vipPrice: body.food.vipPrice,
@@ -129,16 +131,16 @@ module.exports = {
         //let createMenuTask = [];
         let foods;
         foods = await Foods.findOne({
-                where:{
-                    id : body.condition.id,
-                    tenantId : body.condition.tenantId
-                }
-            });
+            where: {
+                id: body.condition.id,
+                tenantId: body.condition.tenantId
+            }
+        });
 
         let image;
-        if(body.food.image instanceof Array){
+        if (body.food.image instanceof Array) {
             image = JSON.stringify(body.food.image)
-        }else{
+        } else {
             image = body.food.image
         }
 
@@ -147,14 +149,14 @@ module.exports = {
             foods.name = body.food.name;
             foods.image = image;
             foods.foodNum = body.food.foodNum;
-            foods.icon = (body.food.icon)==null?"": body.food.icon;
+            foods.icon = (body.food.icon) == null ? "" : body.food.icon;
             foods.price = body.food.price;
             foods.oldPrice = body.food.oldPrice;
             foods.vipPrice = body.food.vipPrice;
             foods.sellCount = body.food.sellCount;
             foods.rating = body.food.rating;
             foods.info = body.food.info;
-            foods.taste = JSON.stringify(body.food.taste==null?"":body.food.taste);
+            foods.taste = JSON.stringify(body.food.taste == null ? "" : body.food.taste);
             foods.unit = body.food.unit;
             foods.isActive = body.food.isActive;
             foods.tenantId = body.condition.tenantId;
@@ -192,7 +194,7 @@ module.exports = {
             }
         });
 
-        
+
         let foodId;
         let menuName;
         let menuId;
@@ -203,13 +205,13 @@ module.exports = {
             let images = foods[i].image
 
             let img
-            try{
-                if(Tool.isArray(JSON.parse(images))){
-                    img =[]
-                    img=JSON.parse(images)
+            try {
+                if (Tool.isArray(JSON.parse(images))) {
+                    img = []
+                    img = JSON.parse(images)
                 }
-            }catch(e) {
-                img=images
+            } catch (e) {
+                img = images
             }
 
             foodId = foods[i].id;//foodId=222
@@ -236,7 +238,7 @@ module.exports = {
             foodsJson.id = foods[i].id;
             foodsJson.name = foods[i].name;
             foodsJson.foodNum = foods[i].foodNum;
-            foodsJson.image =img;
+            foodsJson.image = img;
             // foodsJson.icon = foods[i].icon;
             foodsJson.price = foods[i].price;
             foodsJson.oldPrice = foods[i].oldPrice;

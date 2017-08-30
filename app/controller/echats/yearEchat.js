@@ -1,18 +1,18 @@
 const getYearEchats = (function () {
-    let getYear =  function (startTime,endTime) {
+    let getYear = function (startTime, endTime) {
 
 
-        let eeeee=[];
+        let eeeee = [];
         let startYear = parseInt(startTime);
         let endYear = parseInt(endTime);
 
-        for(let i=startYear;i<endYear;i++){
+        for (let i = startYear; i < endYear; i++) {
             let startDates = i;
-            let start =startDates+"-1-1 0:0:0"
-            let end =startDates+"-12-31 23:59:59"
+            let start = startDates + "-1-1 0:0:0"
+            let end = startDates + "-12-31 23:59:59"
             eeeee.push({
-                start:start,
-                end:end,
+                start: start,
+                end: end,
             })
         }
         // console.log(eeeee)

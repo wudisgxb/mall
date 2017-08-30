@@ -77,14 +77,14 @@ module.exports = {
         let totalVipPrice = 0;
         let startTime = null;
         let endTime = null;
-        if(ctx.query.startTime==null){
-            startTime='2000-05-14T06:12:22.000Z'
-        }else{
+        if (ctx.query.startTime == null) {
+            startTime = '2000-05-14T06:12:22.000Z'
+        } else {
             startTime = new Date(ctx.query.startTime);
         }
-        if(ctx.query.endTime==null){
-            endTime='2100-05-14T06:12:22.000Z'
-        }else{
+        if (ctx.query.endTime == null) {
+            endTime = '2100-05-14T06:12:22.000Z'
+        } else {
             endTime = new Date(ctx.query.endTime);
         }
         if (ctx.errors) {
@@ -96,26 +96,26 @@ module.exports = {
         let pageNumber = parseInt(ctx.query.pageNumber);
         //每页显示的大小
         let pageSize = parseInt(ctx.query.pageSize);
-        let place = (pageNumber-1)*pageSize;
+        let place = (pageNumber - 1) * pageSize;
         //根据tenantId，查询当前时间的订单
-        let orders=[];
-        if(ctx.query.pageNumber==null&&ctx.query.pageSize==null){
-             orders = await Orders.findAll({
+        let orders = [];
+        if (ctx.query.pageNumber == null && ctx.query.pageSize == null) {
+            orders = await Orders.findAll({
                 where: {
-                    tenantId:ctx.query.tenantId ,
+                    tenantId: ctx.query.tenantId,
                     createdAt: {
                         $between: [startTime, endTime]
                     }
                 }
             })
-        }else{
+        } else {
             orders = await Orders.findAll({
                 where: {
-                    tenantId:ctx.query.tenantId
+                    tenantId: ctx.query.tenantId
                 },
-                order:[['createdAt','DESC']],
-                offset : place,
-                limit : pageSize
+                order: [['createdAt', 'DESC']],
+                offset: place,
+                limit: pageSize
             })
         }
 
@@ -149,7 +149,7 @@ module.exports = {
                         id: orderGoods[j].FoodId,
                     }
                 });
-             
+
                 foodJson[j] = {};
                 foodJson[j].id = food.id;
                 foodJson[j].name = food.name;
@@ -186,7 +186,7 @@ module.exports = {
             result[k].status = orders[k].status;
             result[k].time = orders[k].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[k].phone;
-            result[k].consigneeId =orders[k].consigneeId;
+            result[k].consigneeId = orders[k].consigneeId;
             result[k].consigneeId = orders[k].consigneeId;
             result[k].consigneeName = consignee == null ? null : consignee.name;
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
@@ -296,30 +296,30 @@ module.exports = {
     //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     // }
     //根据tenantId查询order总记录
-    async getAdminOrderByCount(ctx,next){
+    async getAdminOrderByCount(ctx, next){
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
         let orderOfCount
-        if(ctx.query.tenantId !=null&&ctx.query.tenantId !=""){
+        if (ctx.query.tenantId != null && ctx.query.tenantId != "") {
             orderOfCount = await Orders.count({
-                where:{
-                    tenantId : ctx.query.tenantId
+                where: {
+                    tenantId: ctx.query.tenantId
                 }
             })
-        }else{
+        } else {
             orderOfCount = await Orders.count({})
         }
-        if(orderOfCount==0){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有当前所有信息")
+        if (orderOfCount == 0) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有当前所有信息")
             return;
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderOfCount)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, orderOfCount)
     },
     //修改订单状态
-    async putAdminOrderByStatus(ctx,next){
+    async putAdminOrderByStatus(ctx, next){
         ctx.checkBody('trade_no').notEmpty();
         ctx.checkBody('status').notEmpty();
         if (ctx.errors) {
@@ -328,72 +328,72 @@ module.exports = {
         }
         let body = ctx.request.body
         let order = await Orders.findOne({
-            where : {
-                trade_no : body.trade_no
+            where: {
+                trade_no: body.trade_no
             }
         });
         // logger.info(order);
-        if(order == null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此记录");
+        if (order == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此记录");
             return;
         }
 
-        if(body.status==3){
+        if (body.status == 3) {
             await Orders.update({
-                status : body.status,
-                acceptTime : new Date()
-            },{
-                where:{
-                    trade_no : body.trade_no
+                status: body.status,
+                acceptTime: new Date()
+            }, {
+                where: {
+                    trade_no: body.trade_no
                 }
             })
         }
-        if(body.status==4){
+        if (body.status == 4) {
             await Orders.update({
-                status : body.status,
-                receiveTime : new Date()
-            },{
-                where:{
-                    trade_no : body.trade_no
+                status: body.status,
+                receiveTime: new Date()
+            }, {
+                where: {
+                    trade_no: body.trade_no
                 }
             })
         }
-        if(body.status==2){
+        if (body.status == 2) {
             await Orders.update({
-                status : body.status,
-                payTime : new Date()
-            },{
-                where:{
-                    trade_no : body.trade_no
+                status: body.status,
+                payTime: new Date()
+            }, {
+                where: {
+                    trade_no: body.trade_no
                 }
             })
         }
 
 
         let orderBystatus = await Orders.findOne({
-            where : {
-                trade_no : body.trade_no
+            where: {
+                trade_no: body.trade_no
             }
         });
         let orderstatus = {
-            status : orderBystatus.status
+            status: orderBystatus.status
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderstatus)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, orderstatus)
     },
 
     //添加下单时间，骑手接单时间，商家收单时间
-    async postAdminOrderTime(ctx,next){
+    async postAdminOrderTime(ctx, next){
         let order = await Orders.findAll({})
-        for(let ord of order){
+        for (let ord of order) {
             await Orders.update({
-                payTime:ord.createdAt,
-                acceptTime : ord.createdAt,
-                receiveTime : ord.createdAt
-            },{
-                where:{
-                    trade_no : ord.trade_no,
-                    createdAt : {
-                        $lt : new Date("2017-8-19")
+                payTime: ord.createdAt,
+                acceptTime: ord.createdAt,
+                receiveTime: ord.createdAt
+            }, {
+                where: {
+                    trade_no: ord.trade_no,
+                    createdAt: {
+                        $lt: new Date("2017-8-19")
                     }
                 }
             })
@@ -403,63 +403,62 @@ module.exports = {
 
     },
     //修改配送时间
-    async putAdminOrderByDeliveryTime(ctx,next){
+    async putAdminOrderByDeliveryTime(ctx, next){
         ctx.checkBody('trade_no').notEmpty()
         //输入分钟数
         ctx.checkBody('deliveryTime').notEmpty()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
         let body = ctx.request.body
         let order = await Orders.findOne({
-            where:{
-                trade_no : body.trade_no
+            where: {
+                trade_no: body.trade_no
             }
         })
-        if(order==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此订单")
+        if (order == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此订单")
             return;
         }
         await Orders.update({
-            deliveryTime : body.deliveryTime
-        },{
-            where:{
-                trade_no : body.trade_no
+            deliveryTime: body.deliveryTime
+        }, {
+            where: {
+                trade_no: body.trade_no
             }
         })
         let orderDeliveryTime = await Orders.findOne({
-            where:{
-                trade_no : body.trade_no
+            where: {
+                trade_no: body.trade_no
             }
         })
-        ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"配送时间大约为"+orderDeliveryTime.deliveryTime)
+        ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "配送时间大约为" + orderDeliveryTime.deliveryTime)
     },
     //修改类型
-    async putAdminOrderByBizType(ctx,next){
+    async putAdminOrderByBizType(ctx, next){
 
         let ordergoods = await OrderGoods.findAll({})
         console.log(ordergoods.length)
-        for(let i = 0;i <ordergoods.length; i++ ){
-            if(ordergoods[i].FoodId!=null){
+        for (let i = 0; i < ordergoods.length; i++) {
+            if (ordergoods[i].FoodId != null) {
                 let food = await Foods.findOne({
-                    where:{
-                        id : ordergoods[i].FoodId
+                    where: {
+                        id: ordergoods[i].FoodId
                     }
                 })
                 await OrderGoods.update({
-                    goodsName : food.name,
-                    price :food.price,
-                    vipPrice : food.vipPrice
-                },{
-                  where :{
-                      id : ordergoods[i].id
-                  }
+                    goodsName: food.name,
+                    price: food.price,
+                    vipPrice: food.vipPrice
+                }, {
+                    where: {
+                        id: ordergoods[i].id
+                    }
                 })
 
             }
         }
-
 
 
         // await Orders.update({
@@ -489,14 +488,14 @@ module.exports = {
         let totalVipPrice = 0;
         let startTime = null;
         let endTime = null;
-        if(ctx.query.startTime==null){
-            startTime='2000-05-14T06:12:22.000Z'
-        }else{
+        if (ctx.query.startTime == null) {
+            startTime = '2000-05-14T06:12:22.000Z'
+        } else {
             startTime = new Date(ctx.query.startTime);
         }
-        if(ctx.query.endTime==null){
-            endTime='2100-05-14T06:12:22.000Z'
-        }else{
+        if (ctx.query.endTime == null) {
+            endTime = '2100-05-14T06:12:22.000Z'
+        } else {
             endTime = new Date(ctx.query.endTime);
         }
         if (ctx.errors) {
@@ -508,7 +507,7 @@ module.exports = {
         let pageNumber = parseInt(ctx.query.pageNumber);
         //每页显示的大小
         let pageSize = parseInt(ctx.query.pageSize);
-        let place = (pageNumber-1)*pageSize;
+        let place = (pageNumber - 1) * pageSize;
         //根据tenantId，查询当前时间的订单
         let orders = await Orders.findAll({
             where: {
@@ -516,9 +515,9 @@ module.exports = {
                     $between: [startTime, endTime]
                 }
             },
-            order:[['createdAt','DESC']],
-            offset : place,
-            limit : pageSize
+            order: [['createdAt', 'DESC']],
+            offset: place,
+            limit: pageSize
         })
 
         //循环不相同的订单号
@@ -585,7 +584,7 @@ module.exports = {
             result[k].status = orders[k].status;
             result[k].time = orders[k].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[k].phone;
-            result[k].consigneeId =orders[k].consigneeId;
+            result[k].consigneeId = orders[k].consigneeId;
             result[k].consigneeId = orders[k].consigneeId;
             result[k].consigneeName = consignee == null ? null : consignee.name;
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
@@ -642,32 +641,32 @@ module.exports = {
     async postAdminOrderFoodName(ctx, next){
         let ordergoods = await OrderGoods.findAll({})
         let orderg = []
-        for(let i = 0;i<ordergoods.length;i++){
-            if(ordergoods[i].FoodId==null){
+        for (let i = 0; i < ordergoods.length; i++) {
+            if (ordergoods[i].FoodId == null) {
                 let foods = await Foods.findAll({
-                    where:{
-                        tenantId : ordergoods[i].tenantId
+                    where: {
+                        tenantId: ordergoods[i].tenantId
                     }
                 })
 
-                let a = Math.ceil(Math.random()*(foods.length-1))
+                let a = Math.ceil(Math.random() * (foods.length - 1))
 
                 let foodId = foods[a].id
 
                 orderg.push(
                     OrderGoods.update({
-                        FoodId : foodId
-                    },{
-                        where:{
-                            id : ordergoods[i].id,
-                            FoodId:null
+                        FoodId: foodId
+                    }, {
+                        where: {
+                            id: ordergoods[i].id,
+                            FoodId: null
                         }
                     })
                 )
             }
         }
         await orderg
-         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
         // let ordergoods = await OrderGoods.findAll({})
         // let taske=[]
         // // console.log(ordergoods.length)

@@ -41,34 +41,34 @@ module.exports = {
 
     },
 
-    async getAdminAllTenantId(ctx,next){
+    async getAdminAllTenantId(ctx, next){
         ctx.checkQuery('tenantId').notEmpty();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors);
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return
         }
         //查询tenantId不为All的所有数据
         let admins = await Admins.findAll({
-            where:{
-                tenantId:{
-                    $ne : ctx.query.tenantId
+            where: {
+                tenantId: {
+                    $ne: ctx.query.tenantId
                 }
             }
         })
         //根据查询到的tenantId查询租户的名字
         let merchantAll = []
-        for(let i = 0;i<admins.length;i++){
+        for (let i = 0; i < admins.length; i++) {
 
             let merchant = await Merchants.findOne({
-                where:{
-                    tenantId : admins[i].tenantId
+                where: {
+                    tenantId: admins[i].tenantId
                 }
             })
-            if(merchant!=null) {
+            if (merchant != null) {
                 merchantAll.push(merchant)
             }
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,merchantAll);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchantAll);
     }
 }
 

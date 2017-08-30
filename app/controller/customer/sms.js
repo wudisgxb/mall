@@ -32,7 +32,7 @@ module.exports = {
                     } else {
                         console.log(data.body.status);
                         console.log(data.body.desc);
-                        console.log(JSON.stringify(data.body,null,2));
+                        console.log(JSON.stringify(data.body, null, 2));
                         resolve(data.body);
                     }
                 }
@@ -80,7 +80,7 @@ module.exports = {
                     } else {
                         console.log(data.body.status);
                         console.log(data.body.desc);
-                        console.log(JSON.stringify(data.body,null,2));
+                        console.log(JSON.stringify(data.body, null, 2));
                         resolve(data.body);
                     }
                 }
@@ -131,7 +131,7 @@ module.exports = {
         });
 
         if (ret.length == 0) {
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,{result: "fail"})
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, {result: "fail"})
 
 
         } else {

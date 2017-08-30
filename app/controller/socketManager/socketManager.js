@@ -28,10 +28,10 @@ function htmlEntities(str) {
 /**
  * HTTP server
  */
-var server = http.createServer(function(request, response) {
+var server = http.createServer(function (request, response) {
     // Not important for us. We're writing WebSocket server, not HTTP server
 });
-server.listen(webSocketsServerPort, function() {
+server.listen(webSocketsServerPort, function () {
     console.log((new Date()) + " websocket Server is listening on port " + webSocketsServerPort);
 });
 
@@ -48,12 +48,12 @@ var wsServer = new webSocketServer({
 // var dataList = [];
 
 
-const  SocketManager = (function(){
+const SocketManager = (function () {
     let initSocket = function () {
 
         // This callback function is called every time someone
 // tries to connect to the WebSocket server
-        wsServer.on('request', function(request) {
+        wsServer.on('request', function (request) {
             console.log((new Date()) + ' Connection from origin ' + request.origin + '.');
 
             // accept connection - you should check 'request.origin' to make sure that
@@ -68,8 +68,8 @@ const  SocketManager = (function(){
             console.log((new Date()) + ' Connection accepted.');
 
             // user sent some message
-            connection.on('message', function(message) {
-                 console.log("222222222222222222222222 ||" + message.utf8Data);
+            connection.on('message', function (message) {
+                console.log("222222222222222222222222 ||" + message.utf8Data);
                 // if (message.type === 'utf8') { // accept only text
                 //     if (userName === false) { // first message sent by user is their name
                 //         // remember user name
@@ -105,7 +105,7 @@ const  SocketManager = (function(){
             });
 
             // user disconnected
-            connection.on('close', function(connection) {
+            connection.on('close', function (connection) {
                 console.log((new Date()) + " Peer "
                     + connection.remoteAddress + " disconnected.");
                 // remove user from the list of connected clients
@@ -115,8 +115,8 @@ const  SocketManager = (function(){
     }
 
     let sendSocket = function (content) {
-        for(var i = 0 ;i<clients9000.length;i++) {
-            if(typeof content != "string") {
+        for (var i = 0; i < clients9000.length; i++) {
+            if (typeof content != "string") {
                 content = JSON.stringify(content);
             }
             clients9000[i].sendUTF(content);
@@ -126,8 +126,8 @@ const  SocketManager = (function(){
     }
 
     let instance = {
-        initSocket:initSocket,
-        sendSocket:sendSocket
+        initSocket: initSocket,
+        sendSocket: sendSocket
     }
 
     return instance;

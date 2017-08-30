@@ -12,25 +12,25 @@ const getFoodNum = (function () {
         let ArrayFood = [];
         let b;
         let lastDate = new Date()
-        if(lastDate.getMonth()==1){
+        if (lastDate.getMonth() == 1) {
             lastDate.setYear(-1)
             b = lastDate.format("yyyy-12-dd 23:59:59")
-        }else{
+        } else {
             lastDate.setDate(0);
             b = lastDate.format("yyyy-MM-dd 23:59:59");
         }
 
         let a;
         let firstDate = new Date();
-        if(firstDate.getMonth()==1){
+        if (firstDate.getMonth() == 1) {
             firstDate.setYear(-1)
             a = firstDate.format("yyyy-11-dd 23:59:59")
-        }else if(firstDate.getMonth()==2){
+        } else if (firstDate.getMonth() == 2) {
             firstDate.setDate(0);
             firstDate.setDate(1);
             a = firstDate.format("yyyy-MM-dd 00:00:00");
         }
-        else{
+        else {
             firstDate.setDate(0);
             firstDate.setDate(0)
             a = firstDate.format("yyyy-MM-dd 23:59:59");
@@ -77,7 +77,7 @@ const getFoodNum = (function () {
             result.push({id, num})
         }
         // console.log(result)
-       
+
         return result;
     }
     let instance = {

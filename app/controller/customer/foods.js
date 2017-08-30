@@ -232,7 +232,7 @@ module.exports = {
                     if (e.id == 21) {
                         e.coupon = "半价限购1份";
                     }
-                    
+
                     e.Ratings = e.Ratings.map(rating => {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
                         return rating

@@ -7,136 +7,136 @@ let Customers = db.models.Customers
 
 module.exports = {
 
-    async getCustomerByCount(ctx,next){
+    async getCustomerByCount(ctx, next){
 
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors);
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
-        let jsonCustomer={}
-        if(ctx.query.tenantId!=null&&ctx.query.phone!=null){
+        let jsonCustomer = {}
+        if (ctx.query.tenantId != null && ctx.query.phone != null) {
             jsonCustomer = {
-                tenantId : ctx.query.tenantId,
-                phone : ctx.query.phone
+                tenantId: ctx.query.tenantId,
+                phone: ctx.query.phone
             }
-        }else if(ctx.query.tenantId!=null&&ctx.query.phone==null){
+        } else if (ctx.query.tenantId != null && ctx.query.phone == null) {
             jsonCustomer = {
-                tenantId : ctx.query.tenantId
+                tenantId: ctx.query.tenantId
             }
-        }else if(ctx.query.tenantId==null&&ctx.query.phone!=null){
+        } else if (ctx.query.tenantId == null && ctx.query.phone != null) {
             jsonCustomer = {
-                phone : ctx.query.phone
+                phone: ctx.query.phone
             }
         }
         let customer = await customerSql.getCount(jsonCustomer)
         console.log(customer)
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, customer)
     },
     async getCustomerBytenantId (ctx, next) {
         ctx.checkBody('tenantId').notEmpty()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let limitJson ={}
-        let body= ctx.request.body
-        if(body.pageNumber != null){
+        let limitJson = {}
+        let body = ctx.request.body
+        if (body.pageNumber != null) {
             //页码
             let pageNumber = parseInt(body.pageNumber);
             //每页显示的大小
             let pageSize = parseInt(body.pageSize);
-            let place = (pageNumber-1)*pageSize;
-            limitJson={
-                limit : pageSize,
-                offset : place
+            let place = (pageNumber - 1) * pageSize;
+            limitJson = {
+                limit: pageSize,
+                offset: place
             }
         }
         let jsonCustomer = {
-            tenantId : body.tenantId
+            tenantId: body.tenantId
         }
-        let customer = await customerSql.getCustomer(jsonCustomer,limitJson)
+        let customer = await customerSql.getCustomer(jsonCustomer, limitJson)
         console.log(customer)
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, customer)
     },
 
     async getCustomerByPhone (ctx, next) {
         ctx.checkBody('phone').notEmpty()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let body= ctx.request.body
-        let limitJson ={}
-        if(body.pageNumber != null){
+        let body = ctx.request.body
+        let limitJson = {}
+        if (body.pageNumber != null) {
             //页码
             let pageNumber = parseInt(body.pageNumber);
             //每页显示的大小
             let pageSize = parseInt(body.pageSize);
-            let place = (pageNumber-1)*pageSize;
-            limitJson={
-                limit : pageSize,
-                offset : place
+            let place = (pageNumber - 1) * pageSize;
+            limitJson = {
+                limit: pageSize,
+                offset: place
             }
         }
         let jsonCustomer = {
-            phone : body.phone
+            phone: body.phone
         }
-        let customer = await customerSql.getCustomer(jsonCustomer,limitJson)
+        let customer = await customerSql.getCustomer(jsonCustomer, limitJson)
         console.log(customer)
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, customer)
     },
 
     async updateCustomerBytenantId (ctx, next) {
-        ctx.checkBody('/customers/phone',true).first().notEmpty()
-        ctx.checkBody('/customers/status',true).first().notEmpty()
-        ctx.checkBody('/customers/isVip',true).first().notEmpty()
-        ctx.checkBody('/customers/totalPrice',true).first().notEmpty()
-        ctx.checkBody('/customers/foodName',true).first().notEmpty()
+        ctx.checkBody('/customers/phone', true).first().notEmpty()
+        ctx.checkBody('/customers/status', true).first().notEmpty()
+        ctx.checkBody('/customers/isVip', true).first().notEmpty()
+        ctx.checkBody('/customers/totalPrice', true).first().notEmpty()
+        ctx.checkBody('/customers/foodName', true).first().notEmpty()
         ctx.checkBody('tenantId').notEmpty()
         ctx.checkBody('id').notEmpty()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let body= ctx.request.body
+        let body = ctx.request.body
         let jsonCustomer = {
-            phone : body.customers.phone,
-            status : body.customers.status,
-            isVip : body.customers.isVip,
-            totalPrice : body.customers.totalPrice,
-            foodName : JSON.stringify(body.customers.foodName),
+            phone: body.customers.phone,
+            status: body.customers.status,
+            isVip: body.customers.isVip,
+            totalPrice: body.customers.totalPrice,
+            foodName: JSON.stringify(body.customers.foodName),
         }
-        let whereJson ={
-            id : body.id,
-            tenantId : body.tenantId
+        let whereJson = {
+            id: body.id,
+            tenantId: body.tenantId
         }
         let customer = JSON.stringify(await customerSql.getCustomerOne(whereJson))
         console.log(customer)
-        await Customers.update(jsonCustomer,{
-            where:whereJson
+        await Customers.update(jsonCustomer, {
+            where: whereJson
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
     async saveCustomerBytenantId (ctx, next) {
-        ctx.checkBody('/customers/phone',true).first().notEmpty()
-        ctx.checkBody('/customers/status',true).first().notEmpty()
-        ctx.checkBody('/customers/totalPrice',true).first().notEmpty()
-        ctx.checkBody('/customers/foodName',true).first().notEmpty()
-        ctx.checkBody('/customers/tenantId',true).first().notEmpty()
-        ctx.checkBody('/customers/isVip',true).first().notEmpty()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        ctx.checkBody('/customers/phone', true).first().notEmpty()
+        ctx.checkBody('/customers/status', true).first().notEmpty()
+        ctx.checkBody('/customers/totalPrice', true).first().notEmpty()
+        ctx.checkBody('/customers/foodName', true).first().notEmpty()
+        ctx.checkBody('/customers/tenantId', true).first().notEmpty()
+        ctx.checkBody('/customers/isVip', true).first().notEmpty()
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let body= ctx.request.body
+        let body = ctx.request.body
         let jsonCustomer = {
-            phone : body.customers.phone,
-            status : body.customers.status,
-            totalPrice : body.customers.totalPrice,
-            foodName : JSON.stringify(body.customers.foodName),
-            tenantId : body.customers.tenantId,
-            isVip : body.customers.isVip
+            phone: body.customers.phone,
+            status: body.customers.status,
+            totalPrice: body.customers.totalPrice,
+            foodName: JSON.stringify(body.customers.foodName),
+            tenantId: body.customers.tenantId,
+            isVip: body.customers.isVip
         }
         await customerSql.saveCustomer(jsonCustomer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
@@ -145,16 +145,16 @@ module.exports = {
     async deleteCustomerBytenantId (ctx, next) {
         ctx.checkQuery('id').notEmpty()
         ctx.checkQuery('tenantId').notEmpty()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let whereJson ={
-            tenantId : ctx.query.tenantId,
-            id : ctx.query.id
+        let whereJson = {
+            tenantId: ctx.query.tenantId,
+            id: ctx.query.id
         }
         let customer = await customerSql.getCustomerOne(whereJson)
-        if(customer!=null){
+        if (customer != null) {
             await customer.destroy();
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)

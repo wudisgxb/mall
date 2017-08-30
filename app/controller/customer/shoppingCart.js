@@ -42,7 +42,7 @@ module.exports = {
         let shoppingCarts = await ShoppingCarts.findAll({
             where: {
                 TableId: table.id,
-                tenantId:tenantId
+                tenantId: tenantId
             }
         })
 
@@ -61,7 +61,7 @@ module.exports = {
             var food = await Foods.findAll({
                 where: {
                     id: shoppingCarts[i].FoodId,
-                    tenantId:tenantId
+                    tenantId: tenantId
                 }
             })
             foodArr[i] = {};
@@ -174,7 +174,7 @@ module.exports = {
             });
             console.log(foodUnits)
             var shoppingCart = await ShoppingCarts.findOne({
-                where:{
+                where: {
                     FoodId: foods[i].foodId,
                     tenantId: body.tenantId,
                     tableUser: body.tableUser,
@@ -260,9 +260,9 @@ module.exports = {
         let shoppingCarts = await ShoppingCarts.findAll({
             where: {
                 tableUser: body.condition.tableUser,
-                TableId : table.id,
+                TableId: table.id,
                 FoodId: body.food.foodId,
-                tenantId:body.condition.tenantId,
+                tenantId: body.condition.tenantId,
                 consigneeId: null
             }
         });
@@ -321,9 +321,9 @@ module.exports = {
         let shoppingCarts = await ShoppingCarts.findAll({
             where: {
                 TableId: table.id,
-                tenantId:tenantId,
-                consigneeId:consigneeId,
-                phone:phoneNumber
+                tenantId: tenantId,
+                consigneeId: consigneeId,
+                phone: phoneNumber
             }
         })
 
@@ -411,7 +411,7 @@ module.exports = {
             });
 
             var shoppingCart = await ShoppingCarts.findOne({
-                where:{
+                where: {
                     FoodId: foods[i].foodId,
                     tenantId: body.tenantId,
                     phone: body.phoneNumber,
@@ -496,10 +496,10 @@ module.exports = {
         let shoppingCarts = await ShoppingCarts.findAll({
             where: {
                 consigneeId: body.condition.consigneeId,
-                phone:body.condition.phoneNumber,
-                TableId : table.id,
+                phone: body.condition.phoneNumber,
+                TableId: table.id,
                 FoodId: body.food.foodId,
-                tenantId:body.condition.tenantId
+                tenantId: body.condition.tenantId
             }
         });
 

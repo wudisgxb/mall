@@ -608,7 +608,7 @@ module.exports = {
                     trade_no: trade_no
                 }
             })
-            let FoodNameArray =[]
+            let FoodNameArray = []
             //根据查询到的foodId在菜单中查询当前的菜
             for (let i = 0; i < orders.length; i++) {
                 let food = await Foods.findById(orders[i].FoodId);
@@ -673,9 +673,9 @@ module.exports = {
                     }, {
                         where: {
                             trade_no: trade_no,
-                            status:{
-                                $gte : 2
-                            } ,
+                            status: {
+                                $gte: 2
+                            },
                             deletedAt: {
                                 $ne: null
                             }
@@ -708,22 +708,22 @@ module.exports = {
                 let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
 
                 let customerVips = await Vips.findAll({
-                    where:{
-                        phone : order.phone,
-                        tenantId : tenantId
+                    where: {
+                        phone: order.phone,
+                        tenantId: tenantId
                     }
                 });
                 let isVip = false
-                if(customerVips.length>0){
-                    isVip =true
+                if (customerVips.length > 0) {
+                    isVip = true
                 }
                 let customerJson = {
-                    tenantId : tenantId,
-                    phone : order.phone,
-                    status : 3,
-                    foodName : JSON.stringify(FoodNameArray),
-                    totalPrice :amountJson.totalPrice,
-                    isVip : isVip
+                    tenantId: tenantId,
+                    phone: order.phone,
+                    status: 3,
+                    foodName: JSON.stringify(FoodNameArray),
+                    totalPrice: amountJson.totalPrice,
+                    isVip: isVip
                 }
                 await customer.saveCustomer(customerJson);
 

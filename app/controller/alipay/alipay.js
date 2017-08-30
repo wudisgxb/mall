@@ -522,22 +522,22 @@ module.exports = {
                 console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
 
                 let customerVips = await Vips.findAll({
-                    where:{
-                        phone : order.phone,
-                        tenantId : tenantId,
+                    where: {
+                        phone: order.phone,
+                        tenantId: tenantId,
                     }
                 });
                 let isVip = false
-                if(customerVips.length>0){
-                    isVip =true
+                if (customerVips.length > 0) {
+                    isVip = true
                 }
                 let customerJson = {
-                    tenantId : tenantId,
-                    phone : order.phone,
-                    status : 3,
-                    foodName : JSON.stringify(FoodNameArray),
-                    totalPrice :amountJson.totalPrice,
-                    isVip : isVip
+                    tenantId: tenantId,
+                    phone: order.phone,
+                    status: 3,
+                    foodName: JSON.stringify(FoodNameArray),
+                    totalPrice: amountJson.totalPrice,
+                    isVip: isVip
                 }
                 await customer.saveCustomer(customerJson);
 
@@ -572,7 +572,7 @@ module.exports = {
                                 paymentReqs[0].TransferAccountIsFinish = true;
                                 await paymentReqs[0].save();
                             } else {
-                                if  (amountJson.totalAmount >0) {
+                                if (amountJson.totalAmount > 0) {
                                     await transAccounts.pendingTransferAccounts(ret.out_trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '支付宝', '租户', tenantId, consigneeId);
                                 }
                             }
@@ -591,7 +591,7 @@ module.exports = {
                                     paymentReqs[0].TransferAccountIsFinish = true;
                                     await paymentReqs[0].save();
                                 } else {
-                                    if  (amountJson.totalAmount >0) {
+                                    if (amountJson.totalAmount > 0) {
                                         await transAccounts.pendingTransferAccounts(ret.out_trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '支付宝', '租户', tenantId, consigneeId);
                                     }
                                 }
@@ -602,7 +602,7 @@ module.exports = {
                                     paymentReqs[0].TransferAccountIsFinish = true;
                                     await paymentReqs[0].save();
                                 } else {
-                                    if  (amountJson.merchantAmount >0) {
+                                    if (amountJson.merchantAmount > 0) {
                                         await transAccounts.pendingTransferAccounts(ret.out_trade_no, tenantConfig.payee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '支付宝', '租户', tenantId, consigneeId);
                                     }
                                 }
@@ -613,7 +613,7 @@ module.exports = {
                                     paymentReqs[0].consigneeTransferAccountIsFinish = true;
                                     await paymentReqs[0].save();
                                 } else {
-                                    if  (amountJson.consigneeAmount >0) {
+                                    if (amountJson.consigneeAmount > 0) {
                                         await transAccounts.pendingTransferAccounts(ret.out_trade_no, consignee.payee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '支付宝', '代售', tenantId, consigneeId);
                                     }
                                 }
@@ -621,7 +621,7 @@ module.exports = {
                         }
                     } else {
                         if (consignee == null) {
-                            if  (amountJson.totalAmount >0) {
+                            if (amountJson.totalAmount > 0) {
                                 await transAccounts.pendingTransferAccounts(ret.out_trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '支付宝', '租户', tenantId, consigneeId);
                             }
                         } else {
@@ -633,14 +633,14 @@ module.exports = {
                             });
 
                             if (profitsharing == null) {
-                                if  (amountJson.totalAmount >0) {
+                                if (amountJson.totalAmount > 0) {
                                     await transAccounts.pendingTransferAccounts(ret.out_trade_no, tenantConfig.payee_account, amountJson.totalAmount, '收益', '支付宝', '租户', tenantId, consigneeId);
                                 }
                             } else {
-                                if  (amountJson.merchantAmount >0) {
+                                if (amountJson.merchantAmount > 0) {
                                     await transAccounts.pendingTransferAccounts(ret.out_trade_no, tenantConfig.payee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '支付宝', '租户', tenantId, consigneeId);
                                 }
-                                if  (amountJson.consigneeAmount >0) {
+                                if (amountJson.consigneeAmount > 0) {
                                     await transAccounts.pendingTransferAccounts(ret.out_trade_no, consignee.payee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '支付宝', '代售', tenantId, consigneeId);
                                 }
                             }

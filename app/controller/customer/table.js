@@ -15,7 +15,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        
+
         //查询vip
         let vips = await Vips.findAll({
             where: {
@@ -32,13 +32,13 @@ module.exports = {
             where: {
                 name: ctx.query.tableName,
                 tenantId: ctx.query.tenantId,
-                consigneeId:null
+                consigneeId: null
             }
         })
         if (table != null) {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                tableStatus:table.status,
-                isVip : isVip
+                tableStatus: table.status,
+                isVip: isVip
             })
         } else {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "桌号不存在!")
@@ -60,7 +60,7 @@ module.exports = {
             where: {
                 name: ctx.query.tableName,
                 tenantId: ctx.query.tenantId,
-                consigneeId:ctx.query.consigneeId
+                consigneeId: ctx.query.consigneeId
             }
         })
         if (table == null) {
@@ -90,8 +90,8 @@ module.exports = {
 
             if (shoppingCarts.length > 0) {
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                    tableStatus:1,
-                    isVip:isVip,
+                    tableStatus: 1,
+                    isVip: isVip,
                 });
                 return;
             } else {
@@ -101,20 +101,20 @@ module.exports = {
                         phone: ctx.query.phoneNumber,
                         tenantId: ctx.query.tenantId,
                         TableId: table.id,
-                        $or:[{status:0},{status:1}]
+                        $or: [{status: 0}, {status: 1}]
                     }
                 });
                 //下单状态
                 if (order != null) {
                     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                        tableStatus:2,
-                        isVip:isVip,
+                        tableStatus: 2,
+                        isVip: isVip,
                     });
                 } else {
                     //空桌
                     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                        tableStatus:0,
-                        isVip:isVip,
+                        tableStatus: 0,
+                        isVip: isVip,
                     });
                 }
             }

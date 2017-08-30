@@ -15,7 +15,7 @@ module.exports = {
         ctx.checkBody('/printerSetting/isShowMoney', true).first().notEmpty();
         ctx.checkBody('/printerSetting/connectMode', true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
-        ctx.checkBody('/printerSetting/printName',true).notEmpty();
+        ctx.checkBody('/printerSetting/printName', true).notEmpty();
 
         let body = ctx.request.body;
 

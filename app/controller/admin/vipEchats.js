@@ -6,23 +6,23 @@ let getVipEchats = require('../echats/vipEchats')
 
 
 module.exports = {
-    async saveAdminVip(ctx,next){
+    async saveAdminVip(ctx, next){
         // logger.info("1111")
         ctx.checkBody("tenantId").notEmpty();
         ctx.checkBody("startTime").notEmpty();
         ctx.checkBody("endTime").notEmpty();
         ctx.checkBody("type").notEmpty();
-        let body =ctx.request.body;
-        if(ctx.errors){
-            ctx.body=new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        let body = ctx.request.body;
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-        let result =await getVipEchats.getVip(body.tenantId,body.startTime,body.endTime,body.type)
-        if(result.length==0){
-            ctx.body= new ApiResult(ApiResult.Result.NOT_FOUND,"没有记录")
+        let result = await getVipEchats.getVip(body.tenantId, body.startTime, body.endTime, body.type)
+        if (result.length == 0) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有记录")
             return;
         }
-        ctx.body= new ApiResult(ApiResult.Result.SUCCESS,result)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
 
     }
 }

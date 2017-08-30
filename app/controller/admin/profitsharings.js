@@ -3,46 +3,45 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 const Tool = require('../../Tool/tool');
-let Profitsharings =  db.models.ProfitSharings;
+let Profitsharings = db.models.ProfitSharings;
 let Consignee = db.models.Consignees;
 let Merchant = db.models.Merchants;
 let consignee = db.models.Consignees;
 let Tables = db.models.Tables
 
 
-
 module.exports = {
     //根据TenantId查询所有私有代售点信息
-    async getAdminProfitsharingsByTenantId(ctx,next){
+    async getAdminProfitsharingsByTenantId(ctx, next){
         ctx.checkQuery('tenantId').notEmpty();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
 
         let profitsharing = await Profitsharings.findAll({
-            where:{
-                tenantId:ctx.query.tenantId
+            where: {
+                tenantId: ctx.query.tenantId
             }
         });
-        if(profitsharing==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"未找到信息");
+        if (profitsharing == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到信息");
             return;
         }
         //console.log(profitsharing[0].consigneeId);
-        let consignee=[];
-        for(let i=0;i<profitsharing.length;i++) {
+        let consignee = [];
+        for (let i = 0; i < profitsharing.length; i++) {
             consigneeId = await Consignee.findAll({
-                where:{
-                    consigneeId:profitsharing[i].consigneeId
+                where: {
+                    consigneeId: profitsharing[i].consigneeId
                 }
             })
             consignee.push(consigneeId[i].name)
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consignee);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, consignee);
     },
 
-    async saveAdminProfitsharings(ctx,next){
+    async saveAdminProfitsharings(ctx, next){
         ctx.checkBody('tenantId').notEmpty()
         ctx.checkBody('consigneeName').notEmpty()
         // ctx.checkBody('merchantRemark').notEmpty()
@@ -66,71 +65,71 @@ module.exports = {
                 consigneeName: body.consigneeName,
             }
         })
-        logger.info((profitsharings == null)==true+"没有此分润记录")
+        logger.info((profitsharings == null) == true + "没有此分润记录")
         if (profitsharings != null) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "已有此分润记录");
             return;
         }
 
         let merchant = await Merchant.findOne({
-            where:{
-                tenantId:body.tenantId
+            where: {
+                tenantId: body.tenantId
             }
         })
-        if(merchant==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此租户")
+        if (merchant == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此租户")
             return
         }
 
-        if(body.rate>1){
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"代售商分成比例不可以超过1")
+        if (body.rate > 1) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, "代售商分成比例不可以超过1")
             return;
         }
         let consigneeId
         let excludeFoodId = JSON.stringify(body.excludeFoodId);
-        if(body.consigneeId==null){
+        if (body.consigneeId == null) {
             consigneeId = Tool.allocTenantId()
             await Profitsharings.create({
-                tenantId : body.tenantId,
-                consigneeName : body.consigneeName,
-                consigneeId : consigneeId,
-                merchantRemark :body.consigneeName+"代售-转账",
-                consigneeRemark : merchant.name+"代收分润",
-                rate : body.rate,
-                ownRate : 0.1,
-                excludeFoodId  : excludeFoodId
+                tenantId: body.tenantId,
+                consigneeName: body.consigneeName,
+                consigneeId: consigneeId,
+                merchantRemark: body.consigneeName + "代售-转账",
+                consigneeRemark: merchant.name + "代收分润",
+                rate: body.rate,
+                ownRate: 0.1,
+                excludeFoodId: excludeFoodId
             })
             await consignee.create({
-                tenantId : body.tenantId,
-                name : body.consigneeName,
-                phone : body.phone,
-                wecharPayee_account : body.wecharPayee_account,
-                payee_account : body.payee_account,
-                consigneeId : consigneeId
+                tenantId: body.tenantId,
+                name: body.consigneeName,
+                phone: body.phone,
+                wecharPayee_account: body.wecharPayee_account,
+                payee_account: body.payee_account,
+                consigneeId: consigneeId
             })
             logger.info("-------");
             await Tables.create({
-                tenantId : body.tenantId,
-                consigneeId : consigneeId,
-                status : 0,
-                name : "0号桌",
-                info : "双人桌",
+                tenantId: body.tenantId,
+                consigneeId: consigneeId,
+                status: 0,
+                name: "0号桌",
+                info: "双人桌",
             })
-        }else if(body.consigneeId!=null&&body.consigneeId!=""){
+        } else if (body.consigneeId != null && body.consigneeId != "") {
             consigneeId = body.consigneeId
             await Profitsharings.create({
-                tenantId : body.tenantId,
-                consigneeName : body.consigneeName,
-                consigneeId : consigneeId,
-                merchantRemark :body.consigneeName+"代售-转账",
-                consigneeRemark : merchant.name+"代收分润",
-                rate : body.rate,
-                ownRate : 0.1,
-                excludeFoodId  : excludeFoodId
+                tenantId: body.tenantId,
+                consigneeName: body.consigneeName,
+                consigneeId: consigneeId,
+                merchantRemark: body.consigneeName + "代售-转账",
+                consigneeRemark: merchant.name + "代收分润",
+                rate: body.rate,
+                ownRate: 0.1,
+                excludeFoodId: excludeFoodId
             })
         }
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,consigneeId)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, consigneeId)
         // ctx.checkBody('tenantId').notEmpty()
         // ctx.checkBody('consigneeId').notEmpty()
         //
@@ -177,13 +176,13 @@ module.exports = {
         // ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
 
-    async updateAdminProfitsharings(ctx,next){
+    async updateAdminProfitsharings(ctx, next){
         ctx.checkBody('tenantId').notEmpty()
         ctx.checkBody('consigneeId').notEmpty()
-        ctx.checkBody('/profitsharings/consigneeName',true).first().notEmpty()
-        ctx.checkBody('/profitsharings/rate',true).first().notEmpty()
-        ctx.checkBody('/profitsharings/ownRate',true).first().notEmpty()
-        ctx.checkBody('/profitsharings/excludeFoodId',true).first().notEmpty()
+        ctx.checkBody('/profitsharings/consigneeName', true).first().notEmpty()
+        ctx.checkBody('/profitsharings/rate', true).first().notEmpty()
+        ctx.checkBody('/profitsharings/ownRate', true).first().notEmpty()
+        ctx.checkBody('/profitsharings/excludeFoodId', true).first().notEmpty()
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
@@ -196,14 +195,14 @@ module.exports = {
                 consigneeId: body.consigneeId,
             }
         })
-        if(profitsharings==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此记录")
+        if (profitsharings == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此记录")
             return
         }
 
         let excludeFoodId = JSON.stringify(body.profitsharings.excludeFoodId)
 
-        if(profitsharings!=null){
+        if (profitsharings != null) {
             profitsharings.rate = Number(body.profitsharings.rate).toFixed(2)
             profitsharings.ownRate = Number(body.profitsharings.ownRate).toFixed(2)
             profitsharings.consigneeName = body.profitsharings.consigneeName
@@ -215,7 +214,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
-    async deleteAdminProfitsharings(ctx,next){
+    async deleteAdminProfitsharings(ctx, next){
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('consigneeId').notEmpty();
         if (ctx.errors) {

@@ -80,7 +80,7 @@ const amountManger = (function () {
         })
 
         //获取会员信息算会员价
-        let vip = await vipManager.isVipWithoutPrice(phone,tenantId);
+        let vip = await vipManager.isVipWithoutPrice(phone, tenantId);
         if (vip == true) {
             totalAmount = amountJson.totalVipPrice;
             tmpTotalPrice = amountJson.totalVipPrice;

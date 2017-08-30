@@ -26,17 +26,17 @@ module.exports = {
         let key = date + txt;
         //将唯一的键和随机数存入数据库
         await Captcha.create({
-                key:key,
-                captcha:txt
+            key: key,
+            captcha: txt
         });
         //返回唯一的键，随机数，和图形验证码给前台
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-            "key":key,
-            "number":txt,
-            "buf":buf.toString('base64')
+            "key": key,
+            "number": txt,
+            "buf": buf.toString('base64')
         });
     },
-    
+
     async getadminLong(ctx, next){
         ctx.checkBody('userName').notEmpty();
         ctx.checkBody('password').notEmpty();
@@ -44,49 +44,49 @@ module.exports = {
         ctx.checkBody('key').notEmpty();
         let body = ctx.request.body;
         if (ctx.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,ctx.errors);
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, ctx.errors);
             return;
         }
         //根据key查询Captcha中的记录
-        let captcha =await Captcha.findOne({
-            where:{
-                key : body.key,
+        let captcha = await Captcha.findOne({
+            where: {
+                key: body.key,
             }
         })
         //根据现在的时间减去创建的时间-创建时间如果大于5分钟
-        if((new Date()-captcha.createdAt)>5*1000*60){
+        if ((new Date() - captcha.createdAt) > 5 * 1000 * 60) {
             //将验证码超时，请重新获取传给前端，并跳出
-            ctx.body=new ApiResult(ApiResult.Result.NOT_FOUND,"验证码超时，请重新获取" );
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "验证码超时，请重新获取");
             return;
         }
         let c;
         //判断输入的验证码和数据库中的验证码是否匹配
-        if(body.captcha.toLowerCase()==captcha.captcha.toLowerCase()){
+        if (body.captcha.toLowerCase() == captcha.captcha.toLowerCase()) {
             //如果匹配查询用户名密码是否正确
             c = await Admins.findOne({
-                where:{
-                    nickname:body.userName,
-                    password:body.password
+                where: {
+                    nickname: body.userName,
+                    password: body.password
                 }
             })
             //判断查询的记录数是否等于0
-            if(c==null){
+            if (c == null) {
                 //如果等于0那么就返回给前台用户名密码错误
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"用户名密码错误")
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "用户名密码错误")
                 return;
-            }else{
+            } else {
                 //用户名密码正确返回租户Id给前端
-                ctx.body= new ApiResult(ApiResult.Result.SUCCESS,{
-                    id:c.id,
-                    tenantId:c.tenantId
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                    id: c.id,
+                    tenantId: c.tenantId
                 })
             }
         }
-         else {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"图形验证码错误！请重新输入！")
+        else {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "图形验证码错误！请重新输入！")
             return;
         }
 
     }
-    
+
 }

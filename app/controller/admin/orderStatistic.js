@@ -19,7 +19,7 @@ var start = new Date('2017-07-01 10:11:34').getTime()
 var minMills = 3 * 60 * 60 * 1000
 var maxMills = 3.5 * 60 * 60 * 1000
 module.exports = {
-    async saveVipAndCoupons(ctx,next){
+    async saveVipAndCoupons(ctx, next){
         ctx.checkBody('tenantId').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
@@ -59,7 +59,7 @@ module.exports = {
             orderStatistics = await orderStatistic.getOrderNum(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //分成情况
-        if(body.status == 5){
+        if (body.status == 5) {
             orderStatistics = await orderStatistic.getReat(body.tenantId, body.startTime, body.endTime, body.type)
         }
         //分成情况
@@ -160,8 +160,8 @@ module.exports = {
         }
         let body = ctx.request.body;
         let orders = await Orders.findAll({
-            where:{
-                tenantId : body.tenantId,
+            where: {
+                tenantId: body.tenantId,
             }
         })
         // let ArrayTrand_no = [];
@@ -170,7 +170,7 @@ module.exports = {
         //         ArrayTrand_no.push(orders[i].trade_no)
         //     }
         // }
-        let days =generateDays(orders.length);
+        let days = generateDays(orders.length);
         days = days.map(e => {
             const hour = e.getHours()
             if (hour <= 10) {
@@ -181,10 +181,10 @@ module.exports = {
         })
         for (let j = 0; j < orders.length; j++) {
             await Orders.update({
-                createdAt:days[j]
-            },{
-                where : {
-                    tenantId : body.tenantId
+                createdAt: days[j]
+            }, {
+                where: {
+                    tenantId: body.tenantId
                 }
             })
             // let order = await Orders.findOne({
@@ -194,7 +194,6 @@ module.exports = {
             //     }
             // })
             // let retJson = await amountManager.getTransAccountAmount( body.tenantId, order.consigneeId, ArrayTrand_no[j], order.paymentMethod, 0);
-
 
 
             // let profitSharings = await ProfitSharings.findOne({
@@ -210,7 +209,6 @@ module.exports = {
             // })
 
 
-
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
@@ -218,12 +216,12 @@ module.exports = {
 }
 
 function name() {
-    let randomName = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
-    let nameLength = Math.ceil(Math.random()*10)
+    let randomName = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+    let nameLength = Math.ceil(Math.random() * 10)
     let names;
-    for(let i = 0; i<nameLength.length;i++){
-        let name = randomName[Math.ceil(Math.random()*(randomName.length-1))];
-        names=names+name
+    for (let i = 0; i < nameLength.length; i++) {
+        let name = randomName[Math.ceil(Math.random() * (randomName.length - 1))];
+        names = names + name
     }
     return names
 }

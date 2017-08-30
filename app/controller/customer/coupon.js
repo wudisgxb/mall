@@ -31,22 +31,22 @@ module.exports = {
             }
         });
         let customerVips = await Vips.findAll({
-            where:{
-                phone : body.phoneNumber
+            where: {
+                phone: body.phoneNumber
             }
         });
         let isVip = false
-        if(customerVips.length>0){
-            isVip =true
+        if (customerVips.length > 0) {
+            isVip = true
         }
-        let FoodNameArray =[]
+        let FoodNameArray = []
         let customerJson = {
-            tenantId : body.tenantId,
-            phone : body.phoneNumber,
-            status : 1,
-            foodName : JSON.stringify(FoodNameArray),
-            totalPrice :0,
-            isVip : isVip
+            tenantId: body.tenantId,
+            phone: body.phoneNumber,
+            status: 1,
+            foodName: JSON.stringify(FoodNameArray),
+            totalPrice: 0,
+            isVip: isVip
         }
         await customer.savecustomer(customerJson);
         //let couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
@@ -142,7 +142,7 @@ module.exports = {
             //获取租户名称
             let merchant = await Merchants.findOne({
                 where: {
-                    tenantId: ctx.query.tenantId ,
+                    tenantId: ctx.query.tenantId,
                 }
             })
 
@@ -211,7 +211,7 @@ module.exports = {
             })
 
             let retCoupons = [];
-            for (var k = 0;k<tenantIdArray.length;k++) {
+            for (var k = 0; k < tenantIdArray.length; k++) {
 
                 //获取租户名称
                 let merchant = await Merchants.findOne({
@@ -293,7 +293,7 @@ module.exports = {
             //根据订单号查找绑定优惠券
             let coupon = await Coupons.findOne({
                 where: {
-                    trade_no : body.tradeNo,
+                    trade_no: body.tradeNo,
                     tenantId: body.tenantId,
                     //consigneeId: body.consigneeId,
                     phone: body.phoneNumber,
@@ -321,7 +321,7 @@ module.exports = {
                 coupon.trade_no = body.tradeNo;
                 await coupon.save();
             } else {
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,'优惠券不存在！');
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '优惠券不存在！');
                 return;
             }
         } else {

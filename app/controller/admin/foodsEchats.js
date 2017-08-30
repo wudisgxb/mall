@@ -8,30 +8,30 @@ module.exports = {
         ctx.checkBody('startTime').notEmpty();
         ctx.checkBody('type').notEmpty();
         let body = ctx.request.body
-        if(ctx.errors){
+        if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR);
         }
-        let result = await getFoodEchats.getfEchats(body.tenantId,body.startTime,body.type);
-        if(result.length==0){
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"找不到数据");
+        let result = await getFoodEchats.getfEchats(body.tenantId, body.startTime, body.type);
+        if (result.length == 0) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, "找不到数据");
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,result);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
     },
-    
-    async savefoodsEchats(ctx,next){
+
+    async savefoodsEchats(ctx, next){
         ctx.checkBody('tenantId').notEmpty();
         let body = ctx.request.body
-        if(ctx.errors){
+        if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR);
         }
         let date = new Date()
-        date.setDate(date.getDate()-1)
+        date.setDate(date.getDate() - 1)
         let startTime = date.format("yyyy-MM-dd 00:00:00")
         // console.log(startTime);
-        let result = await getFoodEchats.getfEchats(body.tenantId,startTime,1);
-        if(result.length==0){
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,"找不到数据");
+        let result = await getFoodEchats.getfEchats(body.tenantId, startTime, 1);
+        if (result.length == 0) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, "找不到数据");
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,result);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
     }
 }

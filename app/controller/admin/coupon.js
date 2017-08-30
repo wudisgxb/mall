@@ -8,7 +8,7 @@ const Tool = require('../../Tool/tool');
 module.exports = {
 
     async saveAdminCoupon (ctx, next) {
-        
+
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
         ctx.checkBody('couponType').notEmpty()
@@ -28,12 +28,11 @@ module.exports = {
             tenantId: body.tenantId,
             consigneeId: body.consigneeId,
             time: body.time,
-            couponValue:body.couponValue,
-            couponType:body.couponType,
-            couponRate:body.couponRate,
+            couponValue: body.couponValue,
+            couponType: body.couponType,
+            couponRate: body.couponRate,
             status: 0
         });
-
 
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);

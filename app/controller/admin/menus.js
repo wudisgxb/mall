@@ -7,7 +7,7 @@ let Menus = db.models.Menus;
 module.exports = {
     //新增商品类型
     async saveAdminMenus (ctx, next) {
-        ctx.checkBody('/menu/name',true).first().notEmpty();
+        ctx.checkBody('/menu/name', true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -17,7 +17,7 @@ module.exports = {
         let body = ctx.request.body;
         let menusResult = await Menus.findAll({
             where: {
-                name : body.menu.name,
+                name: body.menu.name,
                 tenantId: body.tenantId
             }
         });
@@ -40,10 +40,10 @@ module.exports = {
 
     //修改商品类型
     async updateAdminMenusById (ctx, next) {
-        ctx.checkBody('/condition/id',true).first().notEmpty();
-        ctx.checkBody('/menu/name',true).first().notEmpty();
-        ctx.checkBody('/menu/sort',true).first().notEmpty();
-        ctx.checkBody('/condition/tenantId',true).first().notEmpty();
+        ctx.checkBody('/condition/id', true).first().notEmpty();
+        ctx.checkBody('/menu/name', true).first().notEmpty();
+        ctx.checkBody('/menu/sort', true).first().notEmpty();
+        ctx.checkBody('/condition/tenantId', true).first().notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -52,8 +52,8 @@ module.exports = {
 
         let menusResult = await Menus.findOne({
             where: {
-                id:body.condition.id,
-                tenantId:body.condition.tenantId
+                id: body.condition.id,
+                tenantId: body.condition.tenantId
             }
         });
         if (menusResult == null) {
@@ -61,7 +61,7 @@ module.exports = {
             return;
         }
         menusResult.name = body.menu.name;
-        menusResult.sort=body.menu.sort;
+        menusResult.sort = body.menu.sort;
         //menus.type = body.type;
         await menusResult.save();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
@@ -69,8 +69,8 @@ module.exports = {
     //
     async getAdminMenus (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors );
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
         let menus = await Menus.findAll({
@@ -80,11 +80,10 @@ module.exports = {
             attributes: {
                 exclude: ['createdAt', 'updatedAt', 'deletedAt']
             },
-            order :["sort"]
+            order: ["sort"]
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, menus);
     },
-
 
 
 }

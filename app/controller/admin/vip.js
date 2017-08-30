@@ -10,23 +10,23 @@ let vipss = require('../admin/vip')
 module.exports = {
 
     async saveAdminVip (ctx, next) {
-        ctx.checkBody('/vip/phone',true).first().notEmpty();
-        ctx.checkBody('/vip/vipLevel',true).first().notEmpty();
-        ctx.checkBody('/vip/name',true).first().notEmpty();
+        ctx.checkBody('/vip/phone', true).first().notEmpty();
+        ctx.checkBody('/vip/vipLevel', true).first().notEmpty();
+        ctx.checkBody('/vip/name', true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty()
         let body = ctx.request.body;
         if (ctx.errors) {
-            ctx.body=new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
         let vips = await Vip.findAll({
             where: {
                 phone: body.vip.phone,
-                tenantId:body.tenantId
+                tenantId: body.tenantId
             }
         })
         if (vips.length > 0) {
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED,"会员已存在")
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "会员已存在")
             return;
         }
         await Vip.create({
@@ -42,27 +42,27 @@ module.exports = {
 
     async updateAdminVipById (ctx, next) {
 
-        ctx.checkBody('/condition/id',true).first().notEmpty();
-        ctx.checkBody('/condition/tenantId',true).first().notEmpty();
-        ctx.checkBody('/vip/name',true).first().notEmpty();
-        ctx.checkBody('/vip/phone',true).first().notEmpty();
-        ctx.checkBody('/vip/vipLevel',true).first().notEmpty();
+        ctx.checkBody('/condition/id', true).first().notEmpty();
+        ctx.checkBody('/condition/tenantId', true).first().notEmpty();
+        ctx.checkBody('/vip/name', true).first().notEmpty();
+        ctx.checkBody('/vip/phone', true).first().notEmpty();
+        ctx.checkBody('/vip/vipLevel', true).first().notEmpty();
         let body = ctx.request.body;
         if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors);
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
             return;
         }
         let vips = await Vip.findOne({
             where: {
                 id: body.condition.id,
-                tenantId:body.condition.tenantId
+                tenantId: body.condition.tenantId
             }
         })
         if (vips != null) {
             vips.phone = body.vip.phone;
             vips.vipLevel = body.vip.vipLevel;
             vips.vipName = body.vip.name;
-            vips.tenantId=body.condition.tenantId;
+            vips.tenantId = body.condition.tenantId;
             await vips.save();
 
         }
@@ -73,8 +73,8 @@ module.exports = {
     async getAdminVip (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
 
-        if(ctx.errors){
-            new ApiResult(ApiResult.Result.DB_ERROR,ctx.errors);
+        if (ctx.errors) {
+            new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
             return;
         }
 
@@ -83,7 +83,7 @@ module.exports = {
                 tenantId: ctx.query.tenantId
             }
         });
-        if(vips.length==0){
+        if (vips.length == 0) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip");
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, vips);
@@ -96,7 +96,7 @@ module.exports = {
     //     //修改字段
     //
     // },
-    
+
 
     async deleteAdminVip(ctx, next){
 
@@ -104,18 +104,17 @@ module.exports = {
         ctx.checkQuery('tenantId').notEmpty();
 
         let table = await Vip.findOne({
-            where:{
-                id:ctx.query.id,
-                tenantId:ctx.query.tenantId
+            where: {
+                id: ctx.query.id,
+                tenantId: ctx.query.tenantId
             }
         });
-        if(table==null){
+        if (table == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip记录");
         }
         await table.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
-
 
 
 }
