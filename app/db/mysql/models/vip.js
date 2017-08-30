@@ -9,8 +9,6 @@ module.exports = function (sequelize, DataTypes) {
         vipLevel:shortDataTypes.Int(),
         vipName:shortDataTypes.String(),
         isTest : shortDataTypes.Bool(),
-        birthday : shortDataTypes.Date(),
-        name : shortDataTypes.String(),
         tenantId : {
             type: Sequelize.STRING
         }

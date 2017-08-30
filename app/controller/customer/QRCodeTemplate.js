@@ -14,7 +14,7 @@ module.exports = {
     //获取二维码模板
     async getQRCodeTemplate (ctx, next) {
         ctx.checkQuery('QRCodeTemplateId').notEmpty();
-        
+
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;

@@ -79,8 +79,8 @@ module.exports = {
             print.printType = body.printerSetting.printType;
             print.printTime = body.printerSetting.printTime;
             print.isNeedCustomSmallTicketHeader = body.printerSetting.isNeedCustomSmallTicketHeader;
-            print.customSmallTicketHeader = body.printerSetting.customSmallTicketHeader || "",
-                print.smallTicketNum = body.printerSetting.smallTicketNum;
+            print.customSmallTicketHeader = body.printerSetting.customSmallTicketHeader || "";
+            print.smallTicketNum = body.printerSetting.smallTicketNum;
             print.isShowMoney = body.printerSetting.isShowMoney;
             print.connectMode = body.printerSetting.connectMode;
             print.tenantId = body.condition.tenantId;
@@ -136,10 +136,7 @@ module.exports = {
         });
 
         if (prints == null || prints.length == 0) {
-            ctx.body = {
-                resCode: 0,
-                result: "打印机不存在！"
-            };
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '打印机不存在！');
             return;
         }
 

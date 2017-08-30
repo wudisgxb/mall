@@ -1,5 +1,6 @@
 let coupon = require('../../controller/customer/coupon');
 let couponAdmin = require('../../controller/admin/coupon');
+
 const router = new (require('koa-router'))()
 
 router.post('/api/test/customer/deal/coupon', coupon.bindCoupon);

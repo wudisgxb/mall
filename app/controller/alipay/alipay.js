@@ -531,8 +531,7 @@ module.exports = {
 
                 let customerVips = await Vips.findAll({
                     where:{
-                        phone : orderOne.phone,
-                        tenantId : tenantId
+                        phone : orderOne.phone
                     }
                 });
                 let isVip = false

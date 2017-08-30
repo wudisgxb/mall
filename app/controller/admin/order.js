@@ -149,7 +149,7 @@ module.exports = {
                         id: orderGoods[j].FoodId,
                     }
                 });
-                // console.log(orderGoods[j].FoodId)
+             
                 foodJson[j] = {};
                 foodJson[j].id = food.id;
                 foodJson[j].name = food.name;
@@ -211,8 +211,7 @@ module.exports = {
                 console.log("重要信息，未找到支付请求，订单号=========" + orders[k].trade_no);
             }
 
-            let amount = await amoutManager.getTransAccountAmount
-            (ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
+            let amount = await amoutManager.getTransAccountAmount(ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
 
             //简单异常处理
             if (amount.totalAmount > 0) {
@@ -438,26 +437,44 @@ module.exports = {
     },
     //修改类型
     async putAdminOrderByBizType(ctx,next){
-        if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
-            return;
-        }
-        let body = ctx.request.body
 
-        await Orders.update({
-            bizType : "eshop"
-        },{where:{
-            consigneeId : {
-                $ne : null
+        let ordergoods = await OrderGoods.findAll({})
+        console.log(ordergoods.length)
+        for(let i = 0;i <ordergoods.length; i++ ){
+            if(ordergoods[i].FoodId!=null){
+                let food = await Foods.findOne({
+                    where:{
+                        id : ordergoods[i].FoodId
+                    }
+                })
+                await OrderGoods.update({
+                    price :food.price,
+                    vipPrice : food.vipPrice
+                },{
+                  where :{
+                      id : ordergoods[i].id
+                  }
+                })
+
             }
-        }});
-        await Orders.update({
-            bizType : "deal"
-        },{
-            where:{
-                consigneeId : null
-            }
-        })
+        }
+
+
+
+        // await Orders.update({
+        //     bizType : "eshop"
+        // },{where:{
+        //     consigneeId : {
+        //         $ne : null
+        //     }
+        // }});
+        // await Orders.update({
+        //     bizType : "deal"
+        // },{
+        //     where:{
+        //         consigneeId : null
+        //     }
+        // })
         // logger.info(order);
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
@@ -591,8 +608,7 @@ module.exports = {
                 console.log("重要信息，未找到支付请求，订单号=========" + orders[k].trade_no);
             }
 
-            let amount = await amoutManager.getTransAccountAmount
-            (orders[k].tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
+            let amount = await amoutManager.getTransAccountAmount(ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
 
             //简单异常处理
             if (amount.totalAmount > 0) {

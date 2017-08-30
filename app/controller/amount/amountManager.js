@@ -14,6 +14,8 @@ const DistanceAndPrices = db.models.DistanceAndPrices;
 const TenantConfigs = db.models.TenantConfigs;
 const Consignees = db.models.Consignees;
 const orderManager = require('../customer/order');
+const promotionManager = require('../customer/promotions')
+const vipManager = require('../customer/vip');
 
 const amountManger = (function () {
 
@@ -39,6 +41,8 @@ const amountManger = (function () {
         let couponValue = null;
         let firstDiscountAmount = 0;
         let tmpTotalPrice = 0;
+        //是否折扣和优惠券共享
+        let isShared = await promotionManager.getOrderAndGoodsPromotionIsShared(trade_no);
 
         let retJson = {};
         let order = await Orders.findOne({
@@ -76,18 +80,13 @@ const amountManger = (function () {
         })
 
         //获取会员信息算会员价
-        let vip = await Vips.findOne({
-            where: {
-                phone: phone,
-                tenantId: tenantId
-            }
-        })
-
-        if (vip != null) {
+        let vip = await vipManager.isVipWithoutPrice(phone,tenantId);
+        if (vip == true) {
             totalAmount = amountJson.totalVipPrice;
             tmpTotalPrice = amountJson.totalVipPrice;
+            amountJson.totalGoodsDiscount = 0;
         } else {
-            totalAmount = amountJson.totalPrice;
+            totalAmount = amountJson.totalPrice - amountJson.totalGoodsDiscount;
             tmpTotalPrice = amountJson.totalPrice;
         }
 
@@ -216,7 +215,7 @@ const amountManger = (function () {
 
         if (profitsharing == null) {
             //首杯半价不享受优惠券
-            if (firstOrderFlag == true) {
+            if (firstOrderFlag == true || (isShared == false && amountJson.totalGoodsDiscount > 0)) {
                 //全转给商家
                 merchantAmount = totalAmount * (1 - 0.02);
                 consigneeAmount = 0;
@@ -269,7 +268,7 @@ const amountManger = (function () {
             }
         } else {
             //首杯半价不享受优惠券
-            if (firstOrderFlag == true) {
+            if (firstOrderFlag == true || (isShared == false && amountJson.totalGoodsDiscount > 0)) {
                 //全转给商家
                 merchantAmount = totalAmount * (1 - 0.02);
                 consigneeAmount = 0;
@@ -355,7 +354,7 @@ const amountManger = (function () {
         }
 
         //商家优惠 加上首单折扣
-        merchantCouponFee = merchantCouponFee + firstDiscountAmount + firstOrderDiscount;
+        merchantCouponFee = merchantCouponFee + firstDiscountAmount + firstOrderDiscount + amountJson.totalGoodsDiscount;
 
         platformAmount = tmpTotalPrice - (platformCouponFee + merchantCouponFee) - merchantAmount - consigneeAmount;
         platformAmount = Math.round(platformAmount * 100) / 100;
@@ -409,27 +408,42 @@ const amountManger = (function () {
                 consigneeId: consigneeId
             }
         });
-        // console.log(trade_no)
-        let food;
+
+        let foodIds = [];
+        for (let k = 0; k < orderGoods.length; k++) {
+            if (!foodIds.contains(orderGoods[k].FoodId)) {
+                foodIds.push(orderGoods[k].FoodId)
+            }
+        }
+
         let totalPrice = 0;
         let totalVipPrice = 0;
-        for (let i = 0; i < orderGoods.length; i++) {
-            food = await Foods.findOne({
+        let goodsDiscount = 0;
+        let totalGoodsDiscount = 0;
+        for (var i = 0; i < foodIds.length; i++) {
+            orderGoods = await OrderGoods.findAll({
                 where: {
-                    id: orderGoods[i].FoodId,
-                    tenantId: tenantId
+                    trade_no: trade_no,
+                    FoodId: foodIds[i]
                 }
             })
-            // console.log(tenantId)
-            // console.log(orderGoods[i].FoodId)
-            // console.log(food)
-            totalPrice += food.price * orderGoods[i].num;//原价
-            totalVipPrice += food.vipPrice * orderGoods[i].num;//会员价
+
+            var foodNum = 0;
+            for (var j = 0; j < orderGoods.length; j++) {
+                foodNum += orderGoods[j].num;
+                totalPrice += orderGoods[0].price * orderGoods[j].num;//原价
+                totalVipPrice += orderGoods[0].vipPrice * orderGoods[j].num;//会员价
+            }
+            //根据订单号和商品id查询商品折扣优惠
+            goodsDiscount = await promotionManager.getGoodsDiscount(trade_no, foodIds[i], foodNum);
+            totalGoodsDiscount += goodsDiscount;
+
         }
 
         let json = {};
         json.totalPrice = Math.round(totalPrice * 100) / 100;
         json.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
+        json.totalGoodsDiscount = Math.round(totalGoodsDiscount * 100) / 100;
         return json;
     }
 

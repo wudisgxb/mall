@@ -46,7 +46,7 @@ module.exports = {
             }
         })
 
-        let foodJson = [];
+        let foodArr = [];
 
         let totalNum = 0;
         let totalPrice = 0;
@@ -64,23 +64,23 @@ module.exports = {
                     tenantId:tenantId
                 }
             })
-            foodJson[i] = {};
-            foodJson[i].id = food[0].id;
-            foodJson[i].name = food[0].name;
-            foodJson[i].price = food[0].price;
-            foodJson[i].vipPrice = food[0].vipPrice;
-            foodJson[i].num = shoppingCarts[i].num;
-            foodJson[i].unit = shoppingCarts[i].unit;
-            foodJson[i].remark = shoppingCarts[i].remark;
-            foodJson[i].tableUser = shoppingCarts[i].tableUser;
-            foodJson[i].tableUserNumber = shoppingCarts[i].tableUserNumber;
+            foodArr[i] = {};
+            foodArr[i].id = food[0].id;
+            foodArr[i].name = food[0].name;
+            foodArr[i].price = food[0].price;
+            foodArr[i].vipPrice = food[0].vipPrice;
+            foodArr[i].num = shoppingCarts[i].num;
+            foodArr[i].unit = shoppingCarts[i].unit;
+            foodArr[i].remark = shoppingCarts[i].remark;
+            foodArr[i].tableUser = shoppingCarts[i].tableUser;
+            foodArr[i].tableUserNumber = shoppingCarts[i].tableUserNumber;
             totalNum += shoppingCarts[i].num;
 
             totalPrice += food[0].price * shoppingCarts[i].num;
             totalVipPrice += food[0].vipPrice * shoppingCarts[i].num;
         }
         result.tableName = tableName;
-        result.foods = foodJson;
+        result.foods = foodArr;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;
@@ -124,7 +124,6 @@ module.exports = {
         let tableUserNumbers;
         console.log(body.tableUser)
         if (body.tableUser == null) {
-
             body.tableUser = tool.uuid();
             tableUserNumbers = await ShoppingCarts.findAll({
                 where: {
@@ -184,7 +183,7 @@ module.exports = {
             })
 
             if (shoppingCart != null) {
-                shoppingCart.num = shoppingCart.num + foods[i].foodCount;
+                shoppingCart.num = foods[i].foodCount;
                 await shoppingCart.save();
             } else {
                 await ShoppingCarts.create({
@@ -298,6 +297,8 @@ module.exports = {
         const tableName = ctx.query.tableName;
         const consigneeId = ctx.query.consigneeId;
         const phoneNumber = ctx.query.phoneNumber;
+        let goodsDiscountJson = {};
+        let totalGoodsDiscount = 0;
 
         let table = await Tables.findOne({
             where: {
@@ -327,7 +328,7 @@ module.exports = {
         })
 
 
-        let foodJson = [];
+        let foodArr = [];
 
         let totalNum = 0;
         let totalPrice = 0;
@@ -345,14 +346,14 @@ module.exports = {
                     tenantId: tenantId
                 }
             })
-            foodJson[i] = {};
-            foodJson[i].id = food[0].id;
-            foodJson[i].name = food[0].name;
-            foodJson[i].price = food[0].price;
-            foodJson[i].vipPrice = food[0].vipPrice;
-            foodJson[i].num = shoppingCarts[i].num;
-            foodJson[i].unit = shoppingCarts[i].unit;
-            foodJson[i].remark = shoppingCarts[i].remark;
+            foodArr[i] = {};
+            foodArr[i].id = food[0].id;
+            foodArr[i].name = food[0].name;
+            foodArr[i].price = food[0].price;
+            foodArr[i].vipPrice = food[0].vipPrice;
+            foodArr[i].num = shoppingCarts[i].num;
+            foodArr[i].unit = shoppingCarts[i].unit;
+            foodArr[i].remark = shoppingCarts[i].remark;
             totalNum += shoppingCarts[i].num;
 
             totalPrice += food[0].price * shoppingCarts[i].num;
@@ -360,7 +361,7 @@ module.exports = {
         }
         result.tableName = tableName;
         result.phoneNumber = phoneNumber;
-        result.foods = foodJson;
+        result.foods = foodArr;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         result.totalVipPrice = Math.round(totalVipPrice * 100) / 100;

@@ -13,6 +13,7 @@ module.exports = {
         ctx.checkBody('coupons').notEmpty()
         ctx.checkBody('couponRate').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('descriptor').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
@@ -32,6 +33,7 @@ module.exports = {
                 consigneeId: body.consigneeId,
                 tableName: body.tableName,
                 couponRate: body.couponRate,
+                descriptor: body.descriptor,
             });
         }
         for (let i = 0; i<body.coupons.length;i++){
@@ -46,19 +48,21 @@ module.exports = {
                 couponType: couponType,
                 couponValue: couponValue,
                 couponRate: body.couponRate,
+                descriptor: body.descriptor,
             });
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,QRCodeTemplateId);
     },
     async updateQRCodeTemplate (ctx, next) {
         ctx.checkBody('/condition/QRCodeTemplateId', true).first().notEmpty();
-
+        ctx.checkBody('/condition/id', true).first().notEmpty();
         ctx.checkBody('/QRCodeTemplate/bizType', true).first().notEmpty();
         ctx.checkBody('/QRCodeTemplate/tableName', true).first().notEmpty();
         ctx.checkBody('/QRCodeTemplate/couponType', true).first().notEmpty();
         ctx.checkBody('/QRCodeTemplate/couponValue', true).first().notEmpty();
         ctx.checkBody('/QRCodeTemplate/couponRate', true).first().notEmpty();
         ctx.checkBody('/QRCodeTemplate/tenantId', true).first().notEmpty();
+        ctx.checkBody('/QRCodeTemplate/descriptor', true).first().notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
@@ -68,6 +72,7 @@ module.exports = {
         let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
                 QRCodeTemplateId: body.condition.QRCodeTemplateId,
+                id : body.condition.id
             }
         })
         if (qrCodeTemplate != null) {
@@ -78,6 +83,7 @@ module.exports = {
             qrCodeTemplate.couponRate = body.QRCodeTemplate.couponRate;
             qrCodeTemplate.tenantId = body.QRCodeTemplate.tenantId;
             qrCodeTemplate.consigneeId = body.QRCodeTemplate.consigneeId;
+            qrCodeTemplate.descriptor = body.QRCodeTemplate.descriptor;
             await qrCodeTemplate.save();
         } else {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '二维码模板不存在！');
@@ -103,6 +109,7 @@ module.exports = {
     },
     async deleteQRCodeTemplate(ctx, next){
         ctx.checkQuery('QRCodeTemplateId').notEmpty();
+        ctx.checkQuery('id').notEmpty();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
@@ -110,6 +117,7 @@ module.exports = {
         let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
                 QRCodeTemplateId: ctx.query.QRCodeTemplateId,
+                id: ctx.query.id,
             }
         });
         if (qrCodeTemplate == null) {

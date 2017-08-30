@@ -23,7 +23,11 @@ module.exports = function (sequelize, DataTypes) {
         reserve2: shortDataTypes.String(255, true),
         reserve3: shortDataTypes.String(255, true),
         reserve4: shortDataTypes.String(255, true),
-        reserve5: shortDataTypes.String(255, true),
+        descriptor : shortDataTypes.String(255, true),
+        //每单限购总数，建议大于单品限购，
+        orderLimit: shortDataTypes.Int(-1),
+        //是否与满减共享
+        isShared: shortDataTypes.Bool(),
     }, {
         paranoid: true,
         associate: function (models) {

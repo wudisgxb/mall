@@ -2,9 +2,11 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
-let Orders = db.models.Orders;
+let NewOrders = db.models.NewOrders;
+let OrderGoods = db.models.OrderGoods;
 let Foods = db.models.Foods;
 let getWeek_EveryYeay = require('../echats/getWeek')
+let oneDay = require('../echats/oneDayEchat')
 
 
 const getFoodEchats = (function () {
@@ -12,65 +14,78 @@ const getFoodEchats = (function () {
     let getfEchats = async function (tenantId,startTime,type) {
         //type为1是日报表，2为月报表，3为周报表，4为季度报表，5为年报表
         if(type==1){
-            let result=[];
-            let orders=[]
-            let endDate = new Date(startTime).format("yyyy-MM-dd 23:59:59");
-            for (let i = new Date(startTime).getTime(); i<new Date(endDate).getTime(); i = i + 86400000) {
-                let foodId=[];
-                let startDate = new Date(i).format("yyyy-MM-dd 01:00:00");
-                // let endDate = new Date(i).format("yyyy-MM-dd 23:59:59");
-                orders = await Orders.findAll({
-                    where: {
-                        tenantId: tenantId,
-                        createdAt: {
-                            $gte:new Date(startDate),
-                            $lt:new Date(endDate)
+            let startDate = new Date(startTime)
+            let start = startDate.format("yyyy-MM-dd");
+            let endDate = startDate.setDate(new Date(startTime).getDate()+1)
+
+            let end = new Date(endDate).format("yyyy-MM-dd")
+            let day=oneDay.getDay(start,end);
+            let result = [];
+            for(let i = 0; i < day.length; i++){
+                let neworder = await NewOrders.findAll({
+                    where:{
+                        tenantId : tenantId,
+                        status : 2,
+                        createdAt:{
+                            $gt:day[i].start,
+                            $lt:day[i].end
                         }
-                    },
-                    paranoid: false
+                    }
                 })
-
-                for(let j=0;j<orders.length;j++){
-
-                    if(!foodId.contains(orders[j].FoodId)){
-                        foodId.push(orders[j].FoodId)
+                let ArrayFoodName=[]
+                let jsonFoodName={}
+                for(let j = 0; j< neworder.length; j++){
+                    let ordergoods = await OrderGoods.findAll({
+                        where:{
+                            tenantId : tenantId,
+                            trade_no:neworder[i].trade_no
+                        }
+                    })
+                    for(let k = 0; k<ordergoods.length; k++){
+                        if(!ArrayFoodName.contains(ordergoods[k].goodsName)){
+                            ArrayFoodName.push(ordergoods[k].goodsName)
+                        }
                     }
                 }
 
-                for (let id of foodId) {
-                    let num = await Orders.sum('num', {
-                        where: {
-                            FoodId: id,
-                            createdAt: {
-                                $lt: new  Date(endDate),
-                                $gte: new Date(startDate)
-                            }
-                        },
-                        paranoid: false
-                    })
-                    let food = await Foods.findOne({
+                for(let g = 0; g<ArrayFoodName.length; g++){
+                    console.log(ArrayFoodName[g])
+                    let ordergoodsNum = await OrderGoods.sum("num",{
                         where:{
-                            id:id
+                            tenantId : tenantId,
+                            goodsName:ArrayFoodName[g],
+                            createdAt:{
+                                $gt:day[i].start,
+                                $lte:day[i].end
+                            }
                         }
                     })
-                    result.push({
-                        FoodId:food.name,
-                        consume:food.price*num,
-                        vipConsume:food.vipPrice*num,
-                        time: new Date(startDate).format("yyyy-MM-dd"),
-                        num: num
+                    let ordergood = await OrderGoods.findOne({
+                        where:{
+                            tenantId : tenantId,
+                            goodsName: name,
+                            createdAt: {
+                                $gt:new Date(startDate),
+                                $lt:new Date(endDate)
+                            }
+                        }
                     })
+                    jsonFoodName={
+                        goodsName : ArrayFoodName[g],
+                        consume : ordergood.price*num,
+                        vipConsume:ordergood.vipPrice*num,
+                        time: startDate,
+                        num : ordergoodsNum
+                    }
+                    result.push(jsonFoodName)
                 }
-
-
             }
             return result;
-
-
         }
+
         if(type==2){
-            let orders=[];
-            let foodId = [];
+
+            let foodName = [];
             let result=[];
             //如startTime为20171表示2017年第一季度
             //截取年份2017
@@ -94,52 +109,64 @@ const getFoodEchats = (function () {
             endDate.format("yyyy-MM-dd 23:59:59");
 
             //获得初始月份的值循环
-            orders = await Orders.findAll({
+            let neworders = await NewOrders.findAll({
                 where: {
                     tenantId: tenantId,
+                    status : 2,
                     createdAt: {
                         $gte:new Date(startDate),
                         $lt:new Date(endDate)
                     }
-                },
-                paranoid:false
+                }
             })
-
-            for(let j=0;j<orders.length;j++){
-
-                if(!foodId.contains(orders[j].FoodId)){
-                    foodId.push(orders[j].FoodId)
+            console.log(neworders.length)
+            let orders=[]
+            for (let i = 0; i < neworders.length; i++){
+                orders = await OrderGoods.findAll({
+                    where:{
+                        trade_no : neworders[i].trade_no
+                    }
+                })
+                for(let j=0;j<orders.length;j++){
+                    if(!foodName.contains(orders[j].goodsName)){
+                        foodName.push(orders[j].goodsName)
+                    }
                 }
             }
-
-            for (let id of foodId) {
-                let num = await Orders.sum('num', {
+            for (let name of foodName) {
+                let num = await OrderGoods.sum('num', {
                     where: {
-                        FoodId: id,
+                        tenantId : tenantId,
+                        goodsName: name,
                         createdAt: {
                             $gt:startDate,
                             $lt:endDate
                         }
-                    },
-                    paranoid: false
+                    }
                 })
-                let food = await Foods.findOne({
+                let order = await OrderGoods.findOne({
                     where:{
-                        id:id
+                        tenantId : tenantId,
+                        goodsName: name,
+                        createdAt: {
+                            $gt:startDate,
+                            $lt:endDate
+                        }
                     }
                 })
                 result.push({
-                    FoodId:food.name,
-                    consume:food.price*num,
-                    vipConsume:food.vipPrice*num,
+                    goodsName : name,
+                    consume : order.price*num,
+                    vipConsume:order.vipPrice*num,
                     time: "第"+quarter+"季度",
                     num: num
                 })
             }
             return result;
         }
+
         if(type==3){
-            let foodId=[];
+            let foodName=[];
             let result=[];
             let newDate  = new Date(startTime)
             let startDate = newDate.format("yyyy-MM-dd 00:00:00")
@@ -149,48 +176,61 @@ const getFoodEchats = (function () {
 
             // let quarter = Math.floor(3/3)
 
-            let orders = await Orders.findAll({
+            let neworders = await NewOrders.findAll({
                 where: {
                     tenantId: tenantId,
+                    status : 2,
                     createdAt: {
-                        $lt: new Date(endDate),
-                        $gte: new Date(startDate)
+                        $gte:new Date(startDate),
+                        $lt:new Date(endDate)
                     }
-                },
-                paranoid: false
+                }
             })
-            for(let j=0;j<orders.length;j++){
-                if(!foodId.contains(orders[j].FoodId)){
-                    foodId.push(orders[j].FoodId)
+            console.log(neworders.length)
+            let orders=[]
+            for (let i = 0; i < neworders.length; i++){
+                orders = await OrderGoods.findAll({
+                    where:{
+                        trade_no : neworders[i].trade_no
+                    }
+                })
+                for(let j=0;j<orders.length;j++){
+                    if(!foodName.contains(orders[j].goodsName)){
+                        foodName.push(orders[j].goodsName)
+                    }
                 }
             }
-
-            for (let id of foodId) {
-                let num = await Orders.sum('num', {
+            for (let name of foodName) {
+                let num = await OrderGoods.sum('num', {
                     where: {
-                        FoodId: id,
+                        tenantId : tenantId,
+                        goodsName: name,
                         createdAt: {
-                            $lt: new Date(endDate),
-                            $gte: new Date(startDate)
+                            $gt:new Date(startDate),
+                            $lt:new Date(endDate)
                         }
-                    },
-                    paranoid: false
-                })
-                let food = await Foods.findOne({
-                    where:{
-                        id:id
                     }
                 })
+                let order = await OrderGoods.findOne({
+                    where:{
+                        tenantId : tenantId,
+                        goodsName: name,
+                        createdAt: {
+                            $gt:new Date(startDate),
+                            $lt:new Date(endDate)
+                        }
+                    }
+                })
+
                 result.push({
-                    FoodId:food.name,
-                    consume:food.price*num,
-                    vipConsume:food.vipPrice*num,
-                    time: new Date(startTime).format("yyyy-MM-dd"),
+                    goodsName : name,
+                    consume : order.price*num,
+                    vipConsume:order.vipPrice*num,
+                    time: "第"+startDate.substring(5,7)+"月",
                     num: num
                 })
             }
             return result;
-
         }
         //年份报表
         if(type==4){
@@ -203,46 +243,60 @@ const getFoodEchats = (function () {
             endTime.setMonth(11,31);
             let endDate = endTime.format("yyyy-MM-dd 23:59:59")
             // console.log(endDate)
-            let foodId = [];
+            let foodName = [];
             let result = [];
 
-            let orders = await Orders.findAll({
+            let neworders = await NewOrders.findAll({
                 where: {
                     tenantId: tenantId,
+                    status : 2,
                     createdAt: {
-                        $lt: new Date(endDate),
-                        $gte: new Date(startDate)
+                        $gte:new Date(startDate),
+                        $lt:new Date(endDate)
                     }
-                },
-                paranoid: false
+                }
             })
-            for(let j=0;j<orders.length;j++){
-                if(!foodId.contains(orders[j].FoodId)){
-                    foodId.push(orders[j].FoodId)
+            console.log(neworders.length)
+            let orders=[]
+            for (let i = 0; i < neworders.length; i++){
+                orders = await OrderGoods.findAll({
+                    where:{
+                        trade_no : neworders[i].trade_no
+                    }
+                })
+                for(let j=0;j<orders.length;j++){
+                    if(!foodName.contains(orders[j].goodsName)){
+                        foodName.push(orders[j].goodsName)
+                    }
                 }
             }
-            // console.log(foodId.length);
-            for (let id of foodId) {
-                let num = await Orders.sum('num', {
+            for (let name of foodName) {
+                let num = await OrderGoods.sum('num', {
                     where: {
-                        FoodId: id,
+                        tenantId : tenantId,
+                        goodsName: name,
                         createdAt: {
-                            $lt: new Date(endDate),
-                            $gte: new Date(startDate)
+                            $gt:new Date(startDate),
+                            $lt:new Date(endDate)
                         }
-                    },
-                    paranoid: false
-                })
-                let food = await Foods.findOne({
-                    where:{
-                        id:id
                     }
                 })
+                let order = await OrderGoods.findOne({
+                    where:{
+                        tenantId : tenantId,
+                        goodsName: name,
+                        createdAt: {
+                            $gt:new Date(startDate),
+                            $lt:new Date(endDate)
+                        }
+                    }
+                })
+
                 result.push({
-                    FoodId:food.name,
-                    consume:food.price*num,
-                    vipConsume:food.vipPrice*num,
-                    time: new Date(startTime).getFullYear(),
+                    goodsName : name,
+                    consume : order.price*num,
+                    vipConsume:order.vipPrice*num,
+                    time: "第"+startDate.substring(0,4)+"年",
                     num: num
                 })
             }
