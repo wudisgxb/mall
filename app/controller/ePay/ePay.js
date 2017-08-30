@@ -130,7 +130,7 @@ module.exports = {
                 where: {
                     trade_no: ret.out_trade_no,
                     app_id: ret.app_id,
-                    total_amount: parseFloat(ret.total_amount),
+                    totalAmount: parseFloat(ret.total_amount),
                     paymentMethod: '支付宝',
                     isFinish: false
                 }
@@ -303,7 +303,7 @@ module.exports = {
             console.log(JSON.stringify({
                 trade_no: trade_no,
                 app_id: xml.appid,
-                total_amount: xml.total_fee / 100,
+                totalAmount: xml.total_fee / 100,
                 paymentMethod: '微信',
                 isFinish: false,
                 isInvalid: false
