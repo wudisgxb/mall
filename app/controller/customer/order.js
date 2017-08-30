@@ -628,7 +628,38 @@ module.exports = {
             return;
         }
 
-
+        let ordergoods = await OrderGoods.findAll({
+            where:{
+                trade_no : trade_no
+            }
+        })
+        let ArrayGoodsName = [];
+        if(ordergoods.length>0){
+            for(let i =0;i<ordergoods.length;i++){
+                for(let j = 0;j<ordergoods[i].num;j++){
+                    ArrayGoodsName.push(ordergoods[i].goodsName)
+                }
+            }
+        }
+        let customerVips = await Vips.findAll({
+            where:{
+                phone: ctx.query.phoneNumber,
+                tenantId: ctx.query.tenantId,
+            }
+        });
+        let isVip = false
+        if(customerVips.length>0){
+            isVip =true
+        }
+        let customerJson = {
+            tenantId : ctx.query.tenantId,
+            phone: ctx.query.phoneNumber,
+            status : 2,
+            foodName : JSON.stringify(ArrayGoodsName),
+            totalPrice :result.totalPrice,
+            isVip : isVip
+        }
+        await customer.savecustomer(customerJson);
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
     },
 
