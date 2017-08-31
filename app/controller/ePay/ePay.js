@@ -212,7 +212,7 @@ module.exports = {
         let amount = ctx.query.amount;
         let tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
-        let qrCodeTemplate = await QRCodeTemplates.findAll({
+        let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
                 QRCodeTemplateId: ctx.query.qrcodeId,
             }
