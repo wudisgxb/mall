@@ -1,5 +1,6 @@
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
+const co = require('co')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 const util = require('../alipay/util');
@@ -49,13 +50,13 @@ module.exports = {
         let amount = ctx.query.amount;
         let tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
-        let qrCodeTemplates = await QRCodeTemplates.findAll({
+        let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
                 QRCodeTemplateId: ctx.query.qrcodeId,
             }
         });
 
-        if (qrCodeTemplates.length == 0) {
+        if (qrCodeTemplate  == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "二维码模板未找到！");
             return;
         }
@@ -63,7 +64,7 @@ module.exports = {
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
             where: {
-                tenantId: qrCodeTemplates.tenantId
+                tenantId: qrCodeTemplate.tenantId
             }
         });
 
@@ -99,7 +100,7 @@ module.exports = {
             trade_no: tradeNo,
             app_id: app_id,
             totalAmount: total_amount,
-            tenantId: ctx.query.tenantId
+            tenantId: qrCodeTemplate.tenantId
         });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
@@ -190,7 +191,7 @@ module.exports = {
 
         console.log(`auth_callback_url: ${auth_callback_url}`)
 
-        const url = client.getAuthorizeURL(auth_callback_url, config.wechat.state, 'snsapi_base')
+        const url = client.getAuthorizeURL(auth_callback_url, config.wechat.ePayState, 'snsapi_base');
         console.log(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
@@ -211,13 +212,13 @@ module.exports = {
         let amount = ctx.query.amount;
         let tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
-        let qrCodeTemplates = await QRCodeTemplates.findAll({
+        let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
                 QRCodeTemplateId: ctx.query.qrcodeId,
             }
         });
 
-        if (qrCodeTemplates.length == 0) {
+        if (qrCodeTemplate == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "二维码模板未找到！");
             return;
         }
@@ -225,7 +226,7 @@ module.exports = {
         //查找主商户名称
         let tenantConfigs = await TenantConfigs.findOne({
             where: {
-                tenantId: qrCodeTemplates.tenantId
+                tenantId: qrCodeTemplate.tenantId
             }
         });
 
@@ -259,13 +260,13 @@ module.exports = {
         let app_id = new_params.appId;
 
         await EPays.create({
-            params: new_params,
+            params: JSON.stringify(new_params),
             paymentMethod: '微信',
             isFinish: false,
             trade_no: tradeNo,
             app_id: app_id,
             totalAmount: total_amount,
-            tenantId: ctx.query.tenantId
+            tenantId: qrCodeTemplate.tenantId
         });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
@@ -294,7 +295,7 @@ module.exports = {
         let fn = co.wrap(wxpay.getSign.bind(wxpay));
         const sign = await fn(str, 'MD5')
 
-        let trade_no = xml.out_trade_no.toString().substr(0, xml.out_trade_no.toString().length - 4);
+        let trade_no = xml.out_trade_no.toString();
 
         if (sign !== xml.sign[0]) {
             console.log("signFlag==" + 0);
@@ -318,7 +319,7 @@ module.exports = {
                 where: {
                     trade_no: trade_no,
                     app_id: xml.appid,
-                    total_amount: total_amount,
+                    totalAmount: total_amount.toFixed(2),
                     paymentMethod: '微信',
                     isFinish: false
                 }

@@ -5,7 +5,7 @@ var Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
 
     var EPays = sequelize.define('EPays', {
-        params: shortDataTypes.String(255,true),
+        params: shortDataTypes.String(2048,true),
         app_id: shortDataTypes.String(255,true),
         paymentMethod: shortDataTypes.String(255,true),//支付方式，支付宝，微信
         isFinish: shortDataTypes.Bool(),//0-第一次支付，1-非第一次
