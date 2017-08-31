@@ -54,7 +54,7 @@ module.exports = async function tasks(app) {
         let foodSellcount = [];
         for (let i = 0; i < foods.length; i++) {
             foodSellcount.push(Foods.update({
-                sellCount: "0"
+                todaySales : "0"
             }, {
                 where: {
                     id: foods[i].id
@@ -101,9 +101,9 @@ module.exports = async function tasks(app) {
         let tenantConfig;
         let consignee;
         if (tmpArray.length > 0) {
-            for (var kk = 0; kk < tmpArray.length; kk++) {
-                tenantId = tmpArray[kk].tenantId;
-                consigneeId = tmpArray[kk].consigneeId;
+            for (var kkk = 0; kkk < tmpArray.length; kkk++) {
+                tenantId = tmpArray[kkk].tenantId;
+                consigneeId = tmpArray[kkk].consigneeId;
                 console.log("tenantId:" + tenantId);
                 console.log("consigneeId:" + consigneeId);
                 merchantAmount = await TransferAccounts.sum(
@@ -406,9 +406,9 @@ module.exports = async function tasks(app) {
         let tenantConfig;
         let consignee;
         if (tmpArray.length > 0) {
-            for (var kk = 0; kk < tmpArray.length; kk++) {
-                tenantId = tmpArray[kk].tenantId;
-                consigneeId = tmpArray[kk].consigneeId;
+            for (var kkk = 0; kkk < tmpArray.length; kkk++) {
+                tenantId = tmpArray[kkk].tenantId;
+                consigneeId = tmpArray[kkk].consigneeId;
                 console.log("tenantId:" + tenantId);
                 console.log("consigneeId:" + consigneeId);
                 merchantAmount = await TransferAccounts.sum(
