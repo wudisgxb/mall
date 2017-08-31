@@ -1,5 +1,6 @@
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
+const co = require('co')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 const util = require('../alipay/util');
@@ -259,7 +260,7 @@ module.exports = {
         let app_id = new_params.appId;
 
         await EPays.create({
-            params: new_params,
+            params: JSON.stringify(new_params),
             paymentMethod: '微信',
             isFinish: false,
             trade_no: tradeNo,
