@@ -8,11 +8,11 @@ const Tool = require('../../Tool/tool');
 module.exports = {
 
     async saveAllQRCodeTemplate (ctx, next) {
-        ctx.checkBody('bizType').notEmpty();
+        // ctx.checkBody('bizType').notEmpty();
         // ctx.checkBody('coupons').notEmpty()
-        ctx.checkBody('couponRate').notEmpty();
+        // ctx.checkBody('couponRate').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
-        ctx.checkBody('descriptor').notEmpty();
+        // ctx.checkBody('descriptor').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
 
         if (ctx.errors) {
@@ -38,12 +38,11 @@ module.exports = {
         if (body.coupons.length == 0) {
             await QRCodeTemplates.create({
                 QRCodeTemplateId: qrCodeTemplateId,
-                bizType: body.bizType,
+                bizType: "eshop",
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
                 tableName: "0号桌",
-                couponRate: body.couponRate,
-                descriptor: body.descriptor,
+                descriptor: body.descriptor==null?null:body.descriptor,
             });
         }
         for (let i = 0; i < body.coupons.length; i++) {
@@ -51,14 +50,14 @@ module.exports = {
             couponValue = body.coupons[i].couponValue
             await QRCodeTemplates.create({
                 QRCodeTemplateId: qrCodeTemplateId,
-                bizType: body.bizType,
+                bizType: "eshop",
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
                 tableName: "0号桌",
                 couponType: couponType,
                 couponValue: couponValue,
                 couponRate: body.couponRate,
-                descriptor: body.descriptor,
+                descriptor: body.descriptor==null?null:body.descriptor,
             });
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplateId);
