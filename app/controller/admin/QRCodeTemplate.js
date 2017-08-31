@@ -7,13 +7,13 @@ const Tool = require('../../Tool/tool');
 
 module.exports = {
 
-    async saveQRCodeTemplate (ctx, next) {
+    async saveAllQRCodeTemplate (ctx, next) {
         ctx.checkBody('bizType').notEmpty();
-        ctx.checkBody('tableName').notEmpty();
-        ctx.checkBody('coupons').notEmpty()
+        // ctx.checkBody('coupons').notEmpty()
         ctx.checkBody('couponRate').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('descriptor').notEmpty();
+        ctx.checkBody('consigneeId').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
@@ -41,7 +41,7 @@ module.exports = {
                 bizType: body.bizType,
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
-                tableName: body.tableName,
+                tableName: "0号桌",
                 couponRate: body.couponRate,
                 descriptor: body.descriptor,
             });
@@ -54,14 +54,14 @@ module.exports = {
                 bizType: body.bizType,
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
-                tableName: body.tableName,
+                tableName: "0号桌",
                 couponType: couponType,
                 couponValue: couponValue,
                 couponRate: body.couponRate,
                 descriptor: body.descriptor,
             });
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, QRCodeTemplateId);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplateId);
     },
     async updateQRCodeTemplate (ctx, next) {
         ctx.checkBody('/condition/QRCodeTemplateId', true).first().notEmpty();
@@ -150,6 +150,50 @@ module.exports = {
         await qrCodeTemplate.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
+    async saveQRCodeTemplate (ctx, next) {
+        ctx.checkBody('bizType').notEmpty();
+        ctx.checkBody('coupons').notEmpty()
+        ctx.checkBody('couponRate').notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('consigneeId').notEmpty();
+        ctx.checkBody('descriptor').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+        let body = ctx.request.body;
+        let qrCodeTemplateId = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+        let couponType;
+        let couponValue;
+        if (body.coupons.length == 0) {
+            await QRCodeTemplates.create({
+                QRCodeTemplateId: qrCodeTemplateId,
+                bizType: body.bizType,
+                tenantId: body.tenantId,
+                consigneeId: body.consigneeId,
+                tableName: "0号桌",
+                couponRate: body.couponRate,
+                descriptor: body.descriptor,
+            });
+        }
+        for (let i = 0; i < body.coupons.length; i++) {
+            couponType = body.coupons[i].couponType
+            couponValue = body.coupons[i].couponValue
+            await QRCodeTemplates.create({
+                QRCodeTemplateId: qrCodeTemplateId,
+                bizType: body.bizType,
+                tenantId: body.tenantId,
+                consigneeId: body.consigneeId,
+                tableName: "0号桌",
+                couponType: couponType,
+                couponValue: couponValue,
+                couponRate: body.couponRate,
+                descriptor: body.descriptor,
+            });
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplateId);
+    },
+    
 }
 
 

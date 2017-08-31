@@ -79,31 +79,33 @@ module.exports = {
         ctx.checkBody('/consignees/phone', true).first().notEmpty();
         ctx.checkBody('/consignees/wecharPayee_account', true).first().notEmpty();
         ctx.checkBody('/consignees/payee_account', true).first().notEmpty();
+        ctx.checkBody('/consignees/tenantId', true).first().notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
         let body = ctx.request.body;
-
-        let consigneeByName = await Consignees.findOne({
+        let consigneeId = Tool.allocTenantId();
+        let consignee = await Consignees.findOne({
             where: {
-                name: body.consignees.name
+                consigneeId: consigneeId
             }
         })
-        if (consigneeByName != null) {
+        if (consignee != null) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "已有此代售名字，请换个名字")
             return;
         }
-        let consigneeId = Tool.allocTenantId();
+
         await Consignees.create({
             name: body.consignees.name,
             phone: body.consignees.phone,
             wecharPayee_account: body.consignees.wecharPayee_account,
             payee_account: body.consignees.payee_account,
+            tenantId : body.consignees.tenantId,
             longitude: body.consignees.longitude,
             latitude: body.consignees.latitude,
-            consigneeId: consigneeId
+            consigneeId: consigneeId,
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {consigneeId: consigneeId})
     },
@@ -130,7 +132,11 @@ module.exports = {
     },
 
     async getAllConsignees(ctx, next){
-        let consignees = await Consignees.findAll({});
+        let consignees = await Consignees.findAll({
+            where : {
+                tenantId : "all"
+            }
+        });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, consignees);
     },//有
     //修改所有的代售点为公有的代售点
