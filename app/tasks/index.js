@@ -54,7 +54,7 @@ module.exports = async function tasks(app) {
         let foodSellcount = [];
         for (let i = 0; i < foods.length; i++) {
             foodSellcount.push(Foods.update({
-                sellCount: "0"
+                todaySales : "0"
             }, {
                 where: {
                     id: foods[i].id
