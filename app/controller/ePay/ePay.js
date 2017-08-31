@@ -295,7 +295,7 @@ module.exports = {
         let fn = co.wrap(wxpay.getSign.bind(wxpay));
         const sign = await fn(str, 'MD5')
 
-        let trade_no = xml.out_trade_no.toString().substr(0, xml.out_trade_no.toString().length - 4);
+        let trade_no = xml.out_trade_no.toString();
 
         if (sign !== xml.sign[0]) {
             console.log("signFlag==" + 0);
@@ -319,7 +319,7 @@ module.exports = {
                 where: {
                     trade_no: trade_no,
                     app_id: xml.appid,
-                    total_amount: total_amount,
+                    totalAmount: total_amount.toFixed(2),
                     paymentMethod: '微信',
                     isFinish: false
                 }
