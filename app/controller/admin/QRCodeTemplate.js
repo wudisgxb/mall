@@ -22,12 +22,22 @@ module.exports = {
 
         let body = ctx.request.body;
 
-        let QRCodeTemplateId = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+        let qrCodeTemplates = await QRCodeTemplates.findAll({
+            where:{
+                consigneeId : body.consigneeId
+            }
+        })
+        let qrCodeTemplateId;
+        if(qrCodeTemplates.length==0){
+            qrCodeTemplateId = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+        }else if(qrCodeTemplates.length>0){
+            qrCodeTemplateId = qrCodeTemplates[0].QRCodeTemplateId
+        }
         let couponType;
         let couponValue;
         if (body.coupons.length == 0) {
             await QRCodeTemplates.create({
-                QRCodeTemplateId: QRCodeTemplateId,
+                QRCodeTemplateId: qrCodeTemplateId,
                 bizType: body.bizType,
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
@@ -40,7 +50,7 @@ module.exports = {
             couponType = body.coupons[i].couponType
             couponValue = body.coupons[i].couponValue
             await QRCodeTemplates.create({
-                QRCodeTemplateId: QRCodeTemplateId,
+                QRCodeTemplateId: qrCodeTemplateId,
                 bizType: body.bizType,
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
@@ -93,18 +103,31 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     async getQRCodeTemplate (ctx, next) {
-        ctx.checkQuery('tenantId').notEmpty();
-
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
-
-        let qrCodeTemplates = await QRCodeTemplates.findAll({
-            where: {
-                tenantId: ctx.query.tenantId,
+        let whereJson={}
+        if((ctx.query.tenantId!=null && ctx.query.tenantId!="") && (ctx.query.consigneeId==null||ctx.query.consigneeId=="")){
+            whereJson={
+                tenantId : ctx.query.tenantId
             }
+        }else if((ctx.query.tenantId==null || ctx.query.tenantId=="") && (ctx.query.consigneeId!=null && ctx.query.consigneeId!="")){
+            whereJson={
+                consigneeId : ctx.query.consigneeId
+            }
+        }else if((ctx.query.tenantId!=null && ctx.query.tenantId!="") && (ctx.query.consigneeId!=null && ctx.query.consigneeId!="")){
+            whereJson={
+                tenantId : ctx.query.tenantId,
+                consigneeId : ctx.query.consigneeId
+            }
+        }
+        let qrCodeTemplates = await QRCodeTemplates.findAll({
+            where: whereJson
         });
+        if(qrCodeTemplates.length==0){
+
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplates);
     },
     async deleteQRCodeTemplate(ctx, next){
@@ -126,7 +149,7 @@ module.exports = {
         }
         await qrCodeTemplate.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
-    }
+    },
 }
 
 

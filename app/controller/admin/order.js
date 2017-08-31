@@ -8,6 +8,7 @@ var Foods = db.models.Foods;
 var PaymentReqs = db.models.PaymentReqs;
 var Tables = db.models.Tables;
 let Consignees = db.models.Consignees;
+let Merchants = db.models.Merchants;
 const amoutManager = require('../amount/amountManager');
 
 module.exports = {
@@ -66,8 +67,8 @@ module.exports = {
         await order.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
-    //async getAdminOrder(ctx, next){},
-
+    async getAdminOrder(ctx, next){},
+    //下面有相同功能的代码了
     async getAdminOrder(ctx, next){
         ctx.checkQuery('tenantId').notEmpty();
         let result = [];
@@ -144,26 +145,21 @@ module.exports = {
 
             for (var j = 0; j < orderGoods.length; j++) {
                 //根据菜单号查询菜单
-                let food = await Foods.findOne({
-                    where: {
-                        id: orderGoods[j].FoodId,
-                    }
-                });
 
                 foodJson[j] = {};
-                foodJson[j].id = food.id;
-                foodJson[j].name = food.name;
-                foodJson[j].price = food.price;
-                foodJson[j].vipPrice = food.vipPrice;
+                foodJson[j].id = orderGoods[j].id;
+                foodJson[j].name = orderGoods[j].name;
+                foodJson[j].price = orderGoods[j].price;
+                foodJson[j].vipPrice = orderGoods[j].vipPrice;
                 //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);
                 foodJson[j].num = orderGoods[j].num;
                 foodJson[j].unit = orderGoods[j].unit;
                 //总数量为每个循环的数量现价
                 totalNum += orderGoods[j].num;
                 //当前菜的总价格为菜品的价格*订单中购买的数量
-                totalPrice += food.price * orderGoods[j].num;//原价
+                totalPrice += orderGoods[j].price * orderGoods[j].num;//原价
                 //会员价为菜品的会员价*订单中购买的数量
-                totalVipPrice += food.vipPrice * orderGoods[j].num;//会员价
+                totalVipPrice += orderGoods[j].vipPrice * orderGoods[j].num;//会员价
             }
 
             result[k] = {};
@@ -187,7 +183,7 @@ module.exports = {
             result[k].time = orders[k].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[k].phone;
             result[k].consigneeId = orders[k].consigneeId;
-            result[k].consigneeId = orders[k].consigneeId;
+            result[k].tenantId = orders[k].consigneeId;
             result[k].consigneeName = consignee == null ? null : consignee.name;
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
 
@@ -199,6 +195,8 @@ module.exports = {
                     tenantId: ctx.query.tenantId
                 }
             });
+
+            console.log("111111111111111111111111111111111111"+paymentReq.id)
 
             if (paymentReq != null) {
                 result[k].total_amount = paymentReq.total_amount;
@@ -509,21 +507,34 @@ module.exports = {
         let pageSize = parseInt(ctx.query.pageSize);
         let place = (pageNumber - 1) * pageSize;
         //根据tenantId，查询当前时间的订单
-        let orders = await Orders.findAll({
-            where: {
+        let jsonOrderWhere={}
+        if(ctx.query.tenantId != "" && ctx.query.tenantId != null){
+            jsonOrderWhere={
+                tenantId : ctx.query.tenantId,
                 createdAt: {
                     $between: [startTime, endTime]
                 }
-            },
+            }
+        }else if(ctx.query.tenantId == "" || ctx.query.tenantId == null){
+            jsonOrderWhere={
+                createdAt: {
+                    $between: [startTime, endTime]
+                }
+            }
+        }
+        let orders = await Orders.findAll({
+            where: jsonOrderWhere,
             order: [['createdAt', 'DESC']],
             offset: place,
             limit: pageSize
         })
 
+
         //循环不相同的订单号
         let order;
         let orderGoods;
         for (let k = 0; k < orders.length; k++) {
+            console.log(orders[k].trade_no)
             totalNum = 0;//数量
             totalPrice = 0;//单价
             totalVipPrice = 0;//会员价
@@ -536,6 +547,11 @@ module.exports = {
                     consigneeId: orders[k].consigneeId
                 }
             });
+            let merchant = await Merchants.findOne({
+                where:{
+                    tenantId : orders[k].tenantId
+                }
+            })
             //根据创建时间和订单号查询所有记录
             orderGoods = await OrderGoods.findAll({
                 where: {
@@ -545,28 +561,23 @@ module.exports = {
 
             for (var j = 0; j < orderGoods.length; j++) {
                 //根据菜单号查询菜单
-                let food = await Foods.findOne({
-                    where: {
-                        id: orderGoods[j].FoodId,
-                    }
-                });
-
                 foodJson[j] = {};
-                foodJson[j].id = food.id;
-                foodJson[j].name = food.name;
-                foodJson[j].price = food.price;
-                foodJson[j].vipPrice = food.vipPrice;
+                foodJson[j].id = orderGoods[j].FoodId;
+                foodJson[j].name = orderGoods[j].goodsName ;
+                foodJson[j].price = orderGoods[j].price;
+                foodJson[j].vipPrice = orderGoods[j].vipPrice;
                 //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);
                 foodJson[j].num = orderGoods[j].num;
                 foodJson[j].unit = orderGoods[j].unit;
                 //总数量为每个循环的数量现价
                 totalNum += orderGoods[j].num;
                 //当前菜的总价格为菜品的价格*订单中购买的数量
-                totalPrice += food.price * orderGoods[j].num;//原价
+                totalPrice += orderGoods[j].price * orderGoods[j].num;//原价
                 //会员价为菜品的会员价*订单中购买的数量
-                totalVipPrice += food.vipPrice * orderGoods[j].num;//会员价
-            }
+                totalVipPrice += orderGoods[j].vipPrice * orderGoods[j].num;//会员价
 
+            }
+            console.log(totalPrice)
             result[k] = {};
 
             let table = await Tables.findById(orders[k].TableId);
@@ -585,18 +596,20 @@ module.exports = {
             result[k].time = orders[k].createdAt.format("yyyy-MM-dd hh:mm:ss");
             result[k].phone = orders[k].phone;
             result[k].consigneeId = orders[k].consigneeId;
-            result[k].consigneeId = orders[k].consigneeId;
+            result[k].tenantId = orders[k].tenantId;
             result[k].consigneeName = consignee == null ? null : consignee.name;
+            result[k].tenantName = merchant == null ? null : merchant.name;
             //result[k].totalVipPrice = Math.round(totalVipPrice * 100) / 100;
             let refund_amount = 0;
-
             let paymentReq = await PaymentReqs.findOne({
                 where: {
                     trade_no: orders[k].trade_no,
                     tenantId: orders[k].tenantId
-                }
+                },
+                paranoid: false
             });
-
+            console.log(orders[k].tenantId)
+            console.log("111111111111111111111111111111111"+paymentReq.trade_no)
             if (paymentReq != null) {
                 result[k].total_amount = paymentReq.total_amount;
                 result[k].actual_amount = paymentReq.actual_amount;
@@ -604,12 +617,12 @@ module.exports = {
                 result[k].refund_reason = paymentReq.refund_reason;
                 result[k].paymentMethod = paymentReq.paymentMethod;//支付方式
                 refund_amount = paymentReq.refund_amount;
-            } else {
+            } else if(paymentReq == null) {
                 console.log("重要信息，未找到支付请求，订单号=========" + orders[k].trade_no);
             }
 
-            let amount = await amoutManager.getTransAccountAmount(ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
-
+            let amount = await amoutManager.getTransAccountAmount(orders[k].tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
+            console.log(totalPrice)
             //简单异常处理
             if (amount.totalAmount > 0) {
                 result[k].totalPrice = amount.totalPrice;
