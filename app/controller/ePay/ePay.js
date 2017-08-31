@@ -131,7 +131,7 @@ module.exports = {
                 where: {
                     trade_no: ret.out_trade_no,
                     app_id: ret.app_id,
-                    totalAmount: parseFloat(ret.total_amount),
+                    totalAmount: parseFloat(ret.total_amount).toFixed(2),
                     paymentMethod: '支付宝',
                     isFinish: false
                 }
