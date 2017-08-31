@@ -99,7 +99,7 @@ module.exports = {
             trade_no: tradeNo,
             app_id: app_id,
             totalAmount: total_amount,
-            tenantId: ctx.query.tenantId
+            tenantId: qrCodeTemplate.tenantId
         });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
@@ -265,7 +265,7 @@ module.exports = {
             trade_no: tradeNo,
             app_id: app_id,
             totalAmount: total_amount,
-            tenantId: ctx.query.tenantId
+            tenantId: qrCodeTemplate.tenantId
         });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
