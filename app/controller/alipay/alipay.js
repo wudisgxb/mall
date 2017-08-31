@@ -428,11 +428,6 @@ module.exports = {
                 FoodNameArray.push(food.name)
             }
 
-            if (coupon != null) {
-                coupon.status = 1;
-                await coupon.save();
-            }
-
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
                     trade_no: ret.out_trade_no,
