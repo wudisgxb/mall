@@ -123,7 +123,7 @@ module.exports = {
                 food.forEach(e => {
                     //首杯半价（青豆家写死）
                     if (e.id == 21) {
-                        e.coupon = "首杯半价";
+                        e.coupon = "新人首杯半价";
                     }
                     e.Ratings = e.Ratings.map(rating => {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
@@ -230,7 +230,7 @@ module.exports = {
                 food.forEach(e => {
                     //首杯半价（青豆家写死）
                     if (e.id == 21) {
-                        e.coupon = "首杯半价";
+                        e.coupon = "新人首杯半价";
                     }
 
                     e.Ratings = e.Ratings.map(rating => {
