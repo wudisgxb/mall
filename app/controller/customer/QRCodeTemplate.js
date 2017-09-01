@@ -113,6 +113,7 @@ module.exports = {
                     qrCode.tenantId = qrCodeTemplates[j].tenantId;
                     qrCode.merchantName = merchant.name;
                     qrCode.industry = merchant.industry;
+                    qrCode.address = merchant.address;
                     qrCode.tenantInfo = tenantConfig;
                     qrCode.consigneeId = qrCodeTemplates[j].consigneeId;
                     //查找代售商户信息

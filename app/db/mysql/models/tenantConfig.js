@@ -54,6 +54,9 @@ module.exports = function (sequelize, DataTypes) {
         //首单折扣（半价）
         firstDiscount: shortDataTypes.Double(-1),
 
+        //是否开通-false不开通，true-开通
+        openFlag: shortDataTypes.Bool(),
+
         //营业起始时间
         startTime: shortDataTypes.String(),
         //营业结束时间
