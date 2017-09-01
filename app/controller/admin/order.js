@@ -67,7 +67,7 @@ module.exports = {
         await order.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
-    async getAdminOrder(ctx, next){},
+
     //下面有相同功能的代码了
     async getAdminOrder(ctx, next){
         ctx.checkQuery('tenantId').notEmpty();
@@ -390,15 +390,13 @@ module.exports = {
             }, {
                 where: {
                     trade_no: ord.trade_no,
-                    createdAt: {
-                        $lt: new Date("2017-8-19")
+                    id : {
+                        $lte : 1244
                     }
                 }
             })
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-
-
     },
     //修改配送时间
     async putAdminOrderByDeliveryTime(ctx, next){

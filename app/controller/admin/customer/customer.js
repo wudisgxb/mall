@@ -16,14 +16,14 @@ let customerSql = (function () {
                 where: whereJson
             })
         }
-        console.log(customer)
+        // console.log(customer)
         return customer
     }
     let getCustomerOne = async function (whereJson) {
         let customer = await Customers.findOne({
             where: whereJson
         })
-        console.log(customer)
+        // console.log(customer)
         return customer
     }
     let getCount = async function (whereJson) {

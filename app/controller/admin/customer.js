@@ -13,8 +13,9 @@ module.exports = {
     async updateCustomerAll(ctx, next){
         let newOrders = await NewOrders.findAll({})
         let arrayCustomers = []
+
         for(let i = 0; i < newOrders.length; i++){
-            let totalPrice
+            let totalPrice=0
 
             let orderGoods = await OrderGoods.findAll({
                 where:{
@@ -22,15 +23,15 @@ module.exports = {
                 }
             })
 
-            let arrayGoodsName
+            let arrayGoodsName=[]
 
             for(let j = 0; j<orderGoods.length;j++){
-                totalPrice += orderGoods[j].num*orderGoods[j].price
+
+                totalPrice += orderGoods[j].num * orderGoods[j].price
                 for(let g = 0; g < orderGoods[j].num; g++){
                     arrayGoodsName.push(orderGoods[j].goodsName)
                 }
             }
-
             let vip = await Vips.findOne({
                 where:{
                     phone : newOrders[i].phone,
@@ -44,17 +45,16 @@ module.exports = {
                     tenantId : newOrders[i].tenantId,
                     status : newOrders[i].status+1-k,
                     isVip : vip==null?false:true,
-                    totalprice : totalPrice,
-                    foodName : arrayGoodsName
+                    totalPrice : totalPrice,
+                    foodName : JSON.stringify(arrayGoodsName)
                 }
                 arrayCustomers.push(customerSql.saveCustomer(whereJson))
             }
 
-            await arrayCustomers;
-
+            Promise.all(arrayCustomers);
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
     async getCustomerByCount(ctx, next){
@@ -106,7 +106,7 @@ module.exports = {
             tenantId: body.tenantId
         }
         let customer = await customerSql.getCustomer(jsonCustomer, limitJson)
-        console.log(customer)
+        // console.log(customer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, customer)
     },
 
@@ -194,19 +194,27 @@ module.exports = {
     },
 
     async deleteCustomerBytenantId (ctx, next) {
-        ctx.checkQuery('id').notEmpty()
-        ctx.checkQuery('tenantId').notEmpty()
+        // ctx.checkQuery('id').notEmpty()
+        // ctx.checkQuery('tenantId').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
+
         let whereJson = {
-            tenantId: ctx.query.tenantId,
-            id: ctx.query.id
+            // tenantId: ctx.query.tenantId,
+            // id: ctx.query.id
+            createdAt : {
+                $gte:new Date("2017-09-01 00:00:00"),
+                $lt : new Date("2017-09-02 00:00:00")
+            }
         }
-        let customer = await customerSql.getCustomerOne(whereJson)
-        if (customer != null) {
-            await customer.destroy();
+        let customer = await customerSql.getCustomer(whereJson)
+        console.log(customer.length)
+        if (customer.length>0) {
+            for(let c of customer){
+                await c.destroy();
+            }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
