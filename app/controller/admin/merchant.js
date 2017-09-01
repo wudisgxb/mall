@@ -145,7 +145,7 @@ module.exports = {
         }
         let tenantId = ctx.query.tenantId;
         //根据tenantId查询查询商户信息
-        let jsonProFit = [];
+        let jsonProit = [];
         let profitSharings = await ProfitSharings.findAll({
             where: {
                 tenantId: tenantId
@@ -154,7 +154,7 @@ module.exports = {
         // console.log(profitSharings)
         //如果没查到显示你所要查询的商户不存在
         if (profitSharings.length == 0) {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "你所要查询的商户不存在");
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "你所要查询的租户不存在");
             return;
         }
         let profitSharingId;
@@ -174,23 +174,27 @@ module.exports = {
                     consigneeId: profitSharingId
                 }
             })
-            jsonProFit[i] = {}
-            jsonProFit[i].tenantId = profitSharings[i].tenantId;
+            if(consignee==null){
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "你所要查询的商户不存在");
+                return
+            }
+            jsonProit[i] = {}
+            jsonProit[i].tenantId = profitSharings[i].tenantId;
 
-            jsonProFit[i].consigneeId = profitSharings[i].consigneeId;
-            // jsonProFit[i].id=consignee.id;
-            jsonProFit[i].rate = profitSharings[i].rate;
-            jsonProFit[i].ownRate = profitSharings[i].ownRate;
-            jsonProFit[i].merchantRemark = profitSharings[i].merchantRemark;
-            jsonProFit[i].consigneeRemark = profitSharings[i].consigneeRemark;
-            jsonProFit[i].consigneeName = consignee.name;
-            jsonProFit[i].consigneePhone = consignee.phone;
-            jsonProFit[i].distributionFee = profitSharings[i].distributionFee;
-            jsonProFit[i].excludeFoodId = profitSharings[i].excludeFoodId;
-            jsonProFit[i].consigneeWecharPayee_Account = consignee.wecharPayee_account;
-            jsonProFit[i].consigneePayee_Account = consignee.payee_account;
+            jsonProit[i].consigneeId = profitSharings[i].consigneeId;
+            // jsonProit[i].id=consignee.id;
+            jsonProit[i].rate = profitSharings[i].rate;
+            jsonProit[i].ownRate = profitSharings[i].ownRate;
+            jsonProit[i].merchantRemark = profitSharings[i].merchantRemark;
+            jsonProit[i].consigneeRemark = profitSharings[i].consigneeRemark;
+            jsonProit[i].consigneeName = consignee.name;
+            jsonProit[i].consigneePhone = consignee.phone;
+            jsonProit[i].distributionFee = profitSharings[i].distributionFee;
+            jsonProit[i].excludeFoodId = profitSharings[i].excludeFoodId;
+            jsonProit[i].consigneeWecharPayee_Account = consignee.wecharPayee_account;
+            jsonProit[i].consigneePayee_Account = consignee.payee_account;
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, jsonProFit);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, jsonProit);
     }
 
 }

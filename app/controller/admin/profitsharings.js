@@ -127,6 +127,13 @@ module.exports = {
                 ownRate: 0.1,
                 excludeFoodId: excludeFoodId
             })
+            await Tables.create({
+                name : "0号桌",
+                status : 0,
+                info : "双人桌",
+                tenantId : body.tenantId,
+                consigneeId : consigneeId
+            })
         }
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, consigneeId)
@@ -231,6 +238,17 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此分润信息")
             return;
         }
+        let tables = await Tables.findAll({
+            where: {
+                tenantId: ctx.query.tenantId,
+                consigneeId: ctx.query.consigneeId
+            }
+        })
+        if(tables == null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有桌子")
+            return;
+        }
+        await tables.destroy()
         await profitsharings.destroy()
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
