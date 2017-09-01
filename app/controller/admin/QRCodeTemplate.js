@@ -9,8 +9,8 @@ module.exports = {
 
     async saveAllQRCodeTemplate (ctx, next) {
         // ctx.checkBody('bizType').notEmpty();
-        // ctx.checkBody('coupons').notEmpty()
-        // ctx.checkBody('couponRate').notEmpty();
+        ctx.checkBody('coupons').notEmpty()
+        ctx.checkBody('couponRate').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         // ctx.checkBody('descriptor').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
@@ -41,25 +41,29 @@ module.exports = {
                 bizType: "eshop",
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
-                tableName: "0号桌",
-                descriptor: body.descriptor==null?null:body.descriptor,
-            });
-        }
-        for (let i = 0; i < body.coupons.length; i++) {
-            couponType = body.coupons[i].couponType
-            couponValue = body.coupons[i].couponValue
-            await QRCodeTemplates.create({
-                QRCodeTemplateId: qrCodeTemplateId,
-                bizType: "eshop",
-                tenantId: body.tenantId,
-                consigneeId: body.consigneeId,
-                tableName: "0号桌",
-                couponType: couponType,
-                couponValue: couponValue,
                 couponRate: body.couponRate,
+                tableName: "0号桌",
                 descriptor: body.descriptor==null?null:body.descriptor,
             });
         }
+        if(body.coupons.length > 0){
+            for (let i = 0; i < body.coupons.length; i++) {
+                couponType = body.coupons[i].couponType
+                couponValue = body.coupons[i].couponValue
+                await QRCodeTemplates.create({
+                    QRCodeTemplateId: qrCodeTemplateId,
+                    bizType: "eshop",
+                    tenantId: body.tenantId,
+                    consigneeId: body.consigneeId,
+                    tableName: "0号桌",
+                    couponType: couponType,
+                    couponValue: couponValue,
+                    couponRate: body.couponRate,
+                    descriptor: body.descriptor==null?null:body.descriptor,
+                });
+            }
+        }
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplateId);
     },
     async updateQRCodeTemplate (ctx, next) {

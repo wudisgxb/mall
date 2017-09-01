@@ -4,8 +4,58 @@ let db = require('../../db/mysql/index');
 let Tool = require('../../Tool/tool')
 let customerSql = require('./customer/customer')
 let Customers = db.models.Customers
+let NewOrders = db.models.NewOrders
+let OrderGoods = db.models.OrderGoods
+let Vips = db.models.Vips
 
 module.exports = {
+
+    async updateCustomerAll(ctx, next){
+        let newOrders = await NewOrders.findAll({})
+        let arrayCustomers = []
+        for(let i = 0; i < newOrders.length; i++){
+            let totalPrice
+
+            let orderGoods = await OrderGoods.findAll({
+                where:{
+                    trade_no : newOrders[i].trade_no
+                }
+            })
+
+            let arrayGoodsName
+
+            for(let j = 0; j<orderGoods.length;j++){
+                totalPrice += orderGoods[j].num*orderGoods[j].price
+                for(let g = 0; g < orderGoods[j].num; g++){
+                    arrayGoodsName.push(orderGoods[j].goodsName)
+                }
+            }
+
+            let vip = await Vips.findOne({
+                where:{
+                    phone : newOrders[i].phone,
+                    tenantId : newOrders[i].tenantId,
+                }
+            })
+
+            for(let k = 0; k <= newOrders[i].status; k++){
+                let whereJson = {
+                    phone : newOrders[i].phone,
+                    tenantId : newOrders[i].tenantId,
+                    status : newOrders[i].status+1-k,
+                    isVip : vip==null?false:true,
+                    totalprice : totalPrice,
+                    foodName : arrayGoodsName
+                }
+                arrayCustomers.push(customerSql.saveCustomer(whereJson))
+            }
+
+            await arrayCustomers;
+
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+
+    },
 
     async getCustomerByCount(ctx, next){
 
@@ -32,6 +82,7 @@ module.exports = {
         console.log(customer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, customer)
     },
+
     async getCustomerBytenantId (ctx, next) {
         ctx.checkBody('tenantId').notEmpty()
         if (ctx.errors) {
