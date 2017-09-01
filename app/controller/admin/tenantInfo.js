@@ -39,6 +39,7 @@ module.exports = {
             result.longitude = tenantInfo.longitude;
             result.latitude = tenantInfo.latitude;
             result.needChoosePeopleNumberPage = tenantInfo.needChoosePeopleNumberPage;
+            result.openFlag = tenantInfo.openFlag;
             result.officialNews = tenantInfo.officialNews;
             result.firstDiscount = tenantInfo.firstDiscount;
             result.startTime = tenantInfo.startTime;
@@ -69,6 +70,7 @@ module.exports = {
         ctx.checkBody('/tenantConfig/latitude', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/officialNews', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/needChoosePeopleNumberPage', true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/openFlag', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/firstDiscount', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/invaildTime', true).first().notEmpty();
 
@@ -103,6 +105,7 @@ module.exports = {
             latitude: body.tenantConfig.latitude,
             officialNews: body.tenantConfig.officialNews,
             needChoosePeopleNumberPage: body.tenantConfig.needChoosePeopleNumberPage,
+            openFlag: body.tenantConfig.openFlag,
             firstDiscount: body.tenantConfig.firstDiscount,
             invaildTime: body.tenantConfig.invaildTime,
 
@@ -128,6 +131,7 @@ module.exports = {
         ctx.checkBody('/tenantConfig/latitude', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/officialNews', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/needChoosePeopleNumberPage', true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/openFlag', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/firstDiscount', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/invaildTime', true).first().notEmpty();
 
@@ -162,6 +166,7 @@ module.exports = {
         TenantConfig.latitude = body.tenantConfig.latitude;
         TenantConfig.officialNews = body.tenantConfig.officialNews;
         TenantConfig.needChoosePeopleNumberPage = body.tenantConfig.needChoosePeopleNumberPage;
+        TenantConfig.openFlag = body.tenantConfig.openFlag;
         TenantConfig.firstDiscount = body.tenantConfig.firstDiscount;
         TenantConfig.invaildTime = body.tenantConfig.invaildTime;
         await TenantConfig.save();
