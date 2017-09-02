@@ -726,8 +726,13 @@ module.exports = {
                     isVip: isVip
                 }
                 await customer.saveCustomer(customerJson);
-
+                let merchant = await Merchants.findOne({
+                    where:{
+                        tenantId :tenantId
+                    }
+                })
                 try {
+                    amountJson.style = merchant==null?null:merchant.style;
                     amountJson.tenantId = tenantId;
                     amountJson.consigneeId = consigneeId;
                     amountJson.phone = order.phone;

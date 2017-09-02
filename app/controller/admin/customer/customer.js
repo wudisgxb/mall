@@ -3,6 +3,7 @@ let Customers = db.models.Customers
 
 
 let customerSql = (function () {
+    
     let getCustomer = async function (whereJson, limitJson) {
         let customer
         if (limitJson != null && limitJson != "") {

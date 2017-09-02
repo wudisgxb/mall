@@ -14,6 +14,7 @@ const Orders = db.models.NewOrders;
 const OrderGoods = db.models.OrderGoods;
 const Coupons = db.models.Coupons;
 const Consignees = db.models.Consignees;
+const Merchants = db.models.Merchants;
 const AlipayErrors = db.models.AlipayErrors;
 const Vips = db.models.Vips;
 const Foods = db.models.Foods;
@@ -535,8 +536,13 @@ module.exports = {
                     isVip: isVip
                 }
                 await customer.saveCustomer(customerJson);
-
+                let merchant = await Merchants.findOne({
+                    where:{
+                        tenantId :tenantId
+                    }
+                })
                 try {
+                    amountJson.style = merchant==null?null:merchant.style
                     amountJson.tenantId = tenantId;
                     amountJson.consigneeId = consigneeId;
                     amountJson.phone = order.phone;
@@ -545,7 +551,6 @@ module.exports = {
                 } catch (e) {
                     console.log(e);
                 }
-
 
                 //支付完成推送支付成功消息
                 let date = new Date().format("hh:mm");

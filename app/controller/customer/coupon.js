@@ -48,7 +48,7 @@ module.exports = {
             totalPrice: 0,
             isVip: isVip
         }
-        await customer.savecustomer(customerJson);
+        await customer.saveCustomer(customerJson);
         //let couponKey = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
         let coupon = await Coupons.findAll({

@@ -7,8 +7,79 @@ let Customers = db.models.Customers
 let NewOrders = db.models.NewOrders
 let OrderGoods = db.models.OrderGoods
 let Vips = db.models.Vips
+let Merchants = db.models.Merchants
 
 module.exports = {
+
+    async getCustomersPhoneBytenantId(ctx,next){
+        ctx.checkQuery("tenantId").notEmpty()
+        ctx.checkQuery("status").notEmpty()
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+        let whereJson = {
+            tenantId : ctx.query.tenantId,
+            status : ctx.query.status,
+        }
+        let customer = await customerSql.getCustomer(whereJson)
+        if(customer.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此租戶下的人數")
+            return;
+        }
+        let customerArray = []
+        for(let i = 0; i < customer.length; i++){
+            if(!customerArray.contains(customer[i].phone)){
+                customerArray.push(customer[i].phone)
+            }
+        }
+        let phoneArray = []
+        let phoneJson = {}
+        for(let j = 0; j < customerArray.length; j++){
+            phoneJson ={
+                phone : customerArray[j]
+            }
+        }
+        phoneArray.push(phoneJson,customerArray.length)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,phoneArray)
+    },
+
+    async getCustomerByAll(ctx,next){
+        ctx.checkQuery("tenantId").notEmpty()
+        ctx.checkQuery("status").notEmpty()
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+        let whereJson = {
+            tenantId : ctx.query.tenantId,
+            status : ctx.query.status,
+        }
+        let customer = await customerSql.getCustomer(whereJson)
+        if(customer.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此租戶下的人數")
+            return;
+        }
+        let customerArray = []
+        for(let i = 0; i < customer.length; i++){
+            let merchant = await Merchants.findOne({
+                where : {
+                    tenantId : customer[i].tenantId
+                }
+            })
+            let customerJson = {
+                id : customer[i].id,
+                phone : customer[i].phone,
+                tenantId : customer[i].tenantId,
+                status : customer[i].status,
+                isVip : customer[i].isVip,
+                totalPrice : customer[i].totalPrice,
+                foodName : customer[i].foodName,
+                tenantName : Merchants==null?null:Merchants.name,
+            }
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customer)
+    },
 
     async updateCustomerAll(ctx, next){
         let newOrders = await NewOrders.findAll({})
@@ -16,7 +87,6 @@ module.exports = {
 
         for(let i = 0; i < newOrders.length; i++){
             let totalPrice=0
-
             let orderGoods = await OrderGoods.findAll({
                 where:{
                     trade_no : newOrders[i].trade_no
@@ -58,7 +128,6 @@ module.exports = {
     },
 
     async getCustomerByCount(ctx, next){
-
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
@@ -79,7 +148,7 @@ module.exports = {
             }
         }
         let customer = await customerSql.getCount(jsonCustomer)
-        console.log(customer)
+        // console.log(customer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, customer)
     },
 
@@ -133,7 +202,7 @@ module.exports = {
             phone: body.phone
         }
         let customer = await customerSql.getCustomer(jsonCustomer, limitJson)
-        console.log(customer)
+        // console.log(customer)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, customer)
     },
 
@@ -162,7 +231,7 @@ module.exports = {
             tenantId: body.tenantId
         }
         let customer = JSON.stringify(await customerSql.getCustomerOne(whereJson))
-        console.log(customer)
+        // console.log(customer)
         await Customers.update(jsonCustomer, {
             where: whereJson
         })
@@ -210,7 +279,7 @@ module.exports = {
             }
         }
         let customer = await customerSql.getCustomer(whereJson)
-        console.log(customer.length)
+        // console.log(customer.length)
         if (customer.length>0) {
             for(let c of customer){
                 await c.destroy();

@@ -34,6 +34,8 @@ const getstatistics = (function () {
             phone: json.phone,
             tenantId: json.tenantId,
             consigneeId: json.consigneeId,
+            createTime: json.createTime,
+            style: json.style,
         })
 
     }
@@ -859,8 +861,14 @@ const getstatistics = (function () {
 
         return resultNover;
     }
-    //查询配送费
-
+    //查询所有的口味
+    let getStyle = async function (startTime, endTime,limitJson) {
+        let orderStatistic = await StatisticsOrders.findAll({
+            where: {
+                
+            }
+        })
+    }
 
     let instance = {
         setOrders: setOrders,
