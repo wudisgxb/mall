@@ -148,7 +148,7 @@ module.exports = {
 
                 foodJson[j] = {};
                 foodJson[j].id = orderGoods[j].id;
-                foodJson[j].name = orderGoods[j].name;
+                foodJson[j].name = orderGoods[j].goodsName;
                 foodJson[j].price = orderGoods[j].price;
                 foodJson[j].vipPrice = orderGoods[j].vipPrice;
                 //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);
@@ -196,7 +196,7 @@ module.exports = {
                 }
             });
 
-            console.log("111111111111111111111111111111111111"+paymentReq.id)
+            // console.log("111111111111111111111111111111111111"+paymentReq.id)
 
             if (paymentReq != null) {
                 result[k].total_amount = paymentReq.total_amount;
@@ -435,7 +435,7 @@ module.exports = {
     async putAdminOrderByBizType(ctx, next){
 
         let ordergoods = await OrderGoods.findAll({})
-        console.log(ordergoods.length)
+        // console.log(ordergoods.length)
         for (let i = 0; i < ordergoods.length; i++) {
             if (ordergoods[i].FoodId != null) {
                 let food = await Foods.findOne({
@@ -532,7 +532,7 @@ module.exports = {
         let order;
         let orderGoods;
         for (let k = 0; k < orders.length; k++) {
-            console.log(orders[k].trade_no)
+            // console.log(orders[k].trade_no)
             totalNum = 0;//数量
             totalPrice = 0;//单价
             totalVipPrice = 0;//会员价
@@ -561,7 +561,7 @@ module.exports = {
                 //根据菜单号查询菜单
                 foodJson[j] = {};
                 foodJson[j].id = orderGoods[j].FoodId;
-                foodJson[j].name = orderGoods[j].goodsName ;
+                foodJson[j].name = orderGoods[j].goodsName;
                 foodJson[j].price = orderGoods[j].price;
                 foodJson[j].vipPrice = orderGoods[j].vipPrice;
                 //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);
@@ -575,7 +575,7 @@ module.exports = {
                 totalVipPrice += orderGoods[j].vipPrice * orderGoods[j].num;//会员价
 
             }
-            console.log(totalPrice)
+            // console.log(totalPrice)
             result[k] = {};
 
             let table = await Tables.findById(orders[k].TableId);
@@ -606,8 +606,8 @@ module.exports = {
                 },
                 paranoid: false
             });
-            console.log(orders[k].tenantId)
-            console.log("111111111111111111111111111111111"+paymentReq.trade_no)
+            // console.log(orders[k].tenantId)
+            // console.log("111111111111111111111111111111111"+paymentReq.trade_no)
             if (paymentReq != null) {
                 result[k].total_amount = paymentReq.total_amount;
                 result[k].actual_amount = paymentReq.actual_amount;
@@ -620,7 +620,7 @@ module.exports = {
             }
 
             let amount = await amoutManager.getTransAccountAmount(orders[k].tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
-            console.log(totalPrice)
+            // console.log(totalPrice)
             //简单异常处理
             if (amount.totalAmount > 0) {
                 result[k].totalPrice = amount.totalPrice;

@@ -5,6 +5,8 @@ let customer = require('../../controller/admin/customer')
 
 const router = new (require('koa-router'))()
 router.get('/api/test/admin/customerByCount',customer.getCustomerByCount)
+router.get('/api/test/admin/customerByPhone',customer.getCustomersPhoneBytenantId)
+router.get('/api/test/admin/customerByAll',customer.getCustomerByAll)
 router.put('/api/test/admin/customerAll',customer.updateCustomerAll)
 router.post('/api/test/admin/customerByTenantId',customer.getCustomerBytenantId)
 router.post('/api/test/admin/customerByPhone',customer.getCustomerByPhone)

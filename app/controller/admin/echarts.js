@@ -9,6 +9,45 @@ const Tool = require('../../Tool/tool')
 let orderStatistic = require('../statistics/orderStatistic')
 
 module.exports = {
+    async getStyle(ctx, next){
+        let orderstatistic = await orderStatistic.getStyle()
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderstatistic)
+    },
+
+    async getOrderstatisticByStyle(ctx, next){
+        ctx.checkQuery("style").notEmpty()
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let orderstatistic = await orderStatistic.getOrderstatisticByStyle(ctx.query.style)
+        let orderstatisticArray = []
+        let ArrayPhone = []
+        for (let i = 0; i < orderstatistic.length; i++){
+            // if(!ArrayPhone.contains(orderstatistic[i].phone)){
+            // ArrayPhone.push(orderstatistic[i].phone)
+            let orderstatisticJson = {
+                id : orderstatistic[i].id,
+                tenantId : orderstatistic[i].tenantId,
+                trade_no : orderstatistic[i].trade_no,
+                totalPrice : orderstatistic[i].totalPrice,
+                merchantAmount : orderstatistic[i].merchantAmount,
+                consigneeAmount : orderstatistic[i].consigneeAmount,
+                platformAmount : orderstatistic[i].platformAmount,
+                refund_amount : orderstatistic[i].refund_amount,
+                platformCouponFee : orderstatistic[i].platformCouponFee,
+                merchantCouponFee : orderstatistic[i].merchantCouponFee,
+                phone : orderstatistic[i].phone,
+                style : JSON.parse(orderstatistic[i].style),
+                createTime : orderstatistic[i].createTime,
+            }
+            orderstatisticArray.push(orderstatisticJson)
+
+            // }
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderstatisticArray)
+    },
+
     async savefoodEchats(ctx, next){
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('startTime').notEmpty();

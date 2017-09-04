@@ -3,6 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/statisticsMySql/index');
 let db1 = require('../../db/mysql/index');
+let Merchants = db1.models.Merchants
 
 // let dbv3 = require('../../db/mysql/index')
 let Orders = db1.models.Orders
@@ -29,6 +30,47 @@ module.exports = {
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+
+    async getStyle(ctx, next){
+        let orderstatistic = await orderStatistic.getStyle()
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderstatistic)
+    },
+
+    async getOrderstatisticByStyle(ctx, next){
+        ctx.checkQuery("style").notEmpty()
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let orderstatistic = await orderStatistic.getOrderstatisticByStyle(ctx.query.style)
+        let orderstatisticArray = []
+        let ArrayPhone = []
+        for (let i = 0; i < orderstatistic.length; i++){
+            // if(!ArrayPhone.contains(orderstatistic[i].phone)){
+                // ArrayPhone.push(orderstatistic[i].phone)
+                let orderstatisticJson = {
+                    id : orderstatistic[i].id,
+                    tenantId : orderstatistic[i].tenantId,
+                    trade_no : orderstatistic[i].trade_no,
+                    totalPrice : orderstatistic[i].totalPrice,
+                    merchantAmount : orderstatistic[i].merchantAmount,
+                    consigneeAmount : orderstatistic[i].consigneeAmount,
+                    platformAmount : orderstatistic[i].platformAmount,
+                    refund_amount : orderstatistic[i].refund_amount,
+                    platformCouponFee : orderstatistic[i].platformCouponFee,
+                    merchantCouponFee : orderstatistic[i].merchantCouponFee,
+                    phone : orderstatistic[i].phone,
+                    style : JSON.parse(orderstatistic[i].style),
+                    createTime : orderstatistic[i].createTime,
+                }
+                orderstatisticArray.push(orderstatisticJson)
+
+            // }
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderstatisticArray)
+    },
+
+
 
     async getOrderStatistic (ctx, next) {
         ctx.checkBody('tenantId').notEmpty()
@@ -129,9 +171,22 @@ module.exports = {
     },
 
     async putOrderStatistic(ctx, next){
-        ctx.checkBody('tanantId').notEmpty()
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+        let merchants = await Merchants.findAll({})
 
+        let statisticsOrdersArray = []
+        for(let i = 0; i < merchants.length; i++){
+            if(merchants[i].style!=null){
+                statisticsOrdersArray.push(StatisticsOrders.update({
+                    style : merchants[i].style
+                },{
+                    where:{
+                        tenantId : merchants[i].tenantId
+                    }
+                }))
+            }
+        }
+        await statisticsOrdersArray;
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,"修改成功")
     },
 
     async status2Mdf(ctx, next){

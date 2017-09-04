@@ -4,6 +4,7 @@ const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const QRCodeTemplates = db.models.QRCodeTemplates;
 const Merchants = db.models.Merchants;
+const Consignees = db.models.Consignees;
 const Tool = require('../../Tool/tool');
 
 module.exports = {
@@ -168,6 +169,11 @@ module.exports = {
                     tenantId : qrCodeTemplates[i].tenantId
                 }
             })
+            let consignee = await Consignees.findOne({
+                where:{
+                    consigneeId : qrCodeTemplates[i].consigneeId
+                }
+            })
             let qrCodeTemplatesJson = {
                 id : qrCodeTemplates[i].id,
                 QRCodeTemplateId : qrCodeTemplates[i].QRCodeTemplateId,
@@ -179,8 +185,10 @@ module.exports = {
                 consigneeId : qrCodeTemplates[i].consigneeId,
                 descriptor : qrCodeTemplates[i].descriptor,
                 orderLimit : qrCodeTemplates[i].orderLimit,
+                tableName : qrCodeTemplates[i].tableName,
                 isShared : qrCodeTemplates[i].isShared,
-                tenantName : merchant==null?null:merchant.name
+                tenantName : merchant==null?null:merchant.name,
+                consigneeName : consignee==null?null:consignee.name
             }
             qrCodeTemplatesArray.push(qrCodeTemplatesJson)
         }
