@@ -148,7 +148,7 @@ module.exports = {
 
                 foodJson[j] = {};
                 foodJson[j].id = orderGoods[j].id;
-                foodJson[j].name = orderGoods[j].name;
+                foodJson[j].name = orderGoods[j].goodsName;
                 foodJson[j].price = orderGoods[j].price;
                 foodJson[j].vipPrice = orderGoods[j].vipPrice;
                 //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);
@@ -561,7 +561,7 @@ module.exports = {
                 //根据菜单号查询菜单
                 foodJson[j] = {};
                 foodJson[j].id = orderGoods[j].FoodId;
-                foodJson[j].name = orderGoods[j].goodsName ;
+                foodJson[j].name = orderGoods[j].goodsName;
                 foodJson[j].price = orderGoods[j].price;
                 foodJson[j].vipPrice = orderGoods[j].vipPrice;
                 //  foodJson[k].consigneeName=(consigneesName.name==null?null:consigneesName.name);

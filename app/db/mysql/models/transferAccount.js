@@ -12,7 +12,6 @@ module.exports = function (sequelize, DataTypes) {
         remark: shortDataTypes.String(255, true), //转账信息
         amount: shortDataTypes.String(255, true),//转账金额
         payee_account: shortDataTypes.String(255, true),//账号
-
         role: shortDataTypes.String(255, true),//角色，租户or代售
         pay_date: shortDataTypes.String(255, true),//转账日期 开始为空，转成功回写
         tenantId: shortDataTypes.String(255, true),

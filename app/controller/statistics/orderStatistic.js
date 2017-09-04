@@ -3,7 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/statisticsMySql/index');
 let dbv3 = require('../../db/Mysql/index')
-
+let Merchants = dbv3.models.Merchants;
 let StatisticsOrders = db.models.Orders;
 let Vips = dbv3.models.Vips;
 let getOneDayEchat = require('../echats/oneDayEchat')
@@ -862,12 +862,44 @@ const getstatistics = (function () {
         return resultNover;
     }
     //查询所有的口味
-    let getStyle = async function (startTime, endTime,limitJson) {
-        let orderStatistic = await StatisticsOrders.findAll({
-            where: {
-                
+    let getStyle = async function () {
+        let merchants = await Merchants.findAll({})
+        let arrayStyle = []
+        for(let i = 0; i < merchants.length; i++){
+            if(merchants[i].style!=null){
+                let styles = JSON.parse(merchants[i].style)
+                console.log(styles)
+                // let style = merchants[i].style.substring(1,merchants[i].style.length-1)
+                // let styles =  style.split(",")
+                // console.log(styles)
+                // console.log(styles instanceof Array)
+                for(let j = 0;j < styles.length; j++){
+                    if(!arrayStyle.contains(styles[j])){
+                        arrayStyle.push(styles[j])
+                    }
+                }
+            }
+        }
+        // console.log(arrayStyle)
+       return arrayStyle;
+
+    }
+    //根据口味查询所有记录
+    let getOrderstatisticByStyle = async function (style) {
+        let styles = "%"+style+"%"
+        console.log(styles)
+        let orderstatistic = await StatisticsOrders.findAll({
+            where :{
+                style :{
+                    $like : styles
+                }
             }
         })
+        return orderstatistic
+    }
+    
+    let getMerchants = async function () {
+        let merchants = await Merchants.findAll({})
     }
 
     let instance = {
@@ -879,6 +911,9 @@ const getstatistics = (function () {
         getOrderNum: getOrderNum,
         newPurchaseRate: newPurchaseRate,
         Retention: Retention,
+        getStyle: getStyle,
+        getOrderstatisticByStyle : getOrderstatisticByStyle,
+        getMerchants : getMerchants
 
     }
     return instance;
