@@ -98,7 +98,6 @@ module.exports = {
             MenuId: body.food.menuId,
             tenantId: body.tenantId
         });
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
     },

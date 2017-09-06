@@ -16,6 +16,7 @@ const getCouponsEchats = (function () {
             //startTime开始时间
             //endTime结束时间
             let OneDay = await OnedayEchat.getDay(startTime, endTime)
+            
             for (let i = 0; i < OneDay.length; i++) {
                 //当天tenantId的所有使用优惠券记录
                 let useCoupons = await Coupons.findAll({
@@ -82,8 +83,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(MonthEchats[i].start),
+                            $lt: new Date(MonthEchats[i].end)
                         },
                         status: 1
                     }
@@ -93,8 +94,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(MonthEchats[i].start),
+                            $lt: new Date(MonthEchats[i].end)
                         }
                     },
                     paranoid: false
@@ -104,8 +105,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(MonthEchats[i].start),
+                            $lt: new Date(MonthEchats[i].end)
                         },
                         status: 0,
                         deletedAt: {
@@ -145,8 +146,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(Quaeter[i].start),
+                            $lt: new Date(Quaeter[i].end)
                         },
                         status: 1
                     }
@@ -156,8 +157,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(Quaeter[i].start),
+                            $lt: new Date(Quaeter[i].end)
                         }
                     },
                     paranoid: false
@@ -167,8 +168,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(Quaeter[i].start),
+                            $lt: new Date(Quaeter[i].end)
                         },
                         status: 0,
                         deletedAt: {
@@ -211,8 +212,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(years[i].start),
+                            $lt: new Date(years[i].end)
                         },
                         status: 1
                     }
@@ -222,8 +223,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(years[i].start),
+                            $lt: new Date(years[i].end)
                         }
                     },
                     paranoid: false
@@ -233,8 +234,8 @@ const getCouponsEchats = (function () {
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gte: new Date(OneDay[i].start),
-                            $lt: new Date(OneDay[i].end)
+                            $gte: new Date(years[i].start),
+                            $lt: new Date(years[i].end)
                         },
                         status: 0,
                         deletedAt: {

@@ -19,6 +19,7 @@ const getConsumptionEchats = (function () {
             const oneDay = 24 * 60 * 60 * 1000;
 
             for (let i = new Date(startTime).getTime(); i < new Date(endTime).getTime(); i += oneDay) {
+                console.log(i)
                 let arrayTrade_no = [];
                 let foodId = [];
                 let orders = await Orders.findAll({
