@@ -897,9 +897,243 @@ const getstatistics = (function () {
         })
         return orderstatistic
     }
-    
+
+    //活动带动的消费金额
+    let getActivity = async function (tenantId,startTime,endTime,type) {
+        if (type == 1) {
+            let result = [];
+            //startTime开始时间
+            //endTime结束时间
+            let OneDay = await getOneDayEchat.getDay(startTime, endTime)
+            for (let i = 0; i < OneDay.length; i++) {
+                //当天tenantId的所有记录
+                let order = await StatisticsOrders.sum("merchantAmount",{
+                    where: {
+                        tenantId: tenantId,
+                        createdAt: {
+                            $gte: new Date(OneDay[i].start),
+                            $lt: new Date(OneDay[i].end)
+                        },
+                        platformCouponFee : {
+                            $ne : 0
+                        },
+                        merchantCouponFee : {
+                            $ne : 0
+                        }
+                    }
+                })
+                result.push({
+                    merchantAmount : order,
+                    time: OneDay[i].start
+                })
+            }
+            return result;
+        }
+        if (type == 3) {
+            let result = [];
+            let MonthEchats = await getMonthEchats.getMonth(startTime, endTime)
+            for (let i = 0; i < MonthEchats.length; i++) {
+                let order = await StatisticsOrders.sum("merchantAmount",{
+                    where: {
+                        tenantId: tenantId,
+                        createdAt: {
+                            $gte: new Date(MonthEchats[i].start),
+                            $lt: new Date(MonthEchats[i].end)
+                        },
+                        platformCouponFee : {
+                            $ne : 0
+                        },
+                        merchantCouponFee : {
+                            $ne : 0
+                        }
+                    }
+                })
+                // let time = new Date(i);
+                // time.setDate(time.getDate()+1)
+                // let times = time.format("yyyy-MM-dd 0:0:0");
+                result.push({
+                    merchantAmount : order,
+                    time: MonthEchats[i].start
+                })
+            }
+            return result;
+
+        }
+        if (type == 2) {
+            let result = [];
+            let Quaeter = getQuarterEchats.getQuarter(startTime, endTime);
+            for (let i = 0; i < Quaeter.length; i++) {
+                let order = await StatisticsOrders.sum("merchantAmount",{
+                    where: {
+                        tenantId: tenantId,
+                        createdAt: {
+                            $gte: new Date(Quaeter[i].start),
+                            $lt: new Date(Quaeter[i].end)
+                        },
+                        platformCouponFee : {
+                            $ne : 0
+                        },
+                        merchantCouponFee : {
+                            $ne : 0
+                        }
+                    }
+                })
+                let startDate = Quaeter[i].start
+                let year = parseInt(startDate.substring(0, 4))
+                let time = parseInt(startDate.substring(5, 6));
+                // console.log(time)
+                let quaeters = (time + 2) / 3
+
+                result.push({
+                    merchantAmount : order,
+                    time: year + "年第" + quaeters + "季度"
+                })
+            }
+            return result;
+        }
+        if (type == 4) {
+            let result = [];
+            let years = getYearEchat.getYear(startTime, endTime);
+            for (let i = 0; i < years.length; i++) {
+                let order = await StatisticsOrders.sum("merchantAmount",{
+                    where: {
+                        tenantId: tenantId,
+                        createdAt: {
+                            $gte: new Date(years[i].start),
+                            $lt: new Date(years[i].end)
+                        },
+                        platformCouponFee : {
+                            $ne : 0
+                        },
+                        merchantCouponFee : {
+                            $ne : 0
+                        }
+                    }
+                })
+                let startDate = years[i].start
+                let year = parseInt(startDate.substring(0, 4))
+
+                result.push({
+                    merchantAmount : order,
+                    time: year + "年"
+                })
+            }
+            return result;
+        }
+    }
+
     let getMerchants = async function () {
         let merchants = await Merchants.findAll({})
+    }
+
+    let getOrderstatisticByPeople = async function (tenantId,purchaseFrequency,type,startTime,endTime) {
+        let getTime = [];
+        let arrayOrder = []
+        if (type == 1) {
+            getTime = await getOneDayEchat.getDay(startTime, endTime)
+        }
+        if (type == 2) {
+            getTime = await AnYearEchats.getAnYear(startTime, endTime)
+        }
+        if (type == 3) {
+            getTime = await getMonthEchats.getMonth(startTime, endTime)
+        }
+
+        for(let k = 0; k <getTime.length; k++){
+            let arrayPhone=[]
+            let orderstatistic
+            let orders = await StatisticsOrders.findAll({
+                where:{
+                    tenantId : tenantId,
+                    createdAt : {
+                        $gte : getTime[k].start,
+                        $lt : getTime[k].end
+                    }
+                }
+            })
+            for(let i = 0; i < orders.length; i++){
+                if(!arrayPhone.contains(orders[i].phone)){
+                    arrayPhone.push(orders[i].phone)
+                }
+            }
+            for(let j = 0; j < arrayPhone.length; j++){
+                let array = []
+                orderstatistic = await StatisticsOrders.findAndCountAll({
+                    where:{
+                        tenantId : tenantId,
+                        phone : arrayPhone[j],
+                        createdAt : {
+                            $gte : getTime[k].start,
+                            $lt : getTime[k].end
+                        }
+                    }
+                })
+                // console.log(orderstatistic.count)
+                if(orderstatistic.count==purchaseFrequency){
+                    // console.log("aaaaaaaaaa")
+                    let jsonOrder = {}
+                    for(let g = 0; g < orderstatistic.rows.length; g++){
+                        jsonOrder = {
+                            id : orderstatistic.rows[g].id,
+                            tenantId : orderstatistic.rows[g].tenantId,
+                            trade_no : orderstatistic.rows[g].trade_no,
+                            totalPrice : orderstatistic.rows[g].totalPrice,
+                            merchantAmount : orderstatistic.rows[g].merchantAmount,
+                            consigneeAmount : orderstatistic.rows[g].consigneeAmount,
+                            platformAmount : orderstatistic.rows[g].platformAmount,
+                            refund_amount : orderstatistic.rows[g].refund_amount,
+                            platformCouponFee : orderstatistic.rows[g].platformCouponFee,
+                            merchantCouponFee : orderstatistic.rows[g].merchantCouponFee,
+                            phone : orderstatistic.rows[g].phone,
+                            style : JSON.parse(orderstatistic.rows[g].style),
+                            createTime : orderstatistic.rows[g].createTime,
+                        }
+                        arrayOrder.push(jsonOrder)
+                    }
+                }
+            }
+        }
+        return arrayOrder;
+    }
+    
+    let getOrderstatisticByPrice = async function (whereJson,limitJson) {
+
+        let orders
+        if(limitJson.limit == "" || limitJson.limit == null){
+
+            orders = await StatisticsOrders.findAll({
+                where : whereJson
+            })
+
+        }else {
+            orders = await StatisticsOrders.findAll({
+                where : whereJson,
+                limit : limitJson.limit,
+                offset : limitJson.offset,
+            })
+        }
+        let orderArray = [];
+        let orderJson = {};
+        for(let i = 0; i <orders.length; i++ ){
+            orderJson = {
+                phone : orders[i].phone,
+                trade_no : orders[i].trade_no,
+                totalPrice : orders[i].totalPrice,
+                merchantAmount : orders[i].merchantAmount,
+                consigneeAmount : orders[i].consigneeAmount,
+                platformAmount : orders[i].platformAmount,
+                deliveryFee : orders[i].deliveryFee,
+                refund_amount : orders[i].refund_amount,
+                platformCouponFee : orders[i].platformCouponFee,
+                merchantCouponFee : orders[i].merchantCouponFee,
+                tenantId : orders[i].tenantId,
+                consigneeId : orders[i].consigneeId,
+                createTime : orders[i].createTime,
+                style : JSON.parse(orders[i].style),
+            }
+            orderArray.push(orderJson)
+        }
+        return orderArray
     }
 
     let instance = {
@@ -913,7 +1147,10 @@ const getstatistics = (function () {
         Retention: Retention,
         getStyle: getStyle,
         getOrderstatisticByStyle : getOrderstatisticByStyle,
-        getMerchants : getMerchants
+        getMerchants : getMerchants,
+        getOrderstatisticByPrice : getOrderstatisticByPrice,
+        getOrderstatisticByPeople:getOrderstatisticByPeople,
+        getActivity : getActivity
 
     }
     return instance;

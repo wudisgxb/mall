@@ -63,7 +63,7 @@ const getFoodEchats = (function () {
                     let ordergood = await OrderGoods.findOne({
                         where:{
                             tenantId : tenantId,
-                            goodsName: name,
+                            goodsName: ArrayFoodName[g],
                             createdAt: {
                                 $gt:new Date(startDate),
                                 $lt:new Date(endDate)

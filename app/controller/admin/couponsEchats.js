@@ -19,5 +19,32 @@ module.exports = {
         let couponsEchats = await getCouponsEchats.getCoupons(body.tenantId, body.startTime, body.endTime, body.type)
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, couponsEchats)
-    }
+    },
+    // async pastdueCouponsEchats(ctx, next){
+    //     ctx.checkBody('tenantId').notEmpty()
+    //     ctx.checkBody('startTime').notEmpty()
+    //     ctx.checkBody('endTime').notEmpty();
+    //     ctx.checkBody('type').notEmpty();
+    //     let body = ctx.request.body;
+    //     if (ctx.errors) {
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+    //         return;
+    //     }
+    //     let couponsEchats = await getCouponsEchats.getPastdueCoupons(body.tenantId, body.startTime, body.endTime, body.type)
+    //
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, couponsEchats)
+    // },
+    // async getAllCoupons(ctx, next){
+    //     ctx.checkBody('tenantId').notEmpty()
+    //     ctx.checkBody('startTime').notEmpty()
+    //     ctx.checkBody('endTime').notEmpty();
+    //     ctx.checkBody('type').notEmpty();
+    //     let body = ctx.request.body;
+    //     if (ctx.errors) {
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+    //         return;
+    //     }
+    //     let couponsEchats = await getCouponsEchats.getAllCoupons(body.tenantId, body.startTime, body.endTime, body.type)
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, couponsEchats)
+    // },
 }

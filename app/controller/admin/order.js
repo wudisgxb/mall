@@ -317,7 +317,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, orderOfCount)
     },
     //修改订单状态
-    async putAdminOrderByStatus(ctx, next){
+    async updateAdminOrderByStatus(ctx, next){
         ctx.checkBody('trade_no').notEmpty();
         ctx.checkBody('status').notEmpty();
         if (ctx.errors) {
@@ -399,7 +399,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     //修改配送时间
-    async putAdminOrderByDeliveryTime(ctx, next){
+    async updateAdminOrderByDeliveryTime(ctx, next){
         ctx.checkBody('trade_no').notEmpty()
         //输入分钟数
         ctx.checkBody('deliveryTime').notEmpty()
@@ -432,7 +432,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "配送时间大约为" + orderDeliveryTime.deliveryTime)
     },
     //修改类型
-    async putAdminOrderByBizType(ctx, next){
+    async updateAdminOrderByBizType(ctx, next){
 
         let ordergoods = await OrderGoods.findAll({})
         // console.log(ordergoods.length)

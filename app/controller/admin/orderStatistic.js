@@ -70,7 +70,77 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderstatisticArray)
     },
 
+    //根據金錢段查詢記錄，可分頁
+    async getOrderstatisticByPrice(ctx,next){
+        ctx.checkQuery("tenantId").notEmpty()
+        ctx.checkQuery("minPrice").notEmpty()
+        ctx.checkQuery("maxPrice").notEmpty()
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return;
+        }
+        let minPrice = ctx.query.minPrice
+        let tenantId = ctx.query.tenantId
+        let maxPrice = ctx.query.maxPrice
+        //頁數
+        let pageSize = ctx.query.pageSize
+        //每頁顯示個數
+        let pageCount = ctx.query.pageCount
+        let whereJson={
+            tenantId : tenantId,
+            merchantAmount : {
+                $gte : minPrice,
+                $lt : maxPrice
+            }
+        }
+        //起始位置
+        let offset = (pageSize-1)*pageCount
 
+        let limitJson = {}
+        if(pageCount != null && pageCount != ""){
+            limitJson={
+                offset : offset,
+                limit : pageCount
+            }
+        }
+        console.log(limitJson.offset==null)
+        let orders = await orderStatistic.getOrderstatisticByPrice(whereJson,limitJson);
+        if(orders.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"沒找到當前記錄")
+            return;
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orders)
+    },
+
+    //周,月购买一次,两次的人数 (购买频率)-- 手机号码
+    async getOrderstatisticByPeople(ctx,next){
+        ctx.checkQuery("tenantId").notEmpty();
+        ctx.checkQuery("purchaseFrequency").notEmpty();
+        ctx.checkQuery("type").notEmpty();
+        ctx.checkQuery("startTime").notEmpty();
+        ctx.checkQuery("endTime").notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return;
+        }
+        let order = await orderStatistic.getOrderstatisticByPeople(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.type,ctx.query.startTime,ctx.query.endTime)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,order)
+    },
+
+    //优惠券带动交易额
+    async getActivity(ctx,next){
+        ctx.checkBody('tenantId').notEmpty()
+        ctx.checkBody('startTime').notEmpty()
+        ctx.checkBody('endTime').notEmpty();
+        ctx.checkBody('type').notEmpty();
+        let body = ctx.request.body;
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+        let order = await orderStatistic.getActivity(body.tenantId,body.startTime,body.endTime,body.type)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,order)
+    },
 
     async getOrderStatistic (ctx, next) {
         ctx.checkBody('tenantId').notEmpty()

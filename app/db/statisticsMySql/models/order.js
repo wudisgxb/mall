@@ -20,7 +20,7 @@ module.exports = function (sequelize, DataTypes) {
         // foodName : shortDataTypes.String(255,true),//菜名
         phone : shortDataTypes.Phone(), //手机号
         createTime : shortDataTypes.Date(255,true),//创建统计数据的时间
-        style : shortDataTypes.String()
+        style : shortDataTypes.String(255,true)
     }, {
         paranoid: true,
         associate: function (models) {

@@ -13,6 +13,7 @@ module.exports = {
         ctx.checkBody('/merchant/address', true).first().notEmpty();
         ctx.checkBody('/merchant/industry', true).first().notEmpty();
         ctx.checkBody('/merchant/tenantId', true).first().notEmpty();
+        // ctx.checkBody('/merchant/style', true).first().notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -34,7 +35,8 @@ module.exports = {
             phone: body.merchant.phone,
             address: body.merchant.address,
             industry: body.merchant.industry,
-            tenantId: body.merchant.tenantId
+            tenantId: body.merchant.tenantId,
+            style: JSON.stringify(body.merchant.style)
             // todo: ok?
             //deletedAt: Date.now()
         });
@@ -47,6 +49,7 @@ module.exports = {
         ctx.checkBody('/merchant/phone', true).first().notEmpty();
         ctx.checkBody('/merchant/industry', true).first().notEmpty();
         ctx.checkBody('/condition/tenantId', true).first().notEmpty();
+        ctx.checkBody('/condition/style', true).first().notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -71,6 +74,7 @@ module.exports = {
             merchants.industry = body.merchant.industry;
             merchants.address = body.merchant.address;
             merchants.tenantId = body.condition.tenantId;
+            merchants.style = body.condition.style;
             //menus.type = body.type;
             await merchants.save();
         }
