@@ -15,7 +15,7 @@ const getDayEchats = (function () {
             })
         }
 
-        console.log(result.length)
+        // console.log(result.length)
         return result;
     }
     let instance = {
