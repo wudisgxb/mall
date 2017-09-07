@@ -121,6 +121,7 @@ module.exports = {
         if (body.status == 7) {
             orderStatistics = await orderStatistic.Retention(body.tenantId, body.startTime, body.endTime, body.type)
         }
+        
         if (body.status == 8) {
             orderStatistics = await orderStatistic.xinren(body.tenantId)
         }

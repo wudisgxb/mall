@@ -1,6 +1,9 @@
-const getMonthEchats = (function () {
-    let getMonth = function (startTime, endTime) {
 
+
+
+let getMonthEchats = (function () {
+    let getMonth = function (startTime, endTime) {
+        
         let startDate = parseInt(startTime.substring(0, 4))
         //10
         let startMonth = parseInt(startTime.substring(5))//10
@@ -36,7 +39,6 @@ const getMonthEchats = (function () {
                 end: end,
             })
         }
-        // console.log(eeeee)
         return eeeee;
     }
     let instance = {

@@ -75,6 +75,7 @@ module.exports = {
         ctx.checkQuery("tenantId").notEmpty()
         ctx.checkQuery("minPrice").notEmpty()
         ctx.checkQuery("maxPrice").notEmpty()
+        ctx.checkQuery("type").notEmpty();
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return;
@@ -83,9 +84,9 @@ module.exports = {
         let tenantId = ctx.query.tenantId
         let maxPrice = ctx.query.maxPrice
         //頁數
-        let pageSize = ctx.query.pageSize
+        let pageSize = ctx.query.pageNumber
         //每頁顯示個數
-        let pageCount = ctx.query.pageCount
+        let pageCount = ctx.query.pageSize
         let whereJson={
             tenantId : tenantId,
             merchantAmount : {
@@ -94,20 +95,31 @@ module.exports = {
             }
         }
         //起始位置
-        let offset = (pageSize-1)*pageCount
+
+        let offset = (pageNumber-1)*pageSize
 
         let limitJson = {}
         if(pageCount != null && pageCount != ""){
             limitJson={
-                offset : offset,
-                limit : pageCount
+                offset : offset==0?0:offset,
+                limit : pageSize
             }
         }
-        console.log(limitJson.offset==null)
-        let orders = await orderStatistic.getOrderstatisticByPrice(whereJson,limitJson);
-        if(orders.length==0){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"沒找到當前記錄")
-            return;
+        // console.log(limitJson.offset==null)
+        let orders
+        if(ctx.query.type == 1){
+            orders = await orderStatistic.getOrderstatisticByPrice(whereJson,limitJson);
+            if(orders.length==0){
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"沒找到當前記錄")
+                return;
+            }
+        }
+        if(ctx.query.type == 2){
+            orders = await orderStatistic.getOrderstatisticByPriceCount(whereJson);
+            // if(orders.length==0){
+            //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"沒找到當前記錄")
+            //     return;
+            // }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orders)
     },
@@ -116,14 +128,32 @@ module.exports = {
     async getOrderstatisticByPeople(ctx,next){
         ctx.checkQuery("tenantId").notEmpty();
         ctx.checkQuery("purchaseFrequency").notEmpty();
-        ctx.checkQuery("type").notEmpty();
         ctx.checkQuery("startTime").notEmpty();
         ctx.checkQuery("endTime").notEmpty();
+        ctx.checkQuery("type").notEmpty();
+
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return;
         }
-        let order = await orderStatistic.getOrderstatisticByPeople(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.type,ctx.query.startTime,ctx.query.endTime)
+        let order;
+        if(ctx.query.type==1){
+            if(ctx.query.pageSize!=null&&ctx.query.pageSize!=""&&ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""){
+                let pageSize = ctx.query.pageSize
+                let pageNumber = ctx.query.pageNumber
+                let place = (pageNumber - 1) * pageSize;
+                let limitJson = {
+                    limit : pageSize,
+                    offset : place
+                }
+                order = await orderStatistic.getOrderstatisticByPeople(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.startTime,ctx.query.endTime,limitJson)
+            }else{
+                order = await orderStatistic.getOrderstatisticByPeople(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.startTime,ctx.query.endTime)
+            }
+        }
+        if(ctx.query.type==2){
+            order = await orderStatistic.getOrderstatisticByPeopleCount(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.startTime,ctx.query.endTime)
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,order)
     },
 

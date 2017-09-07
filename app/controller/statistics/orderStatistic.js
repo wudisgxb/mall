@@ -58,7 +58,8 @@ const getstatistics = (function () {
                     },
                 })
                 for (let j = 0; j < consumption.length; j++) {
-                    numPrice = consumption[j].totalPrice + numPrice
+                    console.log(numPrice)
+                    numPrice = Number(consumption[j].totalPrice) + numPrice
                 }
                 result.push({
                     numPrice: {
@@ -71,7 +72,7 @@ const getstatistics = (function () {
                     },
                     AvgConsumption: {
                         name: "平均价格",
-                        value: numPrice / consumption.length
+                        value: consumption.length==0?0:(numPrice / consumption.length).toFixed(2)
                     },
                     time: {
                         name: "现在时间",
@@ -84,20 +85,21 @@ const getstatistics = (function () {
         // 每月平均消费
         if (type == 2) {
             let result = [];
-            let getMonthEchats = await getMonthEchats.getMonth(startTime, endTime);
-            for (let i = 0; i < getMonthEchats.length; i++) {
+
+            let getTime = getMonthEchats.getMonth(startTime, endTime);
+            for (let i = 0; i < getTime.length; i++) {
                 let numPrice = 0;
                 let consumption = await StatisticsOrders.findAll({
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gt: new Date(getMonthEchats[i].start),
-                            $lt: new Date(getMonthEchats[i].end)
+                            $gt: new Date(getTime[i].start),
+                            $lt: new Date(getTime[i].end)
                         }
                     },
                 })
                 for (let j = 0; j < consumption.length; j++) {
-                    numPrice = consumption[j].totalPrice + numPrice
+                    numPrice = Number(consumption[j].totalPrice) + numPrice
                 }
                 result.push({
                     numPrice: {
@@ -110,11 +112,11 @@ const getstatistics = (function () {
                     },
                     AvgConsumption: {
                         name: "平均价格",
-                        value: numPrice / consumption.length
+                        value: consumption.length==0?0:(numPrice / consumption.length).toFixed(2)
                     },
                     time: {
                         name: "时间",
-                        value: getMonthEchats[i].start
+                        value: getTime[i].start
                     }
                 })
             }
@@ -123,23 +125,23 @@ const getstatistics = (function () {
         //每季度平均消费
         if (type == 3) {
             let result = [];
-            let getQuarterEchats = await getQuarterEchats.getQuarter(startTime, endTime);
-            for (let i = 0; i < getQuarterEchats.length; i++) {
+            let getTime = await getQuarterEchats.getQuarter(startTime, endTime);
+            for (let i = 0; i < getTime.length; i++) {
                 let numPrice = 0;
                 let consumption = await StatisticsOrders.findAll({
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gt: new Date(getQuarterEchats[i].start),
-                            $lt: new Date(getQuarterEchats[i].end)
+                            $gt: new Date(getTime[i].start),
+                            $lt: new Date(getTime[i].end)
                         }
                     },
                 })
                 for (let j = 0; j < consumption.length; j++) {
-                    numPrice = consumption[j].totalPrice + numPrice
+                    numPrice = Number(consumption[j].totalPrice) + numPrice
                 }
-                let year = parseInt(getQuarterEchats[i].start.substring(0, 4))
-                let quart = (parseInt(getQuarterEchats[i].start.substring(5)) + 2) / 3
+                let year = parseInt(getTime[i].start.substring(0, 4))
+                let quart = (parseInt(getTime[i].start.substring(5)) + 2) / 3
 
                 result.push({
                     numPrice: {
@@ -152,7 +154,7 @@ const getstatistics = (function () {
                     },
                     AvgConsumption: {
                         name: "平均价格",
-                        value: numPrice / consumption.length
+                        value: consumption.length==0?0:(numPrice / consumption.length).toFixed(2)
                     },
                     time: {
                         name: "时间",
@@ -165,22 +167,22 @@ const getstatistics = (function () {
         //每年平均消费
         if (type == 4) {
             let result = [];
-            let getYearEchat = await getYearEchat.getYear(startTime, endTime);
-            for (let i = 0; i < getYearEchat.length; i++) {
+            let getTime = await getYearEchat.getYear(startTime, endTime);
+            for (let i = 0; i < getTime.length; i++) {
                 let numPrice = 0;
                 let consumption = await StatisticsOrders.findAll({
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gt: new Date(getYearEchat[i].start),
-                            $lt: new Date(getYearEchat[i].end)
+                            $gt: new Date(getTime[i].start),
+                            $lt: new Date(getTime[i].end)
                         }
                     },
                 })
                 for (let j = 0; j < consumption.length; j++) {
-                    numPrice = consumption[j].totalPrice + numPrice
+                    numPrice = Number(consumption[j].totalPrice) + numPrice
                 }
-                let year = parseInt(getYearEchat[i].start.substring(0, 4));
+                let year = parseInt(getTime[i].start.substring(0, 4));
                 result.push({
                     numPrice: {
                         name: "价格",
@@ -192,7 +194,7 @@ const getstatistics = (function () {
                     },
                     AvgConsumption: {
                         name: "平均价格",
-                        value: numPrice / consumption.length
+                        value: consumption.length==0?0:(numPrice / consumption.length).toFixed(2)
                     },
                     time: {
                         name: "时间",
@@ -203,23 +205,21 @@ const getstatistics = (function () {
             return result;
         }
         //每周平均消费
-
-
     }
     // 查询vip平均消费
     let getVipAvgConsumption = async function (tenantId, startTime, endTime, type) {
         if (type == 1) {
             let result = [];
-            let getDayEchat = await getDayEchat.getDay(startTime, endTime);
-            for (let i = 0; i < getDayEchat.length; i++) {
+            let getTime = await getDayEchat.getDay(startTime, endTime);
+            for (let i = 0; i < getTime.length; i++) {
                 let vipPhone = [];
                 let numPrice = 0;
                 let consumption = await StatisticsOrders.findAll({
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gt: new Date(getDayEchat[i].start),
-                            $lt: new Date(getDayEchat[i].end)
+                            $gt: new Date(getTime[i].start),
+                            $lt: new Date(getTime[i].end)
                         }
                     },
                 })
@@ -238,13 +238,13 @@ const getstatistics = (function () {
                         where: {
                             tenantId: tenantId,
                             createdAt: {
-                                $gt: new Date(getDayEchat[i].start),
-                                $lt: new Date(getDayEchat[i].end)
+                                $gt: new Date(getTime[i].start),
+                                $lt: new Date(getTime[i].end)
                             },
                             phone: vipPhone[k]
                         }
                     })
-                    numPrice += statisticsOrders[k].totalPrice
+                    numPrice += Number(statisticsOrders[k].totalPrice)
                 }
                 result.push({
                     numPrice: {
@@ -253,15 +253,15 @@ const getstatistics = (function () {
                     },
                     property: {
                         name: "人数",
-                        value: consumption.length,
+                        value: vipPhone.length,
                     },
                     AvgConsumption: {
                         name: "平均价格",
-                        value: numPrice / consumption.length
+                        value: vipPhone.length==0?0:(numPrice/vipPhone.length).toFixed(2)
                     },
                     time: {
                         name: "时间",
-                        value: getDayEchat[i].start
+                        value: getTime[i].start
                     }
                 })
             }
@@ -270,16 +270,16 @@ const getstatistics = (function () {
 
         if (type == 2) {
             let result = [];
-            let getMonthEchats = await getMonthEchats.getMonth(startTime, endTime);
-            for (let i = 0; i < getMonthEchats.length; i++) {
+            let getTime = await getMonthEchats.getMonth(startTime, endTime);
+            for (let i = 0; i < getTime.length; i++) {
                 let vipPhone = [];
                 let numPrice = 0;
                 let consumption = await StatisticsOrders.findAll({
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gt: new Date(getMonthEchats[i].start),
-                            $lt: new Date(getMonthEchats[i].end)
+                            $gt: new Date(getTime[i].start),
+                            $lt: new Date(getTime[i].end)
                         }
                     },
                 })
@@ -298,13 +298,13 @@ const getstatistics = (function () {
                         where: {
                             tenantId: tenantId,
                             createdAt: {
-                                $gt: new Date(getMonthEchats[i].start),
-                                $lt: new Date(getMonthEchats[i].end)
+                                $gt: new Date(getTime[i].start),
+                                $lt: new Date(getTime[i].end)
                             },
                             phone: vipPhone[k]
                         }
                     })
-                    numPrice += statisticsOrders[k].totalPrice
+                    numPrice += Number(statisticsOrders[k].totalPrice)
                 }
                 result.push({
                     numPrice: {
@@ -313,17 +313,16 @@ const getstatistics = (function () {
                     },
                     property: {
                         name: "人数",
-                        value: consumption.length,
+                        value: vipPhone.length,
                     },
                     AvgConsumption: {
                         name: "平均价格",
-                        value: numPrice / consumption.length
+                        value: vipPhone.length==0?0:(numPrice/vipPhone.length).toFixed(2)
                     },
                     time: {
                         name: "时间",
-                        value: getMonthEchats[i].start
+                        value: getTime[i].start
                     }
-
                 })
             }
             return result;
@@ -331,16 +330,16 @@ const getstatistics = (function () {
 
         if (type == 3) {
             let result = [];
-            let getQuarterEchats = await getQuarterEchats.getQuarter(startTime, endTime);
-            for (let i = 0; i < getQuarterEchats.length; i++) {
+            let getTime = await getQuarterEchats.getQuarter(startTime, endTime);
+            for (let i = 0; i < getTime.length; i++) {
                 let vipPhone = [];
                 let numPrice = 0;
                 let consumption = await StatisticsOrders.findAll({
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gt: new Date(getQuarterEchats[i].start),
-                            $lt: new Date(getQuarterEchats[i].end)
+                            $gt: new Date(getTime[i].start),
+                            $lt: new Date(getTime[i].end)
                         }
                     },
                 })
@@ -365,10 +364,10 @@ const getstatistics = (function () {
                             phone: vipPhone[k]
                         }
                     })
-                    numPrice += statisticsOrders[k].totalPrice
+                    numPrice += Number(statisticsOrders[k].totalPrice)
                 }
-                let year = parseInt(getQuarterEchats[i].start.substring(0, 4))
-                let quart = (parseInt(getQuarterEchats[i].start.substring(5)) + 2) / 3
+                let year = parseInt(getTime[i].start.substring(0, 4))
+                let quart = (parseInt(getTime[i].start.substring(5)) + 2) / 3
                 result.push({
                     numPrice: {
                         name: "价格",
@@ -376,11 +375,11 @@ const getstatistics = (function () {
                     },
                     property: {
                         name: "人数",
-                        value: consumption.length,
+                        value: vipPhone.length,
                     },
                     AvgConsumption: {
                         name: "平均价格",
-                        value: numPrice / consumption.length
+                        value: vipPhone.length==0?0:(numPrice/vipPhone.length).toFixed(2)
                     },
                     time: {
                         name: "时间",
@@ -393,16 +392,16 @@ const getstatistics = (function () {
 
         if (type == 4) {
             let result = [];
-            let getYearEchat = await getYearEchat.getQuarter(startTime, endTime);
-            for (let i = 0; i < getYearEchat.length; i++) {
+            let getTime = await getYearEchat.getYear(startTime, endTime);
+            for (let i = 0; i < getTime.length; i++) {
                 let vipPhone = [];
                 let numPrice = 0;
                 let consumption = await StatisticsOrders.findAll({
                     where: {
                         tenantId: tenantId,
                         createdAt: {
-                            $gt: new Date(getYearEchat[i].start),
-                            $lt: new Date(getYearEchat[i].end)
+                            $gt: new Date(getTime[i].start),
+                            $lt: new Date(getTime[i].end)
                         }
                     },
                 })
@@ -415,7 +414,9 @@ const getstatistics = (function () {
                     if (vips != null) {
                         vipPhone.push(vips.phone)
                     }
+
                 }
+
                 for (let k = 0; k < vipPhone.length; k++) {
                     let statisticsOrders = await StatisticsOrders.findOne({
                         where: {
@@ -427,9 +428,10 @@ const getstatistics = (function () {
                             phone: vipPhone[k]
                         }
                     })
-                    numPrice += statisticsOrders[k].totalPrice
+                    console.log(statisticsOrders[k].totalPrice)
+                    numPrice = Number(statisticsOrders[k].totalPrice)+numPrice
                 }
-                let year = parseInt(getYearEchat[i].start.substring(0, 4));
+                let year = parseInt(getTime[i].start.substring(0, 4));
                 result.push({
                     numPrice: {
                         name: "价格",
@@ -437,11 +439,11 @@ const getstatistics = (function () {
                     },
                     property: {
                         name: "人数",
-                        value: consumption.length,
+                        value: vipPhone.length,
                     },
                     AvgConsumption: {
                         name: "平均价格",
-                        value: numPrice / consumption.length
+                        value: vipPhone.length==0?0:(numPrice/vipPhone.length).toFixed(2)
                     },
                     time: {
                         name: "时间",
@@ -923,7 +925,7 @@ const getstatistics = (function () {
                     }
                 })
                 result.push({
-                    merchantAmount : order,
+                    merchantAmount : order==null?0:order,
                     time: OneDay[i].start
                 })
             }
@@ -1025,10 +1027,85 @@ const getstatistics = (function () {
     let getMerchants = async function () {
         let merchants = await Merchants.findAll({})
     }
+    
+    let getOrderstatisticByPeopleArray = async function (tenantId,purchaseFrequency,startTime,endTime) {
+        console.log(startTime)
+        let start = new Date(startTime)
+        let end = new Date(endTime)
+        console.log(start)
+        let orderstatistic = await StatisticsOrders.findAll({
+            where: {
+                tenantId : tenantId,
+                createdAt : {
+                    $gte : start,
+                    $lt : end
+                }
+            }
+        })
+        console.log("orderstatistic的长度"+orderstatistic.length)
+        let ArrayPhone = []
+        //去除所有不重复的代码
+        for(let i = 0; i<orderstatistic.length; i++){
+            if(!ArrayPhone.contains(orderstatistic[i].phone)){
+                ArrayPhone.push(orderstatistic[i].phone)
+            }
+        }
+        console.log("ArrayPhone======"+ArrayPhone.length)
+        let arrayManyTimesToBuyByPhone = []
+        for(let j = 0; j < ArrayPhone.length; j++){
+            let order = await StatisticsOrders.findAll({
+                where:{
+                    tenantId : tenantId,
+                    phone : ArrayPhone[j],
+                    createdAt : {
+                        $gte : start,
+                        $lt : end
+                    }
+                }
+            })
+            console.log(order.length)
+            if(order.length==purchaseFrequency){
+                console.log(ArrayPhone[j])
+                arrayManyTimesToBuyByPhone.push(order[0].phone)
+            }
+        }
+        console.log(arrayManyTimesToBuyByPhone.length)
+        return arrayManyTimesToBuyByPhone
+    }
 
-    let getOrderstatisticByPeople = async function (tenantId,purchaseFrequency,type,startTime,endTime) {
-        let getTime = [];
+    let getOrderstatisticByPeopleCount = async function (tenantId,purchaseFrequency,startTime,endTime) {
+        let arrayPeopleByPhone =await getOrderstatisticByPeopleArray(tenantId,purchaseFrequency,startTime,endTime)
+        return arrayPeopleByPhone.length
+    }
+
+    let getOrderstatisticByPeople = async function (tenantId,purchaseFrequency,startTime,endTime,limitJson) {
+        let arrayPeopleByPhone =await getOrderstatisticByPeopleArray(tenantId,purchaseFrequency,startTime,endTime)
+        console.log(arrayPeopleByPhone)
+        let start = new Date(startTime);
+        let end = new Date(endTime);
         let arrayOrder = []
+        for(let i = 0; i < arrayPeopleByPhone.length; i++){
+            let orderStatistic = await StatisticsOrders.findAll({
+                where:{
+                    tenantId : tenantId,
+                    phone : arrayPeopleByPhone[i],
+                    createdAt : {
+                        $gte : start,
+                        $lt : end
+                    }
+                },
+                order:["createdAt","DESC"],
+                limit : limitJson.limit,
+                offset : limitJson.offset
+            })
+            arrayOrder.push(orderStatistic)
+        }
+        return arrayOrder;
+    }
+
+    let getOrderstatisticByPeoples = async function () {
+        let getTime = [];
+
         if (type == 1) {
             getTime = await getOneDayEchat.getDay(startTime, endTime)
         }
@@ -1041,7 +1118,8 @@ const getstatistics = (function () {
 
         for(let k = 0; k <getTime.length; k++){
             let arrayPhone=[]
-            let orderstatistic
+            let arrayOrder = []
+            //查询商家的全部记录数
             let orders = await StatisticsOrders.findAll({
                 where:{
                     tenantId : tenantId,
@@ -1051,6 +1129,7 @@ const getstatistics = (function () {
                     }
                 }
             })
+            //查询全部不重复的电话
             for(let i = 0; i < orders.length; i++){
                 if(!arrayPhone.contains(orders[i].phone)){
                     arrayPhone.push(orders[i].phone)
@@ -1058,7 +1137,8 @@ const getstatistics = (function () {
             }
             for(let j = 0; j < arrayPhone.length; j++){
                 let array = []
-                orderstatistic = await StatisticsOrders.findAndCountAll({
+                //根据电话查询所有的count信息
+                let orderstatistic = await StatisticsOrders.findAndCountAll({
                     where:{
                         tenantId : tenantId,
                         phone : arrayPhone[j],
@@ -1069,49 +1149,56 @@ const getstatistics = (function () {
                     }
                 })
                 // console.log(orderstatistic.count)
+
                 if(orderstatistic.count==purchaseFrequency){
                     // console.log("aaaaaaaaaa")
-                    let jsonOrder = {}
+                    // let jsonOrder = {}
                     for(let g = 0; g < orderstatistic.rows.length; g++){
-                        jsonOrder = {
-                            id : orderstatistic.rows[g].id,
-                            tenantId : orderstatistic.rows[g].tenantId,
-                            trade_no : orderstatistic.rows[g].trade_no,
-                            totalPrice : orderstatistic.rows[g].totalPrice,
-                            merchantAmount : orderstatistic.rows[g].merchantAmount,
-                            consigneeAmount : orderstatistic.rows[g].consigneeAmount,
-                            platformAmount : orderstatistic.rows[g].platformAmount,
-                            refund_amount : orderstatistic.rows[g].refund_amount,
-                            platformCouponFee : orderstatistic.rows[g].platformCouponFee,
-                            merchantCouponFee : orderstatistic.rows[g].merchantCouponFee,
-                            phone : orderstatistic.rows[g].phone,
-                            style : JSON.parse(orderstatistic.rows[g].style),
-                            createTime : orderstatistic.rows[g].createTime,
-                        }
-                        arrayOrder.push(jsonOrder)
+                        // jsonOrder = {
+                        //     id : orderstatistic.rows[g].id,
+                        //     tenantId : orderstatistic.rows[g].tenantId,
+                        //     trade_no : orderstatistic.rows[g].trade_no,
+                        //     totalPrice : orderstatistic.rows[g].totalPrice,
+                        //     merchantAmount : orderstatistic.rows[g].merchantAmount,
+                        //     consigneeAmount : orderstatistic.rows[g].consigneeAmount,
+                        //     platformAmount : orderstatistic.rows[g].platformAmount,
+                        //     refund_amount : orderstatistic.rows[g].refund_amount,
+                        //     platformCouponFee : orderstatistic.rows[g].platformCouponFee,
+                        //     merchantCouponFee : orderstatistic.rows[g].merchantCouponFee,
+                        //     phone : orderstatistic.rows[g].phone,
+                        //     style : JSON.parse(orderstatistic.rows[g].style),
+                        //     createTime : orderstatistic.rows[g].createTime,
+                        // }
+                        arrayOrder.push(orderstatistic.rows[g].phone)
                     }
                 }
+            }
+            for(let l = 0; l < arrayOrder.length; l++){
+                let orderstatistic = await StatisticsOrders.findAll({
+                    where : {
+                        tenantId : tenantId,
+                        phone : arrayOrder[l],
+                        createdAt : {
+                            $gte : getTime[k].start,
+                            $lt : getTime[k].end
+                        }
+                    },
+                    order : ["createdAt","DESC"],
+                    limit: limitJson.limit,
+                    offset : limitJson.offset
+                })
             }
         }
         return arrayOrder;
     }
-    
-    let getOrderstatisticByPrice = async function (whereJson,limitJson) {
 
+    let getOrderstatisticByArray = async function (whereJson) {
         let orders
-        if(limitJson.limit == "" || limitJson.limit == null){
 
-            orders = await StatisticsOrders.findAll({
-                where : whereJson
-            })
+        orders = await StatisticsOrders.findAll({
+            where : whereJson,
+        })
 
-        }else {
-            orders = await StatisticsOrders.findAll({
-                where : whereJson,
-                limit : limitJson.limit,
-                offset : limitJson.offset,
-            })
-        }
         let orderArray = [];
         let orderJson = {};
         for(let i = 0; i <orders.length; i++ ){
@@ -1136,6 +1223,49 @@ const getstatistics = (function () {
         return orderArray
     }
 
+    let getOrderstatisticByPriceArray = async function (whereJson,limitJson) {
+
+        let orders
+        orders = await StatisticsOrders.findAll({
+            where : whereJson,
+            limit : Number(limitJson.limit),
+            offset : limitJson.offset
+        })
+
+        let orderArray = [];
+        let orderJson = {};
+        for(let i = 0; i <orders.length; i++ ){
+            orderJson = {
+                phone : orders[i].phone,
+                trade_no : orders[i].trade_no,
+                totalPrice : orders[i].totalPrice,
+                merchantAmount : orders[i].merchantAmount,
+                consigneeAmount : orders[i].consigneeAmount,
+                platformAmount : orders[i].platformAmount,
+                deliveryFee : orders[i].deliveryFee,
+                refund_amount : orders[i].refund_amount,
+                platformCouponFee : orders[i].platformCouponFee,
+                merchantCouponFee : orders[i].merchantCouponFee,
+                tenantId : orders[i].tenantId,
+                consigneeId : orders[i].consigneeId,
+                createTime : orders[i].createTime,
+                style : JSON.parse(orders[i].style),
+            }
+            orderArray.push(orderJson)
+        }
+        return orderArray
+    }
+
+    let getOrderstatisticByPriceCount = async function (whereJson) {
+        let orderstatistic = await getOrderstatisticByArray(whereJson)
+        return orderstatistic.length
+    }
+
+    let getOrderstatisticByPrice = async function (whereJson,limitJson) {
+        let orderstatistic = await getOrderstatisticByPriceArray(whereJson,limitJson)
+        return orderstatistic;
+    }
+
     let instance = {
         setOrders: setOrders,
         getAvgConsumption: getAvgConsumption,
@@ -1149,9 +1279,10 @@ const getstatistics = (function () {
         getOrderstatisticByStyle : getOrderstatisticByStyle,
         getMerchants : getMerchants,
         getOrderstatisticByPrice : getOrderstatisticByPrice,
+        getOrderstatisticByPriceCount : getOrderstatisticByPriceCount,
         getOrderstatisticByPeople:getOrderstatisticByPeople,
-        getActivity : getActivity
-
+        getActivity : getActivity,
+        getOrderstatisticByPeopleCount : getOrderstatisticByPeopleCount
     }
     return instance;
 })();
