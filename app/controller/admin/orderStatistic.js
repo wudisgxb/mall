@@ -84,9 +84,9 @@ module.exports = {
         let tenantId = ctx.query.tenantId
         let maxPrice = ctx.query.maxPrice
         //頁數
-        let pageSize = ctx.query.pageNumber
+        let pageNumber = ctx.query.pageNumber
         //每頁顯示個數
-        let pageCount = ctx.query.pageSize
+        let pageSize = ctx.query.pageSize
         let whereJson={
             tenantId : tenantId,
             merchantAmount : {
@@ -99,7 +99,7 @@ module.exports = {
         let offset = (pageNumber-1)*pageSize
 
         let limitJson = {}
-        if(pageCount != null && pageCount != ""){
+        if(pageNumber != null && pageNumber != ""){
             limitJson={
                 offset : offset==0?0:offset,
                 limit : pageSize

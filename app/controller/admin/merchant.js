@@ -74,7 +74,7 @@ module.exports = {
             merchants.industry = body.merchant.industry;
             merchants.address = body.merchant.address;
             merchants.tenantId = body.condition.tenantId;
-            merchants.style = body.condition.style;
+            merchants.style = JSON.stringify(body.condition.style);
             //menus.type = body.type;
             await merchants.save();
         }
@@ -92,7 +92,22 @@ module.exports = {
                     exclude: ['createdAt', 'updatedAt']
                 },
             });
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchant);
+            let merchantArray = []
+            for(let i = 0;i < merchant.length; i++){
+                let merchantJson = {
+                    id : merchant[i].id,
+                    name : merchant[i].name,
+                    phone : merchant[i].phone,
+                    industry : merchant[i].industry,
+                    address : merchant[i].address,
+                    tenantId : merchant[i].tenantId,
+                    needOrderConfirmPage : merchant[i].needOrderConfirmPage,
+                    style : JSON.parse(merchant[i].style),
+
+                }
+                merchantArray.push(merchantJson)
+            }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchantArray);
         }
         if (ctx.query.tenantId == null && ctx.query.consigneeId != null) {
             let Profitsharings = await ProfitSharings.findAll({
