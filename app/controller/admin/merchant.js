@@ -3,6 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 let Merchants = db.models.Merchants;
+let Admins = db.models.Adminer;
 let ProfitSharings = db.models.ProfitSharings;
 let Consignees = db.models.Consignees;
 
@@ -56,28 +57,40 @@ module.exports = {
             return;
         }
         let body = ctx.request.body;
-        let merchantResult = await Merchants.findAll({
-            where: {
+        let adminer = await Admins.findOne({
+            where :{
                 tenantId: body.condition.tenantId
             }
-        });
-        if (merchantResult.length <= 0) {
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "租户不存在，请重新定义")
-            return;
+        })
+        if(adminer==null){
+            
         }
-        let id = merchantResult[0].id
-        let merchants;
-        merchants = await Merchants.findById(id);
-        if (merchants != null) {
-            merchants.name = body.merchant.name;
-            merchants.phone = body.merchant.phone;
-            merchants.industry = body.merchant.industry;
-            merchants.address = body.merchant.address;
-            merchants.tenantId = body.condition.tenantId;
-            merchants.style = JSON.stringify(body.condition.style);
-            //menus.type = body.type;
-            await merchants.save();
-        }
+
+
+        // let merchantResult = await Merchants.findAll({
+        //     where: {
+        //         tenantId: body.condition.tenantId
+        //     }
+        // });
+        // if (merchantResult.length <= 0) {
+        //     ctx.body = new ApiResult(ApiResult.Result.EXISTED, "租户不存在，请重新定义")
+        //     return;
+        // }
+        // let id = merchantResult[0].id
+        // let merchants;
+        // merchants = await Merchants.findById(id);
+        // if (merchants != null) {
+        //     merchants.name = body.merchant.name;
+        //     merchants.phone = body.merchant.phone;
+        //     merchants.industry = body.merchant.industry;
+        //     merchants.address = body.merchant.address;
+        //     merchants.tenantId = body.condition.tenantId;
+        //     merchants.style = JSON.stringify(body.condition.style);
+        //     //menus.type = body.type;
+        //     await merchants.save();
+        // }
+
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 

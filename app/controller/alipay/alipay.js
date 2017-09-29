@@ -4,7 +4,7 @@ const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 const util = require('../alipay/util');
 let path = require('path');
-let Tool = require('../../Tool/tool');
+
 const fs = require('fs');
 const Alipay = require('../alipay/index');
 const Tables = db.models.Tables;
@@ -20,8 +20,11 @@ const Vips = db.models.Vips;
 const Foods = db.models.Foods;
 const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../infoPush/infoPush');
+const Tool = require('../../Tool/tool');
+const sqlClienteleIntegrals = require('../clienteleIntegrals/clienteleIntegrals')
 const transAccountsManager = require('./transferAccounts')
 const transAccounts = require('../customer/transAccount')
+const sqlMerchantIntegrals = require('../merchantIntegrals/merchantIntegrals')
 const customer = require('../admin/customer/customer')
 const amountManager = require('../amount/amountManager')
 const webSocket = require('../socketManager/socketManager');
@@ -471,6 +474,7 @@ module.exports = {
                         trade_no: ret.out_trade_no,
                     }
                 });
+                amountManager.integralAllocation()
 
                 order.status = 2;
                 await order.save();
@@ -541,6 +545,38 @@ module.exports = {
                         tenantId :tenantId
                     }
                 })
+                //判断是否是会员
+                if(isVip==true){
+
+                    let merchantIntegralsJson ={
+                        tenantId : tenantId
+                    }
+                    //如果是会员的话获取商户的积分信息
+                    let merchantIntegrals = await sqlMerchantIntegrals.getMerchantIntegrals(merchantIntegralsJson)
+                    //如果积分信息获取到的话
+                    if(merchantIntegrals!=null){
+                        //则获取商家积分信息的积分兑换比率
+                        let integralsNum
+
+                        let priceIntegralsRate = Number(merchantIntegrals.priceIntegralsRate)
+                        if(merchantIntegrals.looseChange==true){
+                            integralsNum = priceIntegralsRate==0?0:amountJson.totalPrice/priceIntegralsRate
+                        }else {
+                            integralsNum = priceIntegralsRate==0?0:Math.ceil(amountJson.totalPrice/priceIntegralsRate)
+                        }
+                        let integralId = Tool.allocTenantId()
+                        let integralsJson ={
+                            integralId : integralId,
+                            tenantId : tenantId,
+                            phone : order.phone,
+                            price : amountJson.totalPrice,
+                            integralnum : integralsNum,
+                            integralTime : new Date(),
+                            goodsName: JSON.stringify(FoodNameArray),
+                        }
+                        await sqlClienteleIntegrals.saveClienteleIntegral(integralsJson)
+                    }
+                }
                 try {
                     amountJson.style = merchant==null?null:merchant.style
                     amountJson.tenantId = tenantId;

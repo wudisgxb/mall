@@ -26,10 +26,14 @@ module.exports = function (sequelize, DataTypes) {
          * 100 => 超级管理员
          */
         type: shortDataTypes.Int(),
-        tenantType:shortDataTypes.String(),
-        tenantId: {
-            type: Sequelize.STRING
-        }
+        /**
+         * 1.为平台
+         * 2.为商圈
+         * 3.租户
+         */
+        // tenantType:shortDataTypes.String(),
+        // tenantId:shortDataTypes.String(),
+
 
     }, {
         timestamps: false,

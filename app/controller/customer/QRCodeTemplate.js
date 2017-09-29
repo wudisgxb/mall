@@ -152,4 +152,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodes);
         }
     },
+    
+
 }

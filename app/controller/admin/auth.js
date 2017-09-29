@@ -9,32 +9,36 @@ let Captcha = db.models.Captcha
 let Admins = db.models.Adminer
 let Caap = require('ccap')();
 let http = require('http')
+let auth = require('../auth/auth')
 
 
 module.exports = {
 
     async getAdminLoginUser(ctx, next){
-        //if (request.url == '/favicon.ico')return response.end('');
-        //实例化caap包
-        let ary = Caap.get();
-        //获取当前时间
-        let date = new Date().format("yyyyMMddhhmmssS");
-        //ary中喊随机数，和验证码图片
-        let txt = ary[0];
-        let buf = ary[1];
-        //用当前时间和随机数拼接一个唯一的建
-        let key = date + txt;
-        //将唯一的键和随机数存入数据库
-        await Captcha.create({
-            key: key,
-            captcha: txt
-        });
-        //返回唯一的键，随机数，和图形验证码给前台
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-            "key": key,
-            "number": txt,
-            "buf": buf.toString('base64')
-        });
+        let admin = await auth.getAdminLoginUsers();
+        // console.log(admin)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,admin)
+        // //if (request.url == '/favicon.ico')return response.end('');
+        // //实例化caap包
+        // let ary = Caap.get();
+        // //获取当前时间
+        // let date = new Date().format("yyyyMMddhhmmssS");
+        // //ary中喊随机数，和验证码图片
+        // let txt = ary[0];
+        // let buf = ary[1];
+        // //用当前时间和随机数拼接一个唯一的建
+        // let key = date + txt;
+        // //将唯一的键和随机数存入数据库
+        // await Captcha.create({
+        //     key: key,
+        //     captcha: txt
+        // });
+        // //返回唯一的键，随机数，和图形验证码给前台
+        // ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+        //     "key": key,
+        //     "number": txt,
+        //     "buf": buf.toString('base64')
+        // });
     },
 
     async getadminLong(ctx, next){
@@ -69,24 +73,28 @@ module.exports = {
                 return;
             }
         }
-        let c;
-            //如果匹配查询用户名密码是否正确
-            c = await Admins.findOne({
-                where: {
-                    nickname: body.userName,
-                    password: body.password
-                }
-            })
+        let whereJson = {
+            nickname: body.userName,
+            password: body.password
+        }
+        let admin = await auth.getadmin(whereJson)
+        //如果匹配查询用户名密码是否正确
+
             //判断查询的记录数是否等于0
-            if (c == null) {
-                //如果等于0那么就返回给前台用户名密码错误
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "用户名密码错误")
-                return;
-            } else {
-                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                    id: c.id,
-                    tenantId: c.tenantId
-                })
+        if (admin == null) {
+            //如果等于0那么就返回给前台用户名密码错误
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "用户名密码错误")
+            return;
+        } else {
+            let correspondingJson = {
+                phone : admin.phone
             }
-    }
+            let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                correspondingId: adminCorresponding.correspondingId,
+                correspondingType : adminCorresponding.correspondingType
+            })
+        }
+    },
+
 }

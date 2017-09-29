@@ -15,7 +15,6 @@ let getHounthEchats = require('../echats/HounthEchats')
 let getWeeksEchat = require('../echats/getWeeks')
 let AnYearEchats = require('../echats/anYearEchats')
 
-
 const getstatistics = (function () {
     // 设置Order表
     let setOrders = async function (json) {
@@ -1029,10 +1028,10 @@ const getstatistics = (function () {
     }
     
     let getOrderstatisticByPeopleArray = async function (tenantId,purchaseFrequency,startTime,endTime) {
-        console.log(startTime)
+
         let start = new Date(startTime)
         let end = new Date(endTime)
-        console.log(start)
+
         let orderstatistic = await StatisticsOrders.findAll({
             where: {
                 tenantId : tenantId,
@@ -1042,7 +1041,7 @@ const getstatistics = (function () {
                 }
             }
         })
-        console.log("orderstatistic的长度"+orderstatistic.length)
+
         let ArrayPhone = []
         //去除所有不重复的代码
         for(let i = 0; i<orderstatistic.length; i++){
@@ -1063,29 +1062,33 @@ const getstatistics = (function () {
                     }
                 }
             })
-            console.log(order.length)
+
             if(order.length==purchaseFrequency){
-                console.log(ArrayPhone[j])
                 arrayManyTimesToBuyByPhone.push(order[0].phone)
             }
         }
-        console.log(arrayManyTimesToBuyByPhone.length)
+
         return arrayManyTimesToBuyByPhone
     }
 
-    let getOrderstatisticByPeopleCount = async function (tenantId,purchaseFrequency,startTime,endTime) {
-        let arrayPeopleByPhone =await getOrderstatisticByPeopleArray(tenantId,purchaseFrequency,startTime,endTime)
-        return arrayPeopleByPhone.length
-    }
+    // let getOrderstatisticByPeopleCount = async function (tenantId,purchaseFrequency,startTime,endTime) {
+    //     let arrayPeopleByPhone =await getOrderstatisticByPeopleArray(tenantId,purchaseFrequency,startTime,endTime)
+    //     return arrayPeopleByPhone.length
+    // }
 
-    let getOrderstatisticByPeople = async function (tenantId,purchaseFrequency,startTime,endTime,limitJson) {
+    let getOrderstatisticByPeople = async function (tenantId,purchaseFrequency,startTime,endTime) {
+        console.log(StatisticsOrders)
         let arrayPeopleByPhone =await getOrderstatisticByPeopleArray(tenantId,purchaseFrequency,startTime,endTime)
+        if(arrayPeopleByPhone.length==0){
+            return []
+        }
         console.log(arrayPeopleByPhone)
         let start = new Date(startTime);
         let end = new Date(endTime);
         let arrayOrder = []
+        let orderStatistic
         for(let i = 0; i < arrayPeopleByPhone.length; i++){
-            let orderStatistic = await StatisticsOrders.findAll({
+            orderStatistic = await StatisticsOrders.findAll({
                 where:{
                     tenantId : tenantId,
                     phone : arrayPeopleByPhone[i],
@@ -1094,11 +1097,29 @@ const getstatistics = (function () {
                         $lt : end
                     }
                 },
-                order:["createdAt","DESC"],
-                limit : limitJson.limit,
-                offset : limitJson.offset
+                order:[["createdAt","desc"]],
             })
-            arrayOrder.push(orderStatistic)
+            console.log(orderStatistic.length)
+        }
+        let orderJson
+        for(let j = 0; j <orderStatistic.length; j++ ){
+            orderJson = {
+                phone : orderStatistic[j].phone,
+                trade_no : orderStatistic[j].trade_no,
+                totalPrice : orderStatistic[j].totalPrice,
+                merchantAmount : orderStatistic[j].merchantAmount,
+                consigneeAmount : orderStatistic[j].consigneeAmount,
+                platformAmount : orderStatistic[j].platformAmount,
+                deliveryFee : orderStatistic[j].deliveryFee,
+                refund_amount : orderStatistic[j].refund_amount,
+                platformCouponFee : orderStatistic[j].platformCouponFee,
+                merchantCouponFee : orderStatistic[j].merchantCouponFee,
+                tenantId : orderStatistic[j].tenantId,
+                consigneeId : orderStatistic[j].consigneeId,
+                createTime : orderStatistic[j].createTime,
+                style : JSON.parse(orderStatistic[j].style),
+            }
+            arrayOrder.push(orderJson)
         }
         return arrayOrder;
     }
@@ -1282,7 +1303,7 @@ const getstatistics = (function () {
         getOrderstatisticByPriceCount : getOrderstatisticByPriceCount,
         getOrderstatisticByPeople:getOrderstatisticByPeople,
         getActivity : getActivity,
-        getOrderstatisticByPeopleCount : getOrderstatisticByPeopleCount
+
     }
     return instance;
 })();

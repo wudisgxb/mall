@@ -23,9 +23,10 @@ module.exports = function (sequelize, DataTypes) {
         tenantId: shortDataTypes.String(100, false),
         //是否订单确认
         needOrderConfirmPage: shortDataTypes.Bool(),
-        style : shortDataTypes.String()
+        style : shortDataTypes.String(),
         // //是否实时
         // isRealTime:shortDataTypes.Bool(),
+        aggregateScore : shortDataTypes.Int(),
     }, {
         associate: function (models) {
         },

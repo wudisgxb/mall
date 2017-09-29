@@ -8,12 +8,14 @@ module.exports = function (sequelize, DataTypes) {
         name: shortDataTypes.String(),
         status: shortDataTypes.Int(),
         info: shortDataTypes.String(),
+        // isMakeAppintment : shortDataTypes.Bool(),
         tenantId: {
             type: Sequelize.STRING
         },
         consigneeId: {
             type: Sequelize.STRING
         }
+
     }, {
         associate: function (models) {
         },

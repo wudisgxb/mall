@@ -106,7 +106,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
 
     },
-
+    
     async alipay(ctx, next) {
         let response = ctx.request.body;
         let tableId = 0;

@@ -3,7 +3,6 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 let Vip = db.models.Vips;
-let vipss = require('../admin/vip')
 let getCouponsEchats = require('../echats/couponsEchats')
 module.exports = {
     async couponsEchats(ctx, next){

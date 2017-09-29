@@ -33,6 +33,7 @@ module.exports = {
                 customerArray.push(customer[i].phone)
             }
         }
+        
         let phoneArray = []
         let phoneJson = {}
         for(let j = 0; j < customerArray.length; j++){

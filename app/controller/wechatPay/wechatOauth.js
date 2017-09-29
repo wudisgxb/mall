@@ -12,6 +12,9 @@ const OrderGoods = db.models.OrderGoods;
 const PaymentReqs = db.models.PaymentReqs;
 const AlipayErrors = db.models.AlipayErrors;
 const TenantConfigs = db.models.TenantConfigs;
+const AllianceMerchants = db.models.AllianceMerchants;
+const MerchantSetIntegrals = db.models.MerchantSetIntegrals;
+const VipIntegrals = db.models.VipIntegrals;
 const Foods = db.models.Foods;
 const Coupons = db.models.Coupons;
 const User = db.models.User;
@@ -707,15 +710,19 @@ module.exports = {
                 //output:object（总金额，租户金额，代售金额）
 
                 let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
-
-                let customerVips = await Vips.findAll({
+                let allianceMerchants = await AllianceMerchants.findOne({
+                    where:{
+                        tenantId :tenantId
+                    }
+                })
+                let customerVips = await Vips.findOne({
                     where: {
                         phone: order.phone,
-                        tenantId: tenantId
+                        alliancesId: allianceMerchants.alliancesId
                     }
                 });
                 let isVip = false
-                if (customerVips.length > 0) {
+                if (customerVips!=null) {
                     isVip = true
                 }
                 let customerJson = {
@@ -732,6 +739,56 @@ module.exports = {
                         tenantId :tenantId
                     }
                 })
+                if(isVip){
+                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,allianceMerchants.alliancesId)
+                }
+                //判断是否为VIP
+                // if(isVip){
+                //     //查询此租户的积分配置
+                //     let merchantSetIntegrals = await MerchantSetIntegrals.findOne({
+                //         where:{
+                //             tenantId :tenantId
+                //         }
+                //     })
+                //
+                //     let priceIntegralsRate =0
+                //     //转换成int类型
+                //     if(merchantSetIntegrals!=null){
+                //         priceIntegralsRate = Number(merchantSetIntegrals.priceIntegralsRate)
+                //     }
+                //     //积分记录ID
+                //     let vipIntegralsId = Tool.allocTenantId().substring(4);
+                //     //得到本次消费的积分数
+                //     let integral = priceIntegralsRate==0?0:Math.ceil(amountJson.totalPrice/priceIntegralsRate)
+                //     //添加一条vip积分表的记录
+                //     await VipIntegrals.create({
+                //         vipIntegralsId : "wxpy"+vipIntegralsId,
+                //         vipId : customerVips.membershipCardNumber,
+                //         buyOrSale : "1",
+                //         buyOrSaleMerchant : tenantId,
+                //         price : amountJson.totalPrice,
+                //         integral : integral,
+                //         alliancesId : allianceMerchants.alliancesId
+                //     })
+                //     //用查询到的积分数+本次消费的积分数得到会员的总积分数
+                //     let aggregateScore =Number(customerVips.aggregateScore)+integral
+                //     //修改VIP表中的总积分数
+                //     await Vips.update({
+                //         aggregateScore :aggregateScore
+                //     },{
+                //         where:{
+                //             phone: order.phone,
+                //             alliancesId : allianceMerchants.alliancesId
+                //         }
+                //     })
+                //     //获得商家的积分数
+                //     let merchantAggregateScore = merchant.aggregateScore-
+                //     //修改商家表中的总积分数
+                //     await Merchants.update({
+                //         aggregateScore :
+                //     })
+                //
+                // }
                 try {
                     amountJson.style = merchant==null?null:merchant.style;
                     amountJson.tenantId = tenantId;

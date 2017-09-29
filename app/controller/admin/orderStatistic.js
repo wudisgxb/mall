@@ -72,6 +72,7 @@ module.exports = {
 
     //根據金錢段查詢記錄，可分頁
     async getOrderstatisticByPrice(ctx,next){
+
         ctx.checkQuery("tenantId").notEmpty()
         ctx.checkQuery("minPrice").notEmpty()
         ctx.checkQuery("maxPrice").notEmpty()
@@ -130,30 +131,16 @@ module.exports = {
         ctx.checkQuery("purchaseFrequency").notEmpty();
         ctx.checkQuery("startTime").notEmpty();
         ctx.checkQuery("endTime").notEmpty();
-        ctx.checkQuery("type").notEmpty();
-
+        console.log()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return;
         }
         let order;
-        if(ctx.query.type==1){
-            if(ctx.query.pageSize!=null&&ctx.query.pageSize!=""&&ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""){
-                let pageSize = ctx.query.pageSize
-                let pageNumber = ctx.query.pageNumber
-                let place = (pageNumber - 1) * pageSize;
-                let limitJson = {
-                    limit : pageSize,
-                    offset : place
-                }
-                order = await orderStatistic.getOrderstatisticByPeople(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.startTime,ctx.query.endTime,limitJson)
-            }else{
-                order = await orderStatistic.getOrderstatisticByPeople(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.startTime,ctx.query.endTime)
-            }
-        }
-        if(ctx.query.type==2){
-            order = await orderStatistic.getOrderstatisticByPeopleCount(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.startTime,ctx.query.endTime)
-        }
+        order = await orderStatistic.getOrderstatisticByPeople(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.startTime,ctx.query.endTime)
+        // if(ctx.query.type==2){
+        //     order = await orderStatistic.getOrderstatisticByPeopleCount(ctx.query.tenantId,ctx.query.purchaseFrequency,ctx.query.startTime,ctx.query.endTime)
+        // }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,order)
     },
 

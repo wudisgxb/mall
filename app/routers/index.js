@@ -31,24 +31,24 @@ var db = require('./../db/mysql/index.js');
 
 module.exports = function (app) {
 
-  try {
-    var loadDir = (dir) => {
-      fs
-          .readdirSync(dir)
-          .forEach((file) => {
-            var nextPath = path.join(dir, file);
-            var stat = fs.statSync(nextPath);
-            if (stat.isDirectory()) {
-              loadDir(nextPath);
-            } else if (stat.isFile() && file.indexOf('.') !== 0 && file !== 'index.js' && file !== 'url.js') {
-                const router = require(nextPath)
-                app.use(router.routes(), router.allowedMethods());
-            }
-          });
-    };
+    try {
+        var loadDir = (dir) => {
+            fs
+                .readdirSync(dir)
+                .forEach((file) => {
+                    var nextPath = path.join(dir, file);
+                    var stat = fs.statSync(nextPath);
+                    if (stat.isDirectory()) {
+                        loadDir(nextPath);
+                    } else if (stat.isFile() && file.indexOf('.') !== 0 && file !== 'index.js' && file !== 'url.js') {
+                        const router = require(nextPath)
+                        app.use(router.routes(), router.allowedMethods());
+                    }
+                });
+        };
 
-    loadDir(__dirname);
-  } catch (e) {
-    app.emit('error', e)
-  }
+        loadDir(__dirname);
+    } catch (e) {
+        app.emit('error', e)
+    }
 }

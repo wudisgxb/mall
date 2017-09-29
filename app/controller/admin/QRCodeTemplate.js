@@ -298,6 +298,7 @@ module.exports = {
                 descriptor: body.descriptor,
             });
         }
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplateId);
     },
 }
