@@ -380,7 +380,7 @@ module.exports = {
     },
 
     async alipay(ctx, next) {
-
+        console.log("进入回调")
         let response = ctx.request.body;
         let tableId = 0;
 
@@ -545,7 +545,7 @@ module.exports = {
                         tenantId :tenantId
                     }
                 })
-
+                console.log()
                 //判断是否是会员
                 if(isVip==true){
                     console.log("-------------------------------isVip---------------------"+isVip)
