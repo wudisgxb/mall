@@ -545,7 +545,9 @@ module.exports = {
                         tenantId :tenantId
                     }
                 })
-                console.log()
+                console.log("======================="+order.phone)
+                console.log("======================="+isVip)
+                // console.log("======================="+order.phone)
                 //判断是否是会员
                 if(isVip==true){
                     console.log("-------------------------------isVip---------------------"+isVip)
