@@ -210,20 +210,25 @@ module.exports = {
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,vip)
     },
-    //
+    //修改卡号/修改商圈Id
     async updateVipmem(ctx,next){
 
         let vips = await Vip.findAll({paranoid: false})
 
         let ArrayNumber = []
         for(let i =0;i<vips.length;i++){
-            ArrayNumber.push(Vip.update({
 
+            let y = 1
+            ArrayNumber.push(Vip.update({
+                membershipCardNumber :y,
+                alliancesId :"222267370d07487ee160a1b7c07136e4"
             },{
                 where:{
                     id : vips[i].id
                 }
             }))
+            y++
+
         }
         await ArrayNumber
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
