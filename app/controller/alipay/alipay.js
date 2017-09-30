@@ -548,12 +548,15 @@ module.exports = {
 
                 //判断是否是会员
                 if(isVip==true){
-
+                    console.log("-------------------------------isVip---------------------"+isVip)
                     let merchantIntegralsJson ={
                         tenantId : tenantId
                     }
                     //如果是会员的话获取商户的积分信息
                     let merchantIntegrals = await sqlMerchantIntegrals.getMerchantIntegrals(merchantIntegralsJson)
+                    console.log(tenantId)
+                    console.log(order.phone)
+                    console.log(amountJson.totalPrice)
                     amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice)
                     //如果积分信息获取到的话
                     // if(merchantIntegrals!=null){

@@ -486,18 +486,23 @@ const amountManger = (function () {
     }
     //会员购买商品后的积分分配
     let integralAllocation = async function (tenantId,phone,totalPrice) {
+        console.log("会员购买商品后的积分分配中的tenantId"+tenantId)
+        console.log("会员购买商品后的积分分配中的tenantId"+phone)
+        console.log("会员购买商品后的积分分配中的tenantId"+totalPrice)
         let allianceMerchants = await AllianceMerchants.findOne({
             where:{
                 tenantId:tenantId
             }
         })
         let alliancesId = allianceMerchants.alliancesId
+        console.log("商圈的Id"+alliancesId)
         let vip = await Vips.findOne({
             where:{
                 alliancesId : alliancesId,
                 phone : phone
             }
         })
+        console.log("vip用户信息"+vip)
 
         //查询此租户的积分配置
         let merchantSetIntegrals = await MerchantSetIntegrals.findOne({
@@ -505,12 +510,14 @@ const amountManger = (function () {
                 tenantId :tenantId
             }
         })
+        console.log("租户积分配置信息"+merchantSetIntegrals)
 
-        let priceIntegralsRate =0
+        let priceIntegralsRate
         //转换成int类型
         if(merchantSetIntegrals!=null){
-            priceIntegralsRate = Number(merchantSetIntegrals.priceIntegralsRate)
+            priceIntegralsRate = Number(merchantSetIntegrals.priceIntegralsRate).toFixed(2)
         }
+        console.log(priceIntegralsRate)
         //积分记录ID
         let vipIntegralsId = "wxpy"+(Tool.allocTenantId().substring(4));
         //得到本次消费的积分数
