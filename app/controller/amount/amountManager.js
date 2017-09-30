@@ -27,6 +27,7 @@ const Consignees = db.models.Consignees;
 const orderManager = require('../customer/order');
 const promotionManager = require('../customer/promotions')
 const vipManager = require('../customer/vip');
+const Tool = require('../../Tool/tool')
 
 const amountManger = (function () {
 
