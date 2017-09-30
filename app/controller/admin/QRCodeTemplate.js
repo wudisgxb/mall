@@ -3,6 +3,9 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const QRCodeTemplates = db.models.QRCodeTemplates;
+const AllianceMerchants = db.models.AllianceMerchants;
+const Alliances = db.models.Alliances
+const AllianceHeadquarters = db.models.AllianceHeadquarters
 const Merchants = db.models.Merchants;
 const Consignees = db.models.Consignees;
 const Tool = require('../../Tool/tool');
@@ -193,6 +196,81 @@ module.exports = {
             qrCodeTemplatesArray.push(qrCodeTemplatesJson)
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplatesArray);
+    },
+    async getQRCodeTemplateByTenantId(ctx,next){
+        ctx.checkQuery('tenantId').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let qrCodeTemplates = await QRCodeTemplates.findOne({
+            where:{
+                tenantId:ctx.query.tenantId,
+                bizType : "Ipay"
+            }
+        })
+        if(qrCodeTemplates==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"查询不到此二维码")
+            return
+        }
+        // console.log(qrCodeTemplates)
+        let qrCodeTemplatesArray =[]
+        // for(let i = 0; i < qrCodeTemplates.length; i++){
+
+            let merchant = await Merchants.findOne({
+                where:{
+                    tenantId : qrCodeTemplates.tenantId
+                }
+            })
+            let paymentMerchant;
+            if(merchant!=null){
+                let allianceMerchants = await AllianceMerchants.findOne({
+                    where:{
+                        tenantId : qrCodeTemplates.tenantId
+                    }
+                })
+                paymentMerchant = allianceMerchants
+            }
+            if(merchant==null){
+                let alliances = await Alliances.findOne({
+                    where:{
+                        alliancesId : qrCodeTemplates.tenantId
+                    }
+                })
+                merchant = alliances
+                let allianceHeadquarters = await AllianceHeadquarters.findOne({
+                    where:{
+                        alliancesId : qrCodeTemplates.tenantId
+                    }
+                })
+                paymentMerchant = allianceHeadquarters
+            }
+            let consignee = await Consignees.findOne({
+                where:{
+                    consigneeId : qrCodeTemplates.consigneeId
+                }
+            })
+            let qrCodeTemplatesJson = {
+                id : qrCodeTemplates.id,
+                QRCodeTemplateId : qrCodeTemplates.QRCodeTemplateId,
+                bizType : qrCodeTemplates.bizType,
+                couponType : qrCodeTemplates.couponType,
+                couponValue : qrCodeTemplates.couponValue,
+                couponRate : qrCodeTemplates.couponRate,
+                tenantId : qrCodeTemplates.tenantId,
+                consigneeId : qrCodeTemplates.consigneeId,
+                descriptor : qrCodeTemplates.descriptor,
+                orderLimit : qrCodeTemplates.orderLimit,
+                tableName : qrCodeTemplates.tableName,
+                isShared : qrCodeTemplates.isShared,
+                tenantName : merchant==null?null:merchant.name,
+                consigneeName : consignee==null?null:consignee.name,
+                paymentMerchant : paymentMerchant.name
+            }
+            qrCodeTemplatesArray.push(qrCodeTemplatesJson)
+        // }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,qrCodeTemplatesArray)
+
     },
     async deleteQRCodeTemplate(ctx, next){
         ctx.checkQuery('QRCodeTemplateId').notEmpty();

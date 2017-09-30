@@ -689,6 +689,7 @@ const amountManger = (function () {
     }
     //充值积分
     let rechargeIntegral = async function (alliancesId,totalPrice) {
+        console.log("用了"+totalPrice)
         let alliancesHeadquarters = await AllianceHeadquarters.findOne({
             where:{
                 alliancesId:alliancesId

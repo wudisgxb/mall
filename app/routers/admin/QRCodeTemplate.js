@@ -6,6 +6,8 @@ const router = new (require('koa-router'))()
 //根据条件查看所有的二维码模板
 router.get('/api/test/admin/QRCodeTemplate', QRCodeTemplate.getQRCodeTemplate);
 
+router.get('/api/test/admin/getQRCodeTemplateByTenantId', QRCodeTemplate.getQRCodeTemplateByTenantId);
+
 //新增二维码模板
 router.post('/api/test/admin/QRCodeTemplate', QRCodeTemplate.saveQRCodeTemplate);
 

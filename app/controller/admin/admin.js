@@ -105,27 +105,23 @@ module.exports = {
 
     async putAdmin(ctx, next){
         let admin = await Admins.findAll({})
-        console.log(admin.length);
-        console.log(AdminCorresponding)
-
         for(let i = 0; i < admin.length; i++){
-
-            if(admin[i].tenantId!="all"&&admin[i].tenantId!="tenantId1"){
-                let correspondingType = 3;
-                if(admin[i].tenantType=="商家联盟"){
-                    correspondingType = 2
-                }
-                await AdminCorresponding.create({
-
-                    phone : admin[i].phone,
-                    correspondingType: correspondingType,
-                    correspondingId: admin[i].tenantId
-                })
-
+            let correspondingType = 3
+            let correspondingId = admin[i].tenantId
+            if(admin[i].type==1000){
+                correspondingId = "1111"+Tool.allocTenantId().substring(4)
+                correspondingType =1
             }
-
+            if(admin[i].type==500){
+                correspondingId = "2222"+Tool.allocTenantId().substring(4)
+                correspondingType =2
+            }
+            await AdminCorresponding.create({
+                phone : admin[i].phone,
+                correspondingType : correspondingType,
+                correspondingId :correspondingId
+            })
         }
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 

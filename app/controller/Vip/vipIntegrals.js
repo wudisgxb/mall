@@ -3,11 +3,15 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 let Tool = require('../../Tool/tool')
-
+let Alliances = db.models.Alliances
+let Headquarters = db.models.Headquarters
+let AllianceIntegrals = db.models.AllianceIntegrals
+let HeadquartersIntegrals = db.models.HeadquartersIntegrals
 let VipIntegrals = db.models.VipIntegrals
 let Vips = db.models.Vips
 let Merchants = db.models.Merchants
 let AllianceMerchants = db.models.AllianceMerchants
+let AllianceHeadquarters = db.models.AllianceHeadquarters
 let MerchantIntegrals = db.models.MerchantIntegrals
 let amountManager = require('../amount/amountManager')
 
@@ -81,8 +85,40 @@ module.exports = {
             buyOrSaleMerchant : vip.id,
             price :0,
             integral : body.integral,
-            allianceId :allianceMerchants.alliancesId
+            // allianceId :allianceMerchants.alliancesId
         })
+
+        //将用户对商圈的积分记录下来
+        let alliancesIntegralsId = "allM"+Tool.allocTenantId().substring(4)
+        await MerchantIntegrals.create({
+            merchantIntegralsId : merchantIntegralsId,
+            tenantId : body.buyOrSaleMerchant,
+            buyOrSale : 0,
+            buyOrSaleMerchant : allianceMerchants.alliancesId,
+            price :0,
+            integral : body.integral,
+            // allianceId :allianceMerchants.alliancesId
+        })
+
+        //根据商圈查询平台
+        let allianceHeadquarters = await AllianceHeadquarters.findOne({
+            where:{
+                allianceId :allianceMerchants.alliancesId
+            }
+        })
+
+        //将租户对平台的积分记录下来
+        let headquartersIntegralsId = "heaM"+Tool.allocTenantId().substring(4)
+        await MerchantIntegrals.create({
+            merchantIntegralsId : headquartersIntegralsId,
+            tenantId : body.buyOrSaleMerchant,
+            buyOrSale : 0,
+            buyOrSaleMerchant : allianceHeadquarters.headquartersId,
+            price :0,
+            integral : body.integral,
+            // allianceId :allianceMerchants.alliancesId
+        })
+
 
         //记录下会员的积分消费
         let vipIntegralsId = "merV"+Tool.allocTenantId().substring(4)
@@ -106,8 +142,52 @@ module.exports = {
             }
         })
 
+        let allianceIntegralsId = "merA"+Tool.allocTenantId().substring(4)
+        await AllianceIntegrals.create({
+            allianceIntegralsId :allianceIntegralsId,
+            alliancesId : allianceMerchants.alliancesId,
+            buyOrSale : 0,
+            buyOrSaleMerchant : body.buyOrSaleMerchant,
+            price : 0,
+            integral : 4
+        })
+        let alliance = await Alliances.findOne({
+            where:{
+                alliancesId : allianceMerchants.alliancesId,
+            }
+        })
+        let aggregateScoreAlliances = Number(alliance.aggregateScore)+4
+        await Alliances.update({
+            aggregateScore : aggregateScoreAlliances
+        },{
+            where:{
+                alliancesId : allianceMerchants.alliancesId,
+            }
+        })
 
 
+        let headquartersIntegralsId = "merA"+Tool.allocTenantId().substring(4)
+        await HeadquartersIntegrals.create({
+            headquartersIntegralsId :headquartersIntegralsId,
+            headquartersId : allianceHeadquarters.headquartersId,
+            buyOrSale : 0,
+            buyOrSaleMerchant : body.buyOrSaleMerchant,
+            price : 0,
+            integral : 2
+        })
+        let headquarters = await Headquarters.findOne({
+            where:{
+                headquartersId : allianceHeadquarters.headquartersId,
+            }
+        })
+        let aggregateScoreheadquarters = Number(headquarters.aggregateScore)+2
+        await Headquarters.update({
+            aggregateScore : aggregateScoreheadquarters
+        },{
+            where:{
+                headquartersId : allianceHeadquarters.headquartersId,
+            }
+        })
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
 
