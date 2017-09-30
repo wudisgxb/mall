@@ -68,16 +68,15 @@ module.exports = {
     async saveAllianceMerchantsBytenantId(ctx,next){
         let merchants = await Merchants.findAll({})
         for(let i = 0; i < merchants.length; i++){
-            // AllianceMerchants.create({
-            //     alliancesId : ,
-            //     tenantId :merchants[i].tenantId,
-            //     allianceRemark : "商圈",
-            //     tenantRemark : merchants[i].name+"租户",
-            //     tenantName : merchants[i].name,
-            //     allianceName :
-            // })
+            AllianceMerchants.create({
+                alliancesId : "222267370d07487ee160a1b7c07136e4",
+                tenantId :merchants[i].tenantId,
+                allianceRemark : "缤润汇商圈",
+                tenantRemark : merchants[i].name+"租户",
+                tenantName : merchants[i].name,
+                allianceName :"缤润汇商圈"
+            })
         }
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     async updateAllianceMerchants(ctx,next){
