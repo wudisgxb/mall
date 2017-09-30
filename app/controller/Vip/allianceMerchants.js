@@ -65,6 +65,21 @@ module.exports = {
         await sqlAllianceMerchants.createOperation(AllianceMerchants,createJson);
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+    async saveAllianceMerchantsBytenantId(ctx,next){
+        let merchants = await Merchants.findAll({})
+        for(let i = 0; i < merchants.length; i++){
+            // AllianceMerchants.create({
+            //     alliancesId : ,
+            //     tenantId :merchants[i].tenantId,
+            //     allianceRemark : "商圈",
+            //     tenantRemark : merchants[i].name+"租户",
+            //     tenantName : merchants[i].name,
+            //     allianceName :
+            // })
+        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    },
     async updateAllianceMerchants(ctx,next){
         ctx.checkBody('id').notEmpty()
         ctx.checkBody('tenantId').notEmpty()
