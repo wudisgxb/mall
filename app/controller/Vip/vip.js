@@ -216,9 +216,10 @@ module.exports = {
         let vips = await Vip.findAll({paranoid: false})
 
         let ArrayNumber = []
+        let y = 1
         for(let i =0;i<vips.length;i++){
 
-            let y = 1
+
             ArrayNumber.push(Vip.update({
                 membershipCardNumber :y,
                 alliancesId :"222267370d07487ee160a1b7c07136e4"
