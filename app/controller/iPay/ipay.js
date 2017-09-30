@@ -161,8 +161,9 @@ module.exports = {
                     isFinish: false
                 }
             });
-            console.log(ePay)
+            console.log("________________"+ePay+"---------------------")
             if (ePay != null) {
+                console("ePay != null")
                 //支付请求表 isFinish改成true
                 ePay.isFinish = true;
                 await ePay.save();

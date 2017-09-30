@@ -484,7 +484,7 @@ const amountManger = (function () {
         }
 
     }
-    //积分分配
+    //会员购买商品后的积分分配
     let integralAllocation = async function (tenantId,phone,totalPrice) {
         let allianceMerchants = await AllianceMerchants.findOne({
             where:{
@@ -691,6 +691,7 @@ const amountManger = (function () {
     //充值积分
     let rechargeIntegral = async function (alliancesId,totalPrice) {
         console.log("用了"+totalPrice)
+        console.log(alliancesId)
         let alliancesHeadquarters = await AllianceHeadquarters.findOne({
             where:{
                 alliancesId:alliancesId
@@ -763,11 +764,13 @@ const amountManger = (function () {
         if(alliancesHeadquarters==null){
             //如果没找到的话就说明这个付款的Id是租户的
             //查询商圈和租户的关联表查询到在那个商圈充值的
+
             let alliancesMerchant = await AllianceMerchants.findOne({
                 where:{
                     tenantId : alliancesId
                 }
             })
+            console.log("alliancesMerchant商圈租户关联的关系"+alliancesMerchant)
             //获得商圈IdW
             dealId = alliancesMerchant.alliancesId
             //获得一个和租户有关的Id
