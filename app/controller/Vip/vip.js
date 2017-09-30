@@ -208,6 +208,10 @@ module.exports = {
                     }]
             }
         });
+        if(vip.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"查无此人")
+            return
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,vip)
     },
     //修改卡号/修改商圈Id

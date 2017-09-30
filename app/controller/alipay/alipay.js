@@ -474,7 +474,7 @@ module.exports = {
                         trade_no: ret.out_trade_no,
                     }
                 });
-                amountManager.integralAllocation()
+
 
                 order.status = 2;
                 await order.save();
@@ -545,6 +545,7 @@ module.exports = {
                         tenantId :tenantId
                     }
                 })
+
                 //判断是否是会员
                 if(isVip==true){
 
@@ -553,29 +554,30 @@ module.exports = {
                     }
                     //如果是会员的话获取商户的积分信息
                     let merchantIntegrals = await sqlMerchantIntegrals.getMerchantIntegrals(merchantIntegralsJson)
+                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice)
                     //如果积分信息获取到的话
-                    if(merchantIntegrals!=null){
-                        //则获取商家积分信息的积分兑换比率
-                        let integralsNum
-
-                        let priceIntegralsRate = Number(merchantIntegrals.priceIntegralsRate)
-                        if(merchantIntegrals.looseChange==true){
-                            integralsNum = priceIntegralsRate==0?0:amountJson.totalPrice/priceIntegralsRate
-                        }else {
-                            integralsNum = priceIntegralsRate==0?0:Math.ceil(amountJson.totalPrice/priceIntegralsRate)
-                        }
-                        let integralId = Tool.allocTenantId()
-                        let integralsJson ={
-                            integralId : integralId,
-                            tenantId : tenantId,
-                            phone : order.phone,
-                            price : amountJson.totalPrice,
-                            integralnum : integralsNum,
-                            integralTime : new Date(),
-                            goodsName: JSON.stringify(FoodNameArray),
-                        }
-                        await sqlClienteleIntegrals.saveClienteleIntegral(integralsJson)
-                    }
+                    // if(merchantIntegrals!=null){
+                    //     //则获取商家积分信息的积分兑换比率
+                    //     let integralsNum
+                    //
+                    //     let priceIntegralsRate = Number(merchantIntegrals.priceIntegralsRate)
+                    //     if(merchantIntegrals.looseChange==true){
+                    //         integralsNum = priceIntegralsRate==0?0:amountJson.totalPrice/priceIntegralsRate
+                    //     }else {
+                    //         integralsNum = priceIntegralsRate==0?0:Math.ceil(amountJson.totalPrice/priceIntegralsRate)
+                    //     }
+                    //     let integralId = Tool.allocTenantId()
+                    //     let integralsJson ={
+                    //         integralId : integralId,
+                    //         tenantId : tenantId,
+                    //         phone : order.phone,
+                    //         price : amountJson.totalPrice,
+                    //         integralnum : integralsNum,
+                    //         integralTime : new Date(),
+                    //         goodsName: JSON.stringify(FoodNameArray),
+                    //     }
+                    //     await sqlClienteleIntegrals.saveClienteleIntegral(integralsJson)
+                    // }
                 }
                 try {
                     amountJson.style = merchant==null?null:merchant.style
