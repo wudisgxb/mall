@@ -44,6 +44,18 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "此商圈下会员已存在")
             return;
         }
+        let vipsNum = await Vip.findAll({
+            where: {
+                membershipCardNumber: body.vip.membershipCardNumber,
+                alliancesId:allianceMerchants.alliancesId
+                // tenantId: body.tenantId
+            }
+        })
+        if(vipsNum>0){
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "此商圈下卡号已存在")
+            return;
+        }
+
         if(body.vip.referralPhone!=""&&body.vip.referralPhone!=null){
             let vip = await Vip.findOne({
                 where:{

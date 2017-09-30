@@ -697,10 +697,10 @@ const amountManger = (function () {
                 alliancesId:alliancesId
             }
         })
-        let dealId
+        // let dealId
         if(alliancesHeadquarters!=null){
             //如果这个付款的alliancesId是商圈的，那么就是在平台充值
-            dealId = alliancesHeadquarters.headquartersId
+            let dealId = alliancesHeadquarters.headquartersId
             //生成一个和商圈有关的平台Id
             let headquartersIntegralsId = "allH"+(Tool.allocTenantId().substring(4))
             //查询这个平台的积分设置
@@ -772,21 +772,23 @@ const amountManger = (function () {
             })
             console.log("alliancesMerchant商圈租户关联的关系"+alliancesMerchant)
             //获得商圈IdW
-            dealId = alliancesMerchant.alliancesId
+            console.log(alliancesMerchant.alliancesId)
+
             //获得一个和租户有关的Id
             let alliancesIntegralsId = "tenA"+(Tool.allocTenantId().substring(4))
             //查询商圈设置的积分
             let allianceSetIntegrals = await AllianceSetIntegrals.findOne({
                 where:{
-                    alliancesId : dealId
+                    alliancesId : alliancesMerchant.alliancesId
                 }
             })
             //计算出购买的积分量
             let integral = totalPrice/(Number(allianceSetIntegrals.priceIntegralsRate))
+            console.log("alliancesIntegralsId为"+alliancesIntegralsId)
             //新增商圈记录
             await AllianceIntegrals.create({
-                alliancesIntegralsId : alliancesIntegralsId,
-                alliancesId : dealId,
+                allianceIntegralsId : alliancesIntegralsId,
+                alliancesId : alliancesMerchant.alliancesId,
                 buyOrSale : "0",//失去积分
                 buyOrSaleMerchant : alliancesId,//给积分给那个租户
                 price : totalPrice,
@@ -794,15 +796,15 @@ const amountManger = (function () {
             })
             let alliance = await Alliances.findOne({
                 where:{
-                    alliancesId : dealId
+                    alliancesId : alliancesMerchant.alliancesId,
                 }
             })
-            let aggregateScoreAlliances = alliance.aggregateScore-integral
+            let aggregateScoreAlliances = Number(alliance.aggregateScore)-integral
             await Alliances.update({
                 aggregateScore : aggregateScoreAlliances
             },{
                 where:{
-                    alliancesId : dealId
+                    alliancesId : alliancesMerchant.alliancesId
                 }
             })
 
@@ -811,7 +813,7 @@ const amountManger = (function () {
                 merchantIntegralsId : merchantIntegralsId,
                 tenantId : alliancesId,
                 buyOrSale : "1",
-                buyOrSaleMerchant:dealId,
+                buyOrSaleMerchant:alliancesMerchant.alliancesId,
                 price:totalPrice,
                 integral : integral,
             })
