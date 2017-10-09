@@ -533,6 +533,32 @@ const amountManger = (function () {
 
         //得到本次消费的积分数
         let integral = priceIntegralsRate==0?0:Math.ceil(totalPrice/priceIntegralsRate)
+
+        //得到商家返利积分（暂时写死为20）
+        let merchantRebate = 20;
+        //得到商家返给平台的积分
+        let merchantRebateTerrace = Math.floor(merchantRebate*0.1)
+        //得到商家返给商圈的积分
+        let merchantRebateAlliance = Math.floor(merchantRebate*0.2)
+        //得到商家返给开户商积分
+        let merchantRebateMerchant = Math.floor(merchantRebate*0.7)
+        //查询商家的总积分数
+        console.log(Merchants)
+        let merchant = await Merchants.findOne({
+            where:{
+                tenantId : tenantId
+            }
+        })
+        console.log("租户为"+merchant.name)
+        //商家剩余积分数
+        let merchantResidueIntegral = merchant.aggregateScore-(merchantRebate+integral)
+        if(merchantResidueIntegral<0){
+            return "-1"
+        }
+        console.log("商家积分"+merchant.aggregateScore)
+        console.log("商家返利积分"+merchantRebate)
+        console.log("给会员的积分"+integral)
+        console.log("商家剩余的总积分"+merchantResidueIntegral)
         //检查vip积分Id是否存在
         console.log("检查vip积分Id是否存在"+vipIntegralsId)
         //添加一条vip积分表的记录
@@ -568,31 +594,7 @@ const amountManger = (function () {
             price : totalPrice,//获得的钱数
             integral : integral,//失去的积分数
         })
-        //得到商家返利积分（暂时写死为20）
-        let merchantRebate = 20;
-        //得到商家返给平台的积分
-        let merchantRebateTerrace = Math.floor(merchantRebate*0.1)
-        //得到商家返给商圈的积分
-        let merchantRebateAlliance = Math.floor(merchantRebate*0.2)
-        //得到商家返给开户商积分
-        let merchantRebateMerchant = Math.floor(merchantRebate*0.7)
-        //查询商家的总积分数
-        let merchant = await Merchants.findOne({
-            where:{
-                tenantId : tenantId
-            }
-        })
 
-
-        //商家剩余积分数
-        let merchantResidueIntegral = merchant.aggregateScore-(merchantRebate+integral)
-        if(merchantResidueIntegral<0){
-            return "-1"
-        }
-        console.log("商家积分"+merchant.aggregateScore)
-        console.log("商家返利积分"+merchantRebate)
-        console.log("给会员的积分"+integral)
-        console.log("商家剩余的总积分"+merchantResidueIntegral)
         //修改商家表中的总积分数
         await Merchants.update({
             aggregateScore : merchantResidueIntegral
