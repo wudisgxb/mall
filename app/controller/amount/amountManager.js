@@ -550,20 +550,23 @@ const amountManger = (function () {
             }
         })
         console.log("租户为"+merchant.name)
+        console.log("商家积分"+merchant.aggregateScore)
+        console.log("给会员的积分"+integral)
         //商家剩余积分数
         let merchantResidueIntegral = merchant.aggregateScore-(merchantRebate+integral)
-        if(merchantResidueIntegral<0){
-            return "-1"
-        }
-        console.log("商家积分"+merchant.aggregateScore)
+
+        // console.log("商家积分"+merchant.aggregateScore)
         console.log("商家返利积分"+merchantRebate)
-        console.log("给会员的积分"+integral)
+        // console.log("给会员的积分"+integral)
         console.log("商家剩余的总积分"+merchantResidueIntegral)
         //检查vip积分Id是否存在
         console.log("检查vip积分Id是否存在"+vipIntegralsId)
         //添加一条vip积分表的记录
         console.log("会员积分表"+VipIntegrals)
         console.log("商圈Id"+alliancesId)
+        if(merchantResidueIntegral<0){
+            return "-1"
+        }
         await VipIntegrals.create({
             vipIntegralsId : vipIntegralsId,
             vipId : vip.membershipCardNumber,
@@ -712,7 +715,7 @@ const amountManger = (function () {
             price : 0,//失去的钱数
             integral : merchantRebateTerrace,//获得的积分数
         })
-
+        return "1"
     }
     //充值积分
     let rechargeIntegral = async function (alliancesId,totalPrice) {
