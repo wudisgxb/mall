@@ -589,7 +589,10 @@ const amountManger = (function () {
         if(merchantResidueIntegral<0){
             return "-1"
         }
-
+        console.log(merchant.aggregateScore)
+        console.log(merchantRebate)
+        console.log(aggregateScore)
+        console.log(merchantResidueIntegral)
         //修改商家表中的总积分数
         await Merchants.update({
             aggregateScore : merchantResidueIntegral
