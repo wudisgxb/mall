@@ -742,7 +742,7 @@ module.exports = {
                 // })
                 let pay = "微信"
                 if(isVip){
-                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,allianceMerchants.alliancesId,pay)
+                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
                 }
                 //判断是否为VIP
                 // if(isVip){

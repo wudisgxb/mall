@@ -521,7 +521,7 @@ const amountManger = (function () {
         console.log(priceIntegralsRate)
         //积分记录ID
         let vipIntegralsId
-        console.log(pay)
+        console.log("pay的值为:"+pay)
         if(pay=="支付宝"){
             vipIntegralsId = "alpy"+(Tool.allocTenantId().substring(4));
         }
