@@ -16,6 +16,7 @@ const Coupons = db.models.Coupons;
 const Consignees = db.models.Consignees;
 const Merchants = db.models.Merchants;
 const AlipayErrors = db.models.AlipayErrors;
+const AllianceMerchants = db.models.AllianceMerchants;
 const Vips = db.models.Vips;
 const Foods = db.models.Foods;
 const ProfitSharings = db.models.ProfitSharings;
@@ -521,10 +522,17 @@ module.exports = {
 
                 console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
 
+
+                let allianceMerchants = await AllianceMerchants.findOne({
+                    where:{
+                        tenantId : tenantId
+                    }
+                })
+                //在商圈中查找
                 let customerVips = await Vips.findAll({
                     where: {
                         phone: order.phone,
-                        tenantId: tenantId,
+                        alliancesId : allianceMerchants.alliancesId,
                     }
                 });
                 let isVip = false
