@@ -486,7 +486,7 @@ const amountManger = (function () {
 
     }
     //会员购买商品后的积分分配
-    let integralAllocation = async function (tenantId,phone,totalPrice) {
+    let integralAllocation = async function (tenantId,phone,totalPrice,pay) {
         console.log("会员购买商品后的积分分配中的交易商:"+tenantId)
         console.log("会员购买商品后的积分分配中的电话:"+phone)
         console.log("会员购买商品后的积分分配中的价格:"+totalPrice)
@@ -520,7 +520,16 @@ const amountManger = (function () {
         }
         console.log(priceIntegralsRate)
         //积分记录ID
-        let vipIntegralsId = "wxpy"+(Tool.allocTenantId().substring(4));
+        let vipIntegralsId
+        if(pay=="支付宝"){
+            vipIntegralsId = "alpy"+(Tool.allocTenantId().substring(4));
+        }
+        else if(pay=="微信"){
+            vipIntegralsId = "wxpy"+(Tool.allocTenantId().substring(4));
+        }else{
+            vipIntegralsId = "wupy"+(Tool.allocTenantId().substring(4));
+        }
+
         //得到本次消费的积分数
         let integral = priceIntegralsRate==0?0:Math.ceil(totalPrice/priceIntegralsRate)
         //检查vip积分Id是否存在

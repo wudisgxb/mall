@@ -521,7 +521,7 @@ module.exports = {
                 let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, ret.out_trade_no, '支付宝', 0);
 
                 console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
-                
+
                 let allianceMerchants = await AllianceMerchants.findOne({
                     where:{
                         tenantId : tenantId
@@ -566,7 +566,8 @@ module.exports = {
                     console.log(tenantId)
                     console.log(order.phone)
                     console.log(amountJson.totalPrice)
-                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice)
+                    let pay = "支付宝"
+                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
                     //如果积分信息获取到的话
                     // if(merchantIntegrals!=null){
                     //     //则获取商家积分信息的积分兑换比率

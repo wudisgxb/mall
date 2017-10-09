@@ -19,7 +19,7 @@ const Foods = db.models.Foods;
 const Coupons = db.models.Coupons;
 const User = db.models.User;
 const Vips = db.models.Vips
-const Merchants = db.models.Merchant
+const Merchants = db.models.Merchants
 const Consignees = db.models.Consignees;
 const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../../controller/infoPush/infoPush');
@@ -734,14 +734,15 @@ module.exports = {
                     isVip: isVip
                 }
                 await customer.saveCustomer(customerJson);
-                console.log(Merchants)
+                // console.log(Merchants)
                 // let merchant = await Merchants.findOne({
                 //     where:{
                 //         tenantId :tenantId
                 //     }
                 // })
+                let pay = "微信"
                 if(isVip){
-                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,allianceMerchants.alliancesId)
+                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,allianceMerchants.alliancesId,pay)
                 }
                 //判断是否为VIP
                 // if(isVip){
