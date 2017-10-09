@@ -742,55 +742,13 @@ module.exports = {
                 // })
                 let pay = "微信"
                 if(isVip){
-                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
+                    let integralAllocation = amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
+                    if(integralAllocation=="-1"){
+                        ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"商家积分不足")
+                        return
+                    }
                 }
-                //判断是否为VIP
-                // if(isVip){
-                //     //查询此租户的积分配置
-                //     let merchantSetIntegrals = await MerchantSetIntegrals.findOne({
-                //         where:{
-                //             tenantId :tenantId
-                //         }
-                //     })
-                //
-                //     let priceIntegralsRate =0
-                //     //转换成int类型
-                //     if(merchantSetIntegrals!=null){
-                //         priceIntegralsRate = Number(merchantSetIntegrals.priceIntegralsRate)
-                //     }
-                //     //积分记录ID
-                //     let vipIntegralsId = Tool.allocTenantId().substring(4);
-                //     //得到本次消费的积分数
-                //     let integral = priceIntegralsRate==0?0:Math.ceil(amountJson.totalPrice/priceIntegralsRate)
-                //     //添加一条vip积分表的记录
-                //     await VipIntegrals.create({
-                //         vipIntegralsId : "wxpy"+vipIntegralsId,
-                //         vipId : customerVips.membershipCardNumber,
-                //         buyOrSale : "1",
-                //         buyOrSaleMerchant : tenantId,
-                //         price : amountJson.totalPrice,
-                //         integral : integral,
-                //         alliancesId : allianceMerchants.alliancesId
-                //     })
-                //     //用查询到的积分数+本次消费的积分数得到会员的总积分数
-                //     let aggregateScore =Number(customerVips.aggregateScore)+integral
-                //     //修改VIP表中的总积分数
-                //     await Vips.update({
-                //         aggregateScore :aggregateScore
-                //     },{
-                //         where:{
-                //             phone: order.phone,
-                //             alliancesId : allianceMerchants.alliancesId
-                //         }
-                //     })
-                //     //获得商家的积分数
-                //     let merchantAggregateScore = merchant.aggregateScore-
-                //     //修改商家表中的总积分数
-                //     await Merchants.update({
-                //         aggregateScore :
-                //     })
-                //
-                // }
+               
                 try {
                     amountJson.style = merchant==null?null:merchant.style;
                     amountJson.tenantId = tenantId;
