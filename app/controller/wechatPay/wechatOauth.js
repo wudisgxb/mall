@@ -734,12 +734,12 @@ module.exports = {
                     isVip: isVip
                 }
                 await customer.saveCustomer(customerJson);
-                // console.log(Merchants)
-                // let merchant = await Merchants.findOne({
-                //     where:{
-                //         tenantId :tenantId
-                //     }
-                // })
+                console.log(Merchants)
+                let merchant = await Merchants.findOne({
+                    where:{
+                        tenantId :tenantId
+                    }
+                })
                 let pay = "微信"
                 if(isVip){
                     let integralAllocation = amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
@@ -748,7 +748,7 @@ module.exports = {
                         return
                     }
                 }
-               
+
                 try {
                     amountJson.style = merchant==null?null:merchant.style;
                     amountJson.tenantId = tenantId;
