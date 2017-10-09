@@ -585,14 +585,14 @@ const amountManger = (function () {
 
 
         //商家剩余积分数
-        let merchantResidueIntegral = merchant.aggregateScore-(merchantRebate+aggregateScore)
+        let merchantResidueIntegral = merchant.aggregateScore-(merchantRebate+integral)
         if(merchantResidueIntegral<0){
             return "-1"
         }
-        console.log(merchant.aggregateScore)
-        console.log(merchantRebate)
-        console.log(aggregateScore)
-        console.log(merchantResidueIntegral)
+        console.log("商家积分"+merchant.aggregateScore)
+        console.log("商家返利积分"+merchantRebate)
+        console.log("给会员的积分"+integral)
+        console.log("商家剩余的总积分"+merchantResidueIntegral)
         //修改商家表中的总积分数
         await Merchants.update({
             aggregateScore : merchantResidueIntegral
