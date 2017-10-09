@@ -521,8 +521,7 @@ module.exports = {
                 let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, ret.out_trade_no, '支付宝', 0);
 
                 console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
-
-
+                
                 let allianceMerchants = await AllianceMerchants.findOne({
                     where:{
                         tenantId : tenantId

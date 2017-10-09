@@ -6,7 +6,7 @@ module.exports = function (sequelize, DataTypes) {
     //商户积分
     var VipIntegrals = sequelize.define('VipIntegrals', {
         vipIntegralsId : shortDataTypes.String(100, false),//vip积分Id
-        allianceId : shortDataTypes.String(100, false),//vip积分Id
+        allianceId : shortDataTypes.String(100, false),//商圈Id
         vipId: shortDataTypes.String(100, false),//vip的Id
         buyOrSale : shortDataTypes.String(100, false),//买入或者卖出0为买入1为卖出
         buyOrSaleMerchant : shortDataTypes.String(100, false),//买入卖出商

@@ -523,8 +523,11 @@ const amountManger = (function () {
         let vipIntegralsId = "wxpy"+(Tool.allocTenantId().substring(4));
         //得到本次消费的积分数
         let integral = priceIntegralsRate==0?0:Math.ceil(totalPrice/priceIntegralsRate)
-
+        //检查vip积分Id是否存在
+        console.log("检查vip积分Id是否存在"+vipIntegralsId)
         //添加一条vip积分表的记录
+        console.log("会员积分表"+VipIntegrals)
+        console.log("商圈Id"+alliancesId)
         await VipIntegrals.create({
             vipIntegralsId : vipIntegralsId,
             vipId : vip.membershipCardNumber,
@@ -532,7 +535,7 @@ const amountManger = (function () {
             buyOrSaleMerchant : tenantId,
             price : totalPrice,
             integral : integral,
-            alliancesId : alliancesId
+            allianceId : alliancesId
         })
         //用查询到的积分数+本次消费的积分数得到会员的总积分数
         let aggregateScore = Number(vip.aggregateScore)+integral
