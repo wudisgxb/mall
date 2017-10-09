@@ -743,6 +743,7 @@ module.exports = {
                 let pay = "微信"
                 if(isVip){
                     let integralAllocation = amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
+                    console.log(integralAllocation)
                     if(integralAllocation=="-1"){
                         ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"商家积分不足")
                         return
