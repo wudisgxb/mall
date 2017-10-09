@@ -13,6 +13,7 @@ const HeadquartersSetIntegrals = db.models.HeadquartersSetIntegrals
 const AllianceIntegrals = db.models.AllianceIntegrals
 const AllianceHeadquarters = db.models.AllianceHeadquarters;
 const MerchantIntegrals = db.models.MerchantIntegrals
+const MerchantSetIntegrals = db.models.MerchantSetIntegrals;
 const AllianceSetIntegrals = db.models.AllianceSetIntegrals
 const AllianceMerchants = db.models.AllianceMerchants
 const Vips = db.models.Vips;
@@ -486,9 +487,9 @@ const amountManger = (function () {
     }
     //会员购买商品后的积分分配
     let integralAllocation = async function (tenantId,phone,totalPrice) {
-        console.log("会员购买商品后的积分分配中的tenantId"+tenantId)
-        console.log("会员购买商品后的积分分配中的tenantId"+phone)
-        console.log("会员购买商品后的积分分配中的tenantId"+totalPrice)
+        console.log("会员购买商品后的积分分配中的交易商:"+tenantId)
+        console.log("会员购买商品后的积分分配中的电话:"+phone)
+        console.log("会员购买商品后的积分分配中的价格:"+totalPrice)
         let allianceMerchants = await AllianceMerchants.findOne({
             where:{
                 tenantId:tenantId
@@ -502,7 +503,7 @@ const amountManger = (function () {
                 phone : phone
             }
         })
-        console.log("vip用户信息"+vip)
+        console.log("vip用户信息"+vip.phone)
 
         //查询此租户的积分配置
         let merchantSetIntegrals = await MerchantSetIntegrals.findOne({
