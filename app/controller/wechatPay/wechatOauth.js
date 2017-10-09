@@ -734,11 +734,12 @@ module.exports = {
                     isVip: isVip
                 }
                 await customer.saveCustomer(customerJson);
-                let merchant = await Merchants.findOne({
-                    where:{
-                        tenantId :tenantId
-                    }
-                })
+                console.log(Merchants)
+                // let merchant = await Merchants.findOne({
+                //     where:{
+                //         tenantId :tenantId
+                //     }
+                // })
                 if(isVip){
                     amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,allianceMerchants.alliancesId)
                 }
