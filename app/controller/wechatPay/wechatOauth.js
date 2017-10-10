@@ -745,7 +745,7 @@ module.exports = {
                     let integralAllo= await amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
                     console.log("积分分配是否有错,看integralAllocation是不是-1"+integralAllo)
                     if(integralAllo=="-1"){
-                        ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"你TMSB，商家积分不足，还购买")
+                        webSocket.sendSocket("你TMSB，商家积分不足，还购买");
                     }
                 }
 
