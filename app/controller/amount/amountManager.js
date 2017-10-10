@@ -565,7 +565,7 @@ const amountManger = (function () {
         console.log("会员积分表"+VipIntegrals)
         console.log("商圈Id"+alliancesId)
         if(merchantResidueIntegral<0){
-            return "-1"
+            return -1
         }
         await VipIntegrals.create({
             vipIntegralsId : vipIntegralsId,
@@ -715,7 +715,7 @@ const amountManger = (function () {
             price : 0,//失去的钱数
             integral : merchantRebateTerrace,//获得的积分数
         })
-        return "1"
+        return 1
     }
     //充值积分
     let rechargeIntegral = async function (alliancesId,totalPrice) {
