@@ -10,6 +10,7 @@ const fs = require('fs');
 const Alipay = require('../alipay/index');
 const TenantConfigs = db.models.TenantConfigs;
 const EPays = db.models.EPays;
+const Foods = db.models.Foods
 const QRCodeTemplates = db.models.QRCodeTemplates;
 const transAccountsManager = require('../alipay/transferAccounts')
 const transAccounts = require('../customer/transAccount')
