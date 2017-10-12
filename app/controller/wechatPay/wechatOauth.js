@@ -28,6 +28,7 @@ const amountManager = require('../amount/amountManager')
 const transAccounts = require('../customer/transAccount')
 const orderManager = require('../customer/order');
 const config = require('../../config/config')
+const axios = require('axios');
 
 const getstatistics = require('../statistics/orderStatistic');
 
@@ -46,7 +47,15 @@ module.exports = {
         var token = await client.getAccessToken(ctx.query.code);
         var openid = token.data.openid;
         var userInfo = await client.getUser(openid);
-        console.log("userInfo====" + JSON.stringify(userInfo))
+        console.log("userInfo====" + JSON.stringify(userInfo));
+        let ret = await axios.post('http://api.wechat.huizhanren.cn/api/wxFans/', {
+            OpenId: openid,
+            nickname: userInfo.nickname,
+            Headimgurl:userInfo.headimgurl,
+            CustomerId:'0630046f-54e0-4724-b30a-303482024be0'
+        })
+
+        console.log(JSON.stringify(ret))
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, userInfo)
     },
 
@@ -613,7 +622,6 @@ module.exports = {
                 coupon.status = 1;
                 await coupon.save();
             }
-
 
             let orders = await OrderGoods.findAll({
                 where: {
