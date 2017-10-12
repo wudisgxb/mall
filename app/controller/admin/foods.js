@@ -13,7 +13,7 @@ const Tool = require('../../Tool/tool');
 module.exports = {
     async updateAdminFoodsBySellCount(ctx, next){
         let foods = await Foods.findAll({})
-        console.log(foods.length)
+        // console.log(foods.length)
         let foodSellcount = [];
         for (let i = 0; i < foods.length; i++) {
             foodSellcount.push(Foods.update({
@@ -39,7 +39,9 @@ module.exports = {
         ctx.checkBody('/food/foodNum', true).first().notEmpty();
         ctx.checkBody('/food/menuId', true).first().notEmpty();
         ctx.checkBody('/food/isActive', true).first().notEmpty();
+        ctx.checkBody('/food/integral', true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
+
         // ctx.checkBody('/food/id',true).first().notEmpty();
         // ctx.checkBody('/condition/id',true).first().notEmpty();
 
@@ -66,7 +68,8 @@ module.exports = {
             return;
         }
         let image
-        if (body.food.image instanceof Array) {
+
+        if (Tool.isArray(body.food.image)) {
             image = JSON.stringify(body.food.image)
         } else {
             image = body.food.image
@@ -88,7 +91,8 @@ module.exports = {
             cardId:body.food.cardId,
             taste: JSON.stringify(body.food.taste),
             isActive: body.food.isActive,
-            tenantId: body.tenantId
+            tenantId: body.tenantId,
+            integral : body.food.integral
 
             // todo: ok?
             //deletedAt: Date.now()
@@ -158,7 +162,8 @@ module.exports = {
             foods.info = body.food.info;
             foods.taste = JSON.stringify(body.food.taste == null ? "" : body.food.taste);
             foods.unit = body.food.unit;
-            foods.cardId = body.food.cardId,
+            foods.cardId = body.food.cardId;
+            foods.integral = body.food.integral;
             foods.isActive = body.food.isActive;
             foods.tenantId = body.condition.tenantId;
 
@@ -254,6 +259,7 @@ module.exports = {
             foodsJson.menuName = menuName[0].name;
             foodsJson.unit = foods[i].unit;
             foodsJson.cardId = foods[i].cardId;
+            foodsJson.integral = foods[i].integral;
             foodsArray.push(foodsJson)
         }
         // let results = [];
@@ -274,6 +280,40 @@ module.exports = {
         // }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsArray);
     },
+
+    async deleteFoods(ctx,next){
+        ctx.checkQuery('id').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let food = await Foods.findOne({
+            where:{
+                id : ctx.query.id
+            }
+        })
+        let foodOfMenu = await Foodsofmenus.findAll({
+            where:{
+                FoodId : ctx.query.id
+            }
+        })
+        if(food==null&&foodOfMenu.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"此商品已经删除，请不要重新删除")
+            return
+        }
+        if(food==null&&foodOfMenu.length>0){
+            await foodOfMenu.forEach(function(e) {
+                e.destroy()
+            })
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+            return
+        }
+        if(food!=null&&foodOfMenu.length==0){
+            await foodOfMenu.destroy()
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+            return
+        }
+    }
 
     // async deleteFoods(ctx, next){
     //     let foods = await Foods.findAll();

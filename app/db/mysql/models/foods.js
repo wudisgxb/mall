@@ -38,6 +38,8 @@ module.exports = function (sequelize, DataTypes) {
         isActive: shortDataTypes.Bool(),
         unit: shortDataTypes.String(),
 
+        integral : shortDataTypes.Int(),//积分
+
         //卡包ID，公众号推卡包场景用，正常不用
         cardId: shortDataTypes.String(255, true),
         tenantId: {

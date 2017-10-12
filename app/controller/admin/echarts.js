@@ -72,7 +72,7 @@ module.exports = {
         let date = new Date()
         date.setDate(date.getDate() - 1)
         let startTime = date.format("yyyy-MM-dd 00:00:00")
-        console.log(startTime);
+        // console.log(startTime);
         let result = await getFoodEchats.getfEchats(body.tenantId, startTime, 1);
         if (result.length == 0) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, "找不到数据");
