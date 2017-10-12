@@ -20,6 +20,8 @@ module.exports = function (sequelize, DataTypes) {
             receiveTime:shortDataTypes.Date(),//收货时间
             orderLimit: shortDataTypes.Int(-1),//每单限购总数，建议大于单品限购，待完善
 
+            integral : shortDataTypes.Int(),//积分
+
             openId: shortDataTypes.String(255, true),//微信账号
             cardId: shortDataTypes.String(255, true),//卡包ID
             cardSendResult : shortDataTypes.String(1000, true),//卡包发送结果-success；-微信返回码

@@ -41,7 +41,8 @@ log4js.configure({
           "filename": "errors.log"
         }
       }]
-    }]
+    }],
+    "replaceConsole":true
   }, { cwd: logDir })
   //注册日志： 日志名（前缀）startup
 const logger = log4js.getLogger('startup')
