@@ -46,6 +46,7 @@ module.exports = {
         var token = await client.getAccessToken(ctx.query.code);
         var openid = token.data.openid;
         var userInfo = await client.getUser(openid);
+        console.log("userInfo====" + JSON.stringify(userInfo))
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, userInfo)
     },
 
