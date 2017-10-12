@@ -197,7 +197,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
         }
-        let vip = await Vip.findOne({
+        let vip = await Vip.findAll({
             where: {
                 alliancesId: ctx.query.alliancesId,
                 $or:[{
@@ -208,7 +208,7 @@ module.exports = {
                     }]
             }
         });
-        if(vip==null){
+        if(vip.length==0){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"查无此人")
             return
         }

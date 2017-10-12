@@ -558,22 +558,16 @@ module.exports = {
                 //判断是否是会员
                 if(isVip==true){
                     console.log("-------------------------------isVip---------------------"+isVip)
-                    // let merchantIntegralsJson ={
-                    //     tenantId : tenantId
-                    // }
-                    // //如果是会员的话获取商户的积分信息
-                    // let merchantIntegrals = await sqlMerchantIntegrals.getMerchantIntegrals(merchantIntegralsJson)
-                    // console.log(tenantId)
-                    // console.log(order.phone)
-                    // console.log(amountJson.totalPrice)
-                    let pay = "支付宝"
-                    let integralAllo = await amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
-                    // console.log("积分分配是否有错,看integralAllocation是不是-1"+integralAllo)
-                    if(integralAllo=="-1"){
-                        webSocket.sendSocket("商家积分不足");
-                    }else{
-                        webSocket.sendSocket(integralAllo);
+                    let merchantIntegralsJson ={
+                        tenantId : tenantId
                     }
+                    //如果是会员的话获取商户的积分信息
+                    let merchantIntegrals = await sqlMerchantIntegrals.getMerchantIntegrals(merchantIntegralsJson)
+                    console.log(tenantId)
+                    console.log(order.phone)
+                    console.log(amountJson.totalPrice)
+                    let pay = "支付宝"
+                    amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
                     //如果积分信息获取到的话
                     // if(merchantIntegrals!=null){
                     //     //则获取商家积分信息的积分兑换比率
