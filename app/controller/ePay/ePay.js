@@ -486,6 +486,27 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
             return;
         }
+
+        //商品限购，卡包发送就一次
+        let order = await Orders.findOne({
+            where: {
+                TableId: table.id,
+                tenantId: body.tenantId,
+                status: 2,
+                bizType:"ePay",
+                consigneeId: null,
+                cardSendResult:"success",
+                openId:body.openId,
+                cardId:body.cardId
+            }
+        })
+
+        if (order != null) {
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "商品每人限购一份！");
+            return;
+        }
+
+
         let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
         await OrderGoods.create({
