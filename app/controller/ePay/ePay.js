@@ -219,6 +219,21 @@ module.exports = {
         let tradeNo;
         if (ctx.query.tradeNo != null) {
             tradeNo = ctx.query.tradeNo;
+
+            //反写OpenId到订单
+
+            const token = await client.getAccessToken(ctx.query.code);
+            const openId = token.data.openid;
+            let order = await Orders.findOne({
+                where: {
+                    trade_no: trade_no
+                }
+            })
+
+            if (order != null) {
+                order.openId = openId;
+                await order.save();
+            }
         } else {
             tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
         }
@@ -352,7 +367,7 @@ module.exports = {
                     }
                 });
 
-                let orderGoods = await OrderGoods.findAll({
+                let orderGoods = await OrderGoods.findOne({
                     where: {
                         trade_no: trade_no
                     }
@@ -463,7 +478,6 @@ module.exports = {
         ctx.checkBody('foodId').notEmpty();
         ctx.checkBody('foodName').notEmpty();
         ctx.checkBody('foodPrice').notEmpty();
-        ctx.checkBody('openId').notEmpty();
         ctx.checkBody('cardId').notEmpty();
 
         if (ctx.errors) {
@@ -532,7 +546,6 @@ module.exports = {
             bizType: "ePay",
             deliveryTime: "",
             payTime: new Date(),
-            openId:body.openId,
             cardId:body.cardId
         });
 
