@@ -487,23 +487,23 @@ const amountManger = (function () {
     }
     //会员购买商品后的积分分配
     let integralAllocation = async function (tenantId,phone,totalPrice,pay) {
-        console.log("会员购买商品后的积分分配中的交易商:"+tenantId)
-        console.log("会员购买商品后的积分分配中的电话:"+phone)
-        console.log("会员购买商品后的积分分配中的价格:"+totalPrice)
+        // console.log("会员购买商品后的积分分配中的交易商:"+tenantId)
+        // console.log("会员购买商品后的积分分配中的电话:"+phone)
+        // console.log("会员购买商品后的积分分配中的价格:"+totalPrice)
         let allianceMerchants = await AllianceMerchants.findOne({
             where:{
                 tenantId:tenantId
             }
         })
         let alliancesId = allianceMerchants.alliancesId
-        console.log("商圈的Id"+alliancesId)
+        // console.log("商圈的Id"+alliancesId)
         let vip = await Vips.findOne({
             where:{
                 alliancesId : alliancesId,
                 phone : phone
             }
         })
-        console.log("vip用户信息"+vip.phone)
+        // console.log("vip用户信息"+vip.phone)
 
         //查询此租户的积分配置
         let merchantSetIntegrals = await MerchantSetIntegrals.findOne({
@@ -511,17 +511,17 @@ const amountManger = (function () {
                 tenantId :tenantId
             }
         })
-        console.log("租户积分配置信息"+merchantSetIntegrals)
+        // console.log("租户积分配置信息"+merchantSetIntegrals)
 
         let priceIntegralsRate
         //转换成int类型
         if(merchantSetIntegrals!=null){
             priceIntegralsRate = Number(merchantSetIntegrals.priceIntegralsRate).toFixed(2)
         }
-        console.log(priceIntegralsRate)
+        // console.log(priceIntegralsRate)
         //积分记录ID
         let vipIntegralsId
-        console.log("pay的值为:"+pay)
+        // console.log("pay的值为:"+pay)
         if(pay=="支付宝"){
             vipIntegralsId = "alpy"+(Tool.allocTenantId().substring(4));
         }
@@ -543,27 +543,27 @@ const amountManger = (function () {
         //得到商家返给开户商积分
         let merchantRebateMerchant = Math.floor(merchantRebate*0.7)
         //查询商家的总积分数
-        console.log(Merchants)
+        // console.log(Merchants)
         let merchant = await Merchants.findOne({
             where:{
                 tenantId : tenantId
             }
         })
-        console.log("租户为"+merchant.name)
-        console.log("商家积分"+merchant.aggregateScore)
-        console.log("给会员的积分"+integral)
+        // console.log("租户为"+merchant.name)
+        // console.log("商家积分"+merchant.aggregateScore)
+        // console.log("给会员的积分"+integral)
         //商家剩余积分数
         let merchantResidueIntegral = merchant.aggregateScore-(merchantRebate+integral)
 
-        // console.log("商家积分"+merchant.aggregateScore)
-        console.log("商家返利积分"+merchantRebate)
-        // console.log("给会员的积分"+integral)
-        console.log("商家剩余的总积分"+merchantResidueIntegral)
-        //检查vip积分Id是否存在
-        console.log("检查vip积分Id是否存在"+vipIntegralsId)
-        //添加一条vip积分表的记录
-        console.log("会员积分表"+VipIntegrals)
-        console.log("商圈Id"+alliancesId)
+        // // console.log("商家积分"+merchant.aggregateScore)
+        // console.log("商家返利积分"+merchantRebate)
+        // // console.log("给会员的积分"+integral)
+        // console.log("商家剩余的总积分"+merchantResidueIntegral)
+        // //检查vip积分Id是否存在
+        // console.log("检查vip积分Id是否存在"+vipIntegralsId)
+        // //添加一条vip积分表的记录
+        // console.log("会员积分表"+VipIntegrals)
+        // console.log("商圈Id"+alliancesId)
         if(merchantResidueIntegral<0){
             return "-1"
         }
@@ -626,14 +626,14 @@ const amountManger = (function () {
             merchantIntegralsId : merchantAlliancesId,
             tenantId : tenantId,
             buyOrSale : 0,//失去积分
-            buyOrSaleMerchant:alliances,//积分给此商圈
+            buyOrSaleMerchant:alliancesId,//积分给此商圈
             price : 0,//获得的钱数
             integral : merchantRebateAlliance,//失去的积分数
         })
         let alliancesMerchantId = "MerA"+Tool.allocTenantId().substring(4)
         await AllianceIntegrals.create({
             allianceIntegralsId : alliancesMerchantId,
-            alliancesId : alliances,
+            alliancesId : alliancesId,
             buyOrSale : 0,//获取积分
             buyOrSaleMerchant:tenantId,//积分给此从租户获取
             price : 0,//失去的钱数
@@ -650,7 +650,7 @@ const amountManger = (function () {
         let openMerchantResidueIntegral = openMerchant.aggregateScore+merchantRebateMerchant
         //修改开户商总积分
         await Merchants.update({
-            aggregateScore : merchantResidueIntegral
+            aggregateScore : openMerchantResidueIntegral
         },{
             where:{
                 tenantId : vip.tenantId
@@ -719,8 +719,8 @@ const amountManger = (function () {
     }
     //充值积分
     let rechargeIntegral = async function (alliancesId,totalPrice) {
-        console.log("用了"+totalPrice)
-        console.log(alliancesId)
+        // console.log("用了"+totalPrice)
+        // console.log(alliancesId)
         let alliancesHeadquarters = await AllianceHeadquarters.findOne({
             where:{
                 alliancesId:alliancesId
@@ -799,9 +799,9 @@ const amountManger = (function () {
                     tenantId : alliancesId
                 }
             })
-            console.log("alliancesMerchant商圈租户关联的关系"+alliancesMerchant)
+            // console.log("alliancesMerchant商圈租户关联的关系"+alliancesMerchant)
             //获得商圈IdW
-            console.log(alliancesMerchant.alliancesId)
+            // console.log(alliancesMerchant.alliancesId)
 
             //获得一个和租户有关的Id
             let alliancesIntegralsId = "tenA"+(Tool.allocTenantId().substring(4))
@@ -813,7 +813,7 @@ const amountManger = (function () {
             })
             //计算出购买的积分量
             let integral = totalPrice/(Number(allianceSetIntegrals.priceIntegralsRate))
-            console.log("alliancesIntegralsId为"+alliancesIntegralsId)
+            // console.log("alliancesIntegralsId为"+alliancesIntegralsId)
             //新增商圈记录
             await AllianceIntegrals.create({
                 allianceIntegralsId : alliancesIntegralsId,

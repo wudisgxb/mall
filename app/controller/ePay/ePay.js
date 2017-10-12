@@ -13,6 +13,7 @@ const fs = require('fs');
 const Alipay = require('../alipay/index');
 const TenantConfigs = db.models.TenantConfigs;
 const EPays = db.models.EPays;
+const Foods = db.models.Foods
 const QRCodeTemplates = db.models.QRCodeTemplates;
 const transAccountsManager = require('../alipay/transferAccounts')
 const transAccounts = require('../customer/transAccount')
@@ -342,6 +343,15 @@ module.exports = {
                         tenantId: tenantId
                     }
                 });
+
+                let food = await Foods.findOne({
+                    where:{
+                        id : 1076
+                    }
+                });
+                food.sellCount = food.sellCount + 1;
+                food.todaySales = food.todaySales + 1;
+                await food.save();
 
                 if (tenantConfig != null) {
                     if (tenantConfig.isRealTime) {
