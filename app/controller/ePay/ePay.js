@@ -217,6 +217,7 @@ module.exports = {
         let amount = ctx.query.amount;
 
         let tradeNo;
+        console.log("ctx.query.tradeNo ==" +ctx.query.tradeNo)
         if (ctx.query.tradeNo != null) {
             tradeNo = ctx.query.tradeNo;
         } else {
@@ -370,7 +371,7 @@ module.exports = {
                 }
 
                 //发送卡包
-                let order = await Orders.findAll({
+                let order = await Orders.findOne({
                     where: {
                         trade_no: trade_no
                     }
