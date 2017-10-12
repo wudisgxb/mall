@@ -71,6 +71,7 @@ module.exports = {
                     bizType : qrCodeTemplates[0].bizType,
                     tenantId : qrCodeTemplates[0].tenantId,
                     tenantName : merchant==null?null:merchant.name,
+                    aggregateScore :merchant==null?null:merchant.aggregateScore,
                     industry : merchant.industry,
                     address : merchant.address,
                     tenantInfo : {
