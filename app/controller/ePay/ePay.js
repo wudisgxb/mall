@@ -340,6 +340,15 @@ module.exports = {
                     }
                 });
 
+                let food = await Foods.findOne({
+                    where:{
+                        id : 1076
+                    }
+                });
+                food.sellCount = food.sellCount + 1;
+                food.todaySales = food.todaySales + 1;
+                await food.save();
+
                 if (tenantConfig != null) {
                     if (tenantConfig.isRealTime) {
                         console.log("服务器公网IP：" + ip);
