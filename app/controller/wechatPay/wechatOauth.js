@@ -55,7 +55,7 @@ module.exports = {
             CustomerId:'0630046f-54e0-4724-b30a-303482024be0'
         })
 
-        console.log(JSON.stringify(ret))
+        console.log(ret)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, userInfo)
     },
 
