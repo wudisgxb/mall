@@ -19,6 +19,7 @@ module.exports = function (sequelize, DataTypes) {
             // acceptTime:shortDataTypes.Date(),//接单时间
             // receiveTime:shortDataTypes.Date(),//收货时间
             orderLimit: shortDataTypes.Int(-1),//每单限购总数，建议大于单品限购，待完善
+
         },
         {
             paranoid: true,
