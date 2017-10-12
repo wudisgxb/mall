@@ -272,6 +272,40 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsArray);
     },
 
+    async deleteFoods(ctx,next){
+        ctx.checkQuery('id').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let food = await Foods.findOne({
+            where:{
+                id : ctx.query.id
+            }
+        })
+        let foodOfMenu = await Foodsofmenus.findAll({
+            where:{
+                FoodId : ctx.query.id
+            }
+        })
+        if(food==null&&foodOfMenu.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"此商品已经删除，请不要重新删除")
+            return
+        }
+        if(food==null&&foodOfMenu.length>0){
+            await foodOfMenu.forEach(function(e) {
+                e.destroy()
+            })
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+            return
+        }
+        if(food!=null&&foodOfMenu.length==0){
+            await foodOfMenu.destroy()
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+            return
+        }
+    }
+
     // async deleteFoods(ctx, next){
     //     let foods = await Foods.findAll();
     //

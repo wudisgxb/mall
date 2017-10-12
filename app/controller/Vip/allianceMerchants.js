@@ -179,15 +179,16 @@ module.exports = {
         }
         let allianceMerchant = await sqlAllianceMerchants.getOperations(AllianceMerchants,whereJson);
         if(allianceMerchant.length==0){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"这个商圈下没有租户")
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此商圈")
             return
         }
         let merchantArray = []
         for(let i = 0; i < allianceMerchant.length; i++){
             let merchant = await Merchants.findOne({
                 where:{
-                    tenantId : allianceMerchant[i].tenantId
-                }
+                    tenantId : allianceMerchant[i].tenantId,
+                },
+                order:[["aggregateScore","DESC"]]
             })
             merchantArray.push(merchant)
         }
