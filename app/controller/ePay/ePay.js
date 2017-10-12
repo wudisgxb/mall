@@ -3,6 +3,9 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const co = require('co')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
+const Orders = db.models.NewOrders;
+const OrderGoods = db.models.OrderGoods;
+const Tables = db.models.Tables;
 const util = require('../alipay/util');
 let path = require('path');
 let Tool = require('../../Tool/tool');
@@ -389,5 +392,70 @@ module.exports = {
         }
 
         ctx.body = "SUCCESS";
+    },
+
+    async saveOrder(ctx, next) {
+        ctx.checkBody('tableName').notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('qrcodeId').notEmpty();
+
+        ctx.checkBody('foodNum').notEmpty();
+        ctx.checkBody('foodUnit').notEmpty();
+        ctx.checkBody('foodId').notEmpty();
+        ctx.checkBody('foodName').notEmpty();
+        ctx.checkBody('foodPrice').notEmpty();
+        ctx.checkBody('openId').notEmpty();
+        ctx.checkBody('cardId').notEmpty();
+
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
+        let body = ctx.request.body;
+
+        //获取tableId
+        let table = await Tables.findOne({
+            where: {
+                tenantId: body.tenantId,
+                name: body.tableName,
+                consigneeId: null
+            }
+        })
+
+        if (table == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
+            return;
+        }
+        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+
+        await OrderGoods.create({
+            num: body.foodNum,
+            unit: body.foodUnit,
+            FoodId: body.foodId,
+            goodsName: body.foodName,
+            price: body.foodPrice,
+            trade_no: trade_no,
+            tenantId: body.tenantId,
+        });
+
+
+        await Orders.create({
+            phone: "11111111111",
+            TableId: table.id,
+            trade_no: trade_no,
+            info: "",
+            diners_num: 1,
+            status: 0,
+            tenantId: body.tenantId,
+            QRCodeTemplateId: body.qrcodeId,
+            bizType: "ePay",
+            deliveryTime: "",
+            payTime: new Date(),
+            openId:body.openId,
+            cardId:body.cardId
+        });
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {tradeNo:trade_no});
     },
 }

@@ -182,7 +182,7 @@ module.exports = {
         await tasks;
 
         if (order == null) {
-            let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
+            let orderLimit = await promotionManager.getOrderLimit(body.qrcodeId, body.tenantId);
 
             //添加默認配送時間
             await Orders.create({
@@ -193,12 +193,11 @@ module.exports = {
                 diners_num: body.dinersNum,
                 status: 0,
                 tenantId: body.tenantId,
-                QRCodeTemplateId: body.QRCodeTemplateId,
+                QRCodeTemplateId: body.qrcodeId,
                 orderLimit: orderLimit,
                 bizType: "deal",
                 deliveryTime: "",
                 payTime: new Date()
-
             });
         }
 
@@ -369,7 +368,7 @@ module.exports = {
         await tasks;
 
         if (order == null) {
-            let orderLimit = await promotionManager.getOrderLimit(body.QRCodeTemplateId, body.tenantId);
+            let orderLimit = await promotionManager.getOrderLimit(body.qrcodeId, body.tenantId);
 
             await Orders.create({
                 phone: body.phoneNumber,
@@ -379,7 +378,7 @@ module.exports = {
                 status: 0,
                 tenantId: body.tenantId,
                 consigneeId: body.consigneeId,
-                QRCodeTemplateId: body.QRCodeTemplateId,
+                QRCodeTemplateId: body.qrcodeId,
                 orderLimit: orderLimit,
                 bizType: "eshop",
                 deliveryTime: deliveryTime,
