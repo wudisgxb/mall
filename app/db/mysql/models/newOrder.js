@@ -22,14 +22,13 @@ module.exports = function (sequelize, DataTypes) {
 
             openId: shortDataTypes.String(255, true),//微信账号
             cardId: shortDataTypes.String(255, true),//卡包ID
+            cardSendResult : shortDataTypes.String(1000, true),//卡包发送结果-success；-微信返回码
         },
         {
             paranoid: true,
             associate: function (models) {
                 models.NewOrders.belongsTo(models.Tables);
-            }
-
-            ,
+            },
             instanceMethods: {}
             ,
             classMethods: {}

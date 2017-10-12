@@ -22,6 +22,7 @@ const ip = require('ip').address();
 const OAuth = require('co-wechat-oauth')
 const WXPay = require('co-wechat-payment')
 const client = new OAuth(config.wechat.appId, config.wechat.secret);
+const axios = require('axios');
 
 const wxpay = new WXPay({
     appId: config.wechat.appId,
@@ -214,7 +215,14 @@ module.exports = {
         }
 
         let amount = ctx.query.amount;
-        let tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+
+        let tradeNo;
+        if (ctx.query.tradeNo != null) {
+            tradeNo = ctx.query.tradeNo;
+        } else {
+            tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+        }
+
 
         let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
@@ -344,14 +352,55 @@ module.exports = {
                     }
                 });
 
-                let food = await Foods.findOne({
-                    where:{
-                        id : 1076
+                let orderGoods = await OrderGoods.findAll({
+                    where: {
+                        trade_no: trade_no
                     }
-                });
-                food.sellCount = food.sellCount + 1;
-                food.todaySales = food.todaySales + 1;
-                await food.save();
+                })
+
+                if (orderGoods.length > 0) {
+                    let food = await Foods.findOne({
+                        where:{
+                            id : orderGoods[0].FoodId
+                        }
+                    });
+                    food.sellCount = food.sellCount + 1;
+                    food.todaySales = food.todaySales + 1;
+                    await food.save();
+                }
+
+                //发送卡包
+                let order = await Orders.findAll({
+                    where: {
+                        trade_no: trade_no
+                    }
+                })
+
+                if (order != null) {
+                    if (order.openId != null && order.cardId != null) {
+                        //获取token
+                        let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
+                        let token = ret1.data.access_token;
+
+                        let ret2 = await axios.post(`https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=${token}`, {
+                            "touser": order.openId,
+                            "wxcard": {"card_id":order.cardId},
+                            "msgtype":"wxcard"
+                        })
+
+                        if (ret2.data.errcode == 0) {
+                            order.status = 2;
+                            order.cardSendResult = "success";
+                            await order.save();
+                        } else {
+                            order.status = 2;
+                            order.cardSendResult = JSON.stringify(ret2.data);
+                            await order.save();
+                        }
+                    } else {
+                        console.log("无卡券信息！无法发送！");
+                    }
+                }
 
                 if (tenantConfig != null) {
                     if (tenantConfig.isRealTime) {
