@@ -216,18 +216,17 @@ module.exports = {
 
         let amount = ctx.query.amount;
 
+        const token = await client.getAccessToken(ctx.query.code);
         let tradeNo;
         console.log("ctx.query.tradeNo ==" +ctx.query.tradeNo)
         if (ctx.query.tradeNo != null) {
             tradeNo = ctx.query.tradeNo;
 
             //反写OpenId到订单
-
-            const token = await client.getAccessToken(ctx.query.code);
             const openId = token.data.openid;
             let order = await Orders.findOne({
                 where: {
-                    trade_no: trade_no
+                    trade_no: tradeNo
                 }
             })
 
@@ -267,7 +266,7 @@ module.exports = {
         console.log("total_amount ============" + total_amount);
 
         console.log(`code: ${ctx.query.code}`)
-        const token = await client.getAccessToken(ctx.query.code)
+        //const token = await client.getAccessToken(ctx.query.code)
         const ip = ctx.request.headers['x-real-ip']
 
         console.log(`openid: ${token.data.openid}; ip: ${ip}`)
