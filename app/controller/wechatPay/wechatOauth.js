@@ -42,6 +42,13 @@ const wxpay = new WXPay({
 })
 
 module.exports = {
+    async  getWechatInfo(ctx, next) {
+        var token = await client.getAccessToken('code');
+        var openid = token.data.openid;
+        var userInfo = await client.getUser('openid');
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, userInfo)
+    },
+
     async userDealRedirect(ctx, next) {
         //const path = ctx.query.path
         //初始回调地址前台做转发用不用改
