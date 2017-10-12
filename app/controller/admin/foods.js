@@ -85,6 +85,7 @@ module.exports = {
             rating: body.food.rating,
             info: body.food.info,
             unit: body.food.unit,
+            cardId:body.food.cardId,
             taste: JSON.stringify(body.food.taste),
             isActive: body.food.isActive,
             tenantId: body.tenantId
@@ -157,6 +158,7 @@ module.exports = {
             foods.info = body.food.info;
             foods.taste = JSON.stringify(body.food.taste == null ? "" : body.food.taste);
             foods.unit = body.food.unit;
+            foods.cardId = body.food.cardId,
             foods.isActive = body.food.isActive;
             foods.tenantId = body.condition.tenantId;
 
@@ -233,7 +235,7 @@ module.exports = {
                     'name'
                 ]
             });
-            foodsJson = {};
+            let foodsJson = {};
             foodsJson.id = foods[i].id;
             foodsJson.name = foods[i].name;
             foodsJson.foodNum = foods[i].foodNum;
@@ -251,6 +253,7 @@ module.exports = {
             foodsJson.info = foods[i].info;
             foodsJson.menuName = menuName[0].name;
             foodsJson.unit = foods[i].unit;
+            foodsJson.cardId = foods[i].cardId;
             foodsArray.push(foodsJson)
         }
         // let results = [];

@@ -3,6 +3,9 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const co = require('co')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
+const Orders = db.models.NewOrders;
+const OrderGoods = db.models.OrderGoods;
+const Tables = db.models.Tables;
 const util = require('../alipay/util');
 let path = require('path');
 let Tool = require('../../Tool/tool');
@@ -19,6 +22,7 @@ const ip = require('ip').address();
 const OAuth = require('co-wechat-oauth')
 const WXPay = require('co-wechat-payment')
 const client = new OAuth(config.wechat.appId, config.wechat.secret);
+const axios = require('axios');
 
 const wxpay = new WXPay({
     appId: config.wechat.appId,
@@ -211,7 +215,14 @@ module.exports = {
         }
 
         let amount = ctx.query.amount;
-        let tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+
+        let tradeNo;
+        if (ctx.query.tradeNo != null) {
+            tradeNo = ctx.query.tradeNo;
+        } else {
+            tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+        }
+
 
         let qrCodeTemplate = await QRCodeTemplates.findOne({
             where: {
@@ -341,14 +352,55 @@ module.exports = {
                     }
                 });
 
-                let food = await Foods.findOne({
-                    where:{
-                        id : 1076
+                let orderGoods = await OrderGoods.findAll({
+                    where: {
+                        trade_no: trade_no
                     }
-                });
-                food.sellCount = food.sellCount + 1;
-                food.todaySales = food.todaySales + 1;
-                await food.save();
+                })
+
+                if (orderGoods.length > 0) {
+                    let food = await Foods.findOne({
+                        where:{
+                            id : orderGoods[0].FoodId
+                        }
+                    });
+                    food.sellCount = food.sellCount + 1;
+                    food.todaySales = food.todaySales + 1;
+                    await food.save();
+                }
+
+                //发送卡包
+                let order = await Orders.findAll({
+                    where: {
+                        trade_no: trade_no
+                    }
+                })
+
+                if (order != null) {
+                    if (order.openId != null && order.cardId != null) {
+                        //获取token
+                        let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
+                        let token = ret1.data.access_token;
+
+                        let ret2 = await axios.post(`https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=${token}`, {
+                            "touser": order.openId,
+                            "wxcard": {"card_id":order.cardId},
+                            "msgtype":"wxcard"
+                        })
+
+                        if (ret2.data.errcode == 0) {
+                            order.status = 2;
+                            order.cardSendResult = "success";
+                            await order.save();
+                        } else {
+                            order.status = 2;
+                            order.cardSendResult = JSON.stringify(ret2.data);
+                            await order.save();
+                        }
+                    } else {
+                        console.log("无卡券信息！无法发送！");
+                    }
+                }
 
                 if (tenantConfig != null) {
                     if (tenantConfig.isRealTime) {
@@ -399,5 +451,91 @@ module.exports = {
         }
 
         ctx.body = "SUCCESS";
+    },
+
+    async saveOrder(ctx, next) {
+        ctx.checkBody('tableName').notEmpty();
+        ctx.checkBody('tenantId').notEmpty();
+        ctx.checkBody('qrcodeId').notEmpty();
+
+        ctx.checkBody('foodNum').notEmpty();
+        ctx.checkBody('foodUnit').notEmpty();
+        ctx.checkBody('foodId').notEmpty();
+        ctx.checkBody('foodName').notEmpty();
+        ctx.checkBody('foodPrice').notEmpty();
+        ctx.checkBody('openId').notEmpty();
+        ctx.checkBody('cardId').notEmpty();
+
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
+        let body = ctx.request.body;
+
+        //获取tableId
+        let table = await Tables.findOne({
+            where: {
+                tenantId: body.tenantId,
+                name: body.tableName,
+                consigneeId: null
+            }
+        })
+
+        if (table == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
+            return;
+        }
+
+        //商品限购，卡包发送就一次
+        let order = await Orders.findOne({
+            where: {
+                TableId: table.id,
+                tenantId: body.tenantId,
+                status: 2,
+                bizType:"ePay",
+                consigneeId: null,
+                cardSendResult:"success",
+                openId:body.openId,
+                cardId:body.cardId
+            }
+        })
+
+        if (order != null) {
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "商品每人限购一份！");
+            return;
+        }
+
+
+        let trade_no = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+
+        await OrderGoods.create({
+            num: body.foodNum,
+            unit: body.foodUnit,
+            FoodId: body.foodId,
+            goodsName: body.foodName,
+            price: body.foodPrice,
+            trade_no: trade_no,
+            tenantId: body.tenantId,
+        });
+
+
+        await Orders.create({
+            phone: "11111111111",
+            TableId: table.id,
+            trade_no: trade_no,
+            info: "",
+            diners_num: 1,
+            status: 0,
+            tenantId: body.tenantId,
+            QRCodeTemplateId: body.qrcodeId,
+            bizType: "ePay",
+            deliveryTime: "",
+            payTime: new Date(),
+            openId:body.openId,
+            cardId:body.cardId
+        });
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {tradeNo:trade_no});
     },
 }

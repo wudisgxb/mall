@@ -15,4 +15,7 @@ router.get('/api/test/customer/epay/wechatpay/redirectUrl', ePay.ePayRedirect);
 router.post('/api/test/epay/alipay', ePay.alipay);
 router.post('/api/test/epay/wechatPayNotify', ePay.wechatPayNotify);
 
+//ePay下单
+router.post('/api/test/epay/order', ePay.saveOrder);
+
 module.exports = router

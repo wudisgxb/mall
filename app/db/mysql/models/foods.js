@@ -21,22 +21,25 @@ module.exports = function (sequelize, DataTypes) {
         /**
          * 原价
          */
-        todaySales:shortDataTypes.Int(),//总数量
+        todaySales: shortDataTypes.Int(),//总数量
         oldPrice: shortDataTypes.Double(),
-        foodNum : shortDataTypes.Int(),
+        foodNum: shortDataTypes.Int(),
         vipPrice: shortDataTypes.Double(),
         //口味
-        taste: shortDataTypes.String(255,true),
+        taste: shortDataTypes.String(255, true),
         //活动价
-        activityPrice:shortDataTypes.Double(-1),
+        activityPrice: shortDataTypes.Double(-1),
 
         sellCount: shortDataTypes.Int(),
         rating: shortDataTypes.Int(),
-        
+
 
         info: shortDataTypes.String(),
         isActive: shortDataTypes.Bool(),
         unit: shortDataTypes.String(),
+
+        //卡包ID，公众号推卡包场景用，正常不用
+        cardId: shortDataTypes.String(255, true),
         tenantId: {
             type: Sequelize.STRING
         }

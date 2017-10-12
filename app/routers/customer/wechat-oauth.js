@@ -2,6 +2,8 @@
 const Oauth = require('../../controller/wechatPay/wechatOauth')
 const router = new (require('koa-router'))()
 
+//红包节获取用户头像，openId
+router.get('/api/test/customer/wechatInfo', Oauth.getWechatInfo)
 
 router.get('/api/test/customer/deal/wechatpay/redirectUrl', Oauth.userDealRedirect)
 // router.get('/api/v2/oauth/getUser', Oauth.getUser)
