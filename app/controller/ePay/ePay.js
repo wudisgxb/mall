@@ -106,7 +106,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
 
     },
-    
+
     async alipay(ctx, next) {
         let response = ctx.request.body;
         let tableId = 0;
@@ -131,7 +131,7 @@ module.exports = {
                 where: {
                     trade_no: ret.out_trade_no,
                     app_id: ret.app_id,
-                    totalAmount: parseFloat(ret.total_amount).toFixed(2),
+                    totalAmount: parseFloat(ret.total_amount),
                     paymentMethod: '支付宝',
                     isFinish: false
                 }
@@ -314,12 +314,14 @@ module.exports = {
             console.log("app_id=" + xml.appid);
             console.log("total_amount=" + parseFloat(xml.total_fee));
             let total_amount = parseFloat(xml.total_fee) / 100;
+            console.log("total_amount1=" + total_amount.toFixed(2));
 
             let ePay = await EPays.findOne({
                 where: {
                     trade_no: trade_no,
                     app_id: xml.appid,
-                    totalAmount: total_amount.toFixed(2),
+                    //totalAmount: total_amount.toFixed(2),
+                    totalAmount: total_amount,
                     paymentMethod: '微信',
                     isFinish: false
                 }

@@ -156,7 +156,7 @@ module.exports = {
                 where: {
                     trade_no: ret.out_trade_no,
                     app_id: ret.app_id,
-                    totalAmount: parseFloat(ret.total_amount).toFixed(2),
+                    totalAmount: parseFloat(ret.total_amount),
                     paymentMethod: '支付宝',
                     isFinish: false
                 }
@@ -500,7 +500,7 @@ module.exports = {
                 where: {
                     trade_no: trade_no,
                     app_id: xml.appid,
-                    totalAmount: total_amount.toFixed(2),
+                    totalAmount: total_amount,
                     paymentMethod: '微信',
                     isFinish: false
                 }

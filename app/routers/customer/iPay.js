@@ -9,7 +9,7 @@ router.get('/api/test/customer/ipay/alipay', iPay.getIPayAlipayReq);
 
 router.get('/api/test/customer/ipay/wechatpay', iPay.getIPayWechatpayReq);
 
-// router.get('/api/test/customer/ipay/wechatpay/redirectUrl', iPay.iPayRedirect);
+router.get('/api/test/customer/ipay/wechatpay/redirectUrl', iPay.iPayRedirect);
 
 //回调
 router.post('/api/test/ipay/alipay', iPay.alipay);

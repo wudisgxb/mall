@@ -45,54 +45,77 @@ module.exports = {
     },
 
     async updateAdminMerchantById (ctx, next) {
-        ctx.checkBody('/merchant/name', true).first().notEmpty();
-        ctx.checkBody('/merchant/address', true).first().notEmpty();
-        ctx.checkBody('/merchant/phone', true).first().notEmpty();
-        ctx.checkBody('/merchant/industry', true).first().notEmpty();
-        ctx.checkBody('/condition/tenantId', true).first().notEmpty();
-        ctx.checkBody('/condition/style', true).first().notEmpty();
+        ctx.checkBody('/merchant/name',true).first().notEmpty();
+        ctx.checkBody('/merchant/address',true).first().notEmpty();
+        ctx.checkBody('/merchant/phone',true).first().notEmpty();
+        ctx.checkBody('/merchant/industry',true).first().notEmpty();
+        ctx.checkBody('/condition/tenantId',true).first().notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
         let body = ctx.request.body;
-        let adminer = await Admins.findOne({
-            where :{
-                tenantId: body.condition.tenantId
+        let merchantResult = await Merchants.findAll({
+            where: {
+                tenantId:body.condition.tenantId
             }
-        })
-        if(adminer==null){
-            
+        });
+        if (merchantResult.length <= 0) {
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "租户不存在，请重新定义")
+            return;
         }
-
-
-        // let merchantResult = await Merchants.findAll({
-        //     where: {
-        //         tenantId: body.condition.tenantId
-        //     }
-        // });
-        // if (merchantResult.length <= 0) {
-        //     ctx.body = new ApiResult(ApiResult.Result.EXISTED, "租户不存在，请重新定义")
-        //     return;
-        // }
-        // let id = merchantResult[0].id
-        // let merchants;
-        // merchants = await Merchants.findById(id);
-        // if (merchants != null) {
-        //     merchants.name = body.merchant.name;
-        //     merchants.phone = body.merchant.phone;
-        //     merchants.industry = body.merchant.industry;
-        //     merchants.address = body.merchant.address;
-        //     merchants.tenantId = body.condition.tenantId;
-        //     merchants.style = JSON.stringify(body.condition.style);
-        //     //menus.type = body.type;
-        //     await merchants.save();
-        // }
-
-
+        let id = merchantResult[0].id
+        let merchants;
+        merchants = await Merchants.findById(id);
+        if (merchants != null) {
+            merchants.name = body.merchant.name;
+            merchants.phone = body.merchant.phone;
+            merchants.industry = body.merchant.industry;
+            merchants.address = body.merchant.address;
+            merchants.tenantId = body.condition.tenantId;
+            //menus.type = body.type;
+            await merchants.save();
+        }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+
+    // async getAdminMerchant (ctx, next) {
+    //
+    //     if(ctx.query.tenantId!=null&&ctx.query.consigneeId==null){
+    //         let merchant = await Merchants.findAll({
+    //             where: {
+    //                 tenantId: ctx.query.tenantId
+    //             },
+    //             attributes: {
+    //                 exclude: ['createdAt', 'updatedAt']
+    //             },
+    //         });
+    //         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchant);
+    //     }
+    //     if(ctx.query.tenantId==null&&ctx.query.consigneeId!=null){
+    //         let Profitsharings = await ProfitSharings.findAll({
+    //             where: {
+    //                 consigneeId: ctx.query.consigneeId
+    //             },
+    //
+    //         });
+    //         let merchantId;
+    //         let merchant;
+    //         let merchants = [];
+    //         for(let i = 0; i < Profitsharings.length;i++) {
+    //             merchantId = Profitsharings[i].tenantId;
+    //             merchant = await Merchants.findOne({
+    //                 where: {
+    //                     tenantId: merchantId
+    //                 },
+    //
+    //             });
+    //             merchants.push(merchant)
+    //         }
+    //         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchants);
+    //     }
+    // },
 
     async getAdminMerchant (ctx, next) {
 
@@ -114,6 +137,7 @@ module.exports = {
                     industry : merchant[i].industry,
                     address : merchant[i].address,
                     tenantId : merchant[i].tenantId,
+                    aggregateScore : merchant[i].aggregateScore,
                     needOrderConfirmPage : merchant[i].needOrderConfirmPage,
                     style : JSON.parse(merchant[i].style),
 

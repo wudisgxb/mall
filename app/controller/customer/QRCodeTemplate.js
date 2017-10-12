@@ -39,7 +39,97 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplates[0]);
             return;
         }
+        if(qrCodeTemplates[0].bizType.toLowerCase()=='ipay'){
+            let merchant = await Merchants.findOne({
+                where:{
+                    tenantId : qrCodeTemplates[0].tenantId
+                }
+            })
+            console.log(merchant)
+            // let paymentMerchant;//付款商
+            let qrCodeTemplatesJson = {}
+            if(merchant!=null){
+                let allianceMerchants = await AllianceMerchants.findOne({
+                    where:{
+                        tenantId : qrCodeTemplates[0].tenantId
+                    }
+                })
+                // paymentMerchant = allianceMerchants.alliancesId//付款商为商圈
+                let alliance = await Alliances.findOne({
+                    where:{
+                        alliancesId :allianceMerchants.alliancesId
+                    }
+                })
+                let tenantInfo = await TenantConfigs.findOne({
+                    where:{
+                        tenantId : qrCodeTemplates[0].tenantId
+                    }
+                })
+                qrCodeTemplatesJson = {
+                    // id : qrCodeTemplates.id,
+                    QRCodeTemplateId : qrCodeTemplates[0].QRCodeTemplateId,
+                    bizType : qrCodeTemplates[0].bizType,
+                    tenantId : qrCodeTemplates[0].tenantId,
+                    tenantName : merchant==null?null:merchant.name,
+                    industry : merchant.industry,
+                    address : merchant.address,
+                    tenantInfo : {
+                        homeImage : tenantInfo.homeImage,
+                        longitude : tenantInfo.longitude,
+                        latitude : tenantInfo.latitude,
+                        officialNews : tenantInfo.officialNews,
+                        needChoosePeopleNumberPage : tenantInfo.needChoosePeopleNumberPage,
+                        openFlag : tenantInfo.tenantInfo,
+                        startTime : tenantInfo.startTime,
+                        endTime : tenantInfo.endTime
+                    },
+                    paymentId : alliance.alliancesId,
+                    paymentMerchant : alliance.name
+                }
+            }
+            if(merchant==null){
+                let alliances = await Alliances.findOne({
+                    where:{
+                        alliancesId : qrCodeTemplates[0].tenantId
+                    }
+                })
+                // merchant = alliances//充值商为商圈
+                let allianceHeadquarters = await AllianceHeadquarters.findOne({
+                    where:{
+                        alliancesId : qrCodeTemplates[0].tenantId
+                    }
+                })
+                let headquarters = Headquarters.findOne({
+                    where:{
+                        headquartersId : allianceHeadquarters.headquartersId
+                    }
+                })
+                // paymentMerchant = allianceHeadquarters.headquartersId//付款商为平台
 
+                qrCodeTemplatesJson = {
+                    // id : qrCodeTemplates.id,
+                    QRCodeTemplateId : qrCodeTemplates[0].QRCodeTemplateId,
+                    bizType : qrCodeTemplates[0].bizType,
+                    alliancesId : alliances.alliancesId,
+                    tableName : qrCodeTemplates[0].tableName,
+                    isShared : qrCodeTemplates[0].isShared,
+                    industry : alliances.industry,
+                    phone : alliances.phone,
+                    address : alliances.address,
+                    longitude : alliances.longitude,
+                    latitude : alliances.latitude,
+                    officialNews : alliances.officialNews,
+                    homeImage : alliances.homeImage,
+                    alliancesName : alliances.name+"充值",
+                    // consigneeName : consignee==null?null:consignee.name,
+                    paymentId : headquarters.headquartersId,
+                    paymentMerchant : headquarters.name
+                }
+            }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS,qrCodeTemplatesJson)
+            return
+
+        }
         //青豆家抢购活动，10次
         if (ctx.query.QRCodeTemplateId == '201708101938208000001') {
             let paymentReqs = await PaymentReqs.findAll({
