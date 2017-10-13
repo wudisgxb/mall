@@ -16,6 +16,6 @@ router.put('/api/test/admin/food', foods.updateAdminFoodsById);
 //查询
 router.get('/api/test/admin/food', foods.getAdminFoods);
 //删除
-router.get('/api/test/admin/food', foods.deleteFoods);
+router.delete('/api/test/admin/food', foods.deleteFoods);
 
 module.exports = router

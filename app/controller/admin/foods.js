@@ -3,7 +3,7 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 let getFoodNum = require('../../controller/statistics/statistics');
-
+let OrderGoods = db.models.OrderGoods
 let Foods = db.models.Foods;
 let Menus = db.models.Menus;
 let Foodsofmenus = db.models.FoodsOfTMenus;
@@ -292,27 +292,42 @@ module.exports = {
                 id : ctx.query.id
             }
         })
+        console.log(food)
+        console.time("111111111")
         let foodOfMenu = await Foodsofmenus.findAll({
             where:{
                 FoodId : ctx.query.id
             }
         })
-        if(food==null&&foodOfMenu.length==0){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"此商品已经删除，请不要重新删除")
-            return
-        }
-        if(food==null&&foodOfMenu.length>0){
+        let orderGoods = await OrderGoods.findAll({
+            where:{
+                FoodId : ctx.query.id
+            }
+        })
+        console.timeEnd("111111111")
+        if(food!=null&&foodOfMenu.length==0&&orderGoods.length==0){
             await foodOfMenu.forEach(function(e) {
                 e.destroy()
             })
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-            return
-        }
-        if(food!=null&&foodOfMenu.length==0){
             await foodOfMenu.destroy()
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
             return
         }
+        if(food==null&&foodOfMenu.length==0&&orderGoods.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"此商品已经删除，请不要重新删除")
+            return
+        }
+        if(food==null&&foodOfMenu.length>0&&orderGoods.length==0){
+            await foodOfMenu.forEach(function(e) {
+                e.destroy()
+            })
+            return
+        }
+        if(food!=null&&foodOfMenu.length==0&&orderGoods.length==0){
+            await foodOfMenu.destroy()
+            return
+        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
 
     // async deleteFoods(ctx, next){
