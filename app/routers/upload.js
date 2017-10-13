@@ -13,7 +13,7 @@ if (!fs.existsSync(uploadDir)) {
 var newFileName = (filename) => {
     var ret;
     do {
-        var newfilename = `${utilx.randomNum(6)}-${filename}`;
+        var newfilename = `${utilx.randomNum(6)}${filename}`;
         ret = path.join(uploadDir, newfilename);
     } while (fs.exists(ret));
     return {

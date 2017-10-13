@@ -54,7 +54,7 @@ module.exports = {
             Headimgurl:userInfo.headimgurl,
             CustomerId:'0630046f-54e0-4724-b30a-303482024be0'
         })
-        
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, userInfo)
     },
 
