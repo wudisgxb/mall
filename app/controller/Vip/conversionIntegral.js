@@ -10,6 +10,8 @@ const NewOrders = db.models.NewOrders
 const OrderGoods = db.models.OrderGoods
 const HeadquartersIntegrals = db.models.HeadquartersIntegrals
 const AllianceHeadquarters = db.models.AllianceHeadquarters
+const QRCodeTemplates = db.models.QRCodeTemplates
+const Merchants = db.models.Merchants
 const Headquarters = db.models.Headquarters
 
 module.exports = {
@@ -148,18 +150,53 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     async saveConversionIntegralGood(ctx,next){
-        ctx.checkBody('phone').netEmpty()
-        ctx.checkBody('goods').notEmpty()
+        ctx.checkBody('qrcoldId').notEmpty()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
         }
         let body = ctx.request.body
-        if(body.goods.length=0){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR)
-            return
+        let aaa = await QRCodeTemplates.findAll({
+            where:{
+                QRCodeTemplateId : body.qrcoldId
+            }
+        })
+        console.log(aaa.length)
+        let arrayAAA = []
+        for(let j = 0 ;j < aaa.length ;j++){
+            if(!arrayAAA.contains(aaa[j].tenantId)){
+                arrayAAA.push(aaa[j].tenantId)
+            }
         }
-
-
+        // aaa.forEach(function (e) {
+        //     if(!arrayAAA.contains(e.tenantId)){
+        //         arrayAAA.push(e)
+        //     }
+        // })
+        // console.log(arrayAAA.length)
+        // let aaaArrat = []
+        // for(let i = 0;i < arrayAAA.length; i++){
+        //     let aaaJson = {}
+        //     let merchant = await Merchants.findOne({
+        //         where:{
+        //             tenantId : arrayAAA[i].tenantId
+        //         }
+        //     })
+        //     let ccc = await QRCodeTemplates.findOne({
+        //         where:{
+        //             QRCodeTemplateId : body.qrcoldId,
+        //             tenantId : arrayAAA[i].tenantId
+        //         }
+        //     })
+        //     aaaJson.QRCodeTemplateId = arrayAAA[i].QRCodeTemplateId;
+        //     aaaJson.id = arrayAAA[i].id;
+        //
+        //     aaaJson.merchantName = merchant.name
+        //     aaaJson.aggregateScore = merchant.aggregateScore
+        //     aaaArrat.push(aaaJson)
+        // }
+        // let bbbArray = []
+        // bbbArray = aaaArrat.sort((a, b) => b.aggregateScore - a.aggregateScore);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,aaa)
     }
 }
