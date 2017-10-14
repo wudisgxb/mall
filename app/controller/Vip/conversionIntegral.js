@@ -28,7 +28,7 @@ module.exports = {
         let vip = await Vips.findOne({
             where:{
                 phone : body.phone,
-                alliancesId : alliancesId
+                alliancesId : body.alliancesId
             }
         })
         if(vip==null){
@@ -146,5 +146,20 @@ module.exports = {
         //     }
         // })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    },
+    async saveConversionIntegralGood(ctx,next){
+        ctx.checkBody('phone').netEmpty()
+        ctx.checkBody('goods').notEmpty()
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let body = ctx.request.body
+        if(body.goods.length=0){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR)
+            return
+        }
+
+
     }
 }
