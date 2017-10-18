@@ -372,6 +372,8 @@ module.exports = {
                         trade_no: trade_no
                     }
                 })
+                console.log(trade_no)
+                console.log(orderGoods.length)
                 console.log("-----------------------------------------------------------")
                 if (orderGoods.length > 0) {
                     console.log("-----------------------------------------------------------")
