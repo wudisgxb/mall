@@ -395,6 +395,7 @@ module.exports = {
         //ctx.redirect(url);
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, url)
         console.log(`start: ${new Date()}`)
+
     },
 
     async getIPayWechatpayReq(ctx, next) {
