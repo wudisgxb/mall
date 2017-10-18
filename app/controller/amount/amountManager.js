@@ -727,12 +727,14 @@ const amountManger = (function () {
     let rechargeIntegral = async function (alliancesId,totalPrice) {
         // console.log("用了"+totalPrice)
         // console.log(alliancesId)
+        //查询商圈对应的平台
         let alliancesHeadquarters = await AllianceHeadquarters.findOne({
             where:{
                 alliancesId:alliancesId
             }
         })
         // let dealId
+        //如果对应的平台不为null的话
         if(alliancesHeadquarters!=null){
             //如果这个付款的alliancesId是商圈的，那么就是在平台充值
             let dealId = alliancesHeadquarters.headquartersId
@@ -799,6 +801,8 @@ const amountManger = (function () {
         if(alliancesHeadquarters==null){
             //如果没找到的话就说明这个付款的Id是租户的
             //查询商圈和租户的关联表查询到在那个商圈充值的
+
+
 
             let alliancesMerchant = await AllianceMerchants.findOne({
                 where:{

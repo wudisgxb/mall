@@ -13,7 +13,9 @@ const Headquarters =db.models.Headquarters
 const HeadquartersSetIntegrals = db.models.HeadquartersSetIntegrals
 const AllianceIntegrals = db.models.AllianceIntegrals
 const Merchants = db.models.Merchants
+const PaymentReqs = db.models.PaymentReqs;
 const TenantConfigs = db.models.TenantConfigs;
+
 const AllianceHeadquarters = db.models.AllianceHeadquarters;
 const EPays = db.models.EPays;
 const QRCodeTemplates = db.models.QRCodeTemplates;
@@ -124,7 +126,8 @@ module.exports = {
             trade_no: tradeNo,
             app_id: app_id,
             totalAmount: total_amount,
-            tenantId: qrCodeTemplate.tenantId
+            tenantId: qrCodeTemplate.tenantId,
+            isRecharge :true
         });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
@@ -152,13 +155,15 @@ module.exports = {
             console.log("trade_no=" + ret.out_trade_no);
             console.log("app_id=" + ret.app_id);
             console.log("total_amount=" + parseFloat(ret.total_amount));
+            //根据订单号找充值的记录
             let ePay = await EPays.findOne({
                 where: {
                     trade_no: ret.out_trade_no,
                     app_id: ret.app_id,
                     totalAmount: parseFloat(ret.total_amount),
                     paymentMethod: '支付宝',
-                    isFinish: false
+                    isFinish: false,
+                    isRecharge : true
                 }
             });
             console.log("________________"+ePay+"---------------------")
@@ -168,7 +173,35 @@ module.exports = {
                 ePay.isFinish = true;
                 await ePay.save();
                 let alliancesId = ePay.tenantId;
+                let merchant = await Merchants.findOne({
+                    where:{
+                        tenantId : alliancesId
+                    }
+                })
+
+                console.log(ret.total_amount)
+                console.log(merchant==null?"商圈充值":merchant.name+"充值")
+                console.log(ePay.paymentMethod)
+                console.log(ret.out_trade_no)
+                console.log(pay_date)
+                // if(merchant!=null){
+                //     let tenantConfig = await TenantConfigs.findOne({
+                //         where:{
+                //             tenantId:merchant.tenantId
+                //         }
+                //     })
+                //     tenantConfig.wecharPayee_account
+                //     let allianceMerchants = await AllianceMerchants.findOne({
+                //         where:{
+                //             tenantId:merchant.tenantId
+                //         }
+                //     })
+                //     await transAccounts.pendingTransferAccounts(ret.out_trade_no, payee_account, amount, remark, paymentMethod, role, tenantId, consigneeId)
+                // }
+
+
                 await amountManager.rechargeIntegral(alliancesId,ret.total_amount);
+
 
                 //商圈Id
                 // let alliancesHeadquarters = await AllianceHeadquarters.findOne({
@@ -374,7 +407,7 @@ module.exports = {
             return;
         }
 
-        let amount = ctx.query.amount;
+        // let amount = ctx.query.amount;
         let tradeNo = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
 
         let qrCodeTemplate = await QRCodeTemplates.findOne({
@@ -447,7 +480,8 @@ module.exports = {
             trade_no: tradeNo,
             app_id: app_id,
             totalAmount: total_amount,
-            tenantId: qrCodeTemplate.tenantId
+            tenantId: qrCodeTemplate.tenantId,
+            isRecharge : true
         });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
@@ -511,7 +545,17 @@ module.exports = {
                 await ePay.save();
 
                 let tenantId = ePay.tenantId;
+                let merchant = await Merchants.findOne({
+                    where:{
+                        tenantId : tenantId
+                    }
+                })
 
+                console.log(total_amount)
+                console.log(merchant==null?"商圈充值":merchant.name+"充值")
+                console.log(ePay.paymentMethod)
+                console.log(trade_no)
+                // console.log(pay_date)
                 //查找主商户信息
                 // let tenantConfig = await TenantConfigs.findOne({
                 //     where: {

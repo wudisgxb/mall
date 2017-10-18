@@ -16,6 +16,7 @@ module.exports = function (sequelize, DataTypes) {
         trade_no: shortDataTypes.String(255,true),//订单号
         TransferAccountIsFinish: shortDataTypes.Bool(),//主商户是否转账成功
         tenantId:shortDataTypes.String(255,true),//租户id
+        isRecharge : shortDataTypes.Bool()//1为充值，0为不充值
     }, {
         paranoid: true,
         associate: function (models) {
