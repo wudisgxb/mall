@@ -396,6 +396,7 @@ module.exports = {
                         //获取token
                         let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
                         let token = ret1.data.access_token;
+                        console.log(token)
 
                         let ret2 = await axios.post(`https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=${token}`, {
                             "touser": order.openId,

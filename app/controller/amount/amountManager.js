@@ -486,7 +486,7 @@ const amountManger = (function () {
 
     }
     //会员购买商品后的积分分配
-    let integralAllocation = async function (tenantId,phone,totalPrice,pay) {
+    let integralAllocation = async function (trade_no,tenantId,phone,totalPrice,pay) {
         // console.log("会员购买商品后的积分分配中的交易商:"+tenantId)
         // console.log("会员购买商品后的积分分配中的电话:"+phone)
         // console.log("会员购买商品后的积分分配中的价格:"+totalPrice)
@@ -574,7 +574,8 @@ const amountManger = (function () {
             buyOrSaleMerchant : tenantId,
             price : totalPrice,
             integral : integral,
-            allianceId : alliancesId
+            allianceId : alliancesId,
+            trade_noId : trade_no
         })
         //用查询到的积分数+本次消费的积分数得到会员的总积分数
         let aggregateScore = Number(vip.aggregateScore)+integral
@@ -596,6 +597,7 @@ const amountManger = (function () {
             buyOrSaleMerchant:vip.phone,//积分给此vip
             price : totalPrice,//获得的钱数
             integral : integral,//失去的积分数
+            trade_noId : trade_no
         })
 
         //修改商家表中的总积分数
@@ -629,6 +631,7 @@ const amountManger = (function () {
             buyOrSaleMerchant:alliancesId,//积分给此商圈
             price : 0,//获得的钱数
             integral : merchantRebateAlliance,//失去的积分数
+            trade_noId : null
         })
         let alliancesMerchantId = "MerA"+Tool.allocTenantId().substring(4)
         await AllianceIntegrals.create({
@@ -664,6 +667,7 @@ const amountManger = (function () {
             buyOrSaleMerchant:vip.tenantId,//积分给此租户
             price : 0,//获得的钱数
             integral : merchantRebateMerchant,//失去的积分数
+            trade_noId : null
         })
         //开户商的租户
         let openMerchantId = "MerO"+Tool.allocTenantId().substring(4)
@@ -674,6 +678,7 @@ const amountManger = (function () {
             buyOrSaleMerchant:tenantId,//积分从此租户获取
             price : 0,//获得的钱数
             integral : merchantRebateMerchant,//失去的积分数
+            trade_noId : null
         })
 
         let allianceHeadquarters = await AllianceHeadquarters.findOne({
@@ -705,6 +710,7 @@ const amountManger = (function () {
             buyOrSaleMerchant:headquarters.headquartersId,//积分给此平台
             price : 0,//获得的钱数
             integral : merchantRebateTerrace,//失去的积分数
+            trade_noId : null
         })
         let HeadquartersMer = "merH"+Tool.allocTenantId().substring(4)
         await HeadquartersIntegrals.create({
@@ -845,6 +851,7 @@ const amountManger = (function () {
                 buyOrSaleMerchant:alliancesMerchant.alliancesId,
                 price:totalPrice,
                 integral : integral,
+                trade_noId : null
             })
             let merchant = await Merchants.findOne({
                 where:{

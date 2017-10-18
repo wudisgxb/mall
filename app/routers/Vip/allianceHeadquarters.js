@@ -8,5 +8,7 @@ router.get('/api/test/admin/allianceHeadquarters', allianceHeadquarters.getAllia
 router.put('/api/test/admin/allianceHeadquarters', allianceHeadquarters.updateAllianceHeadquarters);
 router.delete('/api/test/admin/allianceHeadquarters', allianceHeadquarters.deleteAllianceHeadquarters);
 router.get('/api/test/admin/allianceHeadquartersByHeadquartersId', allianceHeadquarters.getAllianceHeadquartersByheadquartersId);
+router.get('/api/test/admin/getMerchant', allianceHeadquarters.getMerchant);
+
 
 module.exports = router

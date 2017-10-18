@@ -249,7 +249,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodesArray);
         }
     },
-
     async getQRCodeTemplateIpay (ctx, next) {
         ctx.checkQuery('QRCodeTemplateId').notEmpty();
 

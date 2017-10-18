@@ -2,7 +2,8 @@
 const sqlOperation = (function () {
     let getOperations = async function (sequelize,whereJson) {
         let sequelizeAll = await sequelize.findAll({
-            where:whereJson
+            where:whereJson,
+            attributes :['tenantId']
         })
         return sequelizeAll
     }

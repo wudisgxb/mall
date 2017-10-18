@@ -54,7 +54,6 @@ module.exports = {
             Headimgurl:userInfo.headimgurl,
             CustomerId:'0630046f-54e0-4724-b30a-303482024be0'
         })
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, userInfo)
     },
 
@@ -758,7 +757,7 @@ module.exports = {
                 let pay = "微信"
                 if(isVip){
                     // console.log("1111111111111111111111111111111111111111111111111111111111111111")
-                    let integralAllo= await amountManager.integralAllocation(tenantId,order.phone,amountJson.totalPrice,pay)
+                    let integralAllo= await amountManager.integralAllocation(trade_no,tenantId,order.phone,amountJson.totalPrice,pay)
                     // console.log("22222222222222222222222222222222222222222222222222222222222222222222222222")
                     // console.log("积分分配是否有错,看integralAllocation是不是-1"+integralAllo)
                     if(integralAllo=="-1"){

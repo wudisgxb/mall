@@ -1,12 +1,16 @@
-const ApiError = require('../../db/mongo/ApiError')
+const ApiError = require('../../db/mon   o/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const Headquarters = db.models.Headquarters;
 const Tool = require('../../Tool/tool');
 const sqlAllianceHeadquarters = require('../businessAlliance/allianceHeadquarters')
+const sqlAllianceMerchants = require('../businessAlliance/allianceMerchants')
 const sqlAlliances = require('../businessAlliance/alliances')
 const sqlHeadquarters = require('../businessAlliance/headquarters')
+const AllianceMerchants = db.models.AllianceMerchants;
+const Foods = db.models.Foods
+
 
 
 module.exports = {
@@ -157,5 +161,39 @@ module.exports = {
             alliancesArray.push(alliances)
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,alliancesArray)
+    },
+    async getMerchant(ctx,next){
+        ctx.checkQuery('headquartersId').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let whereJson = {
+            headquartersId : ctx.query.headquartersId
+        }
+        let allianceHeadquarters = await sqlAllianceHeadquarters.getAllianceHeadquarters(whereJson);
+        if(allianceHeadquarters.length==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有当前记录")
+            return
+        }
+        let merchantArray = []
+        for(let i = 0 ; i < allianceHeadquarters.length ; i++){
+            let alliances = allianceHeadquarters[i].alliancesId
+            let jsonAllianceMerchants ={
+                alliances : alliances
+            }
+            let allianceMerchants = await sqlAllianceMerchants.getOperations(jsonAllianceMerchants)
+            for(let j = 0 ; j < allianceMerchants.length ; j++){
+                let tenantId = allianceMerchants[i].tenantId
+                let merchant = await Merchant.findOne({
+                    where:{
+                        tenantId : tenantId
+                    }
+                })
+                merchantArray.push(merchant)
+            }
+
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,merchantArray)
     },
 }

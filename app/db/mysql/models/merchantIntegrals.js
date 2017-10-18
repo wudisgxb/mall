@@ -11,6 +11,7 @@ module.exports = function (sequelize, DataTypes) {
         buyOrSaleMerchant : shortDataTypes.String(100, false),//买入卖出商
         price : shortDataTypes.String(100, false),
         integral : shortDataTypes.String(100, false),
+        trade_noId : shortDataTypes.String(100, true),
     }, {
         associate: function (models) {
         },
