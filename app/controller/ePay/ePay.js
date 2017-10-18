@@ -367,7 +367,7 @@ module.exports = {
                     }
                 });
 
-                let orderGoods = await OrderGoods.findOne({
+                let orderGoods = await OrderGoods.findAll({
                     where: {
                         trade_no: trade_no
                     }
