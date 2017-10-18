@@ -391,6 +391,7 @@ module.exports = {
                     }
                 })
 
+
                 if (order != null) {
                     if (order.openId != null && order.cardId != null) {
                         //获取token
