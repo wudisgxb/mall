@@ -372,8 +372,9 @@ module.exports = {
                         trade_no: trade_no
                     }
                 })
-
+                console.log("-----------------------------------------------------------")
                 if (orderGoods.length > 0) {
+                    console.log("-----------------------------------------------------------")
                     let food = await Foods.findOne({
                         where:{
                             id : orderGoods[0].FoodId
@@ -383,7 +384,7 @@ module.exports = {
                     food.todaySales = food.todaySales + 1;
                     await food.save();
                 }
-
+                console.log("-----------------------------------------------------------")
                 //发送卡包
                 let order = await Orders.findOne({
                     where: {
