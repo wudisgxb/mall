@@ -15,6 +15,7 @@ module.exports = {
         ctx.checkBody('phone').notEmpty()
         ctx.checkBody('role').notEmpty()
         ctx.checkBody('industry').notEmpty()
+
         // ctx.checkBody('adminType').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
@@ -52,6 +53,7 @@ module.exports = {
         //         correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
         //     }
         // }
+
         let industry = body.industry
         let correspondingId
         if (body.role == 1) {
@@ -65,22 +67,25 @@ module.exports = {
         if (body.role == 3) {
             correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
         }
+
+
         await Admins.create({
             nickname: body.userName,
             name: body.name == null ? "超级管理员" : body.name,
             password: body.password,
             phone: body.phone,
-            style : industry,
+            style :industry,
             status: body.status == null ? 0 : body.status,
             type: body.type == null ? 100 : body.type,
         })
 
-
         await AdminCorresponding.create({
             phone: body.phone,
             correspondingType: body.role,
+            adminType : 1000,
             correspondingId: correspondingId
         })
+
         // await AdminCorresponding.create({
         //     phone: body.phone,
         //     correspondingType: body.adminType,
@@ -89,7 +94,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,{
             phone: body.phone,
             userName: body.userName,
-            style : body.style
+            style : industry
         });
     },
     async roleRegister(ctx,next){

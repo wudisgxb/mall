@@ -15,7 +15,7 @@ module.exports = function (sequelize, DataTypes) {
         name: shortDataTypes.String(),
         password: shortDataTypes.String(),
         phone: shortDataTypes.Phone(),
-        style : shortDataTypes.Phone(),
+        style : shortDataTypes.String(),
         status: shortDataTypes.Int(),
         /**
          * 管理员类型
