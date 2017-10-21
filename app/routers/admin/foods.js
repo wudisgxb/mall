@@ -15,6 +15,8 @@ router.post('/api/test/admin/food', foods.saveAdminFoods);
 router.put('/api/test/admin/food', foods.updateAdminFoodsById);
 //查询
 router.get('/api/test/admin/food', foods.getAdminFoods);
+//查询个数
+router.get('/api/test/admin/foodByCount', foods.getAdminFoodsByCount);
 //删除
 router.delete('/api/test/admin/food', foods.deleteFoods);
 

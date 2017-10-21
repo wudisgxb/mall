@@ -5,6 +5,7 @@ const router = new (require('koa-router'))()
 router.post('/api/test/admin/vip', vip.saveAdminVip);
 router.put('/api/test/admin/vip', vip.updateAdminVipById);
 router.get('/api/test/admin/vip',vip.getAdminVip);
+// router.get('/api/test/admin/alliancesVip',vip.getAlliancesVip);
 router.get('/api/test/admin/vipByCount',vip.getAdminVipCount)
 router.get('/api/test/admin/vipPhone',vip.getAdminVipPhone);
 router.delete('/api/test/admin/vip',vip.deleteAdminVip);

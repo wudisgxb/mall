@@ -157,9 +157,33 @@ module.exports = {
                 consigneeId : ctx.query.consigneeId
             }
         }
-        let qrCodeTemplates = await QRCodeTemplates.findAll({
-            where: whereJson
-        });
+
+        let pageNumber = parseInt(ctx.query.pageNumber);
+
+        if(pageNumber<1){
+            pageNumber=1
+        }
+
+        let pageSize = parseInt(ctx.query.pageSize);
+        if(pageNumber<1){
+            pageNumber=1
+        }
+        let place = (pageNumber - 1) * pageSize;
+        let qrCodeTemplates
+        if(ctx.query.pageNumber!=null&&ctx.query.pageSize!=null&&ctx.query.pageSize!=""&&ctx.query.pageNumber!=""){
+            qrCodeTemplates = await QRCodeTemplates.findAll({
+                where: whereJson,
+                offset: Number(place),
+                limit: Number(pageSize)
+            });
+        }
+        if(ctx.query.pageNumber==null&&ctx.query.pageSize==null){
+            qrCodeTemplates = await QRCodeTemplates.findAll({
+                where: whereJson,
+
+            });
+        }
+
         if(qrCodeTemplates.length==0){
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, "查不到此数据");
             return;
@@ -196,6 +220,32 @@ module.exports = {
             qrCodeTemplatesArray.push(qrCodeTemplatesJson)
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodeTemplatesArray);
+    },
+    async getQRCodeTemplateCount(ctx, next){
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+        let whereJson={}
+        if((ctx.query.tenantId!=null && ctx.query.tenantId!="") && (ctx.query.consigneeId==null||ctx.query.consigneeId=="")){
+            whereJson={
+                tenantId : ctx.query.tenantId
+            }
+        }else if((ctx.query.tenantId==null || ctx.query.tenantId=="") && (ctx.query.consigneeId!=null && ctx.query.consigneeId!="")){
+            whereJson={
+                consigneeId : ctx.query.consigneeId
+            }
+        }else if((ctx.query.tenantId!=null && ctx.query.tenantId!="") && (ctx.query.consigneeId!=null && ctx.query.consigneeId!="")){
+            whereJson={
+                tenantId : ctx.query.tenantId,
+                consigneeId : ctx.query.consigneeId
+            }
+        }
+        let qrCodeTemplatesCount = await QRCodeTemplates.count({
+            where: whereJson,
+
+        });
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,qrCodeTemplatesCount)
     },
     async getQRCodeTemplateByTenantId(ctx,next){
         ctx.checkQuery('tenantId').notEmpty();

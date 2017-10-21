@@ -192,14 +192,35 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
         }
+        let pageNumber = parseInt(ctx.query.pageNumber);
+
+        if(pageNumber<1){
+            pageNumber=1
+        }
+
+        let pageSize = parseInt(ctx.query.pageSize);
+        if(pageNumber<1){
+            pageNumber=1
+        }
+        let place = (pageNumber - 1) * pageSize;
         //查询foods
-
-        let foods = await Foods.findAll({
-            where: {
-                tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
-            }
-        });
-
+        let foods
+        if(ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""&&ctx.query.pageSize!=null&&ctx.query.pageSize!=""){
+            foods = await Foods.findAll({
+                where: {
+                    tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
+                },
+                offset: Number(place),
+                limit: Number(pageSize)
+            });
+        }
+        if(ctx.query.pageNumber==null&&ctx.query.pageSize!=null){
+            foods = await Foods.findAll({
+                where: {
+                    tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
+                }
+            });
+        }
 
         let foodId;
         let menuName;
@@ -262,25 +283,23 @@ module.exports = {
             foodsJson.integral = foods[i].integral;
             foodsArray.push(foodsJson)
         }
-        // let results = [];
-        // let result = [];
-        // let resultId;
-        // result = await getFoodNum.getFood(ctx.query.tenantId, foodnum);
-        //
-        // resultId = result.sort((a, b)=>b.num - a.num);
-        // for (let k = 0; k < foodnum; k++) {
-        //     results.push(resultId[k])
-        // }
-        // for (let i = 0; i < results.length; i++) {
-        //     for (let j = 0; j < foodsJson.length; j++) {
-        //         if (foodsJson[j].id == (results[i].id)) {
-        //             foodsJson.splice(j, 1);
-        //         }
-        //     }
-        // }
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, foodsArray);
     },
-
+    //
+    async getAdminFoodsByCount(ctx, next){
+        ctx.checkQuery('tenantId').notEmpty()
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+        let foodsCount = await Foods.count({
+            where:{
+                tenantId : ctx.query.tenantId
+            }
+        })
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,foodsCount)
+    },
     async deleteFoods(ctx,next){
         ctx.checkQuery('id').notEmpty();
         if(ctx.errors){

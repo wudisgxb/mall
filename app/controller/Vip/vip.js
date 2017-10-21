@@ -4,6 +4,8 @@ const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 let Vip = db.models.Vips;
 let VipIntegrals = db.models.VipIntegrals
+let Merchants = db.models.Merchants
+let Alliances = db.models.Alliances
 let AllianceMerchants = db.models.AllianceMerchants
 let vipss = require('../admin/vip')
 //链接数据库
@@ -263,20 +265,102 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
+    async tenantIdOrAlliancesId(tenantId,alliancesId){
+
+        if(tenantId!=null&&alliancesId==null) {
+            let merchant = await Merchants.findOne({
+                where:{
+                    where:{
+                        tenantId :tenantId
+                    }
+                }
+            })
+            if(merchant==null){
+                return "找不到这个租户"
+            }
+        }
+        if(tenantId!=null&&alliancesId!=null){
+            let alliance = await Alliances.findOne({
+                where:{
+                    alliancesId : alliancesId
+                }
+            })
+            if(alliance==null){
+                return "找不到这个商圈"
+            }
+            let merchant = await Merchants.findOne({
+                where:{
+                    where:{
+                        tenantId :tenantId
+                    }
+                }
+            })
+            if(merchant==null){
+                return "找不到这个租户"
+            }
+
+        }
+        if(alliancesId!=null&&tenantId==null){
+            let alliance = await Alliances.findOne({
+                where:{
+                    alliancesId : ctx.query.alliancesId
+                }
+            })
+            if(alliance==null){
+                return "找不到这个商圈"
+            }
+        }
+        return 1
+    },
+
     async getAdminVipCount (ctx, next) {
-        ctx.checkQuery('tenantId').notEmpty();
+        // ctx.checkQuery('tenantId').notEmpty();
 
         if (ctx.errors) {
             new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
             return;
         }
 
-        //每页显示的大小
-        let vipsCount = await Vip.count({
-            where: {
-                tenantId: ctx.query.tenantId
-            }
-        });
+        let vipsCount
+        if(ctx.query.tenantId!=null&&ctx.query.alliancesId==null) {
+            // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
+            // if(tenantIdOrAlliancesId==1){
+                vipsCount = await Vip.count({
+                    where: {
+                        tenantId: ctx.query.tenantId
+                    }
+                });
+            // }else{
+            //     return tenantIdOrAlliancesId
+            // }
+        }
+        if(ctx.query.tenantId!=null&&ctx.query.alliancesId!=null){
+            // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
+            // if(tenantIdOrAlliancesId==1){
+                vipsCount = await Vip.count({
+                    where: {
+                        tenantId: ctx.query.tenantId,
+                        alliancesId : ctx.query.alliancesId
+                    }
+                });
+            // }else{
+            //     return tenantIdOrAlliancesId
+            // }
+
+        }
+        if(ctx.query.alliancesId!=null&&ctx.query.tenantId==null){
+            // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
+            // if(tenantIdOrAlliancesId==1){
+                vipsCount = await Vip.count({
+                    where: {
+                        alliancesId: ctx.query.alliancesId
+                    }
+                });
+            // }else{
+            //     return tenantIdOrAlliancesId
+            // }
+
+        }
 
 
         // if (vips.length == 0) {
@@ -285,4 +369,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, vipsCount);
     },
 
+
 }
+
+
