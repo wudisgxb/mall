@@ -13,7 +13,8 @@ module.exports = {
         ctx.checkBody('userName').notEmpty()
         ctx.checkBody('password').notEmpty()
         ctx.checkBody('phone').notEmpty()
-        ctx.checkBody('style').notEmpty()
+        ctx.checkBody('role').notEmpty()
+        ctx.checkBody('industry').notEmpty()
         // ctx.checkBody('adminType').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
@@ -51,14 +52,34 @@ module.exports = {
         //         correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
         //     }
         // }
+        let industry = body.industry
+        let correspondingId
+        if (body.role == 1) {
+            correspondingId = "1111" + (Tool.allocTenantId().substring(4))//平台
+            industry = ""
+        }
+        if (body.role == 2) {
+            correspondingId = "2222" + (Tool.allocTenantId().substring(4))//商圈
+            industry =""
+        }
+        if (body.role == 3) {
+            correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
+        }
         await Admins.create({
             nickname: body.userName,
             name: body.name == null ? "超级管理员" : body.name,
             password: body.password,
             phone: body.phone,
-            style : body.style,
+            style : industry,
             status: body.status == null ? 0 : body.status,
             type: body.type == null ? 100 : body.type,
+        })
+
+
+        await AdminCorresponding.create({
+            phone: body.phone,
+            correspondingType: body.role,
+            correspondingId: correspondingId
         })
         // await AdminCorresponding.create({
         //     phone: body.phone,
