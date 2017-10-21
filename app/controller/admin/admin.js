@@ -13,6 +13,7 @@ module.exports = {
         ctx.checkBody('userName').notEmpty()
         ctx.checkBody('password').notEmpty()
         ctx.checkBody('phone').notEmpty()
+        ctx.checkBody('style').notEmpty()
         // ctx.checkBody('adminType').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
@@ -55,6 +56,7 @@ module.exports = {
             name: body.name == null ? "超级管理员" : body.name,
             password: body.password,
             phone: body.phone,
+            style : body.style,
             status: body.status == null ? 0 : body.status,
             type: body.type == null ? 100 : body.type,
         })
@@ -102,7 +104,51 @@ module.exports = {
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,correspondingId)
     },
+    async putAdmins(ctx,next){
+        ctx.checkBody('userName').notEmpty()
+        ctx.checkBody('password').notEmpty()
+        ctx.checkBody('phone').notEmpty()
+        ctx.checkBody('style').notEmpty()
+        ctx.checkBody('id').notEmpty()
+        // ctx.checkBody('adminType').notEmpty()
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
+            return;
+        }
+        let body = ctx.request.body;
+        let admin = await Admins.findOne({
+            where: {
+                nickname: body.userName
+            }
+        })
+        if (admin != null) {
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "用户名已存在！");
+            return;
+        }
+        let adminPhone = await Admins.findOne({
+            where: {
+                phone: body.phone
+            }
+        })
+        if (adminPhone != null) {
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "手机号已存在已存在！");
+            return;
+        }
+        await Admins.update({
+            nickname: body.userName,
+            name: body.name == null ? "超级管理员" : body.name,
+            password: body.password,
+            phone: body.phone,
+            style : body.style
+        },{
+            where: {
+                id: body.id
+            }
+        })
 
+
+
+    },
     async putAdmin(ctx, next){
         let admin = await Admins.findAll({})
         for(let i = 0; i < admin.length; i++){
