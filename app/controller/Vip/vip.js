@@ -158,12 +158,36 @@ module.exports = {
             new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
             return;
         }
+        let pageNumber = parseInt(ctx.query.pageNumber);
 
-        let vips = await Vip.findAll({
-            where: {
-                tenantId: ctx.query.tenantId
-            }
-        });
+        if(pageNumber<1){
+            pageNumber=1
+        }
+
+        let pageSize = parseInt(ctx.query.pageSize);
+        if(pageNumber<1){
+            pageNumber=1
+        }
+        let place = (pageNumber - 1) * pageSize;
+        //每页显示的大小
+        let vips
+        if((ctx.query.pageSize!=null||ctx.query.pageSize!="")&&(ctx.query.pageNumber!=null||ctx.query.pageNumber!="")){
+            vips = await Vip.findAll({
+                where: {
+                    tenantId: ctx.query.tenantId
+                },
+                offset: place,
+                limit: pageSize
+            });
+        }else if(ctx.query.pageSize==null&&ctx.query.pageNumber==null){
+
+            vips = await Vip.findAll({
+                where: {
+                    tenantId: ctx.query.tenantId
+                }
+            });
+        }
+
         if (vips.length == 0) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip");
         }

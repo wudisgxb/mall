@@ -78,11 +78,28 @@ module.exports = {
             return;
         }
 
-        let vips = await Vip.findAll({
-            where: {
-                tenantId: ctx.query.tenantId
-            }
-        });
+        //页码
+        let pageNumber = parseInt(ctx.query.pageNumber);
+        //每页显示的大小
+        let pageSize = parseInt(ctx.query.pageSize);
+        let place = (pageNumber - 1) * pageSize;
+        let vips
+        if((ctx.query.pageNumber!=null||ctx.query.pageNumber!="")&&(ctx.query.pageSize!=null||ctx.query.pageSize!="")){
+            vips = await Vip.findAll({
+                where: {
+                    tenantId: ctx.query.tenantId
+                },
+                offset: place,
+                limit: pageSize
+            });
+        }else{
+            vips = await Vip.findAll({
+                where: {
+                    tenantId: ctx.query.tenantId
+                }
+            });
+        }
+
         if (vips.length == 0) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip");
         }
