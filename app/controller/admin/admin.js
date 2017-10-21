@@ -68,6 +68,7 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,{
             phone: body.phone,
             userName: body.userName,
+            style : body.style
         });
     },
     async roleRegister(ctx,next){
