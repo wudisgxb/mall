@@ -18,9 +18,15 @@ module.exports = function (sequelize, DataTypes) {
         merchantCouponFee : shortDataTypes.String(255,true), //商家优惠
         // coupon : shortDataTypes.String(255,true),//优惠券类型
         // foodName : shortDataTypes.String(255,true),//菜名
-        phone : shortDataTypes.Phone(), //手机号
         createTime : shortDataTypes.Date(255,true),//创建统计数据的时间
-        style : shortDataTypes.String(255,true)
+        style : shortDataTypes.String(255,true),
+        merchantSetIntegrals : shortDataTypes.String(255,true),//商家积分设置（新）
+        isVip : shortDataTypes.Bool(),  //是否是Vip（新）
+        phone : shortDataTypes.Phone(), //如果是vip就是vip手机号，否则就是普通的手机号
+        alliancesId : shortDataTypes.String(255,true),//会员所属的商圈Id如果非会员就是商家所属的商圈Id（新）
+        integrals:shortDataTypes.String(255,true),//当前商品的积分如果不是会员的话就算商品有积分，也获得不到积分（新）
+        vipName : shortDataTypes.String(255,true),//vip名字，若是购买者不是会员，那么vipName就为null(新)
+
     }, {
         paranoid: true,
         associate: function (models) {

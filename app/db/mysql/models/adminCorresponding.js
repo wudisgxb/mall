@@ -16,6 +16,12 @@ module.exports = function (sequelize, DataTypes) {
          */
         correspondingType : shortDataTypes.String(),
         correspondingId : shortDataTypes.String(),
+        /**
+         * 1000为这个公司的总管理员，
+         * 500为这个公司管理员
+         * 100为这个公司的员工
+         */
+        adminType : shortDataTypes.String(),//admin等级
     }, {
         paranoid: true,
         associate: function (models) {

@@ -264,23 +264,23 @@ module.exports = {
     },
 
     async deleteCustomerBytenantId (ctx, next) {
-        // ctx.checkQuery('id').notEmpty()
-        // ctx.checkQuery('tenantId').notEmpty()
+        ctx.checkQuery('id').notEmpty()
+        ctx.checkQuery('tenantId').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
 
         let whereJson = {
-            // tenantId: ctx.query.tenantId,
-            // id: ctx.query.id
-            createdAt : {
-                $gte:new Date("2017-09-01 00:00:00"),
-                $lt : new Date("2017-09-02 00:00:00")
-            }
+            tenantId: ctx.query.tenantId,
+            id: ctx.query.id,
+            // createdAt : {
+            //     $gte:new Date("2017-09-01 00:00:00"),
+            //     $lt : new Date("2017-09-02 00:00:00")
+            // }
         }
         let customer = await customerSql.getCustomer(whereJson)
-        // console.log(customer.length)
+        console.log(customer.length)
         if (customer.length>0) {
             for(let c of customer){
                 await c.destroy();
