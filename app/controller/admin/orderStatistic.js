@@ -131,7 +131,7 @@ module.exports = {
         ctx.checkQuery("purchaseFrequency").notEmpty();
         ctx.checkQuery("startTime").notEmpty();
         ctx.checkQuery("endTime").notEmpty();
-        console.log()
+        // console.log()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return;

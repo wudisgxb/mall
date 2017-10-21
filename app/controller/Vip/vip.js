@@ -265,53 +265,6 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
-    async tenantIdOrAlliancesId(tenantId,alliancesId){
-
-        if(tenantId!=null&&alliancesId==null) {
-            let merchant = await Merchants.findOne({
-                where:{
-                    where:{
-                        tenantId :tenantId
-                    }
-                }
-            })
-            if(merchant==null){
-                return "找不到这个租户"
-            }
-        }
-        if(tenantId!=null&&alliancesId!=null){
-            let alliance = await Alliances.findOne({
-                where:{
-                    alliancesId : alliancesId
-                }
-            })
-            if(alliance==null){
-                return "找不到这个商圈"
-            }
-            let merchant = await Merchants.findOne({
-                where:{
-                    where:{
-                        tenantId :tenantId
-                    }
-                }
-            })
-            if(merchant==null){
-                return "找不到这个租户"
-            }
-
-        }
-        if(alliancesId!=null&&tenantId==null){
-            let alliance = await Alliances.findOne({
-                where:{
-                    alliancesId : ctx.query.alliancesId
-                }
-            })
-            if(alliance==null){
-                return "找不到这个商圈"
-            }
-        }
-        return 1
-    },
 
     async getAdminVipCount (ctx, next) {
         // ctx.checkQuery('tenantId').notEmpty();
@@ -371,5 +324,52 @@ module.exports = {
 
 
 }
+// let tenantIdOrAlliancesId = async function (tenantId,alliancesId){
+//
+//     if(tenantId!=null&&alliancesId==null) {
+//         let merchant = await Merchants.findOne({
+//             where:{
+//                 where:{
+//                     tenantId :tenantId
+//                 }
+//             }
+//         })
+//         if(merchant==null){
+//             return "找不到这个租户"
+//         }
+//     }
+//     if(tenantId!=null&&alliancesId!=null){
+//         let alliance = await Alliances.findOne({
+//             where:{
+//                 alliancesId : alliancesId
+//             }
+//         })
+//         if(alliance==null){
+//             return "找不到这个商圈"
+//         }
+//         let merchant = await Merchants.findOne({
+//             where:{
+//                 where:{
+//                     tenantId :tenantId
+//                 }
+//             }
+//         })
+//         if(merchant==null){
+//             return "找不到这个租户"
+//         }
+//
+//     }
+//     if(alliancesId!=null&&tenantId==null){
+//         let alliance = await Alliances.findOne({
+//             where:{
+//                 alliancesId : ctx.query.alliancesId
+//             }
+//         })
+//         if(alliance==null){
+//             return "找不到这个商圈"
+//         }
+//     }
+//     return 1
+// }
 
 

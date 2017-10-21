@@ -7,7 +7,7 @@ let getVipEchats = require('../echats/vipEchats')
 
 module.exports = {
     async saveAdminVip(ctx, next){
-        // logger.info("1111")
+
         ctx.checkBody("tenantId").notEmpty();
         ctx.checkBody("startTime").notEmpty();
         ctx.checkBody("endTime").notEmpty();
