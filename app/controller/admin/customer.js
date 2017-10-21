@@ -161,7 +161,7 @@ module.exports = {
         }
         let limitJson = {}
         // let body = ctx.request.body
-        if (body.pageNumber != null) {
+        if (ctx.query.pageNumber != null) {
             //页码
             let pageNumber = parseInt(ctx.query.pageNumber);
             //每页显示的大小
