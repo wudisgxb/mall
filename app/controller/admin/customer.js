@@ -154,18 +154,18 @@ module.exports = {
     },
 
     async getCustomerBytenantId (ctx, next) {
-        ctx.checkBody('tenantId').notEmpty()
+        ctx.checkQuery('tenantId').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
         let limitJson = {}
-        let body = ctx.request.body
+        // let body = ctx.request.body
         if (body.pageNumber != null) {
             //页码
-            let pageNumber = parseInt(body.pageNumber);
+            let pageNumber = parseInt(ctx.query.pageNumber);
             //每页显示的大小
-            let pageSize = parseInt(body.pageSize);
+            let pageSize = parseInt(ctx.query.pageSize);
             let place = (pageNumber - 1) * pageSize;
             limitJson = {
                 limit: pageSize,
@@ -173,7 +173,7 @@ module.exports = {
             }
         }
         let jsonCustomer = {
-            tenantId: body.tenantId
+            tenantId: ctx.query.tenantId
         }
         let customer = await customerSql.getCustomer(jsonCustomer, limitJson)
         // console.log(customer)
