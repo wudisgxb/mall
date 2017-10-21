@@ -171,15 +171,15 @@ module.exports = {
         let place = (pageNumber - 1) * pageSize;
         //每页显示的大小
         let vips
-        if((ctx.query.pageSize!=null||ctx.query.pageSize!="")&&(ctx.query.pageNumber!=null||ctx.query.pageNumber!="")){
+        if((ctx.query.pageSize!=null&&ctx.query.pageSize!="")&&(ctx.query.pageNumber!=null&&ctx.query.pageNumber!="")){
             vips = await Vip.findAll({
                 where: {
                     tenantId: ctx.query.tenantId
                 },
-                offset: place,
-                limit: pageSize
+                offset: Number(place),
+                limit: Number(pageSize)
             });
-        }else if(ctx.query.pageSize==null&&ctx.query.pageNumber==null){
+        }else if(ctx.query.pageNumber==null&&ctx.query.pageSize==null){
 
             vips = await Vip.findAll({
                 where: {
@@ -261,6 +261,28 @@ module.exports = {
         }
         await ArrayNumber
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-    }
+    },
+
+    async getAdminVipCount (ctx, next) {
+        ctx.checkQuery('tenantId').notEmpty();
+
+        if (ctx.errors) {
+            new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
+            return;
+        }
+
+        //每页显示的大小
+        let vipsCount = await Vip.count({
+            where: {
+                tenantId: ctx.query.tenantId
+            }
+        });
+
+
+        // if (vips.length == 0) {
+        //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip");
+        // }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, vipsCount);
+    },
 
 }
