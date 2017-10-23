@@ -78,7 +78,7 @@ module.exports = {
             status: body.status == null ? 0 : body.status,
             type: body.type == null ? 100 : body.type,
         })
-
+        console.log(correspondingId)
         await AdminCorresponding.create({
             phone: body.phone,
             correspondingType: body.role,
