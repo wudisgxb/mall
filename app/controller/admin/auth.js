@@ -94,7 +94,7 @@ module.exports = {
                 correspondingId: adminCorresponding.correspondingId,
                 correspondingType : adminCorresponding.correspondingType,
                 style :admin.style,
-                name : admin.name
+                name : admin.name,
             })
         }
     },

@@ -45,15 +45,15 @@ module.exports = {
 
         let industry = body.industry
         let correspondingId
-        if (body.role == 2) {
+        if (body.role == 1) {
             correspondingId = "1111" + (Tool.allocTenantId().substring(4))//平台
             industry = ""
         }
-        if (body.role == 1) {
+        if (body.role == 2) {
             correspondingId = "2222" + (Tool.allocTenantId().substring(4))//商圈
             industry =""
         }
-        if (body.role == 0) {
+        if (body.role == 3) {
             correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
         }
 
