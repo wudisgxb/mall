@@ -7,6 +7,7 @@ let Admins = db.models.Adminer
 let Alliances = db.models.Alliances
 let AdminCorresponding = db.models.AdminCorresponding
 let Merchants = db.models.Merchants
+let Headquarters = db.models.Headquarters
 
 module.exports = {
     async register (ctx, next) {
@@ -169,21 +170,53 @@ module.exports = {
     async putAdmin(ctx, next){
         let admin = await Admins.findAll({})
         for(let i = 0; i < admin.length; i++){
-            let correspondingType = 3
-            let correspondingId = admin[i].tenantId
-            if(admin[i].type==1000){
-                correspondingId = "1111"+Tool.allocTenantId().substring(4)
-                correspondingType =1
-            }
-            if(admin[i].type==500){
-                correspondingId = "2222"+Tool.allocTenantId().substring(4)
-                correspondingType =2
-            }
-            await AdminCorresponding.create({
-                phone : admin[i].phone,
-                correspondingType : correspondingType,
-                correspondingId :correspondingId
+            let adminCorresponding = await AdminCorresponding.findOne({
+                where:{
+                    phone : admin[i].phone
+                }
             })
+            if(adminCorresponding.correspondingType==1){
+                let headquarters = await Headquarters.findOne({
+                    where:{
+                        headquartersId : adminCorresponding.correspondingId
+                    }
+                })
+                let admins = await Admins.findOne({
+                    where:{
+                        phone : admin[i].phone
+                    }
+                })
+                admins.name = headquarters==null?"":headquarters.name
+                await admins.save()
+            }
+            if(adminCorresponding.correspondingType==2){
+                let alliance = await Alliances.findOne({
+                    where:{
+                        alliancesId : adminCorresponding.correspondingId
+                    }
+                })
+                let admins = await Admins.findOne({
+                    where:{
+                        phone : admin[i].phone
+                    }
+                })
+                admins.name = alliance==null?"":alliance.name
+                await admins.save()
+            }
+            if(adminCorresponding.correspondingType==3){
+                let merchant = await Merchants.findOne({
+                    where:{
+                        tenantId : adminCorresponding.correspondingId
+                    }
+                })
+                let admins = await Admins.findOne({
+                    where:{
+                        phone : admin[i].phone
+                    }
+                })
+                admins.name = merchant==null?"":merchant.name
+                await admins.save()
+            }
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
