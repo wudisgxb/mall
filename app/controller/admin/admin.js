@@ -83,7 +83,8 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,{
             phone: body.phone,
             userName: body.userName,
-            style : industry
+            style : industry,
+            correspondingId:correspondingId
         });
     },
     async roleRegister(ctx,next){

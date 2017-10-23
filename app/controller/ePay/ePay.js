@@ -229,7 +229,8 @@ module.exports = {
                     trade_no: tradeNo
                 }
             })
-
+            console.log(1111111111111111111111111111111)
+            console.log(token.data.nickname)
             if (order != null) {
                 order.openId = openId;
                 await order.save();
