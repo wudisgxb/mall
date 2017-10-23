@@ -41,18 +41,7 @@ module.exports = {
             return;
         }
 
-        // let correspondingId
-        // if (body.adminType != null && body.adminType != "") {
-        //     if (body.adminType == 1) {
-        //         correspondingId = "1111" + (Tool.allocTenantId().substring(4))//平台
-        //     }
-        //     if (body.adminType == 2) {
-        //         correspondingId = "2222" + (Tool.allocTenantId().substring(4))//商圈
-        //     }
-        //     if (body.adminType == 3) {
-        //         correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
-        //     }
-        // }
+
 
         let industry = body.industry
         let correspondingId
@@ -292,7 +281,5 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
-    
+
 }
-
-
