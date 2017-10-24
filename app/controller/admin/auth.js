@@ -92,6 +92,7 @@ module.exports = {
             let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                 correspondingId: adminCorresponding.correspondingId,
+                tenantId : adminCorresponding.correspondingId,
                 correspondingType : adminCorresponding.correspondingType,
                 style :admin.style,
                 name : admin.nickname,
