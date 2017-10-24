@@ -968,7 +968,6 @@ module.exports = {
                 }
             })
 
-
             console.log("orderGoods[i].FoodId===" + orderGoods[i].FoodId);
             console.log("orderGoods[i].tenantId===" + orderGoods[i].tenantId);
             //首杯半价(青豆家写死，后面完善)

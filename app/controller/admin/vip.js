@@ -7,6 +7,8 @@ let vipss = require('../admin/vip')
 //链接数据库
 
 
+
+
 module.exports = {
 
     async saveAdminVip (ctx, next) {
@@ -71,11 +73,15 @@ module.exports = {
     },
 
     async getAdminVip (ctx, next) {
-        ctx.checkQuery('tenantId').notEmpty();
+        // ctx.checkQuery('tenantId').notEmpty();
+        let whereJson = {}
+        if(ctx.query.tenantId!=null){
+            whereJson={
+                tenantId: ctx.query.tenantId
+            }
+        }
+        if(ctx,query){
 
-        if (ctx.errors) {
-            new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
-            return;
         }
 
         //页码

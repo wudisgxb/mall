@@ -49,13 +49,13 @@ module.exports = {
         if (body.role == 1) {
             correspondingId = "1111" + (Tool.allocTenantId().substring(4))//平台
             industry = ""
-        }
-        if (body.role == 2) {
+        }else if (body.role == 2) {
             correspondingId = "2222" + (Tool.allocTenantId().substring(4))//商圈
             industry =""
-        }
-        if (body.role == 3) {
+        }else if (body.role == 3) {
             correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
+        }else{
+            correspondingId = Tool.allocTenantId()
         }
 
 
@@ -73,7 +73,7 @@ module.exports = {
             phone: body.phone,
             correspondingType: body.role,
             adminType : 1000,
-            correspondingId: correspondingId
+            correspondingId: correspondingId==null?Tool.allocTenantId():correspondingId
         })
 
         // await AdminCorresponding.create({
@@ -214,7 +214,7 @@ module.exports = {
                         phone : admin[i].phone
                     }
                 })
-                admins.name = merchant==null?"":merchant.name
+                admins.name = merchant==null?admin.name:merchant.name
                 await admins.save()
             }
         }

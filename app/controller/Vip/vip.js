@@ -248,8 +248,6 @@ module.exports = {
         let ArrayNumber = []
         let y = 1
         for(let i =0;i<vips.length;i++){
-
-
             ArrayNumber.push(Vip.update({
                 membershipCardNumber :y,
                 alliancesId :"222267370d07487ee160a1b7c07136e4"
@@ -267,7 +265,7 @@ module.exports = {
 
 
     async getAdminVipCount (ctx, next) {
-        // ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
 
         if (ctx.errors) {
             new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
