@@ -689,7 +689,7 @@ module.exports = {
                     $between: [startTime, endTime]
                 },
                 phone: ctx.query.phoneNumber,
-                consigneeId: ctx.query.consigneeId,
+                // consigneeId: ctx.query.consigneeId,
             }
         })
 
