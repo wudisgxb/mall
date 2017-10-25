@@ -206,7 +206,7 @@ module.exports = {
         //查询foods
         let foods = []
         if(ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""&&ctx.query.pageSize!=null&&ctx.query.pageSize!=""){
-            console.log("bbbbb")
+
             foods = await Foods.findAll({
                 where: {
                     tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
@@ -215,8 +215,8 @@ module.exports = {
                 limit: Number(pageSize)
             });
         }
-        if(ctx.query.pageNumber==null&&ctx.query.pageSize!=null){
-            console.log("aaaaaa")
+        if(ctx.query.pageNumber==null&&ctx.query.pageSize==null){
+
             foods = await Foods.findAll({
                 where: {
                     tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
@@ -228,9 +228,7 @@ module.exports = {
         let menuName;
         let menuId;
         let foodsArray = [];
-        let i;
-
-        for (i = 0; i < foods.length; i++) {
+        for (let i = 0; i < foods.length; i++) {
             let images = foods[i].image
 
             let img
