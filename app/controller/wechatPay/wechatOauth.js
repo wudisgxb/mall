@@ -729,12 +729,23 @@ module.exports = {
                         tenantId :tenantId
                     }
                 })
-                let customerVips = await Vips.findOne({
-                    where: {
-                        phone: order.phone,
-                        alliancesId: allianceMerchants.alliancesId
-                    }
-                });
+                let customerVips
+                if(allianceMerchants!=null){
+                    customerVips = await Vips.findOne({
+                        where: {
+                            phone: order.phone,
+                            alliancesId: allianceMerchants.alliancesId
+                        }
+                    });
+                }else{
+                    customerVips = await Vips.findOne({
+                        where: {
+                            phone: order.phone,
+                            tenantId: tenantId
+                        }
+                    });
+                }
+
                 let isVip = false
                 if (customerVips!=null) {
                     isVip = true
