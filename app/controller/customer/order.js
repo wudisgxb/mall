@@ -1161,7 +1161,7 @@ module.exports = {
         let table = await Tables.findById(order.TableId);
         result.tableName = table.name;
         result.totalNum = totalNum;
-        result.promptText = "友情提示:5分钟内没收到货物请致电前台联系(前台电话号码:025-84449229)";
+        result.promptText = order.tenantId=="333397591b10c8b584f5c01cdee5a49b"?"友情提示:5分钟内没收到货物请致电前台联系(前台电话号码:025-84449229)":"";
         result.totalPrice = Math.round(totalPrice * 100) / 100;
         result.isVip = false;
 
