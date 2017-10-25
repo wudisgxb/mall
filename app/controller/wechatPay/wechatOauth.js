@@ -772,6 +772,7 @@ module.exports = {
                     amountJson.consigneeId = consigneeId;
                     amountJson.phone = order.phone;
                     amountJson.trade_no = trade_no;
+                    console.log("amountJson===="+amountJson)
                     await getstatistics.setOrders(amountJson);
                 } catch (e) {
                     console.log(e);
