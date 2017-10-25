@@ -113,6 +113,7 @@ module.exports = {
                 phone: body.phone
             }
         })
+        console.log(body.adminType)
         if(adminPhone==null){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此电话号码,请注册")
             return
@@ -129,6 +130,7 @@ module.exports = {
         }
         await AdminCorresponding.create({
             phone: body.phone,
+            adminType : 1000,
             correspondingType: body.adminType,
             correspondingId: correspondingId
         })

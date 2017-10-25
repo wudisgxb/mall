@@ -769,14 +769,14 @@ module.exports = {
                 if(isVip){
                     // console.log("1111111111111111111111111111111111111111111111111111111111111111")
                     let integralAllo= await amountManager.integralAllocation(trade_no,tenantId,order.phone,amountJson.totalPrice,pay)
-                    console.log("22222222222222222222222222222222222222222222222222222222222222222222222222")
+                    // console.log("22222222222222222222222222222222222222222222222222222222222222222222222222")
                     // console.log("积分分配是否有错,看integralAllocation是不是-1"+integralAllo)
                     if(integralAllo=="-1"){
                         ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"商家积分不足")
                         return
                     }
                 }
-                console.log(11111111111111111111111111111111)
+                // console.log(11111111111111111111111111111111)
 
                 try {
                     amountJson.style = merchant==null?null:merchant.style;
@@ -784,7 +784,7 @@ module.exports = {
                     amountJson.consigneeId = consigneeId;
                     amountJson.phone = order.phone;
                     amountJson.trade_no = trade_no;
-                    console.log("amountJson===="+amountJson)
+                    // console.log("amountJson===="+amountJson)
                     await getstatistics.setOrders(amountJson);
                 } catch (e) {
                     console.log(e);
