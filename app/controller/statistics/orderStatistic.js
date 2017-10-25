@@ -565,7 +565,7 @@ const getstatistics = (function () {
         }
         let result = [];
         for (let i = 0; i < getTime.length; i++) {
-            console.log(getTime)
+            // console.log(getTime)
             let statisticsOrder = await StatisticsOrders.getBetweenDateByTenantId(tenantId, new Date(getTime[i].start), new Date(getTime[i].end))
             // console.log(333333333)
             //总营收
