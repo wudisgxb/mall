@@ -71,6 +71,7 @@ module.exports = function (sequelize, DataTypes) {
                     }
                 }
                 // console.log(777777777777)
+                console.log(result)
                 return result
             },
             sumField:  function (orders, field) {
