@@ -1248,6 +1248,7 @@ module.exports = {
         result.tenantId = order.tenantId;
         result.merchantName = merchant.name;
         result.merchantIndustry = merchant.industry;
+        result.merchantPhone = merchant.phone
 
         result.consigneeId = order.consigneeId;
 
@@ -1287,14 +1288,8 @@ module.exports = {
                 consigneeId: order.consigneeId,
             }
         });
-        let tenantConfig = await TenantConfigs.findOne({
-            where: {
-                tenantId: order.tenantId
-            }
-        });
-        if(tenantConfig!=null){
-            result.merchantPhone = tenantConfig.phone
-        }
+
+
         if (paymentReq != null) {
             result.actualAmount = paymentReq.actual_amount;
         }
