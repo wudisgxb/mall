@@ -39,6 +39,7 @@ module.exports = {
                 phone: body.phone
             }
         })
+        console.log(adminPhone)
         if (adminPhone != null) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "手机号已存在已存在！");
             return;
