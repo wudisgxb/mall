@@ -1287,7 +1287,14 @@ module.exports = {
                 consigneeId: order.consigneeId,
             }
         });
-
+        let tenantConfig = await TenantConfigs.findOne({
+            where: {
+                tenantId: order.tenantId
+            }
+        });
+        if(tenantConfig!=null){
+            result.merchantPhone = tenantConfig.phone
+        }
         if (paymentReq != null) {
             result.actualAmount = paymentReq.actual_amount;
         }
