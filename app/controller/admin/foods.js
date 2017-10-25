@@ -206,6 +206,7 @@ module.exports = {
         //查询foods
         let foods = []
         if(ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""&&ctx.query.pageSize!=null&&ctx.query.pageSize!=""){
+            console.log("bbbbb")
             foods = await Foods.findAll({
                 where: {
                     tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
@@ -215,6 +216,7 @@ module.exports = {
             });
         }
         if(ctx.query.pageNumber==null&&ctx.query.pageSize!=null){
+            console.log("aaaaaa")
             foods = await Foods.findAll({
                 where: {
                     tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
