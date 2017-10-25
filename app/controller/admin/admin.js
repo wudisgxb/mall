@@ -34,13 +34,13 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "用户名已存在！");
             return;
         }
-        let adminPhone = await Admins.findOne({
+        let adminPhone = await Admins.findAll({
             where: {
                 phone: body.phone
             }
         })
         console.log(adminPhone)
-        if (adminPhone != null) {
+        if (adminPhone.length>1) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "手机号已存在已存在！");
             return;
         }
