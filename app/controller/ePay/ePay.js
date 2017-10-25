@@ -459,7 +459,6 @@ module.exports = {
                         if (total_amount > 0) {
                             await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, total_amount, '收益', '微信', '租户', tenantId, null);
                         }
-
                     }
                 } else {
                     console.log("tenantConfig为空");

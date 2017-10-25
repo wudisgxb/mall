@@ -14,15 +14,17 @@ module.exports = {
         ctx.checkBody('userName').notEmpty()
         ctx.checkBody('password').notEmpty()
         ctx.checkBody('phone').notEmpty()
-        ctx.checkBody('role').notEmpty()
-        ctx.checkBody('industry').notEmpty()
+        // ctx.checkBody('role').notEmpty()
+        // ctx.checkBody('industry').notEmpty()
 
         // ctx.checkBody('adminType').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
+
         let body = ctx.request.body;
+        console.log(body.userName)
         let admin = await Admins.findOne({
             where: {
                 nickname: body.userName
@@ -42,21 +44,24 @@ module.exports = {
             return;
         }
 
-
-
-        let industry = body.industry
+        let industry = body.industry!=null?body.industry:null
         let correspondingId
-        if (body.role == 1) {
-            correspondingId = "1111" + (Tool.allocTenantId().substring(4))//平台
-            industry = ""
-        }else if (body.role == 2) {
-            correspondingId = "2222" + (Tool.allocTenantId().substring(4))//商圈
-            industry =""
-        }else if (body.role == 3) {
-            correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
-        }else{
-            correspondingId = Tool.allocTenantId()
+        if(body.role !=null&&body.industry!=null){
+
+
+            if (body.role == 1) {
+                correspondingId = "1111" + (Tool.allocTenantId().substring(4))//平台
+                industry = ""
+            }else if (body.role == 2) {
+                correspondingId = "2222" + (Tool.allocTenantId().substring(4))//商圈
+                industry =""
+            }else if (body.role == 3) {
+                correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
+            }else{
+                correspondingId = Tool.allocTenantId()
+            }
         }
+
 
 
         await Admins.create({
@@ -64,29 +69,36 @@ module.exports = {
             name: body.name == null ? "超级管理员" : body.name,
             password: body.password,
             phone: body.phone,
-            style :industry,
+            style :industry==null?"":industry,
             status: body.status == null ? 0 : body.status,
             type: body.type == null ? 100 : body.type,
         })
         console.log(correspondingId)
-        await AdminCorresponding.create({
-            phone: body.phone,
-            correspondingType: body.role,
-            adminType : 1000,
-            correspondingId: correspondingId==null?Tool.allocTenantId():correspondingId
-        })
+
+        if(body.role !=null&&body.industry!=null){
+            await AdminCorresponding.create({
+                phone: body.phone,
+                correspondingType: body.role,
+                adminType : 1000,
+                correspondingId: correspondingId==null?Tool.allocTenantId():correspondingId
+            })
+        }
+
 
         // await AdminCorresponding.create({
         //     phone: body.phone,
         //     correspondingType: body.adminType,
         //     correspondingId: correspondingId
         // })
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,{
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
             phone: body.phone,
             userName: body.userName,
-            style : industry,
-            correspondingId:correspondingId
+            style: industry==null?"":industry,
+            correspondingId: correspondingId
         });
+
+
     },
     async roleRegister(ctx,next){
         ctx.checkBody('phone').notEmpty()

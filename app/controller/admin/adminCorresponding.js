@@ -10,12 +10,19 @@ let Merchants = db.models.Merchants
 let Headquarters = db.models.Headquarters
 let TenantConfigs = db.models.TenantConfigs
 
+
+
 module.exports = {
-    //上级管理下级的员工
-    // async administration(ctx,next){
-    //
-    //
-    // },
+    // 上级管理下级的员工
+    async administration(ctx,next){
+        ctx.checkBody('companyUser').notEmpty()
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+
+
+    },
     //新增公司员工岗位
     async saveAdministration(ctx,next){
         ctx.checkBody('username').notEmpty();
@@ -261,7 +268,9 @@ module.exports = {
 
     },
 
-    //查询
+
+
+
 
 
 }

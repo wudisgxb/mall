@@ -6,6 +6,7 @@ let Vip = db.models.Vips;
 let VipIntegrals = db.models.VipIntegrals
 let Merchants = db.models.Merchants
 let Alliances = db.models.Alliances
+let Customers = db.models.Customers
 let AllianceMerchants = db.models.AllianceMerchants
 let vipss = require('../admin/vip')
 //链接数据库
@@ -18,8 +19,8 @@ module.exports = {
         ctx.checkBody('/vip/referral', true).first().notEmpty();//推荐人
         ctx.checkBody('/vip/referralPhone', true).first().notEmpty();//推荐人电话
         ctx.checkBody('/vip/birthday', true).first().notEmpty();//生日
-        ctx.checkBody('/vip/name', true).first().notEmpty();//名字
-        ctx.checkBody('/vip/membershipCardNumber', true).first().notEmpty();//卡号
+        // ctx.checkBody('/vip/name', true).first().notEmpty();//名字
+        // ctx.checkBody('/vip/membershipCardNumber', true).first().notEmpty();//卡号
         ctx.checkBody('tenantId').notEmpty()
         let body = ctx.request.body;
         if (ctx.errors) {
@@ -263,15 +264,34 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
+    async getAdminVipsFind(allianceId){
+        console.log(allianceId)
+        let alliance = await Alliances.findAll({
+            where:{
+                alliancesId : allianceId
+            }
+        })
+        console.log(alliance)
+        if(alliance.length==0){
+            return 0
+        }
+        return 1
+    },
 
     async getAdminVipCount (ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();
-
+        ctx.checkQuery('alliancesId').notEmpty();
         if (ctx.errors) {
             new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
             return;
         }
-
+        let alliancesId = ctx.query.alliancesId
+        let find = await this.getAdminVipsFind(alliancesId)
+        console.log(find)
+        if(find==0){
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED,"查询不到此商圈")
+            return
+        }
         let vipsCount
         if(ctx.query.tenantId!=null&&ctx.query.alliancesId==null) {
             // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
@@ -320,8 +340,33 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, vipsCount);
     },
 
+    async fonds(ctx,next){
 
+
+        ctx.checkBody('tenantId').notEmpty()
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let customers = await Customers.findAll({
+            where:{
+                tenantId : ctx.request.body.tenantId
+            }
+        })
+
+        let a = []
+        customers.forEach(function (e) {
+            a.push(e.phone)
+        })
+        let c = a.filter(function (element,index,self) {
+            return self.indexOf(element)===index
+        })
+        this.bbbb(c)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,c)
+
+    }
 }
+
 // let tenantIdOrAlliancesId = async function (tenantId,alliancesId){
 //
 //     if(tenantId!=null&&alliancesId==null) {

@@ -204,7 +204,7 @@ module.exports = {
         }
         let place = (pageNumber - 1) * pageSize;
         //查询foods
-        let foods
+        let foods = []
         if(ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""&&ctx.query.pageSize!=null&&ctx.query.pageSize!=""){
             foods = await Foods.findAll({
                 where: {
