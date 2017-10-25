@@ -39,7 +39,7 @@ module.exports = {
         ctx.checkBody('/food/foodNum', true).first().notEmpty();
         ctx.checkBody('/food/menuId', true).first().notEmpty();
         ctx.checkBody('/food/isActive', true).first().notEmpty();
-        ctx.checkBody('/food/integral', true).first().notEmpty();
+        // ctx.checkBody('/food/integral', true).first().notEmpty();
         ctx.checkBody('tenantId').notEmpty();
 
         // ctx.checkBody('/food/id',true).first().notEmpty();
@@ -92,7 +92,7 @@ module.exports = {
             taste: JSON.stringify(body.food.taste),
             isActive: body.food.isActive,
             tenantId: body.tenantId,
-            integral : body.food.integral
+            integral : body.food.integral==null?0:body.food.integral
 
             // todo: ok?
             //deletedAt: Date.now()
@@ -163,7 +163,7 @@ module.exports = {
             foods.taste = JSON.stringify(body.food.taste == null ? "" : body.food.taste);
             foods.unit = body.food.unit;
             foods.cardId = body.food.cardId;
-            foods.integral = body.food.integral;
+            foods.integral = body.food.integral==null?0:body.food.integral;
             foods.isActive = body.food.isActive;
             foods.tenantId = body.condition.tenantId;
 
