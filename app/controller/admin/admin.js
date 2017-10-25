@@ -44,7 +44,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "手机号已存在已存在！");
             return;
         }
-
+        console.log(11111111111111)
         let industry = body.industry!=null?body.industry:null
         let correspondingId
         if(body.role !=null&&body.industry!=null){
@@ -64,7 +64,7 @@ module.exports = {
         }
 
 
-
+        console.log(222222222)
         await Admins.create({
             nickname: body.userName,
             name: body.name == null ? "超级管理员" : body.name,
