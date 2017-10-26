@@ -67,6 +67,16 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "食物已存在！");
             return;
         }
+        let menu = await Menus.findOne({
+            where:{
+                id : body.food.menuId
+            }
+        })
+        if(menu==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"请选择菜品类别")
+            return
+        }
+
         let image
 
         if (Tool.isArray(body.food.image)) {
@@ -76,6 +86,7 @@ module.exports = {
         }
 
         let foods;
+
         foods = await Foods.create({
             name: body.food.name,
             image: image,
@@ -97,6 +108,8 @@ module.exports = {
             // todo: ok?
             //deletedAt: Date.now()
         });
+
+
 
         await Foodsofmenus.create({
             FoodId: foods.id,
