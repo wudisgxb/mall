@@ -3,14 +3,24 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/Mysql/index')
 let Distanceandprice = db.models.DistanceAndPrices
+let Merchants = db.models.Merchants
 
 const distanceAndPrice = (function () {
     //查询所有配送信息
+    let getMerchant = async function (tenantId) {
+
+        let merchants = await Merchants.findOne({
+            where:tenantId
+        })
+        if(merchants==null){
+            return 0
+        }
+        return merchants
+    }
+    
     let getdistanceandprice = async function (tenantId) {
         let distanceandprice = await Distanceandprice.findAll({
-            where: {
-                tenantId: tenantId
-            }
+            where: tenantId
         })
         return distanceandprice;
     }
@@ -37,8 +47,8 @@ const distanceAndPrice = (function () {
     }
     //新增配送信息
     let saveDistanceAndPrice = async function (saveJson) {
-        let distanceandprice = await Distanceandprice.create(saveJson)
-        return distanceandprice;
+        await Distanceandprice.create(saveJson)
+        // return distanceandprice;
     }
     //修改配送信息
     let updateDistanceAndPrice = async function (updateJson, whereJson) {
@@ -57,7 +67,8 @@ const distanceAndPrice = (function () {
         updateDistanceAndPrice: updateDistanceAndPrice,
         // deleteDistanceAndPrice :deleteDistanceAndPrice,
         getdistanceandpriceOne: getdistanceandpriceOne,
-        getdistance: getdistance
+        getdistance: getdistance,
+        getMerchant : getMerchant
     }
 
     return instance;

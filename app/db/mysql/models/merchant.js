@@ -27,6 +27,11 @@ module.exports = function (sequelize, DataTypes) {
         // //是否实时
         // isRealTime:shortDataTypes.Bool(),
         aggregateScore : shortDataTypes.Int(),
+        //是否默认接单
+        isDefaultOrder : shortDataTypes.Bool(),
+        //是否自动转账
+        isAutomatedTransit : shortDataTypes.Bool()
+
     }, {
         associate: function (models) {
         },

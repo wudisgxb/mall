@@ -2,6 +2,7 @@ const ApiError = require('../../db/mongo/ApiError');
 const ApiResult = require('../../db/mongo/ApiResult');
 const logger = require('koa-log4').getLogger('AddressController');
 const db = require('../../db/mysql/index');
+const co = require('co')
 const Orders = db.models.NewOrders;
 const OrderGoods = db.models.OrderGoods;
 var Foods = db.models.Foods;
@@ -345,6 +346,7 @@ module.exports = {
                     trade_no: body.trade_no
                 }
             })
+
         }
         if (body.status == 4) {
             await Orders.update({
@@ -378,6 +380,7 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, orderstatus)
     },
+
 
     //添加下单时间，骑手接单时间，商家收单时间
     async postAdminOrderTime(ctx, next){

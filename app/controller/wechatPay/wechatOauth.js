@@ -1057,6 +1057,7 @@ module.exports = {
         }
     },
 
+
     async eshopWechatRefund(ctx, next) {
         ctx.checkBody('tradeNo').notEmpty();
         ctx.checkBody('refundAmount').notEmpty();
@@ -1126,6 +1127,110 @@ module.exports = {
                 resMsg: e
             }
         }
+    },
+
+
+    async mounthTransferAccounts (tenantId) {
+        let fn
+        let transferAccounts = await TransferAccounts.findAll({
+            where:{
+                tenantId : tenantId,
+                // paymentMethod : paymentMethod,
+                status : 0
+            }
+        })
+
+        let merchantAmount = await TransferAccounts.sum("amount",{
+            where:{
+                tenantId : tenantId,
+                // paymentMethod : paymentMethod,
+                status : 0
+            }
+        })
+        console.log(merchantAmount)
+        let tenantConfig = await TenantConfigs.findOne({
+            where:{
+                tenantId : tenantId
+            }
+        })
+        let profitSharings = await ProfitSharings.findOne({
+            where:{
+                tenantId : tenantId
+            }
+        })
+        let consignees = await Consignees.findOne({
+            where:{
+                consigneeId : profitSharings.consigneeId
+            }
+        })
+
+        if (tenantConfig != null) {
+            console.log("服务器公网IP：" + ip);
+            fn = co.wrap(wxpay.transfers.bind(wxpay))
+
+            var params = {
+                partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                openid: tenantConfig.wecharPayee_account,
+                check_name: 'NO_CHECK',
+                amount: (merchantAmount * 100).toFixed(0),
+                desc: '日收益',
+                spbill_create_ip: ip
+            }
+
+            try {
+                var result = await fn(params);
+                // console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
+                if (result.result_code == 'SUCCESS') {
+                    let paymentReqs = await PaymentReqs.findAll({
+                        where: {
+                            tenantId: tenantId,
+                            consigneeId: consignees.consigneeId,
+                            paymentMethod: '微信',
+                            isFinish: true,
+                            isInvalid: false,
+                            TransferAccountIsFinish: false,
+                            consigneeTransferAccountIsFinish: false
+                        }
+                    });
+
+                    for (var j = 0; j < paymentReqs.length; j++) {
+                        paymentReqs[j].TransferAccountIsFinish = true;
+                        await paymentReqs[j].save();
+                    }
+
+                    //待转账表状态修改从0-1
+                    transferAccounts = await TransferAccounts.findAll({
+                        where: {
+                            tenantId: tenantId,
+                            consigneeId: consigneeId,
+                            paymentMethod: '微信',
+                            role: '租户',
+                            status: 0
+                        }
+                    })
+
+                    for (var k = 0; k < transferAccounts.length; k++) {
+                        transferAccounts[k].status = 1;
+                        transferAccounts[k].pay_date = payDate;
+                        await transferAccounts[k].save();
+                    }
+                    console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
+                    console.log("当前微信转账记录0||tenantId:" + tenantId + " consignee:" + consignee + " merchantAmount:" + merchantAmount);
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    },
+    async reimburse(ctx,next){
+        ctx.checkBody('tenantId').notEmpty();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let body = ctx.request.body
+        await this.mounthTransferAccounts(body.tenantId)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
     async queryTransferInfo(ctx, next) {

@@ -12,7 +12,8 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
-        let dis = await distanceAndPrice.getdistanceandprice(ctx.query.tenantId);
+        let dis = await distanceAndPrice.getdistanceandprice({tenantId : ctx.query.tenantId});
+
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, dis)
     },
@@ -50,7 +51,15 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
+
         let deliveryFeeId = new Date().getTime() + "" + Math.ceil(Math.random() * 8999 + 1000)
+        let  merchant = await distanceAndPrice.getMerchant({tenantId:body.tenantId})
+
+        if(merchant==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到当前记录")
+            return
+        }
+        console.log(merchant)
         let saveJson = {
             tenantId: body.tenantId,
             deliveryFeeId: deliveryFeeId,
@@ -58,7 +67,7 @@ module.exports = {
             maxDistance: body.maxDistance,
             deliveryFee: body.deliveryFee,
             startPrice: body.startPrice,
-            deliveryTime: body.deliveryTime,
+            deliveryTime: body.deliveryTime
         }
         await distanceAndPrice.saveDistanceAndPrice(saveJson)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, deliveryFeeId)
