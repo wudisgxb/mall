@@ -19,6 +19,7 @@ const Foods = db.models.Foods;
 const Coupons = db.models.Coupons;
 const User = db.models.User;
 const Vips = db.models.Vips
+const TransferAccounts = db.models.TransferAccounts
 const Merchants = db.models.Merchants
 const Consignees = db.models.Consignees;
 const ProfitSharings = db.models.ProfitSharings;
