@@ -207,9 +207,9 @@ module.exports = {
                     }
                     qrCode.tenantId = qrCodeTemplates[j].tenantId;
                     qrCode.merchantName = merchant!=null?merchant.name:"";
-                    qrCode.aggregateScore = merchant.aggregateScore;
-                    qrCode.industry = merchant.industry;
-                    qrCode.address = merchant.address;
+                    qrCode.aggregateScore = merchant!=null?merchant.aggregateScore:"";
+                    qrCode.industry = merchant!=null?merchant.industry:"";
+                    qrCode.address =  merchant!=null?merchant.address:"";
                     qrCode.tenantInfo = tenantConfig;
                     qrCode.consigneeId = qrCodeTemplates[j].consigneeId;
                     //查找代售商户信息
