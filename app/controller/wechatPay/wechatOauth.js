@@ -835,14 +835,15 @@ module.exports = {
                                 console.log(e);
                             }
                         } else {
+                            console.log(consigneeId)
                             let profitsharing = await ProfitSharings.findOne({
                                 where: {
                                     tenantId: tenantId,
                                     consigneeId: consigneeId
                                 }
                             });
-                            console.log(tenantId
-                            console.log(consigneeId)
+                            console.log(tenantId)
+                            // console.log(consigneeId)
                             if (profitsharing == null) {
                                 params = {
                                     partner_trade_no: Date.now(), //商户订单号，需保持唯一性
