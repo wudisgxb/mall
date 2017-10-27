@@ -835,14 +835,16 @@ module.exports = {
                                 console.log(e);
                             }
                         } else {
-                            console.log(consigneeId)
+                            console.log(ProfitSharings)
                             let profitsharing = await ProfitSharings.findOne({
                                 where: {
                                     tenantId: tenantId,
                                     consigneeId: consigneeId
                                 }
                             });
+                            console.log(consigneeId)
                             console.log(tenantId)
+                            console.log(profitsharing)
                             // console.log(consigneeId)
                             if (profitsharing == null) {
                                 params = {
