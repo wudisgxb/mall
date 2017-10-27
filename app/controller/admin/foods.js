@@ -322,12 +322,20 @@ module.exports = {
                     'name'
                 ]
             });
+            let minuteImage
+            try{
+                if(foods[i].minuteImage!=null){
+                    minuteImage =JSON.parse(foods[i].minuteImage)
+                }else{
+                    minuteImage = null
+                }
+            }
             let foodsJson = {};
             foodsJson.id = foods[i].id;
             foodsJson.name = foods[i].name;
             foodsJson.foodNum = foods[i].foodNum;
             foodsJson.image = img;
-            foodsJson.minuteImage = foods[i].minuteImage==null?"":JSON.parse(foods[i].minuteImage);
+            foodsJson.minuteImage = minuteImage;
             // foodsJson.icon = foods[i].icon;
             foodsJson.price = foods[i].price;
             foodsJson.constPrice = foods[i].constPrice==0?"":foods[i].constPrice;
