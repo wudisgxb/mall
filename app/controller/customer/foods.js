@@ -113,14 +113,16 @@ module.exports = {
                         ]
                     }]
                 });
-
+                console.log(food)
                 if (food.length == 0) {
                     continue;
                 }
 
                 food = JSON.parse(JSON.stringify(food));
 
+
                 food.forEach(e => {
+
                     //首杯半价（青豆家写死）
                     if (e.id == 21) {
                         e.coupon = "新人首杯半价";
@@ -129,6 +131,7 @@ module.exports = {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
                         return rating
                     })
+                    e.minuteImage = JSON.parse(e.minuteImage)
                 })
 
                 food[0].goodsPromotion = await promotionManager.getGoodsPromotion(QRCodeTemplateId, food[0].id, tenantId);
