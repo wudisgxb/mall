@@ -30,6 +30,7 @@ module.exports = {
     async saveAdminFoods (ctx, next) {
         ctx.checkBody('/food/name', true).first().notEmpty();
         ctx.checkBody('/food/image', true).first().notEmpty();
+        ctx.checkBody('/food/minuteImage',true).first().notEmpty();//详细图片
         // ctx.checkBody('/food/icon', true).first().notEmpty();
         ctx.checkBody('/food/price', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
@@ -84,12 +85,19 @@ module.exports = {
         } else {
             image = body.food.image
         }
+        let minuteImage
+        if(Tool.isArray(body.food.minuteImage)){
+            minuteImage = JSON.stringify(body.food.minuteImage)
+        }else{
+            minuteImage = body.food.minuteImage
+        }
 
         let foods;
 
         foods = await Foods.create({
             name: body.food.name,
             image: image,
+            minuteImage : minuteImage,
             icon: (body.food.icon == null) ? "" : body.food.icon,
             price: body.food.price,
             oldPrice: body.food.oldPrice,
@@ -123,6 +131,7 @@ module.exports = {
     async updateAdminFoodsById (ctx, next) {
         ctx.checkBody('/food/name', true).first().notEmpty();
         ctx.checkBody('/food/image', true).first().notEmpty();
+        ctx.checkBody('/food/minuteImage', true).first().notEmpty();
         // ctx.checkBody('/food/icon', true).first().notEmpty();
         ctx.checkBody('/food/price', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
@@ -161,10 +170,18 @@ module.exports = {
             image = body.food.image
         }
 
+        let minuteImage;
+        if (body.food.minuteImage instanceof Array) {
+            minuteImage = JSON.stringify(body.food.minuteImage)
+        } else {
+            minuteImage = body.food.image
+        }
+
         if (foods != null) {
             foods.id = body.condition.id;
             foods.name = body.food.name;
             foods.image = image;
+            foods.minuteImage = minuteImage;
             foods.foodNum = body.food.foodNum;
             foods.icon = (body.food.icon) == null ? "" : body.food.icon;
             foods.price = body.food.price;
@@ -194,6 +211,33 @@ module.exports = {
                 await foodsofmenus.save();
             }
         }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    },
+
+    async updateFoodOne(ctx,next){
+        let food = await Foods.findAll({})
+        let foodArray = []
+        for(let f of food){
+            let foodImageArray = []
+            let image = f.image
+            console.log()
+            try{
+                if(Tool.isArray(JSON.parse(image))){
+                    foodImageArray = JSON.parse(image)
+                }
+            }catch (e){
+                foodImageArray.push(image)
+            }
+
+            foodArray.push(Foods.update({
+                minuteImage : JSON.stringify(foodImageArray)
+            },{
+                where:{
+                    id : f.id
+                }
+            }))
+        }
+        Promise.all(await foodArray)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
@@ -279,6 +323,7 @@ module.exports = {
             foodsJson.name = foods[i].name;
             foodsJson.foodNum = foods[i].foodNum;
             foodsJson.image = img;
+            foodsJson.minuteImage = JSON.parse(foods[i].minuteImage);
             // foodsJson.icon = foods[i].icon;
             foodsJson.price = foods[i].price;
             foodsJson.oldPrice = foods[i].oldPrice;

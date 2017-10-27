@@ -13,6 +13,7 @@ module.exports = function (sequelize, DataTypes) {
          * [url, url, url]
          */
         image: shortDataTypes.String(),
+        minuteImage : shortDataTypes.String(),
         icon: shortDataTypes.String(),
         /**
          * 现价

@@ -1182,10 +1182,11 @@ module.exports = {
                 var result = await fn(params);
                 // console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
                 if (result.result_code == 'SUCCESS') {
+
                     let paymentReqs = await PaymentReqs.findAll({
                         where: {
                             tenantId: tenantId,
-                            consigneeId: consignees.consigneeId,
+                            consigneeId: consignees==null?"":consignees.consigneeId,
                             paymentMethod: '微信',
                             isFinish: true,
                             isInvalid: false,
@@ -1217,6 +1218,8 @@ module.exports = {
                     }
                     console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
                     console.log("当前微信转账记录0||tenantId:" + tenantId + " consignee:" + consignee + " merchantAmount:" + merchantAmount);
+                }else{
+                    return -1
                 }
             } catch (e) {
                 console.log(e);
@@ -1230,8 +1233,8 @@ module.exports = {
             return
         }
         let body = ctx.request.body
-        await this.mounthTransferAccounts(body.tenantId)
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+        let a = await this.mounthTransferAccounts(body.tenantId)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,a)
     },
 
     async queryTransferInfo(ctx, next) {
