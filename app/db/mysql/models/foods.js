@@ -14,6 +14,7 @@ module.exports = function (sequelize, DataTypes) {
          */
         image: shortDataTypes.String(),
         minuteImage : shortDataTypes.String(),
+        ConstPrice : shortDataTypes.String(),//商品进价
         icon: shortDataTypes.String(),
         /**
          * 现价

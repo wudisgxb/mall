@@ -802,7 +802,7 @@ module.exports = {
                     content = table.name + ' 已结账 订单总价： ' + amountJson.totalPrice + '元 ' + date;
                 }
                 infoPushManager.infoPush(content, tenantId);
-
+                console.log("111111111111111111111111111111111111111"+amountJson.totalAmount)
                 if (tenantConfig != null) {
                     if (tenantConfig.isRealTime) {
                         console.log("服务器公网IP：" + ip);

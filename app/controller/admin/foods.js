@@ -33,6 +33,7 @@ module.exports = {
         ctx.checkBody('/food/minuteImage',true).first().notEmpty();//详细图片
         // ctx.checkBody('/food/icon', true).first().notEmpty();
         ctx.checkBody('/food/price', true).first().notEmpty().isFloat().ge(0).toFloat();
+        ctx.checkBody('/food/constPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/vipPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/info', true).first().notEmpty();
@@ -100,6 +101,7 @@ module.exports = {
             minuteImage : minuteImage,
             icon: (body.food.icon == null) ? "" : body.food.icon,
             price: body.food.price,
+            constPrice : body.food.constPrice,
             oldPrice: body.food.oldPrice,
             vipPrice: body.food.vipPrice,
             sellCount: 100,
@@ -134,6 +136,7 @@ module.exports = {
         ctx.checkBody('/food/minuteImage', true).first().notEmpty();
         // ctx.checkBody('/food/icon', true).first().notEmpty();
         ctx.checkBody('/food/price', true).first().notEmpty().isFloat().ge(0).toFloat();
+        ctx.checkBody('/food/constPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/vipPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/sellCount', true).first().notEmpty().isInt().ge(0).toInt();
@@ -185,6 +188,7 @@ module.exports = {
             foods.foodNum = body.food.foodNum;
             foods.icon = (body.food.icon) == null ? "" : body.food.icon;
             foods.price = body.food.price;
+            foods.constPrice = body.food.constPrice;
             foods.oldPrice = body.food.oldPrice;
             foods.vipPrice = body.food.vipPrice;
             foods.sellCount = body.food.sellCount;
@@ -326,6 +330,7 @@ module.exports = {
             foodsJson.minuteImage = JSON.parse(foods[i].minuteImage);
             // foodsJson.icon = foods[i].icon;
             foodsJson.price = foods[i].price;
+            foodsJson.constPrice = foods[i].constPrice;
             foodsJson.oldPrice = foods[i].oldPrice;
             foodsJson.vipPrice = foods[i].vipPrice;
             foodsJson.isActive = foods[i].isActive;
