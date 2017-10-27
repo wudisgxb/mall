@@ -819,7 +819,7 @@ module.exports = {
                                 desc: '收益',
                                 spbill_create_ip: ip
                             }
-
+                            console.log(params)
                             try {
                                 result = await fn(params);
                                 console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
@@ -841,7 +841,8 @@ module.exports = {
                                     consigneeId: consigneeId
                                 }
                             });
-
+                            console.log(tenantId
+                            console.log(consigneeId)
                             if (profitsharing == null) {
                                 params = {
                                     partner_trade_no: Date.now(), //商户订单号，需保持唯一性
