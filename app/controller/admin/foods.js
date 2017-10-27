@@ -327,10 +327,10 @@ module.exports = {
             foodsJson.name = foods[i].name;
             foodsJson.foodNum = foods[i].foodNum;
             foodsJson.image = img;
-            foodsJson.minuteImage = JSON.parse(foods[i].minuteImage);
+            foodsJson.minuteImage = foods[i].minuteImage==null?"":JSON.parse(foods[i].minuteImage);
             // foodsJson.icon = foods[i].icon;
             foodsJson.price = foods[i].price;
-            foodsJson.constPrice = foods[i].constPrice;
+            foodsJson.constPrice = foods[i].constPrice==0?"":foods[i].constPrice;
             foodsJson.oldPrice = foods[i].oldPrice;
             foodsJson.vipPrice = foods[i].vipPrice;
             foodsJson.isActive = foods[i].isActive;
