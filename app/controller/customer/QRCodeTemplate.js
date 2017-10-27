@@ -206,7 +206,7 @@ module.exports = {
                         qrCode.couponRate = qrCodeTemplates[j].couponRate;
                     }
                     qrCode.tenantId = qrCodeTemplates[j].tenantId;
-                    qrCode.merchantName = merchant.name;
+                    qrCode.merchantName = merchant!=null?merchant.name:"";
                     qrCode.aggregateScore = merchant.aggregateScore;
                     qrCode.industry = merchant.industry;
                     qrCode.address = merchant.address;
