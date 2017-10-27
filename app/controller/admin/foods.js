@@ -133,10 +133,10 @@ module.exports = {
     async updateAdminFoodsById (ctx, next) {
         ctx.checkBody('/food/name', true).first().notEmpty();
         ctx.checkBody('/food/image', true).first().notEmpty();
-        ctx.checkBody('/food/minuteImage', true).first().notEmpty();
+        // ctx.checkBody('/food/minuteImage', true).first().notEmpty();
         // ctx.checkBody('/food/icon', true).first().notEmpty();
         ctx.checkBody('/food/price', true).first().notEmpty().isFloat().ge(0).toFloat();
-        ctx.checkBody('/food/constPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
+        // ctx.checkBody('/food/constPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/vipPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/sellCount', true).first().notEmpty().isInt().ge(0).toInt();

@@ -234,6 +234,8 @@ const amountManger = (function () {
                 consigneeAmount = 0;
             } else {
                 if (coupon != null) {
+                    console.log(coupon)
+
                     //总金额*自己分润 - 商家承担优惠
                     switch (coupon.couponType) {
                         case 'amount':
@@ -359,9 +361,11 @@ const amountManger = (function () {
                         consigneeAmount = Math.round(consigneeAmount * 100) / 100;
                     } else {
                         //门店收百分之2，写死
+
                         merchantAmount = totalAmount * (1 - 0.02);
                         consigneeAmount = 0;
                     }
+
                 }
             }
         }
