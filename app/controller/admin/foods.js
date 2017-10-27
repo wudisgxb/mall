@@ -329,6 +329,8 @@ module.exports = {
                 }else{
                     minuteImage = null
                 }
+            }catch (e){
+                console.log(e)
             }
             let foodsJson = {};
             foodsJson.id = foods[i].id;
