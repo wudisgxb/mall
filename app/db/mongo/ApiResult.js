@@ -27,6 +27,7 @@ module.exports.Result = {
         resCode: 10001,
         resMsg: '记录已存在'
     },
+
     PARAMS_ERROR: {
     resCode: PARAMS_ERROR,
     resMsg: 'PARAMS_ERROR'

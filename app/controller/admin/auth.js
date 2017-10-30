@@ -69,7 +69,7 @@ module.exports = {
                 return;
             }
             if (body.captcha.toLowerCase() != captcha.captcha.toLowerCase()) {
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "图形验证码错误")
+                ctx.body = new ApiResult(ApiResult.Result.resMsg, "图形验证码错误")
                 return;
             }
         }

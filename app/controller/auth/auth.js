@@ -13,7 +13,9 @@ const getAuth = (function () {
         let txt = ary[0];
         let buf = ary[1];
         //用当前时间和随机数拼接一个唯一的建
-        let key = date + txt;
+        let rumber = Math.random()*8999+1000
+        let key = date+rumber;
+
         //将唯一的键和随机数存入数据库
         await Captcha.create({
             key: key,
@@ -23,7 +25,7 @@ const getAuth = (function () {
         // console.log(txt)
         let aaa = {
             "key": key,
-            "number": txt,
+            // "number": txt,
             "buf": buf.toString('base64')
         }
         return aaa
