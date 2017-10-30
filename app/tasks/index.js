@@ -37,9 +37,9 @@ module.exports = async function tasks(app) {
 
         rule.dayOfWeek = [0, new schedule.Range(1, 6)];
 
-        rule.hour = 5;
+        rule.hour = 17;
 
-        rule.minute = 1;
+        rule.minute = 5;
         rule.second = 1;
         schedule.scheduleJob(rule, async function () {
             await aliTransferAccounts();
@@ -237,73 +237,12 @@ module.exports = async function tasks(app) {
                 
                 console.log("租户微信转账金额：" + merchantAmount);
                 console.log("代售微信转账金额：" + consigneeAmount);
-                if (tenantConfig != null) {
-                    console.log("服务器公网IP：" + ip);
-                    fn = co.wrap(wxpay.transfers.bind(wxpay))
-                    if (consignee == null) {
-                        var params = {
-                            partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                            openid: tenantConfig.wecharPayee_account,
-                            check_name: 'NO_CHECK',
-                            amount: (merchantAmount * 100).toFixed(0),
-                            desc: '日收益',
-                            spbill_create_ip: ip
-                        }
-
-                        try {
-                            var result = await fn(params);
-                            console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
-
-                            if (result.result_code == 'SUCCESS') {
-                                paymentReqs = await PaymentReqs.findAll({
-                                    where: {
-                                        tenantId: tenantId,
-                                        consigneeId: consigneeId,
-                                        paymentMethod: '微信',
-                                        isFinish: true,
-                                        isInvalid: false,
-                                        TransferAccountIsFinish: false,
-                                        consigneeTransferAccountIsFinish: false
-                                    }
-                                });
-
-                                for (var j = 0; j < paymentReqs.length; j++) {
-                                    paymentReqs[j].TransferAccountIsFinish = true;
-                                    await paymentReqs[j].save();
-                                }
-
-                                //待转账表状态修改从0-1
-                                transferAccounts = await TransferAccounts.findAll({
-                                    where: {
-                                        tenantId: tenantId,
-                                        consigneeId: consigneeId,
-                                        paymentMethod: '微信',
-                                        role: '租户',
-                                        status: 0
-                                    }
-                                })
-
-                                for (var k = 0; k < transferAccounts.length; k++) {
-                                    transferAccounts[k].status = 1;
-                                    transferAccounts[k].pay_date = payDate;
-                                    await transferAccounts[k].save();
-                                }
-
-                                console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
-                                console.log("每日微信转账记录0||tenantId:" + tenantId + " consignee:" + consignee + " merchantAmount:" + merchantAmount);
-                            }
-                        } catch (e) {
-                            console.log(e);
-                        }
-
-                    } else {
-                        let profitsharing = await ProfitSharings.findOne({
-                            where: {
-                                tenantId: tenantId,
-                                consigneeId: consigneeId
-                            }
-                        });
-                        if (profitsharing == null) {
+                //判断是否有利润分成
+                if(tenantConfig.isProfitRate==false){
+                    if (tenantConfig != null) {
+                        console.log("服务器公网IP：" + ip);
+                        fn = co.wrap(wxpay.transfers.bind(wxpay))
+                        if (consignee == null) {
                             var params = {
                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                 openid: tenantConfig.wecharPayee_account,
@@ -315,7 +254,8 @@ module.exports = async function tasks(app) {
 
                             try {
                                 var result = await fn(params);
-                                console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
+                                console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
+
                                 if (result.result_code == 'SUCCESS') {
                                     paymentReqs = await PaymentReqs.findAll({
                                         where: {
@@ -334,6 +274,7 @@ module.exports = async function tasks(app) {
                                         await paymentReqs[j].save();
                                     }
 
+                                    //待转账表状态修改从0-1
                                     transferAccounts = await TransferAccounts.findAll({
                                         where: {
                                             tenantId: tenantId,
@@ -351,109 +292,172 @@ module.exports = async function tasks(app) {
                                     }
 
                                     console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
-                                    console.log("每日微信转账记录1||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
-
+                                    console.log("每日微信转账记录0||tenantId:" + tenantId + " consignee:" + consignee + " merchantAmount:" + merchantAmount);
                                 }
                             } catch (e) {
                                 console.log(e);
                             }
+
                         } else {
-                            console.log("主商户分润：" + merchantAmount);
-                            var params = {
-                                partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                openid: tenantConfig.wecharPayee_account,
-                                check_name: 'NO_CHECK',
-                                amount: (merchantAmount * 100).toFixed(0),
-                                desc: profitsharing.merchantRemark,
-                                spbill_create_ip: ip
-                            }
-
-                            try {
-                                var result1 = await fn(params);
-                                console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result1, null, 2));
-                                console.log("result.result_code:" + result1.result_code);
-                                if (result1.result_code == 'SUCCESS') {
-                                    paymentReqs = await PaymentReqs.findAll({
-                                        where: {
-                                            tenantId: tenantId,
-                                            consigneeId: consigneeId,
-                                            paymentMethod: '微信',
-                                            isFinish: true,
-                                            isInvalid: false,
-                                            TransferAccountIsFinish: false,
-                                            consigneeTransferAccountIsFinish: false
-                                        }
-                                    });
-
-                                    for (var jj = 0; jj < paymentReqs.length; jj++) {
-                                        paymentReqs[jj].TransferAccountIsFinish = true;
-                                        await paymentReqs[jj].save();
-                                    }
-
-                                    transferAccounts = await TransferAccounts.findAll({
-                                        where: {
-                                            tenantId: tenantId,
-                                            consigneeId: consigneeId,
-                                            paymentMethod: '微信',
-                                            role: '租户',
-                                            status: 0
-                                        }
-                                    })
-
-                                    for (var kk = 0; kk < transferAccounts.length; kk++) {
-                                        transferAccounts[kk].status = 1;
-                                        transferAccounts[kk].pay_date = payDate;
-                                        await transferAccounts[kk].save();
-                                    }
-
-                                    if (consigneeAmount != null && consigneeAmount > 0) {
-                                        console.log("代售点分润：" + consigneeAmount);
-                                        params = {
-                                            partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                            openid: consignee.wecharPayee_account,
-                                            check_name: 'NO_CHECK',
-                                            amount: (consigneeAmount * 100).toFixed(0),
-                                            desc: profitsharing.consigneeRemark,
-                                            spbill_create_ip: ip
-                                        }
-
-                                        var result2 = await fn(params);
-                                        console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result2, null, 2));
-                                        console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
-                                        console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
-                                        if (result2.result_code == 'SUCCESS') {
-                                            for (var jj = 0; jj < paymentReqs.length; jj++) {
-                                                paymentReqs[jj].consigneeTransferAccountIsFinish = true;
-                                                await paymentReqs[jj].save();
-                                            }
-
-                                            transferAccounts = await TransferAccounts.findAll({
-                                                where: {
-                                                    tenantId: tenantId,
-                                                    consigneeId: consigneeId,
-                                                    paymentMethod: '微信',
-                                                    role: '代售',
-                                                    status: 0
-                                                }
-                                            })
-
-                                            for (var kk = 0; kk < transferAccounts.length; kk++) {
-                                                transferAccounts[kk].status = 1;
-                                                transferAccounts[kk].pay_date = payDate;
-                                                await transferAccounts[kk].save();
-                                            }
-                                            console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
-                                        }
-                                    }
-
+                            let profitsharing = await ProfitSharings.findOne({
+                                where: {
+                                    tenantId: tenantId,
+                                    consigneeId: consigneeId
                                 }
-                            } catch (e) {
-                                console.log(e);
-                            }
+                            });
+                            if (profitsharing == null) {
+                                var params = {
+                                    partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                    openid: tenantConfig.wecharPayee_account,
+                                    check_name: 'NO_CHECK',
+                                    amount: (merchantAmount * 100).toFixed(0),
+                                    desc: '日收益',
+                                    spbill_create_ip: ip
+                                }
 
+                                try {
+                                    var result = await fn(params);
+                                    console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
+                                    if (result.result_code == 'SUCCESS') {
+                                        paymentReqs = await PaymentReqs.findAll({
+                                            where: {
+                                                tenantId: tenantId,
+                                                consigneeId: consigneeId,
+                                                paymentMethod: '微信',
+                                                isFinish: true,
+                                                isInvalid: false,
+                                                TransferAccountIsFinish: false,
+                                                consigneeTransferAccountIsFinish: false
+                                            }
+                                        });
+
+                                        for (var j = 0; j < paymentReqs.length; j++) {
+                                            paymentReqs[j].TransferAccountIsFinish = true;
+                                            await paymentReqs[j].save();
+                                        }
+
+                                        transferAccounts = await TransferAccounts.findAll({
+                                            where: {
+                                                tenantId: tenantId,
+                                                consigneeId: consigneeId,
+                                                paymentMethod: '微信',
+                                                role: '租户',
+                                                status: 0
+                                            }
+                                        })
+
+                                        for (var k = 0; k < transferAccounts.length; k++) {
+                                            transferAccounts[k].status = 1;
+                                            transferAccounts[k].pay_date = payDate;
+                                            await transferAccounts[k].save();
+                                        }
+
+                                        console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
+                                        console.log("每日微信转账记录1||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
+
+                                    }
+                                } catch (e) {
+                                    console.log(e);
+                                }
+                            } else {
+                                console.log("主商户分润：" + merchantAmount);
+                                var params = {
+                                    partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                    openid: tenantConfig.wecharPayee_account,
+                                    check_name: 'NO_CHECK',
+                                    amount: (merchantAmount * 100).toFixed(0),
+                                    desc: profitsharing.merchantRemark,
+                                    spbill_create_ip: ip
+                                }
+
+                                try {
+                                    var result1 = await fn(params);
+                                    console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result1, null, 2));
+                                    console.log("result.result_code:" + result1.result_code);
+                                    if (result1.result_code == 'SUCCESS') {
+                                        paymentReqs = await PaymentReqs.findAll({
+                                            where: {
+                                                tenantId: tenantId,
+                                                consigneeId: consigneeId,
+                                                paymentMethod: '微信',
+                                                isFinish: true,
+                                                isInvalid: false,
+                                                TransferAccountIsFinish: false,
+                                                consigneeTransferAccountIsFinish: false
+                                            }
+                                        });
+
+                                        for (var jj = 0; jj < paymentReqs.length; jj++) {
+                                            paymentReqs[jj].TransferAccountIsFinish = true;
+                                            await paymentReqs[jj].save();
+                                        }
+
+                                        transferAccounts = await TransferAccounts.findAll({
+                                            where: {
+                                                tenantId: tenantId,
+                                                consigneeId: consigneeId,
+                                                paymentMethod: '微信',
+                                                role: '租户',
+                                                status: 0
+                                            }
+                                        })
+
+                                        for (var kk = 0; kk < transferAccounts.length; kk++) {
+                                            transferAccounts[kk].status = 1;
+                                            transferAccounts[kk].pay_date = payDate;
+                                            await transferAccounts[kk].save();
+                                        }
+
+                                        if (consigneeAmount != null && consigneeAmount > 0) {
+                                            console.log("代售点分润：" + consigneeAmount);
+                                            params = {
+                                                partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                                openid: consignee.wecharPayee_account,
+                                                check_name: 'NO_CHECK',
+                                                amount: (consigneeAmount * 100).toFixed(0),
+                                                desc: profitsharing.consigneeRemark,
+                                                spbill_create_ip: ip
+                                            }
+
+                                            var result2 = await fn(params);
+                                            console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result2, null, 2));
+                                            console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
+                                            console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
+                                            if (result2.result_code == 'SUCCESS') {
+                                                for (var jj = 0; jj < paymentReqs.length; jj++) {
+                                                    paymentReqs[jj].consigneeTransferAccountIsFinish = true;
+                                                    await paymentReqs[jj].save();
+                                                }
+
+                                                transferAccounts = await TransferAccounts.findAll({
+                                                    where: {
+                                                        tenantId: tenantId,
+                                                        consigneeId: consigneeId,
+                                                        paymentMethod: '微信',
+                                                        role: '代售',
+                                                        status: 0
+                                                    }
+                                                })
+
+                                                for (var kk = 0; kk < transferAccounts.length; kk++) {
+                                                    transferAccounts[kk].status = 1;
+                                                    transferAccounts[kk].pay_date = payDate;
+                                                    await transferAccounts[kk].save();
+                                                }
+                                                console.log("每日微信转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
+                                            }
+                                        }
+
+                                    }
+                                } catch (e) {
+                                    console.log(e);
+                                }
+
+                            }
                         }
                     }
                 }
+
                 merchantAmount = 0;
                 consigneeAmount = 0;
             }

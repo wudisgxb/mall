@@ -1300,7 +1300,7 @@ module.exports = {
         }
     },
 
-
+    //手动转账接口
     async mounthTransferAccounts (tenantId) {
         let fn
         let transferAccounts = await TransferAccounts.findAll({
