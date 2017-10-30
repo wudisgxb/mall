@@ -4,6 +4,7 @@
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const ApiLoginResult = require('../../db/mongo/ApiLoginResult')
+const jsonwebtoken = require('jsonwebtoken')
 let db = require('../../db/mysql/index');
 let Tool = require('../../Tool/tool')
 let Captcha = db.models.Captcha
@@ -11,7 +12,7 @@ let Admins = db.models.Adminer
 let Caap = require('ccap')();
 let http = require('http')
 let auth = require('../auth/auth')
-
+const jwtSecret = require('../../config/config')
 
 module.exports = {
 
@@ -91,12 +92,15 @@ module.exports = {
                 phone : admin.phone
             }
             let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
+            const token = jsonwebtoken.sign({role: 'admin'}, jwtSecret, {expiresIn: 5 * 60})
+            console.log(token)
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                 correspondingId: adminCorresponding.correspondingId,
                 tenantId : adminCorresponding.correspondingId,
                 correspondingType : adminCorresponding.correspondingType,
                 style :admin.style,
                 name : admin.nickname,
+                token
             })
         }
     },
