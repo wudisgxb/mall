@@ -86,11 +86,11 @@ module.exports = {
         } else {
             image = body.food.image
         }
-        let minuteImage
+        let minuteImage =[]
         if(Tool.isArray(body.food.minuteImage)){
-            minuteImage = JSON.stringify(body.food.minuteImage)
-        }else{
             minuteImage = body.food.minuteImage
+        }else{
+            minuteImage.push(body.food.minuteImage)
         }
 
         let foods;
@@ -98,7 +98,7 @@ module.exports = {
         foods = await Foods.create({
             name: body.food.name,
             image: image,
-            minuteImage : minuteImage,
+            minuteImage : JSON.stringify(minuteImage),
             icon: (body.food.icon == null) ? "" : body.food.icon,
             price: body.food.price,
             constPrice : body.food.constPrice,
@@ -173,9 +173,9 @@ module.exports = {
             image = body.food.image
         }
 
-        let minuteImage;
+        let minuteImage = [];
         if (body.food.minuteImage instanceof Array) {
-            minuteImage = JSON.stringify(body.food.minuteImage)
+            minuteImage = body.food.minuteImage
         } else {
             minuteImage = body.food.image
         }
@@ -184,7 +184,7 @@ module.exports = {
             foods.id = body.condition.id;
             foods.name = body.food.name;
             foods.image = image;
-            foods.minuteImage = minuteImage;
+            foods.minuteImage = JSON.stringify(minuteImage);
             foods.foodNum = body.food.foodNum;
             foods.icon = (body.food.icon) == null ? "" : body.food.icon;
             foods.price = body.food.price;
@@ -218,32 +218,50 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
-    async updateFoodOne(ctx,next){
-        let food = await Foods.findAll({})
-        let foodArray = []
-        for(let f of food){
-            let foodImageArray = []
-            let image = f.image
-            console.log()
-            try{
-                if(Tool.isArray(JSON.parse(image))){
-                    foodImageArray = JSON.parse(image)
-                }
-            }catch (e){
-                foodImageArray.push(image)
-            }
-
-            foodArray.push(Foods.update({
-                minuteImage : JSON.stringify(foodImageArray)
-            },{
-                where:{
-                    id : f.id
-                }
-            }))
-        }
-        Promise.all(await foodArray)
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-    },
+    // async updateFoodOne(ctx,next){
+    //     let food = await Foods.findAll({
+    //         where:{
+    //             id :1076
+    //         }
+    //     })
+    //     let foodArray = []
+    //     for(let f of food){
+    //         let minuteImageArray = []
+    //         try{
+    //             let minuteImage = f.minuteImage
+    //             if(Tool.isArray(JSON.parse(minuteImage))){
+    //                 // minuteImageArray.push(JSON.stringify(f.minuteImage))
+    //                 // console.log("11111111111111111111111111111111"+minuteImage)
+    //             }else{
+    //                 // minuteImageArray.push(f.minuteImage)
+    //                 // console.log("222222222222222222222222222222222"+minuteImage)
+    //             }
+    //         }catch (e){
+    //             console.log(e)
+    //         }
+    //
+    //         // let foodImageArray = []
+    //         // let image = f.image
+    //         // console.log()
+    //         // try{
+    //         //     if(Tool.isArray(JSON.parse(image))){
+    //         //         foodImageArray = JSON.parse(image)
+    //         //     }
+    //         // }catch (e){
+    //         //     foodImageArray.push(image)
+    //         // }
+    //         //
+    //         // foodArray.push(Foods.update({
+    //         //     minuteImage : JSON.stringify(foodImageArray)
+    //         // },{
+    //         //     where:{
+    //         //         id : f.id
+    //         //     }
+    //         // }))
+    //     }
+    //
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    // },
 
     //获取租户下所有商品
     async getAdminFoods (ctx, next) {

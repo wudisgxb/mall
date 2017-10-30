@@ -164,6 +164,7 @@ module.exports = {
                     purchaseLimit: goodsPromotionJson.purchaseLimit,
                     trade_no: trade_no,
                     tenantId: body.tenantId,
+                    constPrice : food.constPrice
                 }));
             } else {
                 tasks.push(OrderGoods.create({
@@ -175,6 +176,7 @@ module.exports = {
                     vipPrice: food.vipPrice,
                     trade_no: trade_no,
                     tenantId: body.tenantId,
+                    constPrice : food.constPrice
                 }));
             }
 
@@ -348,7 +350,8 @@ module.exports = {
                     activityPrice: goodsPromotionJson.activityPrice,
                     purchaseLimit: goodsPromotionJson.purchaseLimit,
                     tenantId: body.tenantId,
-                    consigneeId: body.consigneeId
+                    consigneeId: body.consigneeId,
+                    constPrice : food.constPrice
                 }))
             } else {
                 tasks.push(OrderGoods.create({
@@ -360,7 +363,8 @@ module.exports = {
                     price: food.price,
                     vipPrice: food.vipPrice,
                     tenantId: body.tenantId,
-                    consigneeId: body.consigneeId
+                    consigneeId: body.consigneeId,
+                    constPrice : food.constPrice
                 }))
             }
 

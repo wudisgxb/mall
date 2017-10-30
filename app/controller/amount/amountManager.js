@@ -490,74 +490,74 @@ const amountManger = (function () {
 
     }
     //会员购买商品后的积分分配
-    let integralAllocation = async function (trade_no,tenantId,phone,totalPrice,pay) {
+    let integralAllocation = async function (trade_no, tenantId, phone, totalPrice, pay) {
         // console.log("会员购买商品后的积分分配中的交易商:"+tenantId)
         // console.log("会员购买商品后的积分分配中的电话:"+phone)
         // console.log("会员购买商品后的积分分配中的价格:"+totalPrice)
         let allianceMerchants = await AllianceMerchants.findOne({
-            where:{
-                tenantId:tenantId
+            where: {
+                tenantId: tenantId
             }
         })
         let alliancesId = allianceMerchants.alliancesId
         // console.log("商圈的Id"+alliancesId)
         let vip = await Vips.findOne({
-            where:{
-                alliancesId : alliancesId,
-                phone : phone
+            where: {
+                alliancesId: alliancesId,
+                phone: phone
             }
         })
         // console.log("vip用户信息"+vip.phone)
 
         //查询此租户的积分配置
         let merchantSetIntegrals = await MerchantSetIntegrals.findOne({
-            where:{
-                tenantId :tenantId
+            where: {
+                tenantId: tenantId
             }
         })
         // console.log("租户积分配置信息"+merchantSetIntegrals)
 
         let priceIntegralsRate
         //转换成int类型
-        if(merchantSetIntegrals!=null){
+        if (merchantSetIntegrals != null) {
             priceIntegralsRate = Number(merchantSetIntegrals.priceIntegralsRate).toFixed(2)
         }
         // console.log(priceIntegralsRate)
         //积分记录ID
         let vipIntegralsId
         // console.log("pay的值为:"+pay)
-        if(pay=="支付宝"){
-            vipIntegralsId = "alpy"+(Tool.allocTenantId().substring(4));
+        if (pay == "支付宝") {
+            vipIntegralsId = "alpy" + (Tool.allocTenantId().substring(4));
         }
-        else if(pay=="微信"){
-            vipIntegralsId = "wxpy"+(Tool.allocTenantId().substring(4));
-        }else{
-            vipIntegralsId = "wupy"+(Tool.allocTenantId().substring(4));
+        else if (pay == "微信") {
+            vipIntegralsId = "wxpy" + (Tool.allocTenantId().substring(4));
+        } else {
+            vipIntegralsId = "wupy" + (Tool.allocTenantId().substring(4));
         }
 
         //得到本次消费的积分数
-        let integral = priceIntegralsRate==0?0:Math.ceil(totalPrice/priceIntegralsRate)
+        let integral = priceIntegralsRate == 0 ? 0 : Math.ceil(totalPrice / priceIntegralsRate)
 
         //得到商家返利积分（暂时写死为20）
         let merchantRebate = 20;
         //得到商家返给平台的积分
-        let merchantRebateTerrace = Math.floor(merchantRebate*0.1)
+        let merchantRebateTerrace = Math.floor(merchantRebate * 0.1)
         //得到商家返给商圈的积分
-        let merchantRebateAlliance = Math.floor(merchantRebate*0.2)
+        let merchantRebateAlliance = Math.floor(merchantRebate * 0.2)
         //得到商家返给开户商积分
-        let merchantRebateMerchant = Math.floor(merchantRebate*0.7)
+        let merchantRebateMerchant = Math.floor(merchantRebate * 0.7)
         //查询商家的总积分数
         // console.log(Merchants)
         let merchant = await Merchants.findOne({
-            where:{
-                tenantId : tenantId
+            where: {
+                tenantId: tenantId
             }
         })
         // console.log("租户为"+merchant.name)
         // console.log("商家积分"+merchant.aggregateScore)
         // console.log("给会员的积分"+integral)
         //商家剩余积分数
-        let merchantResidueIntegral = merchant.aggregateScore-(merchantRebate+integral)
+        let merchantResidueIntegral = merchant.aggregateScore - (merchantRebate + integral)
 
         // // console.log("商家积分"+merchant.aggregateScore)
         // console.log("商家返利积分"+merchantRebate)
@@ -568,249 +568,248 @@ const amountManger = (function () {
         // //添加一条vip积分表的记录
         // console.log("会员积分表"+VipIntegrals)
         // console.log("商圈Id"+alliancesId)
-        if(merchantResidueIntegral<0){
+        if (merchantResidueIntegral < 0) {
             return "-1"
         }
         await VipIntegrals.create({
-            vipIntegralsId : vipIntegralsId,
-            vipId : vip.membershipCardNumber,
-            buyOrSale : "1",
-            buyOrSaleMerchant : tenantId,
-            price : totalPrice,
-            integral : integral,
-            allianceId : alliancesId,
-            trade_noId : trade_no
+            vipIntegralsId: vipIntegralsId,
+            vipId: vip.membershipCardNumber,
+            buyOrSale: "1",
+            buyOrSaleMerchant: tenantId,
+            price: totalPrice,
+            integral: integral,
+            allianceId: alliancesId,
+            trade_noId: trade_no
         })
         //用查询到的积分数+本次消费的积分数得到会员的总积分数
-        let aggregateScore = Number(vip.aggregateScore)+integral
+        let aggregateScore = Number(vip.aggregateScore) + integral
         //修改VIP表中的总积分数
         await Vips.update({
-            aggregateScore :aggregateScore
-        },{
-            where:{
+            aggregateScore: aggregateScore
+        }, {
+            where: {
                 phone: phone,
-                alliancesId : alliancesId
+                alliancesId: alliancesId
             }
         })
         //在menchant积分表中增加一条vip购买的记录记录
-        let merchantVipId = "VipM"+Tool.allocTenantId().substring(4)
+        let merchantVipId = "VipM" + Tool.allocTenantId().substring(4)
         await MerchantIntegrals.create({
-            merchantIntegralsId : merchantVipId,
-            tenantId : tenantId,
-            buyOrSale : 0,//失去积分
-            buyOrSaleMerchant:vip.phone,//积分给此vip
-            price : totalPrice,//获得的钱数
-            integral : integral,//失去的积分数
-            trade_noId : trade_no
+            merchantIntegralsId: merchantVipId,
+            tenantId: tenantId,
+            buyOrSale: 0,//失去积分
+            buyOrSaleMerchant: vip.phone,//积分给此vip
+            price: totalPrice,//获得的钱数
+            integral: integral,//失去的积分数
+            trade_noId: trade_no
         })
 
         //修改商家表中的总积分数
         await Merchants.update({
-            aggregateScore : merchantResidueIntegral
-        },{
-            where:{
-                tenantId : tenantId
+            aggregateScore: merchantResidueIntegral
+        }, {
+            where: {
+                tenantId: tenantId
             }
         })
         //获得商圈积分
         let alliances = await Alliances.findOne({
-            where:{
-                alliancesId : alliancesId
+            where: {
+                alliancesId: alliancesId
             }
         })
         //修改商圈总积分
-        let alliancesResidueIntegral =alliances.aggregateScore+merchantRebateAlliance
+        let alliancesResidueIntegral = alliances.aggregateScore + merchantRebateAlliance
         await Alliances.update({
-            aggregateScore : alliancesResidueIntegral
-        },{
-            where:{
-                alliancesId : alliancesId
+            aggregateScore: alliancesResidueIntegral
+        }, {
+            where: {
+                alliancesId: alliancesId
             }
         })
-        let merchantAlliancesId = "AllM"+Tool.allocTenantId().substring(4)
+        let merchantAlliancesId = "AllM" + Tool.allocTenantId().substring(4)
         await MerchantIntegrals.create({
-            merchantIntegralsId : merchantAlliancesId,
-            tenantId : tenantId,
-            buyOrSale : 0,//失去积分
-            buyOrSaleMerchant:alliancesId,//积分给此商圈
-            price : 0,//获得的钱数
-            integral : merchantRebateAlliance,//失去的积分数
-            trade_noId : null
+            merchantIntegralsId: merchantAlliancesId,
+            tenantId: tenantId,
+            buyOrSale: 0,//失去积分
+            buyOrSaleMerchant: alliancesId,//积分给此商圈
+            price: 0,//获得的钱数
+            integral: merchantRebateAlliance,//失去的积分数
+            trade_noId: null
         })
-        let alliancesMerchantId = "MerA"+Tool.allocTenantId().substring(4)
+        let alliancesMerchantId = "MerA" + Tool.allocTenantId().substring(4)
         await AllianceIntegrals.create({
-            allianceIntegralsId : alliancesMerchantId,
-            alliancesId : alliancesId,
-            buyOrSale : 0,//获取积分
-            buyOrSaleMerchant:tenantId,//积分给此从租户获取
-            price : 0,//失去的钱数
-            integral : merchantRebateAlliance,//获取的积分数
+            allianceIntegralsId: alliancesMerchantId,
+            alliancesId: alliancesId,
+            buyOrSale: 0,//获取积分
+            buyOrSaleMerchant: tenantId,//积分给此从租户获取
+            price: 0,//失去的钱数
+            integral: merchantRebateAlliance,//获取的积分数
         })
 
 
         //获得开户商
         let openMerchant = await Merchants.findOne({
-            where:{
-                tenantId : vip.tenantId
+            where: {
+                tenantId: vip.tenantId
             }
         })
-        let openMerchantResidueIntegral = openMerchant.aggregateScore+merchantRebateMerchant
+        let openMerchantResidueIntegral = openMerchant.aggregateScore + merchantRebateMerchant
         //修改开户商总积分
         await Merchants.update({
-            aggregateScore : openMerchantResidueIntegral
-        },{
-            where:{
-                tenantId : vip.tenantId
+            aggregateScore: openMerchantResidueIntegral
+        }, {
+            where: {
+                tenantId: vip.tenantId
             }
         })
-        let merchantOpenId = "OpenM"+Tool.allocTenantId().substring(4)
+        let merchantOpenId = "OpenM" + Tool.allocTenantId().substring(4)
         await MerchantIntegrals.create({
-            merchantIntegralsId : merchantOpenId,
-            tenantId : tenantId,
-            buyOrSale : 0,//失去积分
-            buyOrSaleMerchant:vip.tenantId,//积分给此租户
-            price : 0,//获得的钱数
-            integral : merchantRebateMerchant,//失去的积分数
-            trade_noId : null
+            merchantIntegralsId: merchantOpenId,
+            tenantId: tenantId,
+            buyOrSale: 0,//失去积分
+            buyOrSaleMerchant: vip.tenantId,//积分给此租户
+            price: 0,//获得的钱数
+            integral: merchantRebateMerchant,//失去的积分数
+            trade_noId: null
         })
         //开户商的租户
-        let openMerchantId = "MerO"+Tool.allocTenantId().substring(4)
+        let openMerchantId = "MerO" + Tool.allocTenantId().substring(4)
         await MerchantIntegrals.create({
-            merchantIntegralsId : openMerchantId,
-            tenantId : vip.tenantId,
-            buyOrSale : 1,//获得积分
-            buyOrSaleMerchant:tenantId,//积分从此租户获取
-            price : 0,//获得的钱数
-            integral : merchantRebateMerchant,//失去的积分数
-            trade_noId : null
+            merchantIntegralsId: openMerchantId,
+            tenantId: vip.tenantId,
+            buyOrSale: 1,//获得积分
+            buyOrSaleMerchant: tenantId,//积分从此租户获取
+            price: 0,//获得的钱数
+            integral: merchantRebateMerchant,//失去的积分数
+            trade_noId: null
         })
 
         let allianceHeadquarters = await AllianceHeadquarters.findOne({
-            where:{
-                alliancesId : alliancesId
+            where: {
+                alliancesId: alliancesId
             }
         })
         //获得平台积分
         let headquarters = await Headquarters.findOne({
-            where :{
-                headquartersId :allianceHeadquarters.headquartersId
+            where: {
+                headquartersId: allianceHeadquarters.headquartersId
             }
         })
         //修改平台总积分
-        let headquartersResidueIntegral = Number(headquarters.aggregateScore)+merchantRebateTerrace;
+        let headquartersResidueIntegral = Number(headquarters.aggregateScore) + merchantRebateTerrace;
         await Headquarters.update({
-            aggregateScore : headquartersResidueIntegral
-        },{
-            where:{
-                headquartersId : allianceHeadquarters.headquartersId
+            aggregateScore: headquartersResidueIntegral
+        }, {
+            where: {
+                headquartersId: allianceHeadquarters.headquartersId
             }
         })
         //在menchant积分表中增加一条给平台积分的记录
-        let merchantHeaId = "heaM"+Tool.allocTenantId().substring(4)
+        let merchantHeaId = "heaM" + Tool.allocTenantId().substring(4)
         await MerchantIntegrals.create({
-            merchantIntegralsId : merchantHeaId,
-            tenantId : tenantId,
-            buyOrSale : 0,//失去积分
-            buyOrSaleMerchant:headquarters.headquartersId,//积分给此平台
-            price : 0,//获得的钱数
-            integral : merchantRebateTerrace,//失去的积分数
-            trade_noId : null
+            merchantIntegralsId: merchantHeaId,
+            tenantId: tenantId,
+            buyOrSale: 0,//失去积分
+            buyOrSaleMerchant: headquarters.headquartersId,//积分给此平台
+            price: 0,//获得的钱数
+            integral: merchantRebateTerrace,//失去的积分数
+            trade_noId: null
         })
-        let HeadquartersMer = "merH"+Tool.allocTenantId().substring(4)
+        let HeadquartersMer = "merH" + Tool.allocTenantId().substring(4)
         await HeadquartersIntegrals.create({
-            headquartersIntegralsId :HeadquartersMer,
-            headquartersId : headquarters.headquartersId,
-            buyOrSale : 1,//获得积分
+            headquartersIntegralsId: HeadquartersMer,
+            headquartersId: headquarters.headquartersId,
+            buyOrSale: 1,//获得积分
             buyOrSaleMerchant: tenantId,
-            price : 0,//失去的钱数
-            integral : merchantRebateTerrace,//获得的积分数
+            price: 0,//失去的钱数
+            integral: merchantRebateTerrace,//获得的积分数
         })
         return "1"
     }
     //充值积分
-    let rechargeIntegral = async function (alliancesId,totalPrice) {
+    let rechargeIntegral = async function (alliancesId, totalPrice) {
         // console.log("用了"+totalPrice)
         // console.log(alliancesId)
         //查询商圈对应的平台
         let alliancesHeadquarters = await AllianceHeadquarters.findOne({
-            where:{
-                alliancesId:alliancesId
+            where: {
+                alliancesId: alliancesId
             }
         })
         // let dealId
         //如果对应的平台不为null的话
-        if(alliancesHeadquarters!=null){
+        if (alliancesHeadquarters != null) {
             //如果这个付款的alliancesId是商圈的，那么就是在平台充值
             let dealId = alliancesHeadquarters.headquartersId
             //生成一个和商圈有关的平台Id
-            let headquartersIntegralsId = "allH"+(Tool.allocTenantId().substring(4))
+            let headquartersIntegralsId = "allH" + (Tool.allocTenantId().substring(4))
             //查询这个平台的积分设置
             let headquartersSetIntegrals = await HeadquartersSetIntegrals.findOne({
-                where:{
-                    alliancesId : alliancesId
+                where: {
+                    alliancesId: alliancesId
                 }
             })
             //积分=总价格/积分配置的比率
-            let integral = totalPrice/(Number(headquartersSetIntegrals.priceIntegralsRate))
+            let integral = totalPrice / (Number(headquartersSetIntegrals.priceIntegralsRate))
             //平台的操作记录下来
             await HeadquartersIntegrals.create({
-                headquartersIntegralsId : headquartersIntegralsId,
-                headquartersId : dealId,
-                buyOrSale : "0",//失去积分
-                buyOrSaleMerchant : alliancesId,
-                price : totalPrice,
-                integral : integral,
+                headquartersIntegralsId: headquartersIntegralsId,
+                headquartersId: dealId,
+                buyOrSale: "0",//失去积分
+                buyOrSaleMerchant: alliancesId,
+                price: totalPrice,
+                integral: integral,
             })
             let headquarters = await Headquarters.findOne({
-                where:{
-                    headquartersId : dealId,
+                where: {
+                    headquartersId: dealId,
                 }
             })
-            let aggregateScoreHeadquarters = headquarters.aggregateScore-integral
+            let aggregateScoreHeadquarters = headquarters.aggregateScore - integral
             await Headquarters.update({
-                aggregateScore : aggregateScoreHeadquarters
-            },{
-                where:{
-                    headquartersId : dealId,
+                aggregateScore: aggregateScoreHeadquarters
+            }, {
+                where: {
+                    headquartersId: dealId,
                 }
             })
 
             //生成一个和平台有关的商圈Id
-            let alliancesIntegralsId = "heaA"+(Tool.allocTenantId().substring(4))
+            let alliancesIntegralsId = "heaA" + (Tool.allocTenantId().substring(4))
             //将商圈的操作记录下来
             await AllianceIntegrals.create({
-                allianceIntegralsId : alliancesIntegralsId,
-                alliancesId : alliancesId,
-                buyOrSale : "1",
-                buyOrSaleMerchant:dealId,
-                price:totalPrice,
-                integral : integral,
+                allianceIntegralsId: alliancesIntegralsId,
+                alliancesId: alliancesId,
+                buyOrSale: "1",
+                buyOrSaleMerchant: dealId,
+                price: totalPrice,
+                integral: integral,
             })
             let alliances = await Alliances.findOne({
-                where:{
-                    alliancesId : alliancesId,
+                where: {
+                    alliancesId: alliancesId,
                 }
             })
-            let aggregateScoreAlliances = alliances.aggregateScore+integral
+            let aggregateScoreAlliances = alliances.aggregateScore + integral
             await Alliances.update({
-                aggregateScore : aggregateScoreAlliances
-            },{
-                where:{
-                    alliancesId : alliancesId,
+                aggregateScore: aggregateScoreAlliances
+            }, {
+                where: {
+                    alliancesId: alliancesId,
                 }
             })
 
 
         }
-        if(alliancesHeadquarters==null){
+        if (alliancesHeadquarters == null) {
             //如果没找到的话就说明这个付款的Id是租户的
             //查询商圈和租户的关联表查询到在那个商圈充值的
 
 
-
             let alliancesMerchant = await AllianceMerchants.findOne({
-                where:{
-                    tenantId : alliancesId
+                where: {
+                    tenantId: alliancesId
                 }
             })
             // console.log("alliancesMerchant商圈租户关联的关系"+alliancesMerchant)
@@ -818,63 +817,206 @@ const amountManger = (function () {
             // console.log(alliancesMerchant.alliancesId)
 
             //获得一个和租户有关的Id
-            let alliancesIntegralsId = "tenA"+(Tool.allocTenantId().substring(4))
+            let alliancesIntegralsId = "tenA" + (Tool.allocTenantId().substring(4))
             //查询商圈设置的积分
             let allianceSetIntegrals = await AllianceSetIntegrals.findOne({
-                where:{
-                    alliancesId : alliancesMerchant.alliancesId
+                where: {
+                    alliancesId: alliancesMerchant.alliancesId
                 }
             })
             //计算出购买的积分量
-            let integral = totalPrice/(Number(allianceSetIntegrals.priceIntegralsRate))
+            let integral = totalPrice / (Number(allianceSetIntegrals.priceIntegralsRate))
             // console.log("alliancesIntegralsId为"+alliancesIntegralsId)
             //新增商圈记录
             await AllianceIntegrals.create({
-                allianceIntegralsId : alliancesIntegralsId,
-                alliancesId : alliancesMerchant.alliancesId,
-                buyOrSale : "0",//失去积分
-                buyOrSaleMerchant : alliancesId,//给积分给那个租户
-                price : totalPrice,
-                integral : integral,
+                allianceIntegralsId: alliancesIntegralsId,
+                alliancesId: alliancesMerchant.alliancesId,
+                buyOrSale: "0",//失去积分
+                buyOrSaleMerchant: alliancesId,//给积分给那个租户
+                price: totalPrice,
+                integral: integral,
             })
             let alliance = await Alliances.findOne({
-                where:{
-                    alliancesId : alliancesMerchant.alliancesId,
+                where: {
+                    alliancesId: alliancesMerchant.alliancesId,
                 }
             })
-            let aggregateScoreAlliances = Number(alliance.aggregateScore)-integral
+            let aggregateScoreAlliances = Number(alliance.aggregateScore) - integral
             await Alliances.update({
-                aggregateScore : aggregateScoreAlliances
-            },{
-                where:{
-                    alliancesId : alliancesMerchant.alliancesId
+                aggregateScore: aggregateScoreAlliances
+            }, {
+                where: {
+                    alliancesId: alliancesMerchant.alliancesId
                 }
             })
 
-            let merchantIntegralsId = "allM"+(Tool.allocTenantId().substring(4))
+            let merchantIntegralsId = "allM" + (Tool.allocTenantId().substring(4))
             await MerchantIntegrals.create({
-                merchantIntegralsId : merchantIntegralsId,
-                tenantId : alliancesId,
-                buyOrSale : "1",
-                buyOrSaleMerchant:alliancesMerchant.alliancesId,
-                price:totalPrice,
-                integral : integral,
-                trade_noId : null
+                merchantIntegralsId: merchantIntegralsId,
+                tenantId: alliancesId,
+                buyOrSale: "1",
+                buyOrSaleMerchant: alliancesMerchant.alliancesId,
+                price: totalPrice,
+                integral: integral,
+                trade_noId: null
             })
             let merchant = await Merchants.findOne({
-                where:{
-                    tenantId : alliancesId,
+                where: {
+                    tenantId: alliancesId,
                 }
             })
-            let aggregateScoreMerchant = Number(merchant.aggregateScore)+integral
+            let aggregateScoreMerchant = Number(merchant.aggregateScore) + integral
             await Merchants.update({
-                aggregateScore : aggregateScoreMerchant
-            },{
-                where:{
-                    tenantId : alliancesId,
+                aggregateScore: aggregateScoreMerchant
+            }, {
+                where: {
+                    tenantId: alliancesId,
                 }
             })
         }
+    }
+    //查询商家利润
+    let getProfitRate = async function (tenantId,trade_no) {
+
+        let totalPrices = 0//总价格
+        let saleGoodsTotalPrices = 0//进价
+        let profitPrice = 0//单个商品的价格
+        let merchantTotalPrice = 0//给商户的钱
+        let terracePrice = 0//给平台的价格
+        let goodsArray = []
+        let goodsJson = {}
+
+        let tenantConfigs = await TenantConfigs.findOne({
+            where:{
+                tenantId : tenantId
+            }
+        })
+        console.log(tenantConfigs)
+        if (tenantConfigs == null) {
+            return "没找到当前租户信息"
+        }
+        let date = new Date().getTime()
+        let ordergoods = await OrderGoods.findAll({
+            where:{
+                tenantId : tenantId,
+                trade_no : trade_no
+            }
+        })
+        let endDate = new Date().getTime()
+        console.log(endDate-date)
+        
+        let tenantConfigsJson = {}
+        tenantConfigsJson.profitRate = tenantConfigs.profitRate != null ? tenantConfigs.profitRate + "%" : "0"
+
+        for (let og of ordergoods){
+            let goodsMessgae = {}
+            //商品总价格
+            let totalPrice = 0
+            totalPrice=og.num * og.price
+            totalPrices += totalPrice
+            //卖出商品的进价价格
+            let saleGoodsTotalPrice = 0
+            saleGoodsTotalPrice = og.num*og.constPrice
+            saleGoodsTotalPrices += saleGoodsTotalPrice
+            //单个商品的利润
+            let profitPriceOne = 0
+            profitPriceOne = totalPrice - saleGoodsTotalPrice
+            profitPrice += profitPriceOne
+            // console.log(1111111111111111111111)
+            // console.log(totalPrices)
+            // console.log(saleGoodsTotalPrices)
+            // console.log(totalPrices-saleGoodsTotalPrices)
+            // console.log(profitPrice)
+            let terracePriceOne = 0
+            let merchantTotalPriceOne = 0
+            //这个租户有没有设置利润比率
+            if (tenantConfigs.profitRate != null) {
+                //给租户的钱
+
+                merchantTotalPriceOne = profitPriceOne*(Number(tenantConfigs.profitRate))/100
+                merchantTotalPrice += merchantTotalPriceOne
+                //给平台的钱
+
+                terracePriceOne = profitPriceOne*(100-Number(tenantConfigs.profitRate))/100
+                terracePrice += terracePriceOne
+            }
+            goodsMessgae={
+                totalPrices : totalPrice,
+                saleGoodsTotalPrices : saleGoodsTotalPrice,
+                profitPrice : profitPriceOne,
+                merchantTotalPrice : merchantTotalPriceOne,
+                terracePrice : terracePriceOne,
+                foodName : og.goodsName,
+                num : og.num
+            }
+            goodsArray.push(goodsMessgae)
+        }
+
+        goodsJson.totalPrices= totalPrices,
+        goodsJson.saleGoodsTotalPrices = saleGoodsTotalPrices,
+        goodsJson.profitPrice = profitPrice,
+        goodsJson.merchantTotalPrice = merchantTotalPrice,
+        goodsJson.terracePrice = terracePrice,
+        goodsJson.goodsArray = goodsArray
+        return goodsJson
+
+    }
+    
+    let getNewOrder = async function (tenantId) {
+        let orders = await Orders.findAll({
+            where:{
+                tenantId : tenantId,
+                consigneeId : {
+                    $ne : null
+                }
+            }
+        })
+        let arrayOrder = []
+        for(let o of orders){
+            let orderJson = {
+                phone : o.phone,
+                status : o.status,
+                trade_no : o.trade_no,
+            }
+            arrayOrder.push(orderJson)
+        }
+        return arrayOrder
+
+    }
+    let getBill = async function (tenantId) {
+        let ordersJson = {}
+        let totalPrice = 0
+        let saleGoodsTotalPrices = 0
+        let profitPrice = 0
+        let merchantTotalPrice = 0
+        let terracePrice = 0
+        let orderArray = []
+        let order = await getNewOrder(tenantId)
+        console.log(order)
+        let getProfitRateArray = []
+        for(let i = 0; i < order.length; i++){
+            let orderJson = {}
+            let orderGoods =await getProfitRate(tenantId,order[i].trade_no)
+            console.log(orderGoods)
+            totalPrice += orderGoods.totalPrices
+            saleGoodsTotalPrices += orderGoods.saleGoodsTotalPrices
+            profitPrice += orderGoods.profitPrice
+            merchantTotalPrice += orderGoods.merchantTotalPrice
+            terracePrice += orderGoods.terracePrice
+            orderJson.phone = order[i].phone
+            orderJson.status = order[i].status
+            orderJson.orderGoods = orderGoods
+            orderArray.push(orderJson)
+            getProfitRateArray.push(orderGoods)
+        }
+        Promise.all(getProfitRateArray)
+        ordersJson.totalPrice = totalPrice
+        ordersJson.saleGoodsTotalPrices = saleGoodsTotalPrices
+        ordersJson.profitPrice = profitPrice
+        ordersJson.merchantTotalPrice = merchantTotalPrice
+        ordersJson.terracePrice = terracePrice
+        ordersJson.orderArray = orderArray
+        return ordersJson
     }
 
     let instance = {
@@ -882,7 +1024,10 @@ const amountManger = (function () {
         getAmountByTradeNo: getAmountByTradeNo,
         isTenantIdAndConsigneeIdSame: isTenantIdAndConsigneeIdSame,
         integralAllocation : integralAllocation,
-        rechargeIntegral : rechargeIntegral
+        rechargeIntegral : rechargeIntegral,
+        getProfitRate : getProfitRate,
+        getNewOrder : getNewOrder,
+        getBill : getBill
     }
 
     return instance;

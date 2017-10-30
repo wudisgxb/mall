@@ -15,6 +15,7 @@ module.exports = function (sequelize, DataTypes) {
             purchaseLimit: shortDataTypes.Int(-1),//每单限购,-1不限制
             consigneeId: shortDataTypes.String(255, true),
             tenantId: shortDataTypes.String(255, true),
+            constPrice: shortDataTypes.Double()
         },
         {
             paranoid: true,

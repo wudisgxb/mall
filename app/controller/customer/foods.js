@@ -113,7 +113,7 @@ module.exports = {
                         ]
                     }]
                 });
-                console.log(food)
+                // console.log(food)
                 if (food.length == 0) {
                     continue;
                 }

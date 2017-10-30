@@ -14,7 +14,7 @@ module.exports = function (sequelize, DataTypes) {
          */
         image: shortDataTypes.String(),
         minuteImage : shortDataTypes.String(),
-        ConstPrice : shortDataTypes.String(),//商品进价
+        constPrice : shortDataTypes.String(),//商品进价
         icon: shortDataTypes.String(),
         /**
          * 现价
@@ -44,6 +44,7 @@ module.exports = function (sequelize, DataTypes) {
 
         //卡包ID，公众号推卡包场景用，正常不用
         cardId: shortDataTypes.String(255, true),
+
         tenantId: {
             type: Sequelize.STRING
         }

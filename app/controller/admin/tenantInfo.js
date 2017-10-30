@@ -2,8 +2,10 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
+const OrderGoods = db.models.OrderGoods
 let TenantInfo = db.models.TenantConfigs;
 const Merchants = db.models.Merchants;
+const amountManager = require('../amount/amountManager')
 
 module.exports = {
 
@@ -171,7 +173,92 @@ module.exports = {
         TenantConfig.invaildTime = body.tenantConfig.invaildTime;
         await TenantConfig.save();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-    }
+    },
 
+    //查询账单信息
+    async getTenantInfoByBill(ctx,next){
+        ctx.checkQuery('tenantId').notEmpty()
+        // ctx.checkQuery('trade_no').notEmpty()
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR.errors)
+            return
+        }
+        let ordersJson = await amountManager.getBill(ctx.query.tenantId)
+
+
+        // let ordersJson = {}
+        // let totalPrice = 0
+        // let saleGoodsTotalPrices = 0
+        // let profitPrice = 0
+        // let merchantTotalPrice = 0
+        // let terracePrice = 0
+        // let orderArray = []
+        //
+        // let order = await amountManager.getNewOrder(ctx.query.tenantId)
+        // let staticDate = new Date().getTime()
+        //
+        // const promises = Array.from({length:200}, (_) => createPromise())
+        // await Promise.all(promises)
+        //
+        // function createPromise(){
+        //     return new Promise((res, rej) => {
+        //         setTimeout(() => {
+        //             res('done')
+        //         },3e2)
+        //     })
+        // }
+        //
+        // // for(let i = 0; i < 200; i++){
+        //
+        //     // let orderJson = {}
+        //     // let orderGoods = await createPromise();
+        //     // totalPrice += orderGoods.totalPrices
+        //     // saleGoodsTotalPrices += orderGoods.saleGoodsTotalPrices
+        //     // profitPrice += orderGoods.profitPrice
+        //     // merchantTotalPrice += orderGoods.merchantTotalPrice
+        //     // terracePrice += orderGoods.terracePrice
+        //     // // orderJson.phone = order[i].phone
+        //     // // orderJson.status = order[i].status
+        //     // orderJson.orderGoods = orderGoods
+        //     // orderArray.push(orderJson)
+        // // }
+        // let endDate = new Date().getTime()
+        // console.log(endDate-staticDate)
+        // // ordersJson.totalPrice = totalPrice
+        // // ordersJson.saleGoodsTotalPrices = saleGoodsTotalPrices
+        // // ordersJson.profitPrice = profitPrice
+        // // ordersJson.merchantTotalPrice = merchantTotalPrice
+        // // ordersJson.terracePrice = terracePrice
+        // // // ordersJson.orderArray = orderArray
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,ordersJson)
+
+    },
+
+    //
+    async saveorderGood(ctx,next){
+        let body = ctx.request.body;
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
+            return;
+        }
+
+        for(let i =0;i<200;i++){
+            let date = new Date().getTime()
+            await OrderGoods.create({
+                num : 1,
+                unit : "袋",
+                trade_no : date,
+                consigneeId : "07e15af0db11ddb1919c5c1376f4e2c7",
+                tenantId : "33333ce0f7e31d8b92c4472a8ad3eeb3",
+                FoodId : 1095,
+                price : 2,
+                vipPrice :2,
+                activityPrice : -1,
+                purchaseLimit : -1,
+                constPrice : 1
+            })
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    }
 
 }

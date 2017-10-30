@@ -279,16 +279,19 @@ module.exports = {
     async status2Mdf(ctx, next){
         let body = ctx.request.body;
 
-        await db1.models.Orders.update({
-            deletedAt: null
-        }, {
-            where: {
-                status: 2,
-                deletedAt: {
-                    $ne: null
-                }
-            },
-        });
+        await Orders.findAll({})
+
+
+        // await db1.models.Orders.update({
+        //     deletedAt: null
+        // }, {
+        //     where: {
+        //         status: 2,
+        //         deletedAt: {
+        //             $ne: null
+        //         }
+        //     },
+        // });
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
