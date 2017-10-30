@@ -13,7 +13,7 @@ let Caap = require('ccap')();
 let http = require('http')
 let auth = require('../auth/auth')
 const jwtSecret = require('../../config/config').jwtSecret
-console.log(jwtSecret)
+// console.log(jwtSecret)
 module.exports = {
 
     async getAdminLoginUser(ctx, next){
