@@ -39,7 +39,7 @@ module.exports = async function tasks(app) {
 
         rule.hour = 17;
 
-        rule.minute = 15;
+        rule.minute = 17;
         rule.second = 1;
         schedule.scheduleJob(rule, async function () {
             await aliTransferAccounts();
