@@ -64,6 +64,7 @@ module.exports = function (app) {
 
     app.use(jwt({secret: require('../config/config').jwtSecret}).unless(function () {
         // 匹配需要验证token的路径
+        console.log(this.originalUrl)
         return !(/login|register/i.test(this.originalUrl))
     }))
 
