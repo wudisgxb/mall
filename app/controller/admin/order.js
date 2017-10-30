@@ -167,7 +167,7 @@ module.exports = {
 
             let table = await Tables.findById(orders[k].TableId);
 
-            result[k].tableName = table.name;
+            result[k].tableName = table==null?"":table.name;
             result[k].trade_no = orders[k].trade_no;
             result[k].info = orders[k].info;
             result[k].id = orders[k].id;
