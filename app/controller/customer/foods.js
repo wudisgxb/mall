@@ -131,7 +131,12 @@ module.exports = {
                         rating.username = rating.username.slice(0, 3) + '****' + rating.username.slice(-4)
                         return rating
                     })
-                    e.minuteImage = JSON.parse(e.minuteImage)
+                    try{
+                        e.minuteImage = JSON.parse(e.minuteImage)
+                    }catch(c){
+                        e.minuteImage =e.minuteImage
+                    }
+
                 })
 
                 food[0].goodsPromotion = await promotionManager.getGoodsPromotion(QRCodeTemplateId, food[0].id, tenantId);
