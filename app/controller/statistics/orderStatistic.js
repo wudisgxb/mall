@@ -564,22 +564,21 @@ const getstatistics = (function () {
             getTime = await getMonthEchats.getMonth(startTime, endTime)
         }
         let result = [];
-        for (let i = 0; i < getTime.length; i++) {
-            // console.log(getTime)
+        for (let i = 0; i < getTime.length; i++) {// console.log(getTime)
             let statisticsOrder = await StatisticsOrders.getBetweenDateByTenantId(tenantId, new Date(getTime[i].start), new Date(getTime[i].end))
-            // console.log(333333333)
+
             //总营收
             let totalPrice = StatisticsOrders.sumField(statisticsOrder, 'totalPrice')
 
             let merchantCouponFee = StatisticsOrders.sumField(statisticsOrder, 'merchantCouponFee')
             let platformCouponFee = StatisticsOrders.sumField(statisticsOrder, 'platformCouponFee')
             let platformAmount = StatisticsOrders.sumField(statisticsOrder, 'platformAmount')
-            // console.log(1111111111111)
+
             let merchantAmount = StatisticsOrders.sumField(statisticsOrder, 'merchantAmount')
             let refund_Amount = StatisticsOrders.sumField(statisticsOrder, 'refund_amount')
             let deliveryFee = StatisticsOrders.sumField(statisticsOrder, 'deliveryFee')
             let consigneeAmount = StatisticsOrders.sumField(statisticsOrder, 'consigneeAmount')
-            // console.log(2222222222222)
+
             let time;
             if (type == 1) {
                 let start = (i * 3)
