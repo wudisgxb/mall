@@ -39,7 +39,7 @@ module.exports = async function tasks(app) {
 
         rule.hour = 17;
 
-        rule.minute = 17;
+        rule.minute = 20;
         rule.second = 1;
         schedule.scheduleJob(rule, async function () {
             await aliTransferAccounts();
@@ -238,12 +238,12 @@ module.exports = async function tasks(app) {
                 console.log("租户微信转账金额：" + merchantAmount);
                 console.log("代售微信转账金额：" + consigneeAmount);
                 //判断是否有利润分成
-                if(tenantConfig.isProfitRate==false){
+                if(!tenantConfig.isProfitRate){
                     if (tenantConfig != null) {
-                        console.log("tenantId:" + tenantId);
-                        console.log("consigneeId:" + consigneeId)
-                        console.log("租户微信转账金额：" + merchantAmount);
-                        console.log("代售微信转账金额：" + consigneeAmount);
+                        console.log("tenantId1:" + tenantId);
+                        console.log("consigneeId1:" + consigneeId)
+                        console.log("租户微信转账金额1：" + merchantAmount);
+                        console.log("代售微信转账金额1：" + consigneeAmount);
                         console.log("服务器公网IP：" + ip);
                         fn = co.wrap(wxpay.transfers.bind(wxpay))
                         if (consignee == null) {
