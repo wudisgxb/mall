@@ -3,6 +3,7 @@
  */
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
+const ApiLoginResult = require('../../db/mongo/ApiLoginResult')
 let db = require('../../db/mysql/index');
 let Tool = require('../../Tool/tool')
 let Captcha = db.models.Captcha
@@ -54,7 +55,7 @@ module.exports = {
         //根据key查询Captcha中的记录
         if(body.captcha!=null){
             if(body.captcha==""){
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "验证码不能为空")
+                ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
                 return;
             }
             let captcha = await Captcha.findOne({
@@ -65,11 +66,11 @@ module.exports = {
             //根据现在的时间减去创建的时间-创建时间如果大于5分钟
             if ((new Date() - captcha.createdAt) > 5 * 1000 * 60) {
                 //将验证码超时，请重新获取传给前端，并跳出
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "验证码超时，请重新获取");
+                ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_TIMEOUT)
                 return;
             }
             if (body.captcha.toLowerCase() != captcha.captcha.toLowerCase()) {
-                ctx.body = new ApiResult(ApiResult.Result.resMsg, "图形验证码错误")
+                ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
                 return;
             }
         }
@@ -83,7 +84,7 @@ module.exports = {
             //判断查询的记录数是否等于0
         if (admin == null) {
             //如果等于0那么就返回给前台用户名密码错误
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "用户名密码错误")
+            ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_MATCH)
             return;
         } else {
             let correspondingJson = {
