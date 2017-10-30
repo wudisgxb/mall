@@ -1060,8 +1060,10 @@ module.exports = {
                         }
 
                     } else {
+                        console.log("22222222222222222222222222")
                         if(tenantConfig.isProfitRate){
                             let getProfitRate = await amountManager.getProfitRate(tenantId,trade_no)
+                            console.log("33333333333333333333333")
                             if (consignee == null) {
                                 if (getProfitRate.merchantTotalPrice > 0) {
                                     await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, '收益', '微信', '租户', tenantId, consigneeId);
@@ -1084,32 +1086,35 @@ module.exports = {
                                     }
                                 }
                             }
-                        }
-                        if (consignee == null) {
-                            if (amountJson.totalAmount > 0) {
-                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
-                            }
-                        } else {
-                            let profitsharing = await ProfitSharings.findOne({
-                                where: {
-                                    tenantId: tenantId,
-                                    consigneeId: consigneeId
-                                }
-                            });
-
-                            if (profitsharing == null) {
+                        }else
+                            console.log("444444444444444444444444")
+                            if (consignee == null) {
                                 if (amountJson.totalAmount > 0) {
                                     await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                                 }
                             } else {
-                                if (amountJson.merchantAmount > 0) {
-                                    await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
-                                }
-                                if (amountJson.consigneeAmount > 0) {
-                                    await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                let profitsharing = await ProfitSharings.findOne({
+                                    where: {
+                                        tenantId: tenantId,
+                                        consigneeId: consigneeId
+                                    }
+                                });
+
+                                if (profitsharing == null) {
+                                    if (amountJson.totalAmount > 0) {
+                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
+                                    }
+                                } else {
+                                    if (amountJson.merchantAmount > 0) {
+                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                    }
+                                    if (amountJson.consigneeAmount > 0) {
+                                        await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                    }
                                 }
                             }
                         }
+
                     }
                 }
             } else {
