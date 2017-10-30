@@ -1086,8 +1086,7 @@ module.exports = {
                                     }
                                 }
                             }
-                        }else
-                            console.log("444444444444444444444444")
+                        }else{
                             if (consignee == null) {
                                 if (amountJson.totalAmount > 0) {
                                     await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
