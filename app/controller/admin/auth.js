@@ -93,7 +93,7 @@ module.exports = {
             }
 
             let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
-            const token = jsonwebtoken.sign({role: 'admin'}, jwtSecret, {expiresIn: 2 * 60})
+            const token = jsonwebtoken.sign({role: 'admin'}, jwtSecret, {expiresIn: 12 * 60 * 60})
             console.log(token)
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                 correspondingId: adminCorresponding.correspondingId,
