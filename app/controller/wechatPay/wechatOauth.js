@@ -1075,12 +1075,14 @@ module.exports = {
                                         consigneeId: consigneeId
                                     }
                                 });
-
+                                console.log("4444444444444444444444444")
                                 if (profitsharing == null) {
-                                    if (amountJson.totalAmount > 0) {
+                                    console.log("555555555555555555555555")
+                                    if (getProfitRate.merchantTotalPrice > 0) {
                                         await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, '收益', '微信', '租户', tenantId, consigneeId);
                                     }
                                 } else {
+                                    console.log("66666666666666666666666666")
                                     if (getProfitRate.merchantTotalPrice > 0) {
                                         await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
                                     }
