@@ -932,7 +932,7 @@ module.exports = {
                             console.log("服务器公网IP：" + ip);
                             let params;
                             let result;
-                            fn = co.wrap(wxpay.transfers.bind(wxpay)
+                            fn = co.wrap(wxpay.transfers.bind(wxpay))
                             //获取利润分配后的商户所得到的价格
                             let getProfitRate = await amountManager.getProfitRate(tenantId,trade_no)
                             //判断是否有代售点
