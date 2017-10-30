@@ -12,8 +12,8 @@ let Admins = db.models.Adminer
 let Caap = require('ccap')();
 let http = require('http')
 let auth = require('../auth/auth')
-const jwtSecret = require('../../config/config')
-    .jwtSecret
+const jwtSecret = require('../../config/config').jwtSecret
+console.log(jwtSecret)
 module.exports = {
 
     async getAdminLoginUser(ctx, next){
@@ -91,6 +91,7 @@ module.exports = {
             let correspondingJson = {
                 phone : admin.phone
             }
+
             let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
             const token = jsonwebtoken.sign({role: 'admin'}, jwtSecret, {expiresIn: 5 * 60})
             console.log(token)

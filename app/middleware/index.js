@@ -62,11 +62,7 @@ module.exports = function (app) {
     app.use(convert(cors()))
     app.use(convert(json()))
 
-    app.use(jwt({secret: require('../config/config').jwtSecret}).unless(function () {
-        // 匹配需要验证token的路径
-        console.log(this.originalUrl)
-        return !(/login|register/i.test(this.originalUrl))
-    }))
+    app.use(jwt({secret: require('../config/config').jwtSecret}).unless({ path: [/login|register/i] }))
 
     app.use(timeCost())
 
