@@ -891,7 +891,7 @@ const amountManger = (function () {
                 tenantId : tenantId
             }
         })
-        console.log(tenantConfigs)
+
         if (tenantConfigs == null) {
             return "没找到当前租户信息"
         }
@@ -903,7 +903,6 @@ const amountManger = (function () {
             }
         })
         let endDate = new Date().getTime()
-        console.log(endDate-date)
         
         let tenantConfigsJson = {}
         tenantConfigsJson.profitRate = tenantConfigs.profitRate != null ? tenantConfigs.profitRate + "%" : "0"
@@ -922,11 +921,7 @@ const amountManger = (function () {
             let profitPriceOne = 0
             profitPriceOne = totalPrice - saleGoodsTotalPrice
             profitPrice += profitPriceOne
-            // console.log(1111111111111111111111)
-            // console.log(totalPrices)
-            // console.log(saleGoodsTotalPrices)
-            // console.log(totalPrices-saleGoodsTotalPrices)
-            // console.log(profitPrice)
+
             let terracePriceOne = 0
             let merchantTotalPriceOne = 0
             //这个租户有没有设置利润比率
@@ -992,12 +987,12 @@ const amountManger = (function () {
         let terracePrice = 0
         let orderArray = []
         let order = await getNewOrder(tenantId)
-        console.log(order)
+        // console.log(order)
         let getProfitRateArray = []
         for(let i = 0; i < order.length; i++){
             let orderJson = {}
             let orderGoods =await getProfitRate(tenantId,order[i].trade_no)
-            console.log(orderGoods)
+            // console.log(orderGoods)
             totalPrice += orderGoods.totalPrices
             saleGoodsTotalPrices += orderGoods.saleGoodsTotalPrices
             profitPrice += orderGoods.profitPrice

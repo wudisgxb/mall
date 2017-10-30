@@ -177,7 +177,7 @@ module.exports = {
         if (body.food.minuteImage instanceof Array) {
             minuteImage = body.food.minuteImage
         } else {
-            minuteImage = body.food.image
+            minuteImage.push(body.food.minuteImage)
         }
 
         if (foods != null) {

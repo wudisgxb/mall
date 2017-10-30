@@ -61,7 +61,7 @@ module.exports = function (sequelize, DataTypes) {
         startTime: shortDataTypes.String(),
         //营业结束时间
         endTime: shortDataTypes.String(),
-
+        isProfitRate : shortDataTypes.Bool(),
         //商家与平台的利润分成
         profitRate : shortDataTypes.String()
     }, {

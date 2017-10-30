@@ -805,61 +805,26 @@ module.exports = {
                 console.log("111111111111111111111111111111111111111"+amountJson.totalAmount)
                 if (tenantConfig != null) {
                     if (tenantConfig.isRealTime) {
-                        console.log("服务器公网IP：" + ip);
-                        let params;
-                        let result;
-                        fn = co.wrap(wxpay.transfers.bind(wxpay))
-                        if (consignee == null) {
-                            params = {
-                                partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                openid: tenantConfig.wecharPayee_account,
-                                check_name: 'NO_CHECK',
-                                amount: Math.round(amountJson.totalAmount * 100),
-                                //desc: tenantConfig.remark,
-                                desc: '收益',
-                                spbill_create_ip: ip
-                            }
-                            console.log(params)
-                            try {
-                                result = await fn(params);
-                                console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
-                                if (result.result_code == 'SUCCESS') {
-                                    paymentReqs[0].TransferAccountIsFinish = true;
-                                    await paymentReqs[0].save();
-                                } else {
-                                    if (amountJson.totalAmount > 0) {
-                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
-                                    }
-                                }
-                            } catch (e) {
-                                console.log(e);
-                            }
-                        } else {
-                            console.log(ProfitSharings)
-                            let profitsharing = await ProfitSharings.findOne({
-                                where: {
-                                    tenantId: tenantId,
-                                    consigneeId: consigneeId
-                                }
-                            });
-                            console.log(consigneeId)
-                            console.log(tenantId)
-                            console.log(profitsharing)
-                            // console.log(consigneeId)
-                            if (profitsharing == null) {
+                        //判断商户是否开启利润分配
+                        if(!tenantConfig.isProfitRate){
+                            console.log("服务器公网IP：" + ip);
+                            let params;
+                            let result;
+                            fn = co.wrap(wxpay.transfers.bind(wxpay))
+                            if (consignee == null) {
                                 params = {
                                     partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                     openid: tenantConfig.wecharPayee_account,
                                     check_name: 'NO_CHECK',
-                                    amount: Math.round(amountJson.totalAmount * 100),//分
+                                    amount: Math.round(amountJson.totalAmount * 100),
                                     //desc: tenantConfig.remark,
                                     desc: '收益',
                                     spbill_create_ip: ip
                                 }
-
+                                console.log(params)
                                 try {
                                     result = await fn(params);
-                                    console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
+                                    console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
                                     if (result.result_code == 'SUCCESS') {
                                         paymentReqs[0].TransferAccountIsFinish = true;
                                         await paymentReqs[0].save();
@@ -872,59 +837,254 @@ module.exports = {
                                     console.log(e);
                                 }
                             } else {
-                                //找到对应关系
-                                console.log("主商户分润：" + amountJson.merchantAmount);
-                                params = {
-                                    partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                    openid: tenantConfig.wecharPayee_account,
-                                    check_name: 'NO_CHECK',
-                                    amount: Math.round(amountJson.merchantAmount * 100),
-                                    desc: profitsharing.merchantRemark,
-                                    spbill_create_ip: ip
-                                }
+                                console.log(ProfitSharings)
+                                let profitsharing = await ProfitSharings.findOne({
+                                    where: {
+                                        tenantId: tenantId,
+                                        consigneeId: consigneeId
+                                    }
+                                });
+                                console.log(consigneeId)
+                                console.log(tenantId)
+                                console.log(profitsharing)
+                                // console.log(consigneeId)
+                                if (profitsharing == null) {
+                                    params = {
+                                        partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                        openid: tenantConfig.wecharPayee_account,
+                                        check_name: 'NO_CHECK',
+                                        amount: Math.round(amountJson.totalAmount * 100),//分
+                                        //desc: tenantConfig.remark,
+                                        desc: '收益',
+                                        spbill_create_ip: ip
+                                    }
 
-                                try {
-                                    result = await fn(params);
-                                    console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result, null, 2));
-                                    if (result.result_code == 'SUCCESS') {
-                                        paymentReqs[0].TransferAccountIsFinish = true;
-                                        await paymentReqs[0].save();
-
-                                        //主商户转账成功才能给代售商户转账
-                                        console.log("代售点分润：" + amountJson.consigneeAmount);
-                                        params = {
-                                            partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                            openid: consignee.wecharPayee_account,
-                                            check_name: 'NO_CHECK',
-                                            amount: Math.round(amountJson.consigneeAmount * 100),
-                                            desc: profitsharing.consigneeRemark,
-                                            spbill_create_ip: ip
-                                        }
-
+                                    try {
                                         result = await fn(params);
-                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result, null, 2));
+                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
                                         if (result.result_code == 'SUCCESS') {
-                                            paymentReqs[0].consigneeTransferAccountIsFinish = true;
+                                            paymentReqs[0].TransferAccountIsFinish = true;
                                             await paymentReqs[0].save();
                                         } else {
+                                            if (amountJson.totalAmount > 0) {
+                                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+                                } else {
+                                    //找到对应关系
+                                    console.log("主商户分润：" + amountJson.merchantAmount);
+                                    params = {
+                                        partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                        openid: tenantConfig.wecharPayee_account,
+                                        check_name: 'NO_CHECK',
+                                        amount: Math.round(amountJson.merchantAmount * 100),
+                                        desc: profitsharing.merchantRemark,
+                                        spbill_create_ip: ip
+                                    }
+
+                                    try {
+                                        result = await fn(params);
+                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result, null, 2));
+                                        if (result.result_code == 'SUCCESS') {
+                                            paymentReqs[0].TransferAccountIsFinish = true;
+                                            await paymentReqs[0].save();
+
+                                            //主商户转账成功才能给代售商户转账
+                                            console.log("代售点分润：" + amountJson.consigneeAmount);
+                                            params = {
+                                                partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                                openid: consignee.wecharPayee_account,
+                                                check_name: 'NO_CHECK',
+                                                amount: Math.round(amountJson.consigneeAmount * 100),
+                                                desc: profitsharing.consigneeRemark,
+                                                spbill_create_ip: ip
+                                            }
+
+                                            result = await fn(params);
+                                            console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result, null, 2));
+                                            if (result.result_code == 'SUCCESS') {
+                                                paymentReqs[0].consigneeTransferAccountIsFinish = true;
+                                                await paymentReqs[0].save();
+                                            } else {
+                                                if (amountJson.consigneeAmount > 0) {
+                                                    await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                                }
+                                            }
+                                        } else {
+
+                                            if (amountJson.merchantAmount > 0) {
+                                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                            }
                                             if (amountJson.consigneeAmount > 0) {
                                                 await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
                                             }
                                         }
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+                                }
+                            }
+                        }else{
+                            //商户开启利润分配
+                            console.log("服务器公网IP：" + ip);
+                            let params;
+                            let result;
+                            fn = co.wrap(wxpay.transfers.bind(wxpay)
+                            //获取利润分配后的商户所得到的价格
+                            let getProfitRate = await amountManager.getProfitRate(tenantId,trade_no)
+                            //判断是否有代售点
+                            if (consignee == null) {
+                                //如果没有代售点
+                                params = {
+                                    partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                    openid: tenantConfig.wecharPayee_account,
+                                    check_name: 'NO_CHECK',
+                                    amount: Math.round(getProfitRate.merchantTotalPrice * 100),
+                                    //desc: tenantConfig.remark,
+                                    desc: '收益',
+                                    spbill_create_ip: ip
+                                }
+                                console.log(params)
+                                try {
+                                    result = await fn(params);
+                                    console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
+                                    if (result.result_code == 'SUCCESS') {
+                                        paymentReqs[0].TransferAccountIsFinish = true;
+                                        await paymentReqs[0].save();
                                     } else {
-                                        if (amountJson.merchantAmount > 0) {
-                                            await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
-                                        }
-                                        if (amountJson.consigneeAmount > 0) {
-                                            await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                        if (amountJson.totalAmount > 0) {
+
+                                            await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                                         }
                                     }
                                 } catch (e) {
                                     console.log(e);
                                 }
+                            } else {
+                                console.log(ProfitSharings)
+                                let profitsharing = await ProfitSharings.findOne({
+                                    where: {
+                                        tenantId: tenantId,
+                                        consigneeId: consigneeId
+                                    }
+                                });
+                                console.log(consigneeId)
+                                console.log(tenantId)
+                                console.log(profitsharing)
+                                // console.log(consigneeId)
+                                if (profitsharing == null) {
+                                    params = {
+                                        partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                        openid: tenantConfig.wecharPayee_account,
+                                        check_name: 'NO_CHECK',
+                                        amount: Math.round(getProfitRate.merchantTotalPrice * 100),//分
+                                        //desc: tenantConfig.remark,
+                                        desc: '收益',
+                                        spbill_create_ip: ip
+                                    }
+
+                                    try {
+                                        result = await fn(params);
+                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
+                                        if (result.result_code == 'SUCCESS') {
+                                            paymentReqs[0].TransferAccountIsFinish = true;
+                                            await paymentReqs[0].save();
+                                        } else {
+                                            if (amountJson.totalAmount > 0) {
+                                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, '收益', '微信', '租户', tenantId, consigneeId);
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+                                } else {
+                                    //因为开启了商户利润分配所以商户和代售点就没有利润的说法，一切以商户的利润比率来算
+                                    //找到对应关系
+                                    // console.log("主商户分润：" + amountJson.merchantAmount);
+                                    params = {
+                                        partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                        openid: tenantConfig.wecharPayee_account,
+                                        check_name: 'NO_CHECK',
+                                        amount: Math.round(getProfitRate.merchantTotalPrice * 100),
+                                        desc: profitsharing.merchantRemark,
+                                        spbill_create_ip: ip
+                                    }
+
+                                    try {
+                                        result = await fn(params);
+                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result, null, 2));
+                                        if (result.result_code == 'SUCCESS') {
+                                            paymentReqs[0].TransferAccountIsFinish = true;
+                                            await paymentReqs[0].save();
+
+                                            //主商户转账成功才能给代售商户转账
+                                            // console.log("代售点分润：" + amountJson.consigneeAmount);
+                                            // params = {
+                                            //     partner_trade_no: Date.now(), //商户订单号，需保持唯一性
+                                            //     openid: consignee.wecharPayee_account,
+                                            //     check_name: 'NO_CHECK',
+                                            //     amount: Math.round(amountJson.consigneeAmount * 100),
+                                            //     desc: profitsharing.consigneeRemark,
+                                            //     spbill_create_ip: ip
+                                            // }
+                                            //
+                                            // result = await fn(params);
+                                            // console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result, null, 2));
+                                            // if (result.result_code == 'SUCCESS') {
+                                            //     paymentReqs[0].consigneeTransferAccountIsFinish = true;
+                                            //     await paymentReqs[0].save();
+                                            // } else {
+                                            //     if (amountJson.consigneeAmount > 0) {
+                                            //         await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                            //     }
+                                            // }
+                                        } else {
+                                            if(getProfitRate.merchantTotalPrice>0){
+                                                await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                            }
+                                            // if (amountJson.merchantAmount > 0) {
+                                            //     await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.merchantAmount, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                            // }
+                                            // if (amountJson.consigneeAmount > 0) {
+                                            //     await transAccounts.pendingTransferAccounts(trade_no, consignee.wecharPayee_account, amountJson.consigneeAmount, profitsharing.consigneeRemark, '微信', '代售', tenantId, consigneeId);
+                                            // }
+                                        }
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+                                }
                             }
                         }
+
                     } else {
+                        if(tenantConfig.isProfitRate){
+                            let getProfitRate = await amountManager.getProfitRate(tenantId,trade_no)
+                            if (consignee == null) {
+                                if (getProfitRate.merchantTotalPrice > 0) {
+                                    await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, '收益', '微信', '租户', tenantId, consigneeId);
+                                }
+                            } else {
+                                let profitsharing = await ProfitSharings.findOne({
+                                    where: {
+                                        tenantId: tenantId,
+                                        consigneeId: consigneeId
+                                    }
+                                });
+
+                                if (profitsharing == null) {
+                                    if (amountJson.totalAmount > 0) {
+                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, '收益', '微信', '租户', tenantId, consigneeId);
+                                    }
+                                } else {
+                                    if (getProfitRate.merchantTotalPrice > 0) {
+                                        await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
+                                    }
+                                }
+                            }
+                        }
                         if (consignee == null) {
                             if (amountJson.totalAmount > 0) {
                                 await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
