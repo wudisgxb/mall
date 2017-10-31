@@ -911,8 +911,8 @@ const amountManger = (function () {
             let goodsMessgae = {}
             //商品总价格
             let totalPrice = 0
-            totalPrice=parseInt(og.num * og.price).toFixed(2)
-            totalPrices += parseInt(totalPrice)
+            totalPrice=og.num * og.price
+            totalPrices += totalPrice
             //卖出商品的进价价格
             let saleGoodsTotalPrice = 0
             saleGoodsTotalPrice = og.num*og.constPrice
@@ -1005,11 +1005,11 @@ const amountManger = (function () {
             getProfitRateArray.push(orderGoods)
         }
         Promise.all(getProfitRateArray)
-        ordersJson.totalPrice = parseInt(totalPrice).toFixed(2)
-        ordersJson.saleGoodsTotalPrices = parseInt(saleGoodsTotalPrices).toFixed(2)
-        ordersJson.profitPrice = parseInt(profitPrice).toFixed(2)
-        ordersJson.merchantTotalPrice = parseInt(merchantTotalPrice).toFixed(2)
-        ordersJson.terracePrice = parseInt(terracePrice).toFixed(2)
+        ordersJson.totalPrice = totalPrice.toFixed(2)
+        ordersJson.saleGoodsTotalPrices = saleGoodsTotalPrices.toFixed(2)
+        ordersJson.profitPrice = profitPrice.toFixed(2)
+        ordersJson.merchantTotalPrice = merchantTotalPrice.toFixed(2)
+        ordersJson.terracePrice = terracePrice.toFixed(2)
         ordersJson.orderArray = orderArray
         return ordersJson
     }
