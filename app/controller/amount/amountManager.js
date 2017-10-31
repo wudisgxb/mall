@@ -912,15 +912,15 @@ const amountManger = (function () {
             //商品总价格
             let totalPrice = 0
             totalPrice=parseInt(og.num * og.price).toFixed(2)
-            totalPrices += parseInt(totalPrice).toFixed(2)
+            totalPrices += parseInt(totalPrice)
             //卖出商品的进价价格
             let saleGoodsTotalPrice = 0
             saleGoodsTotalPrice = parseInt(og.num*og.constPrice).toFixed(2)
-            saleGoodsTotalPrices += parseInt(saleGoodsTotalPrice).toFixed(2)
+            saleGoodsTotalPrices += parseInt(saleGoodsTotalPrice)
             //单个商品的利润
             let profitPriceOne = 0
             profitPriceOne = parseInt(totalPrice - saleGoodsTotalPrice).toFixed(2)
-            profitPrice += parseInt(profitPriceOne).toFixed(2)
+            profitPrice += parseInt(profitPriceOne)
 
             let terracePriceOne = 0
             let merchantTotalPriceOne = 0
