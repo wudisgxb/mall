@@ -1,4 +1,4 @@
-let vip = require('../../controller/customer/vip')
+ let vip = require('../../controller/customer/vip')
 
 const router = new (require('koa-router'))()
 
