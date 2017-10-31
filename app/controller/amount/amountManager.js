@@ -995,8 +995,8 @@ const amountManger = (function () {
             // console.log(orderGoods)
             totalPrice += orderGoods.totalPrices
             saleGoodsTotalPrices += orderGoods.saleGoodsTotalPrices
-            profitPrice += orderGoods.profitPrice
-            merchantTotalPrice += orderGoods.merchantTotalPrice
+            profitPrice += parseInt(orderGoods.profitPrice).toFixed(2)
+            merchantTotalPrice += parseInt(orderGoods.merchantTotalPrice).toFixed(2)
             terracePrice += orderGoods.terracePrice
             orderJson.phone = order[i].phone
             orderJson.status = order[i].status
