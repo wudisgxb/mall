@@ -1005,11 +1005,11 @@ const amountManger = (function () {
             getProfitRateArray.push(orderGoods)
         }
         Promise.all(getProfitRateArray)
-        ordersJson.totalPrice = totalPrice.toFixed(2)
-        ordersJson.saleGoodsTotalPrices = saleGoodsTotalPrices.toFixed(2)
-        ordersJson.profitPrice = profitPrice.toFixed(2)
-        ordersJson.merchantTotalPrice = merchantTotalPrice.toFixed(2)
-        ordersJson.terracePrice = terracePrice.toFixed(2)
+        ordersJson.totalPrice = totalPrice
+        ordersJson.saleGoodsTotalPrices = saleGoodsTotalPrices
+        ordersJson.profitPrice = profitPrice
+        ordersJson.merchantTotalPrice = merchantTotalPrice
+        ordersJson.terracePrice = terracePrice
         ordersJson.orderArray = orderArray
         return ordersJson
     }
