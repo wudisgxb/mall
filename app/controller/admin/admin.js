@@ -40,7 +40,7 @@ module.exports = {
             }
         })
         console.log(adminPhone)
-        if (adminPhone.length>1) {
+        if (adminPhone.length>0) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "手机号已存在已存在！");
             return;
         }
@@ -96,6 +96,7 @@ module.exports = {
             style: industry==null?"":industry,
             correspondingId: correspondingId
         });
+
 
 
     },

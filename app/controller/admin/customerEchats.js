@@ -535,7 +535,7 @@ module.exports = {
             cusJson.vip = cus.isVip==false?{}:vip
             cusArray.push(cusJson)
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,cusArray)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customers.length)
     }
 
 }

@@ -8,10 +8,16 @@ const jsonwebtoken = require('jsonwebtoken')
 let db = require('../../db/mysql/index');
 let Tool = require('../../Tool/tool')
 let Captcha = db.models.Captcha
+const AllianceMerchants = db.models.AllianceMerchants;
+const Merchants = db.models.Merchants
+const Alliances = db.models.Alliances
 let Admins = db.models.Adminer
 let Caap = require('ccap')();
 let http = require('http')
 let auth = require('../auth/auth')
+const sqlAllianceMerchants = require('../businessAlliance/allianceMerchants')
+const sqlHeadquarters = require('../businessAlliance/headquarters')
+const headQuarters = require('../businessAlliance/headquarters')
 const jwtSecret = require('../../config/config').jwtSecret
 // console.log(jwtSecret)
 module.exports = {
@@ -95,14 +101,47 @@ module.exports = {
             let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
             const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 12 * 60 * 60})
             // console.log(token)
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                correspondingId: adminCorresponding.correspondingId,
-                tenantId : adminCorresponding.correspondingId,
-                correspondingType : adminCorresponding.correspondingType,
-                style :admin.style,
-                name : admin.nickname,
-                token
-            })
+            if(adminCorresponding.correspondingType==3){
+                let tenantJson = {
+                    tenantId : adminCorresponding.correspondingId
+                }
+                let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants,tenantJson)
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                    alliancesId : getOperation.alliancesId,
+                    tenantId : adminCorresponding.correspondingId,
+                    correspondingType : adminCorresponding.correspondingType,
+                    style :admin.style,
+                    name : admin.nickname,
+                    token
+                })
+            }
+            if(adminCorresponding.correspondingType==2){
+                let alliancesJson = {
+                    alliancesId:adminCorresponding.correspondingId
+                }
+                let getHeadquarter = await sqlHeadquarters.getHeadquarter(alliancesJson);
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                    alliancesId : adminCorresponding.correspondingId,
+                    headquartersId : getHeadquarter.headquartersId,
+                    correspondingType : adminCorresponding.correspondingType,
+                    style :admin.style,
+                    name : admin.nickname,
+                    token
+                })
+            }
+            if(adminCorresponding.correspondingType==1){
+                let headquarterJson = {
+                    headquartersId: adminCorresponding.correspondingId
+                }
+                // let getHeadquarter = await headQuarters.getHeadquarter(headquarterJson)
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
+                    headquartersId : adminCorresponding.correspondingId,
+                    correspondingType : adminCorresponding.correspondingType,
+                    style :admin.style,
+                    name : admin.nickname,
+                    token
+                })
+            }
         }
     },
 
