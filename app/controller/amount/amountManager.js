@@ -911,16 +911,16 @@ const amountManger = (function () {
             let goodsMessgae = {}
             //商品总价格
             let totalPrice = 0
-            totalPrice=Number(og.num * og.price).toFixed(2)
-            totalPrices += Number(totalPrice).toFixed(2)
+            totalPrice=parseInt(og.num * og.price).toFixed(2)
+            totalPrices += parseInt(totalPrice).toFixed(2)
             //卖出商品的进价价格
             let saleGoodsTotalPrice = 0
-            saleGoodsTotalPrice = Number(og.num*og.constPrice).toFixed(2)
-            saleGoodsTotalPrices += Number(saleGoodsTotalPrice).toFixed(2)
+            saleGoodsTotalPrice = parseInt(og.num*og.constPrice).toFixed(2)
+            saleGoodsTotalPrices += parseInt(saleGoodsTotalPrice).toFixed(2)
             //单个商品的利润
             let profitPriceOne = 0
-            profitPriceOne = Number(totalPrice - saleGoodsTotalPrice).toFixed(2)
-            profitPrice += Number(profitPriceOne).toFixed(2)
+            profitPriceOne = parseInt(totalPrice - saleGoodsTotalPrice).toFixed(2)
+            profitPrice += parseInt(profitPriceOne).toFixed(2)
 
             let terracePriceOne = 0
             let merchantTotalPriceOne = 0
@@ -928,12 +928,12 @@ const amountManger = (function () {
             if (tenantConfigs.profitRate != null) {
                 //给租户的钱
 
-                merchantTotalPriceOne = Number(profitPriceOne*(Number(tenantConfigs.profitRate))/100).toFixed(2)
-                merchantTotalPrice += Number(merchantTotalPriceOne)
+                merchantTotalPriceOne = parseInt(profitPriceOne*(Number(tenantConfigs.profitRate))/100).toFixed(2)
+                merchantTotalPrice += parseInt(merchantTotalPriceOne)
                 //给平台的钱
 
-                terracePriceOne = Number(profitPriceOne*(100-Number(tenantConfigs.profitRate))/100)
-                terracePrice += Number(terracePriceOne)
+                terracePriceOne = parseInt(profitPriceOne*(100-Number(tenantConfigs.profitRate))/100)
+                terracePrice += parseInt(terracePriceOne)
             }
             goodsMessgae={
                 totalPrices : totalPrice,
