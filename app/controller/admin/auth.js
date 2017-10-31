@@ -12,7 +12,7 @@ let Admins = db.models.Adminer
 let Caap = require('ccap')();
 let http = require('http')
 let auth = require('../auth/auth')
-const jwtSecret = require('../../config/config').jwtSecret
+// const jwtSecret = require('../../config/config').jwtSecret
 // console.log(jwtSecret)
 module.exports = {
 
@@ -93,15 +93,15 @@ module.exports = {
             }
 
             let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
-            const token = jsonwebtoken.sign({role: 'admin'}, jwtSecret, {expiresIn: 12 * 60 * 60})
-            console.log(token)
+            // const token = jsonwebtoken.sign({role: 'admin'}, jwtSecret, {expiresIn: 12 * 60 * 60})
+            // console.log(token)
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                 correspondingId: adminCorresponding.correspondingId,
                 tenantId : adminCorresponding.correspondingId,
                 correspondingType : adminCorresponding.correspondingType,
                 style :admin.style,
                 name : admin.nickname,
-                token
+                // token
             })
         }
     },
