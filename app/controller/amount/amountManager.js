@@ -915,12 +915,12 @@ const amountManger = (function () {
             totalPrices += parseInt(totalPrice)
             //卖出商品的进价价格
             let saleGoodsTotalPrice = 0
-            saleGoodsTotalPrice = parseInt(og.num*og.constPrice).toFixed(2)
-            saleGoodsTotalPrices += parseInt(saleGoodsTotalPrice)
+            saleGoodsTotalPrice = og.num*og.constPrice
+            saleGoodsTotalPrices += saleGoodsTotalPrice
             //单个商品的利润
             let profitPriceOne = 0
-            profitPriceOne = parseInt(totalPrice - saleGoodsTotalPrice).toFixed(2)
-            profitPrice += parseInt(profitPriceOne)
+            profitPriceOne = totalPrice - saleGoodsTotalPrice
+            profitPrice +=profitPriceOne
 
             let terracePriceOne = 0
             let merchantTotalPriceOne = 0
@@ -928,12 +928,12 @@ const amountManger = (function () {
             if (tenantConfigs.profitRate != null) {
                 //给租户的钱
 
-                merchantTotalPriceOne = parseInt(profitPriceOne*(Number(tenantConfigs.profitRate))/100).toFixed(2)
-                merchantTotalPrice += parseInt(merchantTotalPriceOne)
+                merchantTotalPriceOne = profitPriceOne*(Number(tenantConfigs.profitRate))/100
+                merchantTotalPrice += merchantTotalPriceOne
                 //给平台的钱
 
-                terracePriceOne = parseInt(profitPriceOne*(100-Number(tenantConfigs.profitRate))/100)
-                terracePrice += parseInt(terracePriceOne)
+                terracePriceOne = profitPriceOne*(100-Number(tenantConfigs.profitRate))/100
+                terracePrice += terracePriceOne
             }
             goodsMessgae={
                 totalPrices : totalPrice,
