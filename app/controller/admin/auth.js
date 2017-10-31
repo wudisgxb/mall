@@ -107,7 +107,7 @@ module.exports = {
                 }
                 let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants,tenantJson)
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                    alliancesId : getOperation.alliancesId,
+                    alliancesId : getOperation==null?"":getOperation.alliancesId,
                     tenantId : adminCorresponding.correspondingId,
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
