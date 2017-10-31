@@ -995,8 +995,8 @@ const amountManger = (function () {
             // console.log(orderGoods)
             totalPrice += orderGoods.totalPrices
             saleGoodsTotalPrices += orderGoods.saleGoodsTotalPrices
-            profitPrice += parseInt(orderGoods.profitPrice).toFixed(2)
-            merchantTotalPrice += parseInt(orderGoods.merchantTotalPrice).toFixed(2)
+            profitPrice += orderGoods.profitPrice
+            merchantTotalPrice += orderGoods.merchantTotalPrice
             terracePrice += orderGoods.terracePrice
             orderJson.phone = order[i].phone
             orderJson.status = order[i].status
@@ -1005,11 +1005,11 @@ const amountManger = (function () {
             getProfitRateArray.push(orderGoods)
         }
         Promise.all(getProfitRateArray)
-        ordersJson.totalPrice = totalPrice
-        ordersJson.saleGoodsTotalPrices = saleGoodsTotalPrices
-        ordersJson.profitPrice = profitPrice
-        ordersJson.merchantTotalPrice = merchantTotalPrice
-        ordersJson.terracePrice = terracePrice
+        ordersJson.totalPrice = parseInt(totalPrice).toFixed(2)
+        ordersJson.saleGoodsTotalPrices = parseInt(saleGoodsTotalPrices).toFixed(2)
+        ordersJson.profitPrice = parseInt(profitPrice).toFixed(2)
+        ordersJson.merchantTotalPrice = parseInt(merchantTotalPrice).toFixed(2)
+        ordersJson.terracePrice = parseInt(terracePrice).toFixed(2)
         ordersJson.orderArray = orderArray
         return ordersJson
     }
