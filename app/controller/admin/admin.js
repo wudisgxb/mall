@@ -137,24 +137,57 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,correspondingId)
     },
     async putAdmins(ctx,next){
-        ctx.checkBody('userName').notEmpty()
-        ctx.checkBody('password').notEmpty()
-        ctx.checkBody('phone').notEmpty()
-        ctx.checkBody('style').notEmpty()
-        ctx.checkBody('id').notEmpty()
+        // ctx.checkBody('userName').notEmpty()
+        // ctx.checkBody('password').notEmpty()
+        // ctx.checkBody('phone').notEmpty()
+        // ctx.checkBody('style').notEmpty()
+
         // ctx.checkBody('adminType').notEmpty()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors)
             return;
         }
         let body = ctx.request.body;
+        let admins = await Admins.findOne({
+            where: {
+                phone: body.phone,
+                nickname: body.userName
+            }
+        })
+        if(admins==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"用户名和密码不能为空")
+            return
+        }else{
+            await Admins.update({
+                name: body.name == null ? "超级管理员" : body.name,
+                password: body.password,
+                style : body.style
+            },{
+                where: {
+                    nickname: body.userName,
+                    phone: body.phone,
+                }
+            })
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
+            return;
+        }
         let admin = await Admins.findOne({
             where: {
                 nickname: body.userName
             }
         })
         if (admin != null) {
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "用户名已存在！");
+            await Admins.update({
+                name: body.name == null ? "超级管理员" : body.name,
+                password: body.password,
+                phone: body.phone,
+                style : body.style
+            },{
+                where: {
+                    nickname: body.userName,
+                }
+            })
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
             return;
         }
         let adminPhone = await Admins.findOne({
@@ -163,23 +196,20 @@ module.exports = {
             }
         })
         if (adminPhone != null) {
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "手机号已存在已存在！");
+            await Admins.update({
+                nickname: body.userName,
+                name: body.name == null ? "超级管理员" : body.name,
+                password: body.password,
+                style : body.style
+            },{
+                where: {
+                    phone: body.phone,
+                }
+            })
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
             return;
         }
-        await Admins.update({
-            nickname: body.userName,
-            name: body.name == null ? "超级管理员" : body.name,
-            password: body.password,
-            phone: body.phone,
-            style : body.style
-        },{
-            where: {
-                id: body.id
-            }
-        })
-
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
-
+        ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR)
     },
     async putAdmin(ctx, next){
         let admin = await Admins.findAll({})
@@ -232,7 +262,7 @@ module.exports = {
                 await admins.save()
             }
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+        ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR)
     },
 
     async getAdminAllTenantId(ctx, next){

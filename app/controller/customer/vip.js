@@ -14,14 +14,14 @@ module.exports = {
         }
         let vips = await Vips.findAll({
             where: {
-                phone: ctx.request.body.phone,
+                phone: ctx.query.phone,
                 tenantId: ctx.query.tenantId
             }
         })
         if (vips.length > 0) {
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result, true)
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, true)
         } else {
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result, false)
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, false)
         }
     },
 

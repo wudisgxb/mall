@@ -44,20 +44,23 @@ module.exports = {
             }
         })
         if (vips.length > 0) {
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "此商圈下会员已存在")
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "此商圈下此会员已存在")
             return;
         }
-        let vipsNum = await Vip.findAll({
-            where: {
-                membershipCardNumber: body.vip.membershipCardNumber,
-                alliancesId:allianceMerchants.alliancesId
-                // tenantId: body.tenantId
+        if(body.vip.membershipCardNumber!=null&&body.vip.membershipCardNumber!=""){
+            let vipsNum = await Vip.findAll({
+                where: {
+                    membershipCardNumber: body.vip.membershipCardNumber,
+                    alliancesId:allianceMerchants.alliancesId
+                    // tenantId: body.tenantId
+                }
+            })
+            if(vipsNum>0){
+                ctx.body = new ApiResult(ApiResult.Result.EXISTED, "此商圈下此卡号已存在")
+                return;
             }
-        })
-        if(vipsNum>0){
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "此商圈下卡号已存在")
-            return;
         }
+
 
         if(body.vip.referralPhone!=""&&body.vip.referralPhone!=null){
             let vip = await Vip.findOne({
@@ -68,6 +71,7 @@ module.exports = {
             })
             if(vip==null){
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此推荐人的电话")
+                return
             }
             let aggregateScore = Number(vip.aggregateScore)+5
             await Vip.update({
@@ -87,7 +91,8 @@ module.exports = {
                 }
             })
             if(vip==null){
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此推荐人的电话")
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此推荐人名字")
+                return
             }
             let aggregateScore = Number(vip.aggregateScore)+5
             await Vip.update({
@@ -106,7 +111,7 @@ module.exports = {
             alliancesId : allianceMerchants.alliancesId,
             birthday :body.vip.birthday,
             name :body.vip.name,
-            membershipCardNumber :body.vip.membershipCardNumber,
+            membershipCardNumber :body.vip.membershipCardNumber==null?"":body.vip.membershipCardNumber,
             referralPhone :body.vip.referralPhone,
             referral :body.vip.referral,
             aggregateScore : 10
@@ -121,7 +126,7 @@ module.exports = {
         ctx.checkBody('/condition/alliancesId', true).first().notEmpty();
         ctx.checkBody('/vip/birthday', true).first().notEmpty();
         ctx.checkBody('/vip/name', true).first().notEmpty();
-        ctx.checkBody('/vip/phone', true).first().notEmpty();
+        ctx.checkBody('/condition/phone', true).first().notEmpty();
         ctx.checkBody('/vip/referral', true).first().notEmpty();
         ctx.checkBody('/vip/referralPhone', true).first().notEmpty();
         let body = ctx.request.body;
@@ -136,17 +141,17 @@ module.exports = {
             }
         })
         if(vips==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"此上去啊下没找到该会员信息，请先注册")
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没找到该会员信息，请先注册")
             return
         }
         if (vips != null) {
-            vips.phone = body.vip.phone;
+            vips.phone = body.condition.phone;
             vips.birthday = body.vip.birthday;
             vips.name = body.vip.name;
             vips.referral = body.vip.referral;
             vips.referralPhone = body.vip.referralPhone;
             // vips.tenantId = body.condition.tenantId;
-            vips.id = body.condition.id;
+            vips.alliancesId = body.condition.alliancesId;
             await vips.save();
 
         }
@@ -182,7 +187,7 @@ module.exports = {
                 offset: Number(place),
                 limit: Number(pageSize)
             });
-        }else if(ctx.query.pageNumber==null&&ctx.query.pageSize==null){
+        }else if(ctx.query.pageNumber==null||ctx.query.pageSize==null||ctx.query.pageNumber==""||ctx.query.pageSize==""){
 
             vips = await Vip.findAll({
                 where: {
@@ -193,24 +198,51 @@ module.exports = {
 
         if (vips.length == 0) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip");
+            return
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, vips);
+    },
+
+    async getAdminVipCount (ctx, next) {
+        ctx.checkQuery('tenantId').notEmpty();
+
+        if (ctx.errors) {
+            new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
+            return;
+        }
+
+        //每页显示的大小
+        let vips
+
+
+        vips = await Vip.findAll({
+            where: {
+                tenantId: ctx.query.tenantId
+            }
+        });
+
+
+        if (vips.length == 0) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip");
+            return
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, vips.length);
     },
 
     //删除会员信息
     async deleteAdminVip(ctx, next){
 
         ctx.checkQuery('id').notEmpty().isInt().toInt();
-        ctx.checkQuery('tenantId').notEmpty();
+        // ctx.checkQuery('tenantId').notEmpty();
 
         let vip = await Vip.findOne({
             where: {
-                id: ctx.query.id,
-                tenantId: ctx.query.tenantId
+                id: ctx.query.id
             }
         });
         if (vip == null) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip记录");
+            return
         }
         await vip.destroy();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
@@ -278,71 +310,69 @@ module.exports = {
         return 1
     },
 
-    async getAdminVipCount (ctx, next) {
-        ctx.checkQuery('tenantId').notEmpty();
-        ctx.checkQuery('alliancesId').notEmpty();
-        if (ctx.errors) {
-            new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
-            return;
-        }
-        let alliancesId = ctx.query.alliancesId
-        let find = await this.getAdminVipsFind(alliancesId)
-        console.log(find)
-        if(find==0){
-            ctx.body = new ApiResult(ApiResult.Result.EXISTED,"查询不到此商圈")
-            return
-        }
-        let vipsCount
-        if(ctx.query.tenantId!=null&&ctx.query.alliancesId==null) {
-            // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
-            // if(tenantIdOrAlliancesId==1){
-                vipsCount = await Vip.count({
-                    where: {
-                        tenantId: ctx.query.tenantId
-                    }
-                });
-            // }else{
-            //     return tenantIdOrAlliancesId
-            // }
-        }
-        if(ctx.query.tenantId!=null&&ctx.query.alliancesId!=null){
-            // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
-            // if(tenantIdOrAlliancesId==1){
-                vipsCount = await Vip.count({
-                    where: {
-                        tenantId: ctx.query.tenantId,
-                        alliancesId : ctx.query.alliancesId
-                    }
-                });
-            // }else{
-            //     return tenantIdOrAlliancesId
-            // }
-
-        }
-        if(ctx.query.alliancesId!=null&&ctx.query.tenantId==null){
-            // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
-            // if(tenantIdOrAlliancesId==1){
-                vipsCount = await Vip.count({
-                    where: {
-                        alliancesId: ctx.query.alliancesId
-                    }
-                });
-            // }else{
-            //     return tenantIdOrAlliancesId
-            // }
-
-        }
-
-
-        // if (vips.length == 0) {
-        //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip");
-        // }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, vipsCount);
-    },
+    // async getAdminVipCount (ctx, next) {
+    //     ctx.checkQuery('tenantId').notEmpty();
+    //     ctx.checkQuery('alliancesId').notEmpty();
+    //     if (ctx.errors) {
+    //         new ApiResult(ApiResult.Result.DB_ERROR, ctx.errors);
+    //         return;
+    //     }
+    //     let alliancesId = ctx.query.alliancesId
+    //     let find = await this.getAdminVipsFind(alliancesId)
+    //     console.log(find)
+    //     if(find==0){
+    //         ctx.body = new ApiResult(ApiResult.Result.EXISTED,"查询不到此商圈")
+    //         return
+    //     }
+    //     let vipsCount
+    //     if(ctx.query.tenantId!=null&&ctx.query.alliancesId==null) {
+    //         // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
+    //         // if(tenantIdOrAlliancesId==1){
+    //             vipsCount = await Vip.count({
+    //                 where: {
+    //                     tenantId: ctx.query.tenantId
+    //                 }
+    //             });
+    //         // }else{
+    //         //     return tenantIdOrAlliancesId
+    //         // }
+    //     }
+    //     if(ctx.query.tenantId!=null&&ctx.query.alliancesId!=null){
+    //         // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
+    //         // if(tenantIdOrAlliancesId==1){
+    //             vipsCount = await Vip.count({
+    //                 where: {
+    //                     tenantId: ctx.query.tenantId,
+    //                     alliancesId : ctx.query.alliancesId
+    //                 }
+    //             });
+    //         // }else{
+    //         //     return tenantIdOrAlliancesId
+    //         // }
+    //
+    //     }
+    //     if(ctx.query.alliancesId!=null&&ctx.query.tenantId==null){
+    //         // let tenantIdOrAlliancesId = await tenantIdOrAlliancesId(ctx.query.tenantId,ctx.query.alliancesId)
+    //         // if(tenantIdOrAlliancesId==1){
+    //             vipsCount = await Vip.count({
+    //                 where: {
+    //                     alliancesId: ctx.query.alliancesId
+    //                 }
+    //             });
+    //         // }else{
+    //         //     return tenantIdOrAlliancesId
+    //         // }
+    //
+    //     }
+    //
+    //
+    //     // if (vips.length == 0) {
+    //     //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此vip");
+    //     // }
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, vipsCount);
+    // },
 
     async fonds(ctx,next){
-
-
         ctx.checkBody('tenantId').notEmpty()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)

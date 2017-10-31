@@ -118,7 +118,7 @@ module.exports = {
                     style : JSON.parse(merchant[i].style),
 
                 }
-                merchantArray.push(merchantJson)
+                merchantArray.push(await merchantJson)
             }
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, merchantArray);
         }

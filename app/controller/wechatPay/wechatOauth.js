@@ -1403,8 +1403,8 @@ module.exports = {
             return
         }
         let body = ctx.request.body
-        let a = await this.mounthTransferAccounts(body.tenantId)
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,a)
+        await this.mounthTransferAccounts(body.tenantId)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
     async queryTransferInfo(ctx, next) {
@@ -1415,6 +1415,6 @@ module.exports = {
         const fn = co.wrap(wxpay.queryTransferInfo.bind(wxpay))
 
         const result = await fn(params)
-        ctx.body = result
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
 }

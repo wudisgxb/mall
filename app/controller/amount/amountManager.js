@@ -936,9 +936,9 @@ const amountManger = (function () {
                 terracePrice += terracePriceOne
             }
             goodsMessgae={
-                totalPrices : totalPrice,
-                saleGoodsTotalPrices : saleGoodsTotalPrice,
-                profitPrice : profitPriceOne,
+                totalPrices : totalPrice,//总价格
+                saleGoodsTotalPrices : saleGoodsTotalPrice,//总进价
+                profitPrice : profitPriceOne,//商品的利润
                 merchantTotalPrice : merchantTotalPriceOne,
                 terracePrice : terracePriceOne,
                 foodName : og.goodsName,

@@ -10,6 +10,7 @@ var PaymentReqs = db.models.PaymentReqs;
 var Tables = db.models.Tables;
 let Consignees = db.models.Consignees;
 let Merchants = db.models.Merchants;
+let TenantConfigs = db.models.TenantConfigs;
 const amoutManager = require('../amount/amountManager');
 
 module.exports = {
@@ -210,32 +211,47 @@ module.exports = {
                 console.log("重要信息，未找到支付请求，订单号=========" + orders[k].trade_no);
             }
 
-            let amount = await amoutManager.getTransAccountAmount(ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
+            let tenantconfig = await TenantConfigs.findOne({
+                where:{
+                    tenantId : ctx.query.tenantId
+                }
+            })
+            if(tenantconfig.isProfitRate){
+                let getProfitRate = await amoutManager.getProfitRate(ctx.query.tenantId,orders[k].trade_no)
+                if(getProfitRate.totalPrices > 0){
+                    result[k].totalPrice = getProfitRate.totalPrices;
+                    result[k].platformCouponFee = getProfitRate.terracePrice;
+                    result[k].merchantCouponFee = getProfitRate.merchantTotalPrice;
+                }
 
-            //简单异常处理
-            if (amount.totalAmount > 0) {
-                result[k].totalPrice = amount.totalPrice;
-                result[k].platformCouponFee = amount.platformCouponFee;
-                result[k].merchantCouponFee = amount.merchantCouponFee;
-                result[k].deliveryFee = amount.deliveryFee;
-                result[k].refund_amount = refund_amount;
-                result[k].platformAmount = amount.platformAmount;
-                result[k].merchantAmount = amount.merchantAmount;
-                result[k].consigneeAmount = amount.consigneeAmount;
-                result[k].couponType = amount.couponType;
-                result[k].couponValue = amount.couponValue;
-            } else {
-                result[k].totalPrice = 0;
-                result[k].platformCouponFee = 0;
-                result[k].merchantCouponFee = 0;
-                result[k].deliveryFee = 0;
-                result[k].refund_amount = 0;
-                result[k].platformAmount = 0;
-                result[k].merchantAmount = 0;
-                result[k].consigneeAmount = 0;
-                result[k].couponType = null;
-                result[k].couponValue = null
+            }else{
+                let amount = await amoutManager.getTransAccountAmount(ctx.query.tenantId, orders[k].consigneeId, orders[k].trade_no, result[k].paymentMethod, refund_amount);
+                //简单异常处理
+                if (amount.totalAmount > 0) {
+                    result[k].totalPrice = amount.totalPrice;
+                    result[k].platformCouponFee = amount.platformCouponFee;
+                    result[k].merchantCouponFee = amount.merchantCouponFee;
+                    result[k].deliveryFee = amount.deliveryFee;
+                    result[k].refund_amount = refund_amount;
+                    result[k].platformAmount = amount.platformAmount;
+                    result[k].merchantAmount = amount.merchantAmount;
+                    result[k].consigneeAmount = amount.consigneeAmount;
+                    result[k].couponType = amount.couponType;
+                    result[k].couponValue = amount.couponValue;
+                } else {
+                    result[k].totalPrice = 0;
+                    result[k].platformCouponFee = 0;
+                    result[k].merchantCouponFee = 0;
+                    result[k].deliveryFee = 0;
+                    result[k].refund_amount = 0;
+                    result[k].platformAmount = 0;
+                    result[k].merchantAmount = 0;
+                    result[k].consigneeAmount = 0;
+                    result[k].couponType = null;
+                    result[k].couponValue = null
+                }
             }
+
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },

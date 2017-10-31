@@ -375,6 +375,7 @@ module.exports = {
 
 
         if(ctx.query.action==0){
+            
             customers = await Customers.count({
                 where:{
                     tenantId : ctx.query.tenantId,
@@ -520,22 +521,7 @@ module.exports = {
             })
         }
 
-
-        let cusArray = []
-        for(let cus of customers){
-            let cusJson = {}
-            let vip
-            if(cus.isVip){
-                vip = await Vips.findOne({
-                    phone : cus.phone
-                })
-            }
-            cusJson.id = cus.id
-            cusJson.phone=cus.phone
-            cusJson.vip = cus.isVip==false?{}:vip
-            cusArray.push(cusJson)
-        }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customers.length)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,customers)
     }
 
 }
