@@ -35,5 +35,9 @@ module.exports.Result = {
     PARAMS_ERROR: {
         resCode: PARAMS_ERROR,
         resMsg: 'PARAMS_ERROR'
+    },
+    IMPORT_ERROR:{
+        resCode: 10004,
+        resMsg: '输入错误'
     }
 }

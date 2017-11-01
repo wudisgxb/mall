@@ -375,7 +375,7 @@ module.exports = {
 
 
         if(ctx.query.action==0){
-            
+
             customers = await Customers.count({
                 where:{
                     tenantId : ctx.query.tenantId,

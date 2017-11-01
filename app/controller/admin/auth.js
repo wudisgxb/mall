@@ -112,7 +112,7 @@ module.exports = {
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
                     name : admin.nickname,
-                    token
+                    // token
                 })
             }
             if(adminCorresponding.correspondingType==2){
@@ -126,20 +126,20 @@ module.exports = {
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
                     name : admin.nickname,
-                    token
+                    // token
                 })
             }
             if(adminCorresponding.correspondingType==1){
-                let headquarterJson = {
-                    headquartersId: adminCorresponding.correspondingId
-                }
+                // let headquarterJson = {
+                //     headquartersId: adminCorresponding.correspondingId
+                // }
                 // let getHeadquarter = await headQuarters.getHeadquarter(headquarterJson)
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                     headquartersId : adminCorresponding.correspondingId,
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
                     name : admin.nickname,
-                    token
+                    // token
                 })
             }
         }
