@@ -95,7 +95,46 @@ module.exports = {
     },
 
     async getAdminGoodsPromotion (ctx, next) {
+
         let keys = ['id', 'QRCodeTemplateId', 'goodsId', 'goodsName', 'target', 'originalPrice', 'discount', 'activityPrice', 'couponRate', 'purchaseLimit', 'tenantId'];
+
+        const condition = await keys.reduce((accu, curr) => {
+            if (ctx.query[curr]) {
+                accu[curr] = ctx.query[curr]
+            }
+            return accu;
+        }, {})
+        let pageNumber = parseInt(ctx.query.pageNumber);
+
+        if(pageNumber<1){
+            pageNumber=1
+        }
+
+        let pageSize = parseInt(ctx.query.pageSize);
+        if(pageNumber<1){
+            pageNumber=1
+        }
+        let place = (pageNumber - 1) * pageSize;
+        let goodsPromotions
+        if(ctx.query.pageSize!=null&&ctx.query.pageSize!=""&&ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""){
+            goodsPromotions = await GoodsPromotions.findAll({
+                where: condition,
+                offset: Number(place),
+                limit: Number(pageSize)
+            });
+        }else{
+            goodsPromotions = await GoodsPromotions.findAll({
+                where: condition
+            });
+        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, goodsPromotions);
+    },
+
+    async getAdminGoodsPromotionCount (ctx, next) {
+
+        let keys = ['id', 'QRCodeTemplateId', 'goodsId', 'goodsName', 'target', 'originalPrice', 'discount', 'activityPrice', 'couponRate', 'purchaseLimit', 'tenantId'];
+
         const condition = await keys.reduce((accu, curr) => {
             if (ctx.query[curr]) {
                 accu[curr] = ctx.query[curr]
@@ -103,7 +142,8 @@ module.exports = {
             return accu;
         }, {})
 
-        let goodsPromotions = await GoodsPromotions.findAll({
+        let goodsPromotions
+        goodsPromotions = await GoodsPromotions.count({
             where: condition
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, goodsPromotions);
