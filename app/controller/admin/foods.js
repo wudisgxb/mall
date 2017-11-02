@@ -366,11 +366,11 @@ module.exports = {
                     'name'
                 ]
             });
-            let unit = await Units.findOne({
-                where:{
-                    id : foods[i].unitId
-                }
-            })
+            // let unit = await Units.findOne({
+            //     where:{
+            //         goodUnit : foods[i].unit
+            //     }
+            // })
             let minuteImage
             try{
                 if(foods[i].minuteImage!=null){
@@ -400,7 +400,7 @@ module.exports = {
             // foodsJson[i].name = foods[i].name;
             foodsJson.info = foods[i].info;
             foodsJson.menuName = menuName[0].name;
-            foodsJson.unit = unit.goodUnit;
+            foodsJson.unit = foods[i].unit;
             foodsJson.cardId = foods[i].cardId;
             foodsJson.integral = foods[i].integral;
             foodsArray.push(foodsJson)

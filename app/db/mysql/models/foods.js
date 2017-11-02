@@ -38,7 +38,7 @@ module.exports = function (sequelize, DataTypes) {
 
         info: shortDataTypes.String(),
         isActive: shortDataTypes.Bool(),
-        unitId: shortDataTypes.String(),
+        unit: shortDataTypes.String(),
 
         integral : shortDataTypes.Int(),//积分
 
