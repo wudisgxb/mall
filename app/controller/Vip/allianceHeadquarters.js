@@ -8,6 +8,7 @@ const sqlAllianceHeadquarters = require('../businessAlliance/allianceHeadquarter
 const sqlAllianceMerchants = require('../businessAlliance/allianceMerchants')
 const sqlAlliances = require('../businessAlliance/alliances')
 const sqlHeadquarters = require('../businessAlliance/headquarters')
+const headQuarters = require('../businessAlliance/headquarters')
 const AllianceMerchants = db.models.AllianceMerchants;
 const Foods = db.models.Foods
 
@@ -117,26 +118,28 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到这个配置")
             return
         }
+
         await sqlAllianceHeadquarters.deleteAllianceHeadquarters(whereJson)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     async getAllianceHeadquarters(ctx,next){
         ctx.checkQuery('alliancesId').notEmpty()
-        ctx.checkQuery('headquartersId').notEmpty()
+        // ctx.checkQuery('headquartersId').notEmpty()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return;
         }
         let whereJson = {
             alliancesId : ctx.query.alliancesId,
-            headquartersId : ctx.query.headquartersId
+            // headquartersId : ctx.query.headquartersId
         }
         let allianceHeadquarters = await sqlAllianceHeadquarters.getAllianceHeadquarters(whereJson);
         if(allianceHeadquarters==null){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到这个商圈Id")
             return
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,allianceHeadquarters)
+        let headquarter = await headQuarters.getHeadquarter({headquartersId :allianceHeadquarters.headquartersId});
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,headquarter)
     },
     async getAllianceHeadquartersByheadquartersId(ctx,next){
         ctx.checkQuery('headquartersId').notEmpty()

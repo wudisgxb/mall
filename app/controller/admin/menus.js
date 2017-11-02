@@ -13,7 +13,10 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-
+        if(body.menu.name==""){
+            ctx.body = new ApiResult(ApiResult.Result.EXISTED, "菜品类别不能为空")
+            return;
+        }
         let body = ctx.request.body;
         let menusResult = await Menus.findAll({
             where: {

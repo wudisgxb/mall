@@ -166,14 +166,19 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到这个商圈Id")
             return
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,allianceMerchant)
+        let alliance = await Alliances.findOne({
+            where:{
+                alliancesId : allianceMerchant.alliancesId
+            }
+        })
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,alliance)
     },
     async getAllianceMerchantsByAllianceId(ctx,next){
         ctx.checkQuery('alliancesId').notEmpty()
         if(ctx.errors){
         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
         return;
-    }
+        }
         let whereJson = {
             alliancesId : ctx.query.alliancesId
         }
