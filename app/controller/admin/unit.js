@@ -8,6 +8,7 @@ module.exports = {
     //新增商品类型
     async saveAdminMenus (ctx, next) {
         ctx.checkBody('/unit/goodUnit', true).first().notBlank();
+        ctx.checkBody('/unit/tenantId', true).first().notBlank();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -20,7 +21,8 @@ module.exports = {
         // }
         let unit = await Units.findOne({
             where: {
-                goodUnit: body.unit.goodUnit
+                goodUnit: body.unit.goodUnit,
+                tenantId : body.unit.tenantId
             }
         });
         if (unit!=null) {
@@ -29,8 +31,8 @@ module.exports = {
         }
 
         await Units.create({
-            goodUnit : body.unit.goodUnit
-
+            goodUnit : body.unit.goodUnit,
+            tenantId : body.unit.tenantId
             // todo: ok?
             //deletedAt: Date.now()
         });
@@ -40,6 +42,7 @@ module.exports = {
     //修改商品类型
     async updateAdminMenusById (ctx, next) {
         ctx.checkBody('/condition/id', true).first().notEmpty();
+        ctx.checkBody('/condition/tenantId', true).first().notEmpty();
         ctx.checkBody('/unit/goodUnit', true).first().notBlank();
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -52,7 +55,8 @@ module.exports = {
         // }
         let unit = await Units.findOne({
             where: {
-                id: body.condition.id
+                id: body.condition.id,
+                tenantId : body.condition.tenantId
             }
         });
         if (unit == null) {
@@ -66,17 +70,29 @@ module.exports = {
     },
     //
     async getAdminMenus (ctx, next) {
-        // ctx.checkQuery('tenantId').notEmpty();
-        // if (ctx.errors) {
-        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
-        //     return;
-        // }
+        ctx.checkQuery('tenantId').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
         let units = await Units.findAll({
             where: {
-                tenantId: ctx.query.tenantId
-            },
-            attributes: {
-                exclude: ['createdAt', 'updatedAt', 'deletedAt']
+                tenantId : ctx.query.tenantId
+            }
+        });
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, units);
+    },
+    async getAdminMenusById (ctx, next) {
+        ctx.checkQuery('Id').notEmpty();
+        ctx.checkQuery('tenantId').notEmpty();
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+        let units = await Units.findOne({
+            where: {
+                id : ctx.query.id,
+                tenantId : ctx.query.tenantId
             }
         });
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, units);
