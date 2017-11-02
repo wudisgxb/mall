@@ -6,7 +6,9 @@ let getFoodNum = require('../../controller/statistics/statistics');
 let OrderGoods = db.models.OrderGoods
 let Foods = db.models.Foods;
 let Menus = db.models.Menus;
+let Units = db.models.Units;
 let Foodsofmenus = db.models.FoodsOfTMenus;
+let FoodsOfUnits = db.models.FoodsOfUnits;
 const Tool = require('../../Tool/tool');
 
 
@@ -30,14 +32,14 @@ module.exports = {
     async saveAdminFoods (ctx, next) {
         ctx.checkBody('/food/name', true).first().notEmpty();
         ctx.checkBody('/food/image', true).first().notEmpty();
-        ctx.checkBody('/food/minuteImage',true).first().notEmpty();//详细图片
+        // ctx.checkBody('/food/minuteImage',true).first().notEmpty();//详细图片
         // ctx.checkBody('/food/icon', true).first().notEmpty();
         ctx.checkBody('/food/price', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/constPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/oldPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         ctx.checkBody('/food/vipPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
-        ctx.checkBody('/food/info', true).first().notEmpty();
-        ctx.checkBody('/food/unit', true).first().notEmpty();
+        // ctx.checkBody('/food/info', true).first().notEmpty();
+        ctx.checkBody('/food/unitId', true).first().notBlank();
         ctx.checkBody('/food/foodNum', true).first().notEmpty();
         ctx.checkBody('/food/menuId', true).first().notEmpty();
         ctx.checkBody('/food/isActive', true).first().notEmpty();
@@ -78,6 +80,15 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"请选择菜品类别")
             return
         }
+        let unit = await Units.findOne({
+            where:{
+                id : body.food.unitId
+            }
+        })
+        if(unit==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此单位")
+            return
+        }
 
         let image
 
@@ -87,10 +98,12 @@ module.exports = {
             image = body.food.image
         }
         let minuteImage =[]
-        if(Tool.isArray(body.food.minuteImage)){
-            minuteImage = body.food.minuteImage
-        }else{
-            minuteImage.push(body.food.minuteImage)
+        if(body.food.minuteImage!=null){
+            if(Tool.isArray(body.food.minuteImage)){
+                minuteImage = body.food.minuteImage
+            }else{
+                minuteImage.push(body.food.minuteImage)
+            }
         }
 
         let foods;
@@ -108,7 +121,7 @@ module.exports = {
             foodNum: body.food.foodNum,
             rating: body.food.rating,
             info: body.food.info,
-            unit: body.food.unit,
+            unitId: body.food.unitId,
             cardId:body.food.cardId,
             taste: JSON.stringify(body.food.taste),
             isActive: body.food.isActive,
@@ -118,9 +131,11 @@ module.exports = {
             // todo: ok?
             //deletedAt: Date.now()
         });
-
-
-
+        if(body.food.unit==null){
+            await Units.create({
+                goodUnit : body.food.unit
+            })
+        }
         await Foodsofmenus.create({
             FoodId: foods.id,
             MenuId: body.food.menuId,
@@ -142,6 +157,7 @@ module.exports = {
         ctx.checkBody('/food/sellCount', true).first().notEmpty().isInt().ge(0).toInt();
         ctx.checkBody('/food/rating', true).first().notEmpty().isInt().ge(0).toInt();
         ctx.checkBody('/food/info', true).first().notEmpty();
+        ctx.checkBody('/food/unit', true).first().notEmpty();
         ctx.checkBody('/food/isActive', true).first().notEmpty();
         ctx.checkBody('/food/foodNum', true).first().notEmpty();
         ctx.checkBody('/food/menuId', true).first().notEmpty();
@@ -180,6 +196,16 @@ module.exports = {
             minuteImage.push(body.food.minuteImage)
         }
 
+        let unit = await Units.findOne({
+            where:{
+                goodUnit :body.food.unit
+            }
+        })
+        if(unit==null){
+            await Units.create({
+                goodUnit : body.food.unit
+            })
+        }
         if (foods != null) {
             foods.id = body.condition.id;
             foods.name = body.food.name;
@@ -340,6 +366,11 @@ module.exports = {
                     'name'
                 ]
             });
+            let unit = await Units.findOne({
+                where:{
+                    id : foods[i].unitId
+                }
+            })
             let minuteImage
             try{
                 if(foods[i].minuteImage!=null){
@@ -369,7 +400,7 @@ module.exports = {
             // foodsJson[i].name = foods[i].name;
             foodsJson.info = foods[i].info;
             foodsJson.menuName = menuName[0].name;
-            foodsJson.unit = foods[i].unit;
+            foodsJson.unit = unit.goodUnit;
             foodsJson.cardId = foods[i].cardId;
             foodsJson.integral = foods[i].integral;
             foodsArray.push(foodsJson)
@@ -379,7 +410,7 @@ module.exports = {
     },
     //
     async getAdminFoodsByCount(ctx, next){
-        ctx.checkQuery('tenantId').notEmpty()
+        ctx.checkQuery('tenantId').notBlank()
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
             return;
