@@ -112,7 +112,7 @@ module.exports = {
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
                     name : admin.nickname,
-                    token
+                    // token
                 })
             }
             if(adminCorresponding.correspondingType==2){
@@ -126,7 +126,7 @@ module.exports = {
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
                     name : admin.nickname,
-                    token
+                    // token
                 })
             }
             if(adminCorresponding.correspondingType==1){
@@ -139,7 +139,7 @@ module.exports = {
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
                     name : admin.nickname,
-                    token
+                    // token
                 })
             }
         }
