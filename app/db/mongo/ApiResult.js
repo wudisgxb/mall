@@ -27,6 +27,18 @@ module.exports.Result = {
         resCode: 10001,
         resMsg: '记录已存在'
     },
+    CREATE_ERROR: {
+        resCode: 1002,
+        resMsg: '数据添加错误'
+    },
+    UPDATE_ERROR: {
+        resCode: 1003,
+        resMsg: '数据库编辑错误'
+    },
+    SELECT_ERROR: {
+        resCode: 1004,
+        resMsg: '数据库查询错误'
+    },
 
     PARAMS_ERROR: {
     resCode: PARAMS_ERROR,

@@ -40,6 +40,7 @@ module.exports = {
             result.invaildTime = tenantInfo.invaildTime;
             result.longitude = tenantInfo.longitude;
             result.latitude = tenantInfo.latitude;
+            result.phone = merchant.phone;
             result.needChoosePeopleNumberPage = tenantInfo.needChoosePeopleNumberPage;
             result.openFlag = tenantInfo.openFlag;
             result.officialNews = tenantInfo.officialNews;

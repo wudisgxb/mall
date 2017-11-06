@@ -111,8 +111,8 @@ module.exports = {
         }
 
         let pageSize = parseInt(ctx.query.pageSize);
-        if(pageNumber<1){
-            pageNumber=1
+        if(pageSize<1){
+            pageSize=1
         }
         let place = (pageNumber - 1) * pageSize;
         let goodsPromotions

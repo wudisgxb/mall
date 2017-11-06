@@ -99,7 +99,7 @@ module.exports = {
             }
 
             let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
-            const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
+            // const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
             // console.log(token)
             if(adminCorresponding.correspondingType==3){
                 let tenantJson = {

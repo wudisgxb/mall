@@ -9,7 +9,7 @@ module.exports = function (sequelize, DataTypes) {
          * 主商户名
          */
         name: shortDataTypes.String(100, false),
-        phone: shortDataTypes.Phone(true),
+        phone: shortDataTypes.String(true),
         //商户类型
         industry: {
             type: DataTypes.STRING,

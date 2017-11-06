@@ -877,7 +877,7 @@ const amountManger = (function () {
     }
     //查询商家利润
     let getProfitRate = async function (tenantId,trade_no) {
-
+        console.log(444444444444444444444444)
         let totalPrices = 0//总价格
         let saleGoodsTotalPrices = 0//进价
         let profitPrice = 0//单个商品的价格
@@ -891,7 +891,7 @@ const amountManger = (function () {
                 tenantId : tenantId
             }
         })
-
+        console.log(tenantConfigs)
         if (tenantConfigs == null) {
             return "没找到当前租户信息"
         }
@@ -946,13 +946,14 @@ const amountManger = (function () {
             }
             goodsArray.push(goodsMessgae)
         }
-
+        console.log(totalPrices)
         goodsJson.totalPrices= totalPrices,
         goodsJson.saleGoodsTotalPrices = saleGoodsTotalPrices,
         goodsJson.profitPrice = profitPrice,
         goodsJson.merchantTotalPrice = merchantTotalPrice,
         goodsJson.terracePrice = terracePrice,
         goodsJson.goodsArray = goodsArray
+        console.log(goodsJson)
         return goodsJson
 
     }

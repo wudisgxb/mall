@@ -30,7 +30,7 @@ module.exports = function (app) {
                 if (err instanceof ApiError) {
                     ctx.body = err
                 } else {
-                    ctx.body = 'Server Internal Error!'
+                    ctx.body = '您的服务器报500错误'
                 }
                 ctx.app.emit('error', err, ctx)
             }
