@@ -39,9 +39,10 @@ module.exports = {
             })
 
             for(let i = 0; i < inStock.length; i++){
-                let goodsNumber = await GoodsInfos.create({
+                let goodsNumber = await GoodsInfos.findOne({
                     where:{
-
+                        tenantId : inStock[i].tenantId,
+                        name : inStock[i].name,
                     }
                 })
                 await InStocks.create({

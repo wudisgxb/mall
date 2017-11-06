@@ -274,6 +274,7 @@ module.exports = {
         //         foodsofmenus.tenantId = body.tenantId;
         //         await foodsofmenus.save();
         //     }
+        console.log(condition)
         await Foods.update(
             condition
         ,{where:{
@@ -363,7 +364,7 @@ module.exports = {
         let foodsArray = [];
         //判断是否传了菜的Id
         if(ctx.query.menuId!=null&&ctx.query.menuId!=""){
-            console.log(55555555)
+
             //判断是否传了分页参数
             if(ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""&&ctx.query.pageSize!=null&&ctx.query.pageSize!=""){
                 if(ctx.query.name!=null&&ctx.query.name!=""){
@@ -396,7 +397,8 @@ module.exports = {
                             },
                             name :{
                                 $like : "%"+ctx.query.name+"%"
-                            }
+                            },
+                            isActive : true
                         },
 
                         offset: Number(place),
@@ -477,9 +479,9 @@ module.exports = {
                         where:{
                             id :{
                                 $in :foodId
-                            }
+                            },
+                            isActive : 1
                         },
-
                         offset: Number(place),
                         limit: Number(pageSize)
                     })
@@ -569,7 +571,8 @@ module.exports = {
                             },
                             name :{
                                 $like : "%"+ctx.query.name+"%"
-                            }
+                            },
+                            isActive:1
                         }
                     })
                     console.log(food)
@@ -714,7 +717,8 @@ module.exports = {
                             tenantId: ctx.query.tenantId,//iftenantId="68d473e77f459833bb06c60f9a8f4809"
                             name : {
                                 $like : "%"+name+"%"
-                            }
+                            },
+                            isActive : true
                         },
                         offset: Number(place),
                         limit: Number(pageSize)
@@ -725,7 +729,8 @@ module.exports = {
 
                     foods = await Foods.findAll({
                         where: {
-                            tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
+                            tenantId: ctx.query.tenantId,//iftenantId="68d473e77f459833bb06c60f9a8f4809"
+                            isActive : true
                         },
                         offset: Number(place),
                         limit: Number(pageSize)
@@ -752,7 +757,8 @@ module.exports = {
                     foods = await Foods.findAll({
                         where: {
                             tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
-                        }
+                        },
+                        isActive : true
                     });
                 }
             }
