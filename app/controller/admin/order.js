@@ -135,14 +135,14 @@ module.exports = {
                     tenantId : orders[k].tenantId
                 }
             })
-            console.log(222222222222222222)
+            // console.log(222222222222222222)
             if(tenantconfig.isProfitRate){
                 let getProfitRate = await amoutManager.getProfitRate(orders[k].tenantId,orders[k].trade_no)
-                console.log(1111111111111111)
-                console.log(getProfitRate.totalPrices)
+                // console.log(1111111111111111)
+                // console.log(getProfitRate.totalPrices)
                 if(getProfitRate.totalPrices > 0){
-                    console.log(getProfitRate.totalPrices)
-                    console.log(333333333333333)
+                    // console.log(getProfitRate.totalPrices)
+                    // console.log(333333333333333)
                     result[k].totalPrice = getProfitRate.totalPrices;
                     result[k].platformCouponFee = getProfitRate.terracePrice;
                     result[k].merchantCouponFee = getProfitRate.merchantTotalPrice;
