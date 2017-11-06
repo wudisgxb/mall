@@ -178,8 +178,9 @@ module.exports = {
         let body = ctx.request.body;
         let keys = ['name', 'image', 'minuteImage', 'icon', 'price', 'constPrice', 'oldPrice',
             'vipPrice', 'sellCount', 'rating', 'info', 'unit', 'isActive', 'foodNum'];
-        const condition = await keys.reduce((accu, curr) => {
-            if (body.food[curr]) {
+        const condition = await keys.reduce((accu, curr,curi,array) => {
+            // console.log(body.food[curr]!=null)
+            if (body.food[curr]!=null) {
                 accu[curr] = body.food[curr]
             }
             return accu;
