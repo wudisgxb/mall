@@ -398,8 +398,7 @@ module.exports = {
                             },
                             name :{
                                 $like : "%"+ctx.query.name+"%"
-                            },
-                            isActive : true
+                            }
                         },
 
                         offset: Number(place),
@@ -480,8 +479,7 @@ module.exports = {
                         where:{
                             id :{
                                 $in :foodId
-                            },
-                            isActive : 1
+                            }
                         },
                         offset: Number(place),
                         limit: Number(pageSize)
@@ -572,8 +570,7 @@ module.exports = {
                             },
                             name :{
                                 $like : "%"+ctx.query.name+"%"
-                            },
-                            isActive:1
+                            }
                         }
                     })
                     console.log(food)
@@ -718,8 +715,8 @@ module.exports = {
                             tenantId: ctx.query.tenantId,//iftenantId="68d473e77f459833bb06c60f9a8f4809"
                             name : {
                                 $like : "%"+name+"%"
-                            },
-                            isActive : true
+                            }
+
                         },
                         offset: Number(place),
                         limit: Number(pageSize)
@@ -731,7 +728,7 @@ module.exports = {
                     foods = await Foods.findAll({
                         where: {
                             tenantId: ctx.query.tenantId,//iftenantId="68d473e77f459833bb06c60f9a8f4809"
-                            isActive : true
+
                         },
                         offset: Number(place),
                         limit: Number(pageSize)
@@ -759,7 +756,7 @@ module.exports = {
                         where: {
                             tenantId: ctx.query.tenantId//iftenantId="68d473e77f459833bb06c60f9a8f4809"
                         },
-                        isActive : true
+
                     });
                 }
             }
