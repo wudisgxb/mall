@@ -37,9 +37,9 @@ module.exports = async function tasks(app) {
 
         rule.dayOfWeek = [0, new schedule.Range(1, 6)];
 
-        rule.hour = 17;
+        rule.hour = 18;
 
-        rule.minute = 23;
+        rule.minute = 1;
         rule.second = 1;
         schedule.scheduleJob(rule, async function () {
             await aliTransferAccounts();
@@ -239,6 +239,7 @@ module.exports = async function tasks(app) {
                 console.log("代售微信转账金额：" + consigneeAmount);
                 //判断是否有利润分成
                 if(!tenantConfig.isProfitRate){
+                    console.log(1111111111111111)
                     if (tenantConfig != null) {
                         console.log("tenantId1:" + tenantId);
                         console.log("consigneeId1:" + consigneeId)
@@ -460,6 +461,8 @@ module.exports = async function tasks(app) {
                             }
                         }
                     }
+                }else{
+                    console.log("利润分成不转账")
                 }
 
                 merchantAmount = 0;
@@ -550,59 +553,11 @@ module.exports = async function tasks(app) {
 
                 console.log("租户转账金额：" + merchantAmount);
                 console.log("代售转账金额：" + consigneeAmount);
-                if (tenantConfig != null) {
-                    if (consignee == null) {
-                        var result = await transAccountsManager.transferAccounts(tenantConfig.payee_account, merchantAmount, null, '日收益', tenantId);
-                        console.log("无代售0:" + JSON.stringify(result, null, 2));
-                        if (result.msg == 'Success') {
-                            paymentReqs = await PaymentReqs.findAll({
-                                where: {
-                                    tenantId: tenantId,
-                                    consigneeId: consigneeId,
-                                    paymentMethod: '支付宝',
-                                    isFinish: true,
-                                    isInvalid: false,
-                                    TransferAccountIsFinish: false,
-                                    consigneeTransferAccountIsFinish: false
-                                }
-                            });
-
-                            for (var j = 0; j < paymentReqs.length; j++) {
-                                paymentReqs[j].TransferAccountIsFinish = true;
-                                await paymentReqs[j].save();
-                            }
-
-                            //待转账表状态修改从0-1
-                            transferAccounts = await TransferAccounts.findAll({
-                                where: {
-                                    tenantId: tenantId,
-                                    consigneeId: consigneeId,
-                                    paymentMethod: '支付宝',
-                                    role: '租户',
-                                    status: 0
-                                }
-                            })
-
-                            for (var k = 0; k < transferAccounts.length; k++) {
-                                transferAccounts[k].status = 1;
-                                transferAccounts[k].pay_date = payDate;
-                                await transferAccounts[k].save();
-                            }
-
-                            console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
-                            console.log("每日支付宝转账记录0||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
-                        }
-
-                    } else {
-                        var profitsharing = await ProfitSharings.findOne({
-                            where: {
-                                tenantId: tenantId,
-                                consigneeId: consigneeId
-                            }
-                        });
-                        if (profitsharing == null) {
+                if(!tenantConfig.isProfitRate){
+                    if (tenantConfig != null) {
+                        if (consignee == null) {
                             var result = await transAccountsManager.transferAccounts(tenantConfig.payee_account, merchantAmount, null, '日收益', tenantId);
-                            console.log("无代售1:" + JSON.stringify(result, null, 2));
+                            console.log("无代售0:" + JSON.stringify(result, null, 2));
                             if (result.msg == 'Success') {
                                 paymentReqs = await PaymentReqs.findAll({
                                     where: {
@@ -639,83 +594,136 @@ module.exports = async function tasks(app) {
                                 }
 
                                 console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
-                                console.log("每日支付宝转账记录1||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
+                                console.log("每日支付宝转账记录0||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
                             }
+
                         } else {
-                            var ret1 = await transAccountsManager.transferAccounts(tenantConfig.payee_account, merchantAmount, null, profitsharing.merchantRemark, tenantId);
-                            if (ret1.msg == 'Success') {
-                                paymentReqs = await PaymentReqs.findAll({
-                                    where: {
-                                        tenantId: tenantId,
-                                        consigneeId: consigneeId,
-                                        paymentMethod: '支付宝',
-                                        isFinish: true,
-                                        isInvalid: false,
-                                        TransferAccountIsFinish: false,
-                                        consigneeTransferAccountIsFinish: false
-                                    }
-                                });
-
-                                for (var jj = 0; jj < paymentReqs.length; jj++) {
-                                    paymentReqs[jj].TransferAccountIsFinish = true;
-                                    await paymentReqs[jj].save();
+                            var profitsharing = await ProfitSharings.findOne({
+                                where: {
+                                    tenantId: tenantId,
+                                    consigneeId: consigneeId
                                 }
-
-                                transferAccounts = await TransferAccounts.findAll({
-                                    where: {
-                                        tenantId: tenantId,
-                                        consigneeId: consigneeId,
-                                        paymentMethod: '支付宝',
-                                        role: '租户',
-                                        status: 0
-                                    }
-                                })
-
-                                for (var kk = 0; kk < transferAccounts.length; kk++) {
-                                    transferAccounts[kk].status = 1;
-                                    transferAccounts[kk].pay_date = payDate;
-                                    await transferAccounts[kk].save();
-                                }
-
-                                console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
-                                console.log("每日支付宝转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
-                                console.log("consigneeAmount:" + consigneeAmount);
-
-                                if (consigneeAmount != null && consigneeAmount > 0) {
-                                    var ret2 = await transAccountsManager.transferAccounts(consignee.payee_account, consigneeAmount, null, profitsharing.consigneeRemark, tenantId);
-                                    if (ret2.msg == 'Success') {
-                                        for (var jj = 0; jj < paymentReqs.length; jj++) {
-                                            paymentReqs[jj].consigneeTransferAccountIsFinish = true;
-                                            await paymentReqs[jj].save();
+                            });
+                            if (profitsharing == null) {
+                                var result = await transAccountsManager.transferAccounts(tenantConfig.payee_account, merchantAmount, null, '日收益', tenantId);
+                                console.log("无代售1:" + JSON.stringify(result, null, 2));
+                                if (result.msg == 'Success') {
+                                    paymentReqs = await PaymentReqs.findAll({
+                                        where: {
+                                            tenantId: tenantId,
+                                            consigneeId: consigneeId,
+                                            paymentMethod: '支付宝',
+                                            isFinish: true,
+                                            isInvalid: false,
+                                            TransferAccountIsFinish: false,
+                                            consigneeTransferAccountIsFinish: false
                                         }
+                                    });
 
-                                        transferAccounts = await TransferAccounts.findAll({
-                                            where: {
-                                                tenantId: tenantId,
-                                                consigneeId: consigneeId,
-                                                paymentMethod: '支付宝',
-                                                role: '代售',
-                                                status: 0
-                                            }
-                                        })
-
-                                        for (var kk = 0; kk < transferAccounts.length; kk++) {
-                                            transferAccounts[kk].status = 1;
-                                            transferAccounts[kk].pay_date = payDate;
-                                            await transferAccounts[kk].save();
-                                        }
-
-                                        console.log("每日支付宝转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
-                                    } else {
-                                        console.log("代售商户支付宝转账失败：" + JSON.stringify(ret2, null, 2));
+                                    for (var j = 0; j < paymentReqs.length; j++) {
+                                        paymentReqs[j].TransferAccountIsFinish = true;
+                                        await paymentReqs[j].save();
                                     }
+
+                                    //待转账表状态修改从0-1
+                                    transferAccounts = await TransferAccounts.findAll({
+                                        where: {
+                                            tenantId: tenantId,
+                                            consigneeId: consigneeId,
+                                            paymentMethod: '支付宝',
+                                            role: '租户',
+                                            status: 0
+                                        }
+                                    })
+
+                                    for (var k = 0; k < transferAccounts.length; k++) {
+                                        transferAccounts[k].status = 1;
+                                        transferAccounts[k].pay_date = payDate;
+                                        await transferAccounts[k].save();
+                                    }
+
+                                    console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
+                                    console.log("每日支付宝转账记录1||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
                                 }
                             } else {
-                                console.log("主商户支付宝转账失败：" + JSON.stringify(ret1, null, 2))
+                                var ret1 = await transAccountsManager.transferAccounts(tenantConfig.payee_account, merchantAmount, null, profitsharing.merchantRemark, tenantId);
+                                if (ret1.msg == 'Success') {
+                                    paymentReqs = await PaymentReqs.findAll({
+                                        where: {
+                                            tenantId: tenantId,
+                                            consigneeId: consigneeId,
+                                            paymentMethod: '支付宝',
+                                            isFinish: true,
+                                            isInvalid: false,
+                                            TransferAccountIsFinish: false,
+                                            consigneeTransferAccountIsFinish: false
+                                        }
+                                    });
+
+                                    for (var jj = 0; jj < paymentReqs.length; jj++) {
+                                        paymentReqs[jj].TransferAccountIsFinish = true;
+                                        await paymentReqs[jj].save();
+                                    }
+
+                                    transferAccounts = await TransferAccounts.findAll({
+                                        where: {
+                                            tenantId: tenantId,
+                                            consigneeId: consigneeId,
+                                            paymentMethod: '支付宝',
+                                            role: '租户',
+                                            status: 0
+                                        }
+                                    })
+
+                                    for (var kk = 0; kk < transferAccounts.length; kk++) {
+                                        transferAccounts[kk].status = 1;
+                                        transferAccounts[kk].pay_date = payDate;
+                                        await transferAccounts[kk].save();
+                                    }
+
+                                    console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
+                                    console.log("每日支付宝转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " merchantAmount:" + merchantAmount);
+                                    console.log("consigneeAmount:" + consigneeAmount);
+
+                                    if (consigneeAmount != null && consigneeAmount > 0) {
+                                        var ret2 = await transAccountsManager.transferAccounts(consignee.payee_account, consigneeAmount, null, profitsharing.consigneeRemark, tenantId);
+                                        if (ret2.msg == 'Success') {
+                                            for (var jj = 0; jj < paymentReqs.length; jj++) {
+                                                paymentReqs[jj].consigneeTransferAccountIsFinish = true;
+                                                await paymentReqs[jj].save();
+                                            }
+
+                                            transferAccounts = await TransferAccounts.findAll({
+                                                where: {
+                                                    tenantId: tenantId,
+                                                    consigneeId: consigneeId,
+                                                    paymentMethod: '支付宝',
+                                                    role: '代售',
+                                                    status: 0
+                                                }
+                                            })
+
+                                            for (var kk = 0; kk < transferAccounts.length; kk++) {
+                                                transferAccounts[kk].status = 1;
+                                                transferAccounts[kk].pay_date = payDate;
+                                                await transferAccounts[kk].save();
+                                            }
+
+                                            console.log("每日支付宝转账记录2||tenantId:" + tenantId + " consigneeId:" + consigneeId + " consigneeAmount:" + consigneeAmount);
+                                        } else {
+                                            console.log("代售商户支付宝转账失败：" + JSON.stringify(ret2, null, 2));
+                                        }
+                                    }
+                                } else {
+                                    console.log("主商户支付宝转账失败：" + JSON.stringify(ret1, null, 2))
+                                }
                             }
                         }
                     }
+                }else{
+                    console.log("利润分成不转账")
                 }
+
                 merchantAmount = 0;
                 consigneeAmount = 0;
             }

@@ -200,8 +200,6 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此订单");
             return;
         }
-
-
         await order.destroy();
 
         let table = await Tables.findById(order.TableId);
@@ -209,6 +207,7 @@ module.exports = {
             table.status = 0;
             await table.save();
         }
+
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS);
     },
@@ -268,24 +267,51 @@ module.exports = {
         let place = (pageNumber - 1) * pageSize;
         //根据tenantId，查询当前时间的订单
         let orders = [];
-        if (ctx.query.pageNumber == null && ctx.query.pageSize == null) {
-            orders = await Orders.findAll({
-                where: {
-                    tenantId: ctx.query.tenantId,
-                    createdAt: {
-                        $between: [startTime, endTime]
+        if(ctx.query.status!=null){
+            if (ctx.query.pageNumber == null && ctx.query.pageSize == null) {
+                orders = await Orders.findAll({
+                    where: {
+                        tenantId: ctx.query.tenantId,
+                        createdAt: {
+                            $between: [startTime, endTime]
+                        },
+                        status : ctx.query.status
                     }
-                }
-            })
-        } else {
-            orders = await Orders.findAll({
-                where: {
-                    tenantId: ctx.query.tenantId
-                },
-                order: [['createdAt', 'DESC']],
-                offset: place,
-                limit: pageSize
-            })
+                })
+            } else {
+                orders = await Orders.findAll({
+                    where: {
+                        tenantId: ctx.query.tenantId,
+                        status : ctx.query.status,
+                        createdAt: {
+                            $between: [startTime, endTime]
+                        },
+                    },
+                    order: [['createdAt', 'DESC']],
+                    offset: place,
+                    limit: pageSize
+                })
+            }
+        }else{
+            if (ctx.query.pageNumber == null && ctx.query.pageSize == null) {
+                orders = await Orders.findAll({
+                    where: {
+                        tenantId: ctx.query.tenantId,
+                        createdAt: {
+                            $between: [startTime, endTime]
+                        }
+                    }
+                })
+            } else {
+                orders = await Orders.findAll({
+                    where: {
+                        tenantId: ctx.query.tenantId
+                    },
+                    order: [['createdAt', 'DESC']],
+                    offset: place,
+                    limit: pageSize
+                })
+            }
         }
 
         //循环不相同的订单号
@@ -417,6 +443,126 @@ module.exports = {
                     result[k].couponValue = null
                 }
             }
+
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
+    },
+
+    async getAdminGoodsOrder(ctx, next){
+        ctx.checkQuery('tenantId').notEmpty();
+        ctx.checkQuery('status').notEmpty()
+        let result = [];
+        let foodJson = [];
+        let totalNums = 0;
+        let totalPrices = 0;
+        let totalVipPrices = 0;
+        let startTime = null;
+        let endTime = null;
+        if (ctx.query.startTime == null) {
+            startTime = '2000-05-14T06:12:22.000Z'
+        } else {
+            startTime = new Date(ctx.query.startTime);
+        }
+        if (ctx.query.endTime == null) {
+            endTime = '2100-05-14T06:12:22.000Z'
+        } else {
+            endTime = new Date(ctx.query.endTime);
+        }
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
+            return;
+        }
+
+        //页码
+        let pageNumber = parseInt(ctx.query.pageNumber);
+        //每页显示的大小
+        let pageSize = parseInt(ctx.query.pageSize);
+        let place = (pageNumber - 1) * pageSize;
+        //根据tenantId，查询当前时间的订单
+        let orders = [];
+        if(ctx.query.status!=null){
+            if (ctx.query.pageNumber == null && ctx.query.pageSize == null) {
+                orders = await Orders.findAll({
+                    where: {
+                        tenantId: ctx.query.tenantId,
+                        createdAt: {
+                            $between: [startTime, endTime]
+                        },
+                        status : ctx.query.status
+                    }
+                })
+            } else {
+                orders = await Orders.findAll({
+                    where: {
+                        tenantId: ctx.query.tenantId,
+                        status : ctx.query.status,
+                        createdAt: {
+                            $between: [startTime, endTime]
+                        },
+                    },
+                    order: [['createdAt', 'DESC']],
+                    offset: place,
+                    limit: pageSize
+                })
+            }
+        }else{
+            if (ctx.query.pageNumber == null && ctx.query.pageSize == null) {
+                orders = await Orders.findAll({
+                    where: {
+                        tenantId: ctx.query.tenantId,
+                        createdAt: {
+                            $between: [startTime, endTime]
+                        }
+                    }
+                })
+            } else {
+                orders = await Orders.findAll({
+                    where: {
+                        tenantId: ctx.query.tenantId
+                    },
+                    order: [['createdAt', 'DESC']],
+                    offset: place,
+                    limit: pageSize
+                })
+            }
+        }
+
+        //循环不相同的订单号
+        let order;
+        let orderGoods;
+        for (let k = 0; k < orders.length; k++) {
+            let totalNum = 0;//数量
+            let totalPrice = 0;//单价
+            let discounts = 0;
+            let reimbursePrice = 0
+
+            //价格的数组
+            foodJson = [];
+
+            //根据consigneeId查询consigneeName
+            let consignee = await Consignees.findOne({
+                where: {
+                    consigneeId: orders[k].consigneeId
+                }
+            });
+            //根据创建时间和订单号查询所有记录
+            orderGoods = await OrderGoods.findAll({
+                where: {
+                    trade_no: orders[k].trade_no
+                }
+            });
+
+            for (var j = 0; j < orderGoods.length; j++) {
+                //根据菜单号查询菜单
+                foodJson[j] = {};
+                //总数量为每个循环的数量现价
+                totalNum += orderGoods[j].num;
+                //当前菜的总价格为菜品的价格*订单中购买的数量
+                totalPrice += orderGoods[j].price * orderGoods[j].num;//原价
+
+            }
+            let amount = await amoutManager.getTransAccountAmount()
+
 
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)

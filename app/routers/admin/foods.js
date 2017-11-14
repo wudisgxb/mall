@@ -14,7 +14,7 @@ router.post('/api/test/admin/food', foods.saveAdminFoods);
 //编辑
 router.put('/api/test/admin/food', foods.updateAdminFoodsById);
 //查询
-router.get('/api/test/admin/food', foods.getAdminFoods);
+router.get('/api/test/admin/food', foods.getAdminFoodsTenantId);
 // router.put('/api/test/admin/foodAllImage', foods.updateFoodOne);
 
 

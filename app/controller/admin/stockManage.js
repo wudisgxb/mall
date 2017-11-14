@@ -52,6 +52,7 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+
     async updateStockManage (ctx, next) {
         ctx.checkBody('id').notBlank()
         if(ctx.errors){
@@ -59,11 +60,10 @@ module.exports = {
             return
         }
         let body = ctx.request.body
-        let keys = ['goodName', 'property', 'specification', 'unit', 'paymentMethod',
-            'goodStatus'];
+        let keys = ['name', 'property', 'specification', 'unit', 'paymentMethod'];
         const condition = await keys.reduce((accu, curr) => {
             if (ctx[curr]) {
-                accu[curr] = body[curr]
+                accu[curr] = body.condition[curr]
             }
             return accu;
         }, {})
@@ -80,14 +80,14 @@ module.exports = {
     },
 
     async getStockManageOne (ctx, next) {
-        ctx.checkQuery('goodName').notBlank()
+        ctx.checkQuery('name').notBlank()
         ctx.checkQuery('goodNumber').notBlank()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
         }
         let whereJson = {
-            goodName : ctx.query.goodName,
+            name : ctx.query.name,
             goodNumber : ctx.query.goodNumber,
         }
         let stock
@@ -135,14 +135,14 @@ module.exports = {
     },
     async getStockManagesByGoodSum (ctx, next) {
         ctx.checkQuery('tenantId').notBlank()
-        ctx.checkQuery('goodName').notBlank()
+        ctx.checkQuery('goodNumber').notBlank()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
         }
         let whereJson = {
             tenantId : ctx.query.tenantId,
-            goodName : ctx.query.goodName,
+            goodNumber : ctx.query.goodNumber,
         }
         let pageNum = "pageNum"
         let stocks = []

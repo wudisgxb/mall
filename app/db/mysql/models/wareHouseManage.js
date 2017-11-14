@@ -9,6 +9,8 @@ module.exports = function (sequelize, DataTypes) {
         name: shortDataTypes.String(),
         //商品编号  (商品的唯一编号，可以处理同种商品，不同进货价格的商品)
         goodsNumber : shortDataTypes.String(),
+        //仓库编号（新）
+        wareHouseNumber : shortDataTypes.String(),
         //商品属性 --零食，酒水
         property: shortDataTypes.String(),
         //商品规格 --多少克--多少斤
@@ -20,7 +22,7 @@ module.exports = function (sequelize, DataTypes) {
         //库存数量(出货剩余数量)
         inventoryNum: shortDataTypes.String(),
         //商品进货价(单价)
-        //constPrice: shortDataTypes.String(255,true),
+        constPrice: shortDataTypes.String(255,true),
         //进货到那个租户
         tenantId : shortDataTypes.String(),
         // //进货的商家

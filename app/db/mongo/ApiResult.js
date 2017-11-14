@@ -39,6 +39,10 @@ module.exports.Result = {
         resCode: 1004,
         resMsg: '数据库查询错误'
     },
+    IMPORT_ERROR: {
+        resCode: 1004,
+        resMsg: '数据库查询错误'
+    },
 
     PARAMS_ERROR: {
     resCode: PARAMS_ERROR,

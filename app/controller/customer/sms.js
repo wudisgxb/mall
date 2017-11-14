@@ -40,6 +40,7 @@ module.exports = {
         });
 
         let result = await smsPromise;
+        console.log(result)
         let smsVerification = db.models.smsVerification;
         await smsVerification.destroy({
             where: {phone: phone}

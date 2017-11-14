@@ -1,4 +1,3 @@
-const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
@@ -39,7 +38,7 @@ const aliDeal = new Alipay({
     return_url: config.alipay.return_url,//前台回调
     rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
-    sandbox: false,
+    sandbox: true,
     signType: 'RSA2'
 });
 
@@ -49,7 +48,7 @@ const aliEshop = new Alipay({
     return_url: config.alipay.return_url,
     rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
-    sandbox: false,
+    sandbox: true,
     signType: 'RSA2'
 });
 
@@ -59,7 +58,7 @@ module.exports = {
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('tableName').notEmpty();
         ctx.checkQuery('tradeNo').notEmpty();
-
+        NSString *privateKey
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -113,6 +112,7 @@ module.exports = {
         let new_params = aliDeal.webPay({
             subject: merchant + '-' + tableName + '账单',
             body: '消费',
+            sellerId : 18551663417,
             outTradeId: ctx.query.tradeNo,
             timeout: '10m',
             amount: total_amount,
@@ -279,6 +279,7 @@ module.exports = {
             subject: merchant + '-' + tableName + '账单',
             body: '消费',
             outTradeId: ctx.query.tradeNo,
+            sellerId : 18551663417,
             timeout: '10m',
             amount: total_amount,
             goodsType: '1'
@@ -528,14 +529,24 @@ module.exports = {
                     }
                 })
                 //在商圈中查找
-                let customerVips = await Vips.findAll({
-                    where: {
-                        phone: order.phone,
-                        alliancesId : allianceMerchants.alliancesId,
-                    }
-                });
+                let customerVips
+                if(allianceMerchants!=null){
+                    customerVips = await Vips.findOne({
+                        where: {
+                            phone: order.phone,
+                            alliancesId: allianceMerchants.alliancesId
+                        }
+                    });
+                }else{
+                    customerVips = await Vips.findOne({
+                        where: {
+                            phone: order.phone,
+                            tenantId: tenantId
+                        }
+                    });
+                }
                 let isVip = false
-                if (customerVips.length > 0) {
+                if (customerVips!=null) {
                     isVip = true
                 }
                 let customerJson = {
@@ -593,11 +604,13 @@ module.exports = {
                     // }
                 }
                 try {
+
                     amountJson.style = merchant==null?null:merchant.style
                     amountJson.tenantId = tenantId;
                     amountJson.consigneeId = consigneeId;
                     amountJson.phone = order.phone;
                     amountJson.trade_no = ret.out_trade_no;
+                    console.log(11111111111111111111111111111111111111111)
                     await getstatistics.setOrders(amountJson);
                 } catch (e) {
                     console.log(e);

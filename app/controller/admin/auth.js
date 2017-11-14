@@ -52,6 +52,7 @@ module.exports = {
     async getadminLong(ctx, next){
         ctx.checkBody('userName').notEmpty();
         ctx.checkBody('password').notEmpty();
+        ctx.checkBody('mode').notBlank()
         //ctx.checkBody('captcha').notEmpty();
         //ctx.checkBody('key').notEmpty();
         let body = ctx.request.body;
@@ -59,28 +60,46 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, ctx.errors);
             return;
         }
+
         //根据key查询Captcha中的记录
-        if(body.captcha!=null){
-            if(body.captcha==""){
-                ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
-                return;
-            }
-            let captcha = await Captcha.findOne({
-                where: {
-                    key: body.key,
+        if(body.mode==="pc"){
+            if(body.captcha!=null){
+                if(body.captcha==""){
+                    ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
+                    return;
                 }
-            })
-            //根据现在的时间减去创建的时间-创建时间如果大于5分钟
-            if ((new Date() - captcha.createdAt) > 5 * 1000 * 60) {
-                //将验证码超时，请重新获取传给前端，并跳出
-                ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_TIMEOUT)
-                return;
-            }
-            if (body.captcha.toLowerCase() != captcha.captcha.toLowerCase()) {
-                ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
-                return;
+                let captcha = await Captcha.findOne({
+                    where: {
+                        key: body.key,
+                    }
+                })
+                // console.log(captcha)
+                // console.log(captcha.createdAt)
+                // if(captcha==null){
+                //     ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_FOUND,"没有此记录")
+                //     return
+                // }
+                //根据现在的时间减去创建的时间-创建时间如果大于5分钟
+                if ((new Date() - captcha.createdAt) > 5 * 1000 * 60) {
+                    //将验证码超时，请重新获取传给前端，并跳出
+
+                    ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_TIMEOUT)
+                    return;
+                }
+                if (body.captcha.toLowerCase() != captcha.captcha.toLowerCase()) {
+                    ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
+                    return;
+                }
+            }else{
+                ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR,"输入不正确,请输入验证码")
+                return
             }
         }
+        if(body.mode!="pc"&&body.mode!="mobile"){
+            ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR,"输入不正确mode必须为pc或者mobile")
+            return
+        }
+
         let whereJson = {
             nickname: body.userName,
             password: body.password
@@ -106,12 +125,18 @@ module.exports = {
                     tenantId : adminCorresponding.correspondingId
                 }
                 let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants,tenantJson)
+                let merchant = await Merchants.findOne({
+                    where:{
+                        tenantId : adminCorresponding.correspondingId
+                    }
+                })
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                     alliancesId : getOperation==null?"":getOperation.alliancesId,
                     tenantId : adminCorresponding.correspondingId,
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
                     name : admin.nickname,
+                    merchantName : merchant==null?"":merchant.name,
                     token
                 })
             }

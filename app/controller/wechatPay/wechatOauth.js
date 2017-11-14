@@ -1318,7 +1318,7 @@ module.exports = {
                 status : 0
             }
         })
-        console.log(merchantAmount)
+        // console.log(Number(merchantAmount))
         let tenantConfig = await TenantConfigs.findOne({
             where:{
                 tenantId : tenantId
@@ -1338,18 +1338,20 @@ module.exports = {
         if (tenantConfig != null) {
             console.log("服务器公网IP：" + ip);
             fn = co.wrap(wxpay.transfers.bind(wxpay))
-
+            console.log((merchantAmount * 100))
             var params = {
                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                 openid: tenantConfig.wecharPayee_account,
                 check_name: 'NO_CHECK',
-                amount: (merchantAmount * 100).toFixed(0),
+                amount:  Math.round((merchantAmount * 100)),
                 desc: '日收益',
                 spbill_create_ip: ip
             }
 
             try {
+                console.log(11111111111)
                 var result = await fn(params);
+                console.log(result)
                 // console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
                 if (result.result_code == 'SUCCESS') {
 
@@ -1364,28 +1366,29 @@ module.exports = {
                             consigneeTransferAccountIsFinish: false
                         }
                     });
-
+                    console.log(22222222222)
                     for (var j = 0; j < paymentReqs.length; j++) {
                         paymentReqs[j].TransferAccountIsFinish = true;
                         await paymentReqs[j].save();
                     }
-
+                    console.log(3333333333333)
                     //待转账表状态修改从0-1
                     transferAccounts = await TransferAccounts.findAll({
                         where: {
                             tenantId: tenantId,
-                            consigneeId: consigneeId,
+                            consigneeId: consignees.consigneeId,
                             paymentMethod: '微信',
                             role: '租户',
                             status: 0
                         }
                     })
-
+                    console.log(44444444444)
                     for (var k = 0; k < transferAccounts.length; k++) {
                         transferAccounts[k].status = 1;
                         transferAccounts[k].pay_date = payDate;
                         await transferAccounts[k].save();
                     }
+                    console.log(5555555555555)
                     console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
                     console.log("当前微信转账记录0||tenantId:" + tenantId + " consignee:" + consignee + " merchantAmount:" + merchantAmount);
                 }else{

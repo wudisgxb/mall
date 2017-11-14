@@ -361,8 +361,10 @@ const amountManger = (function () {
                         consigneeAmount = Math.round(consigneeAmount * 100) / 100;
                     } else {
                         //门店收百分之2，写死
+                        //ownRate为平台分成比率
+                        //1-平台分成比率 = 商家分成比率
 
-                        merchantAmount = totalAmount * (1 - 0.02);
+                        merchantAmount = totalAmount * (1-profitsharing.ownRate);
                         consigneeAmount = 0;
                     }
 

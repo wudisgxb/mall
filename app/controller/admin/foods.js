@@ -9,7 +9,7 @@ let Foods = db.models.Foods;
 let Menus = db.models.Menus;
 let Units = db.models.Units;
 let Foodsofmenus = db.models.FoodsOfTMenus;
-let FoodsOfUnits = db.models.FoodsOfUnits;
+
 const Tool = require('../../Tool/tool');
 
 
@@ -41,7 +41,7 @@ module.exports = {
         ctx.checkBody('/food/vipPrice', true).first().notEmpty().isFloat().ge(0).toFloat();
         // ctx.checkBody('/food/info', true).first().notEmpty();
         ctx.checkBody('/food/unitId', true).first().notBlank();
-        ctx.checkBody('/food/foodNum', true).first().notEmpty();
+        // ctx.checkBody('/food/foodNum', true).first().notEmpty();
         ctx.checkBody('/food/menuId', true).first().notEmpty();
         ctx.checkBody('/food/isActive', true).first().notEmpty();
         // ctx.checkBody('/food/integral', true).first().notEmpty();
@@ -128,7 +128,7 @@ module.exports = {
             oldPrice: body.food.oldPrice,
             vipPrice: body.food.vipPrice,
             sellCount: 100,
-            foodNum: body.food.foodNum,
+            foodNum: 0,
             rating: body.food.rating,
             info: info,
             unit: unit==null?"":unit.goodUnit,
@@ -177,7 +177,7 @@ module.exports = {
 
         let body = ctx.request.body;
         let keys = ['name', 'image', 'minuteImage', 'icon', 'price', 'constPrice', 'oldPrice',
-            'vipPrice', 'sellCount', 'rating', 'info', 'unit', 'isActive', 'foodNum'];
+            'vipPrice', 'sellCount', 'rating', 'info', 'unitId', 'isActive', 'foodNum'];
         const condition = await keys.reduce((accu, curr,curi,array) => {
             // console.log(body.food[curr]!=null)
             if (body.food[curr]!=null) {
@@ -275,16 +275,11 @@ module.exports = {
         //         foodsofmenus.tenantId = body.tenantId;
         //         await foodsofmenus.save();
         //     }
-        console.log(condition)
-        await Foods.update(
-            condition
-        ,{where:{
-                tenantId : body.condition.tenantId,
-                id : body.condition.id
-        }})
-        if(body.food.MenuId!=null&&body.food.MenuId!=""){
+        let menuName
+        if(body.food.menuId!=null&&body.food.menuId!=""){
+            console.log(11111111)
             await Foodsofmenus.update({
-                MenuId : body.food.MenuId,
+                MenuId : body.food.menuId,
                 // FoodId : body.condition.id,
                 // tenantId : body.condition.tenantId
             },{where:{
@@ -292,6 +287,32 @@ module.exports = {
                 tenantId : body.condition.tenantId
             }})
         }
+        if(condition.unitId!=null&&condition.unitId!=""){
+            let unit = await Units.findOne({
+                where:{
+                    id : condition.unitId
+                }
+            })
+            // console.log(FoodsOfUnits)
+            // await FoodsOfUnits.update({
+            //     MenuId : unit.id
+            // },{
+            //     where:{
+            //         tenantId : body.condition.tenantId,
+            //         FoodId : body.condition.id
+            //     }
+            // })
+            delete condition.unitId
+            condition.unit = unit.goodUnit
+        }
+        console.log(condition)
+        await Foods.update(
+            condition
+        ,{where:{
+                tenantId : body.condition.tenantId,
+                id : body.condition.id
+        }})
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
@@ -341,6 +362,218 @@ module.exports = {
     // },
 
     //获取租户下所有商品
+
+    async getAdminFoodsTenantId(ctx, next) {
+        // ctx.checkQuery('tenantId').notBlank
+        let keys = ['name', 'menuId', 'isActive','tenantId'];
+        let condition = keys.reduce((accu, curr) => {
+            if (ctx.query[curr]) {
+                accu[curr] = ctx.query[curr]
+            }
+            return accu;
+        }, {})
+        // condition.name = "%"+condition.name+"%"
+        // condition.MenuId = condition.menuId
+        // delete condition.menuId
+        // console.log(condition)
+        let pageNumber = parseInt(ctx.query.pageNumber);
+
+        if(pageNumber<1){
+            pageNumber=1
+        }
+
+        let pageSize = parseInt(ctx.query.pageSize);
+        if(pageSize<1){
+            pageSize=1
+        }
+        let place = (pageNumber - 1) * pageSize;
+
+        let foods
+        if(condition.isActive!=null){
+            condition.isActive = JSON.parse(condition.isActive)
+        }
+
+        if(ctx.query.pageSize!=null&&ctx.query.pageSize!=""&&ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""){
+            // console.log(1111111111111111)
+            if(condition.name!=null){
+                condition.name = {
+                    $like : "%"+condition.name+"%"
+                }
+            }
+            if(condition.menuId!=null){
+                condition.MenuId = condition.menuId
+
+                let foodMenu = await Foodsofmenus.findAll({
+                    where:{
+                        tenantId : condition.tenantId,
+                        MenuId : condition.MenuId
+                    }
+                })
+                delete condition.menuId
+                delete condition.MenuId
+                let foodId = []
+                for(let foodM of foodMenu){
+                    if(!foodId.contains(foodM.FoodId)){
+                        foodId.push(foodM.FoodId)
+                    }
+                }
+                // console.log(foodId)
+                condition.id = {
+                    $in :foodId
+                }
+                // console.log(condition)
+                foods = await Foods.findAll({
+                    where:condition,
+                    offset: Number(place),
+                    limit: Number(pageSize)
+                })
+
+            }else{
+                foods = await Foods.findAll({
+                    where:condition,
+                    offset: Number(place),
+                    limit: Number(pageSize)
+                })
+            }
+            // console.log(foods)
+        }
+        if(ctx.query.pageSize==null||ctx.query.pageSize==""||ctx.query.pageNumber==null||ctx.query.pageNumber==""){
+            // console.log(2222222222222)
+            if(condition.name!=null){
+                condition.name = {
+                    $like : "%"+condition.name+"%"
+                }
+            }
+            if(condition.menuId!=null){
+                condition.MenuId = condition.menuId
+
+                // console.log(1111111111111)
+                // let menu = await Menus.findOne({
+                //     where:{
+                //         tenantId : condition.tenantId,
+                //         Id : condition.menuId
+                //     }
+                // })
+
+                let foodMenu = await Foodsofmenus.findAll({
+                    where:{
+                        tenantId : condition.tenantId,
+                        MenuId : condition.MenuId
+                    }
+                })
+                delete condition.menuId
+                delete condition.MenuId
+                let foodId = []
+                for(let foodM of foodMenu){
+                    if(!foodId.contains(foodM.FoodId)){
+                        foodId.push(foodM.FoodId)
+                    }
+                }
+                // console.log(foodId)
+                condition.id = {
+                    $in :foodId
+                }
+                // console.log(condition)
+                foods = await Foods.findAll({
+                    where:condition
+                })
+            }else{
+                foods = await Foods.findAll({
+                    where:condition
+                })
+            }
+
+        }
+        // console.log(foods.length)
+        let foodId;
+        let menuName;
+        let menuId;
+        let foodsArray =[]
+        for (let i = 0; i < foods.length; i++) {
+            let images = foods[i].image
+
+            let img
+            try {
+                if (Tool.isArray(JSON.parse(images))) {
+                    img = []
+                    img = JSON.parse(images)
+                }
+            } catch (e) {
+                img = images
+            }
+
+            foodId = foods[i].id;//foodId=222
+            menuId = await Foodsofmenus.findAll({
+                where: {
+                    FoodId: foodId//menuId=null
+                },
+                attributes: [
+                    'MenuId'
+                ]
+            });
+            if (menuId.length == 0) {
+                continue;
+            }//null
+            menuName = await Menus.findAll({
+                where: {
+                    id: menuId[0].MenuId//menuName="冷菜1,热销榜2,热销榜3,热销榜4"
+                },
+                attributes: [
+                    'name'
+                ]
+            });
+            let unit = await Units.findOne({
+                where:{
+                    goodUnit : foods[i].unit,
+                    tenantId : ctx.query.tenantId
+                }
+            })
+            if(unit==null){
+                await Units.create({
+                    goodUnit : foods[i].unit,
+                    tenantId : ctx.query.tenantId
+                })
+            }
+
+            let minuteImage
+            try{
+
+                if(foods[i].minuteImage!=null){
+                    minuteImage =JSON.parse(foods[i].minuteImage)
+                }else{
+                    minuteImage = null
+                }
+            }catch (e){
+                minuteImage=""
+            }
+            let foodsJson = {};
+            foodsJson.id = foods[i].id;
+            foodsJson.name = foods[i].name;
+            foodsJson.foodNum = foods[i].foodNum;
+            foodsJson.image = img;
+            foodsJson.minuteImage = minuteImage;
+            // foodsJson.icon = foods[i].icon;
+            foodsJson.price = foods[i].price;
+            foodsJson.constPrice = foods[i].constPrice==0?"":foods[i].constPrice;
+            foodsJson.oldPrice = foods[i].oldPrice;
+            foodsJson.vipPrice = foods[i].vipPrice;
+            foodsJson.isActive = foods[i].isActive;
+            foodsJson.taste = JSON.parse(foods[i].taste);
+            foodsJson.sellCount = foods[i].sellCount;
+            foodsJson.rating = foods[i].rating;
+            foodsJson.rest = (foods[i].foodNum - foods[i].todaySales) <= 0 ? 0 : (foods[i].foodNum - foods[i].todaySales);
+            // foodsJson[i].name = foods[i].name;
+            foodsJson.info = foods[i].info;
+            foodsJson.menuName = menuName[0].name;
+            foodsJson.unit = foods[i].unit;
+            foodsJson.cardId = foods[i].cardId;
+            foodsJson.integral = foods[i].integral;
+            foodsArray.push(foodsJson)
+        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,foodsArray);
+    },
+
     async getAdminFoods (ctx, next) {
 
         ctx.checkQuery('tenantId').notEmpty();
@@ -853,85 +1086,65 @@ module.exports = {
     },
     //
     async getAdminFoodsByCount(ctx, next){
-        ctx.checkQuery('tenantId').notBlank()
-        if (ctx.errors) {
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors);
-            return;
+        let keys = ['name', 'menuId', 'isActive','tenantId'];
+        let condition = keys.reduce((accu, curr) => {
+            if (ctx.query[curr]!=null) {
+                accu[curr] = ctx.query[curr]
+            }
+            return accu;
+        }, {})
+        console.log(condition)
+        if(condition.name!=null){
+            condition.name = {
+                $like : "%"+condition.name+"%"
+            }
         }
-        let foodsCount
-        if(ctx.query.name!=null&&ctx.query.name!=""){
-            //判断是否有menuId字段
-            if(ctx.query.menuId!=null){
-                let foodsOfMenus = await Foodsofmenus.findAll({
-                    where:{
-                        tenantId : ctx.query.tenantId,
-                        MenuId:ctx.query.menuId
-                    }
-                })
-                let FoodId = [];
-                for(let food of foodsOfMenus){
-                    if(!FoodId.contains(food.FoodId)){
-                        FoodId.push(food.FoodId)
-                    }
+        if(condition.menuId!=null){
+            condition.MenuId = condition.menuId
+
+            let foodMenu = await Foodsofmenus.findAll({
+                where:{
+                    tenantId : condition.tenantId,
+                    MenuId : condition.MenuId
                 }
-                let name = ctx.query.name
-                let likeName = "%"+name+"%"
-
-                foodsCount = await Foods.count({
-                    where:{
-                        id : {
-                            $in : FoodId
-                        },
-                        name :{
-                            $like : likeName
-                        }
-                    }
-                })
-            }else{
-                let name = ctx.query.name
-                let likeName = "%"+name+"%"
-
-                foodsCount = await Foods.count({
-                    where:{
-                        tenantId : ctx.query.tenantId,
-                        name :{
-                            $like : likeName
-                        }
-                    }
-                })
+            })
+            delete condition.menuId
+            delete condition.MenuId
+            let foodId = []
+            for(let foodM of foodMenu){
+                if(!foodId.contains(foodM.FoodId)){
+                    foodId.push(foodM.FoodId)
+                }
             }
 
-        }else{
-            if(ctx.query.menuId!=null){
-                let foodMenus = await Foodsofmenus.findAll({
-                    where:{
-                        tenantId : ctx.query.tenantId,
-                        menuId : ctx.query.menuId
-                    }
-                })
-                let foodId = []
-                for(let f of foodMenus){
-                    if(!foodId.contains(f.FoodId)){
-                        foodId.push(f.FoodId)
-                    }
-                }
-                foodsCount = await Foods.count({
-                    where:{
-                        id : {
-                            $in : foodId
-                        },
-                        tenantId : ctx.query.tenantId
-                    }
-                })
-            }else{
-                foodsCount = await Foods.count({
-                    where:{
-                        tenantId : ctx.query.tenantId
-                    }
-                })
+            condition.id = {
+                $in :foodId
             }
 
         }
+        console.log((typeof condition.isActive)=="string")
+
+        if(condition.isActive!=null){
+            console.log(111)
+            let isAction = condition.isActive
+            while (condition.isActive!=null){
+                isAction = JSON.parse(isAction)
+                if(typeof isAction != "string"){
+                    break
+                }
+            }
+            console.log(isAction)
+            condition.isActive = isAction
+        }
+
+
+
+
+        console.log(condition)
+        let foodsCount = await Foods.count({
+            where:condition
+        })
+        // console.log(foodsCount)
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,foodsCount)
     },
