@@ -414,6 +414,7 @@ module.exports = {
                     result[k].totalPrice = getProfitRate.totalPrices;
                     result[k].platformCouponFee = getProfitRate.terracePrice;
                     result[k].merchantCouponFee = getProfitRate.merchantTotalPrice;
+                    result[k].constPrice = getProfitRate.saleGoodsTotalPrices;
                 }
 
             }else{
