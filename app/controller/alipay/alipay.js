@@ -112,7 +112,6 @@ module.exports = {
         let new_params = aliDeal.webPay({
             subject: merchant + '-' + tableName + '账单',
             body: '消费',
-            sellerId : 18551663417,
             outTradeId: ctx.query.tradeNo,
             timeout: '10m',
             amount: total_amount,

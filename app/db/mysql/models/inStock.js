@@ -26,13 +26,14 @@ module.exports = function (sequelize, DataTypes) {
         //总价
         // totalPrice : shortDataTypes.String(),
         //商品状态-待入库or入库
-        // goodsStatus : shortDataTypes.String(),
+        status : shortDataTypes.String(),
         //批次
         batch : shortDataTypes.String(),
-        //供应商
-        // supplier : shortDataTypes.String(),
+        //入库数量
+        storageNum : shortDataTypes.Int(),
 
-        // tenantId : shortDataTypes.String(),
+
+        tenantId : shortDataTypes.String(),
     }, {
         associate: function (models) {
         },

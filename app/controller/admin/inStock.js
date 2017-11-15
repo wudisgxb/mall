@@ -6,6 +6,7 @@ let InStocks = db.models.InStocks;
 let GoodsInfos = db.models.GoodsInfos
 let WareHouseManages = db.models.WareHouseManages
 let StockOrderBatchs = db.models.StockOrderBatchs
+let SupplierManage = db.models.SupplierManage
 let Tool = require('../../Tool/tool')
 
 let getFoodNum = require('../../controller/statistics/statistics');
@@ -48,6 +49,7 @@ module.exports = {
             goodsNumber : goodInfo.goodsNumber,
             property : goodInfo.property,
             num : body.num,
+            // supplierNumber : body.supplierNumber,
             unit : goodInfo.unit,
             personInCharge : body.personInCharge!=null?body.personInCharge:"",
             time : new Date(),
@@ -101,7 +103,7 @@ module.exports = {
     async saveInStockPatch(ctx,next) {
         ctx.checkBody('instock').notBlank()
         ctx.checkBody('tenantId').notBlank()
-        // ctx.checkBody('batch').notBlank()
+        ctx.checkBody('supplierId').notBlank()
         ctx.checkBody('info').notEmpty()
         ctx.checkBody('discountsPrice').notBlank()
         ctx.checkBody('restPrice').notBlank()
@@ -147,7 +149,10 @@ module.exports = {
                     num : instock.num,
                     unit : goodsInfos.unit,
                     batch : patch,
+                    status : 0,//0为未入库，1为部分入库，2为全部入库
                     unitPrice : goodsInfos.unitPrice,
+                    storageNum : 0,//入库数量
+                    tenantId : body.tenantId
                 })
             }catch(e){
                 console.log(e)
@@ -155,16 +160,13 @@ module.exports = {
                 return
             }
         }
-
-
         try {
-            console.log(111111111111)
             let paymentPrice = totalPrices-Number(body.discountsPrice)+Number(body.restPrice)
-           console.log(StockOrderBatchs)
             await StockOrderBatchs.create({
                 tenantId : body.tenantId,
                 batch : patch,
                 status : 0,
+                supplierId : body.supplierId,
                 info : body.info==null?"":body.info,
                 totalPrice : totalPrices,
                 discountsPrice : Number(body.discountsPrice),
@@ -174,7 +176,7 @@ module.exports = {
                 nonPaymentPrice :paymentPrice-Number(body.alreadyPaymentPrice),
                 orderTime : new Date()
             })
-            console.log(2222222222222)
+
         }catch (e){
             console.log(e)
             ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR)
@@ -183,106 +185,57 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
+    // async updateInStock(ctx,next){
+    //     ctx.checkBody('id').notBlank()
+    //     ctx.checkBody('pageNumber').notBlank()
+    //     ctx.checkBody('num').notBlank()
+    //     ctx.checkBody('personInCharge').notEmpty()
+    //
+    //     ctx.checkBody('tenantId').notBlank()
+    //     let body = ctx.request.body
+    //     let inStock = await InStocks.findOne({
+    //         where:{
+    //             tenantId : body.tenantId,
+    //             pageNumber : body.pageNumber,
+    //             id : body.id
+    //         }
+    //     })
+    //     if(inStock==null){
+    //         ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有找到次记录")
+    //         return
+    //     }
+    //     inStock.num = body.num;
+    //     inStock.personInCharge = body.personInCharge;
+    //     await inStock.save()
+    //
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    //
+    // },
     async updateInStock(ctx,next){
-        ctx.checkBody('id').notBlank()
-        ctx.checkBody('pageNumber').notBlank()
-        ctx.checkBody('num').notBlank()
-        ctx.checkBody('personInCharge').notEmpty()
-
-        ctx.checkBody('tenantId').notBlank()
-        let body = ctx.request.body
-        let inStock = await InStocks.findOne({
-            where:{
-                tenantId : body.tenantId,
-                pageNumber : body.pageNumber,
-                id : body.id
-            }
-        })
-        if(inStock==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有找到次记录")
-            return
-        }
-        inStock.num = body.num;
-        inStock.personInCharge = body.personInCharge;
-        await inStock.save()
-
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-
-    },
-    async saveWareHouseManages(ctx,next){
         ctx.checkBody('tenantId').notBlank();
-        // ctx.checkBody('status').notBlank();
+        ctx.checkBody('batch').notBlank()
+        ctx.checkBody('goodsNumber')
+        ctx.checkBody('storageNum').notBlank();
+        // ctx.checkBody('batch').notEmpty();
+        // ctx.checkBody('inStock').notBlank()
         // ctx.checkBody('constPrice').notBlank()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
         }
         let body = ctx.request.body
-        if(status){
-            let inStock = await InStocks.findAll({
-                where :{
-                    tenantId : body.tenantId,
-                    goodsNumber : body.goodsNumber,
-                    goodsStatus : 0,
-                    // constPrice : body.constPrice
-                }
-            })
-        }
-
-        if(inStock.length==0){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没找到此进货信息")
-            return
-        }
-        let num = 0
-        for(let i = 0; i < inStock.length; i++){
-            num += Number(inStock[i].num)
-        }
-
-        let wareHouseManages = await WareHouseManages.findOne({
+        let inStock = await InStocks.findOne({
             where:{
                 tenantId : body.tenantId,
-                name : body.name,
-                // constPrice : body.constPrice
+                batch : body.batch,
+                goodsNumber : body.goodsNumber
             }
         })
 
-        if(wareHouseManages==null){
-            console.log(num)
-            await WareHouseManages.create({
-                name : inStock[0].name,
-                property : inStock[0].property,
-                goodsNumber : inStock[0].goodsNumber,
-                unit : inStock[0].unit,
-                goodsNum : num,
-                constPrice : inStock[0].unitPrice,
-                inventoryNum : num,
-                tenantId : body.tenantId,
-                info : body.info!=null?body.info:""
-            })
-        }else{
-            console.log(wareHouseManages.goodsNum)
-            console.log(num)
-            await WareHouseManages.update({
-                goodsNum : Number(wareHouseManages.goodsNum) + num,
-                inventoryNum : Number(wareHouseManages.inventoryNum) + num
-            },{
-                where:{
-                    tenantId : body.tenantId,
-                    name : body.name,
-                    // constPrice : body.constPrice,
-                }
-            })
-        }
-        await InStocks.update({
-            goodsStatus : 1
-        },{
-            where:{
-                tenantId : body.tenantId,
-                name : body.name,
-                goodsStatus : 0,
-                // constPrice : body.constPrice,
-            }
-        })
+
+
+
+
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     async getInStockByName(ctx,next){
@@ -332,51 +285,90 @@ module.exports = {
         // ctx.checkQuery('name').notEmpty()
         ctx.checkQuery('tenantId').notEmpty()
         // ctx.checkQuery('unitPrice').notEmpty()
-        ctx.checkQuery('status').notEmpty()
+        // ctx.checkQuery('status').notEmpty()
 
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
         }
-        let inStocks = await InStocks.findAll({
-            where:{
-                tenantId : ctx.query.tenantId
-            }
-        })
-        let inStocksNameArray = []
-        for(let ins of inStocks){
-            if(!inStocksNameArray.contains(ins.name)){
-                inStocksNameArray.push(ins.name)
-            }
-        }
-        let inStocksArray = []
-        for(let i = 0; i <inStocksNameArray.length; i++) {
-            let totalPrice = 0;
-            let num = 0;
-            let constPrice = 0;
-            let inStocksJson = {}
-            let inStocksName = await InStocks.findAll({
+        let stockOrderBatchs
+        if(ctx.query.status!=null&&ctx.query.status!=""){
+            stockOrderBatchs = await StockOrderBatchs.findAll({
                 where:{
                     tenantId : ctx.query.tenantId,
-                    name : inStocksNameArray[i]
+                    status:ctx.query.status,
                 }
             })
-            for(let j = 0; j < inStocksName.length; j++){
-                totalPrice += Number(inStocksName[i].totalPrice);
-                num += Number(inStocksName[i].num);
-                constPrice += Number(inStocksName[i].unitPrice)
-            }
-            inStocksJson.totalPrice = totalPrice;
-            inStocksJson.num = num;
-            inStocksJson.constPrice = constPrice;
-            inStocksJson.name = inStocksNameArray[i];
-            inStocksJson.unit = inStocksName[0].unit;
-            inStocksJson.prototype = inStocksName[0].prototype;
-            inStocksJson.tenantId = ctx.query.tenantId
-            inStocksArray.push(inStocksJson)
+        }else{
+            stockOrderBatchs = await StockOrderBatchs.findAll({
+                where:{
+                    tenantId : ctx.query.tenantId,
+                }
+            })
+        }
+        console.log(stockOrderBatchs.length)
+
+        let stockOrderBatchsArray = []
+        for(let i = 0; i <stockOrderBatchs.length; i++){
+            let stockOrderBatchsJson = {}
+            console.log(stockOrderBatchs[i].batch)
+            let instock = await InStocks.findAll({
+                where:{
+                    // tenantId : stockOrderBatchs[i].tenantId,
+                    batch : stockOrderBatchs[i].batch,
+                }
+            })
+            console.log(instock)
+            stockOrderBatchsJson.batch = stockOrderBatchs[i].batch
+            stockOrderBatchsJson.tenantId = stockOrderBatchs[i].tenantId
+            stockOrderBatchsJson.status = stockOrderBatchs[i].status
+            stockOrderBatchsJson.personInCharge = stockOrderBatchs[i].personInCharge
+            stockOrderBatchsJson.totalPrice = stockOrderBatchs[i].totalPrice
+            stockOrderBatchsJson.discountsPrice = stockOrderBatchs[i].discountsPrice
+            stockOrderBatchsJson.restPrice = stockOrderBatchs[i].restPrice
+            stockOrderBatchsJson.paymentPrice = stockOrderBatchs[i].paymentPrice
+            stockOrderBatchsJson.alreadyPaymentPrice = stockOrderBatchs[i].alreadyPaymentPrice
+            stockOrderBatchsJson.nonPaymentPrice = stockOrderBatchs[i].nonPaymentPrice
+            stockOrderBatchsJson.time = stockOrderBatchs[i].orderTime
+            stockOrderBatchsJson.instock=instock
+            stockOrderBatchsArray.push(stockOrderBatchsJson)
         }
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,inStocksArray)
+
+        // let inStocksNameArray = []
+        // for(let ins of inStocks){
+        //     if(!inStocksNameArray.contains(ins.name)){
+        //         inStocksNameArray.push(ins.name)
+        //     }
+        // }
+        // let inStocksArray = []
+        // for(let i = 0; i <inStocksNameArray.length; i++) {
+        //     let totalPrice = 0;
+        //     let num = 0;
+        //     let constPrice = 0;
+        //     let inStocksJson = {}
+        //     let inStocksName = await InStocks.findAll({
+        //         where:{
+        //             tenantId : ctx.query.tenantId,
+        //             name : inStocksNameArray[i]
+        //         }
+        //     })
+        //     for(let j = 0; j < inStocksName.length; j++){
+        //         totalPrice += Number(inStocksName[i].totalPrice);
+        //         num += Number(inStocksName[i].num);
+        //         constPrice += Number(inStocksName[i].unitPrice)
+        //     }
+        //     inStocksJson.totalPrice = totalPrice;
+        //     inStocksJson.num = num;
+        //     inStocksJson.constPrice = constPrice;
+        //     inStocksJson.name = inStocksNameArray[i];
+        //     inStocksJson.unit = inStocksName[0].unit;
+        //     inStocksJson.prototype = inStocksName[0].prototype;
+        //     inStocksJson.tenantId = ctx.query.tenantId
+        //     inStocksArray.push(inStocksJson)
+        // }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,stockOrderBatchsArray)
     },
     async deleteInStock(ctx,next){
         ctx.checkQuery('pageNumber').notEmpty()

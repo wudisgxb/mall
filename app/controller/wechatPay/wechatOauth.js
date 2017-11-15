@@ -724,7 +724,10 @@ module.exports = {
                 //input:tenantId,consigneeId,trade_no
                 //output:object（总金额，租户金额，代售金额）
 
-                let amountJson = await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
+                let amountJson
+
+                amountJson= await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
+                console.log(amountJson)
                 let allianceMerchants = await AllianceMerchants.findOne({
                     where:{
                         tenantId :tenantId
@@ -780,6 +783,7 @@ module.exports = {
                 // console.log(11111111111111111111111111111111)
 
                 try {
+
                     amountJson.style = merchant==null?null:merchant.style;
                     amountJson.tenantId = tenantId;
                     amountJson.consigneeId = consigneeId;

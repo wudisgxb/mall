@@ -15,10 +15,10 @@ module.exports = {
             return
         }
         if(ctx.query.startDate==null){
-            ctx.query.startTime = new Date("2000-01-01")
+            ctx.query.startDate = new Date("2000-01-01")
         }
         if(ctx.query.endDate==null){
-            ctx.query.startTime = new Date()
+            ctx.query.endDate = new Date()
         }
         let orders = await NewOrders.findAll({
             where:{
@@ -26,9 +26,11 @@ module.exports = {
                 createdAt :{
                     $gte : ctx.query.startDate,
                     $lt : ctx.query.endDate
-                }
+                },
+                status : 4
             }
         })
+
         let totalPrices = 0//商品订单总金额
         let discountss = 0//优惠金额
         let reimbursePrices =0//退款金额
@@ -54,15 +56,17 @@ module.exports = {
                     trade_no : tradeNo
                 }
             })
+
             let paymentreqs = await PaymentReqs.findOne({
                 where:{
                     tenantId : ctx.query.tenantId,
-                    tradeNo : tradeNo
+                    trade_no : tradeNo
                 }
             })
+
             let reimbursePrice = paymentreqs.refund_amount
             let reimburseGoodsNum = 0
-            if(reimbursePrices>0){
+            if(reimbursePrice>0){
                 for(let j = 0; j < orderGoods.length; j++){
                     // totalPrice = orderGoods[j].num*orderGoods[j].price+total
                     reimburseGoodsNum = orderGoods[j].num+reimburseGoodsNum
@@ -78,19 +82,24 @@ module.exports = {
             }
             totalPrices = totalPrice+totalPrices
             discountss = discounts + discountss
-            reimbursePrices = reimbursePrice + reimbursePrices
+            reimbursePrices = Number(reimbursePrice) + reimbursePrices
             writeOffGoodsNums = num + writeOffGoodsNums
             reimburseGoodsNums = reimburseGoodsNum +reimburseGoodsNums
             // let payment = paymentreqs.paymentMethod
             // let amount = await amountManage.getTransAccountAmount(ctx.query.tenantId,orders[i].consigneeId,tradeNo,payment,reimbursePrices)
 
         }
-        orderJson.goodsOrderPrice = totalPrices
-        orderJson.discounts = discountss
-        orderJson.reimbursePrice = reimbursePrices
-        orderJson.writeOffGoodsNum = writeOffGoodsNums
-        orderJson.reimburseGoodsNum = reimburseGoodsNums
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderJson)
+        let goodsWriteoffRevenue = totalPrices-discountss-reimbursePrices
+        orderJson.goodsWriteoffRevenue = goodsWriteoffRevenue
+        orderJson.goodsOrderAmount = totalPrices
+        orderJson.goodsWriteoffMerchantDiscount = discountss
+        orderJson.writeoffRefundAmount = reimbursePrices
+        orderJson.goodsWriteoffCount = writeOffGoodsNums
+        orderJson.goodsWriteoffRefundCount = reimburseGoodsNums
+        orderJson.goodsWriteoffRevenueNet=goodsWriteoffRevenue-0
+        let OrderArray = []
+        OrderArray.push(orderJson)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,OrderArray)
     },
     async getPracticalWriteOff(ctx,next){
         ctx.checkQuery('tenantId').notBlank();
@@ -99,20 +108,23 @@ module.exports = {
             return
         }
         if(ctx.query.startDate==null){
-            ctx.query.startTime = new Date("2000-01-01")
+            ctx.query.startDate = new Date("2000-01-01")
         }
         if(ctx.query.endDate==null){
-            ctx.query.startTime = new Date()
+            ctx.query.endDate = new Date()
         }
+
         let orders = await NewOrders.findAll({
             where:{
                 tenantId : ctx.query.tenantId,
                 createdAt :{
                     $gte : ctx.query.startDate,
                     $lt : ctx.query.endDate
-                }
+                },
+                status : 2
             }
         })
+
         let totalPrices = 0//商品订单总金额
         let discountss = 0//优惠金额
         let reimbursePrices =0//退款金额
@@ -131,36 +143,47 @@ module.exports = {
                     trade_no : tradeNo
                 }
             })
+
             let paymentreqs = await PaymentReqs.findOne({
                 where:{
                     tenantId : ctx.query.tenantId,
-                    tradeNo : tradeNo
+                    trade_no : tradeNo
                 }
             })
+
             let reimbursePrice = paymentreqs.refund_amount
             let reimburseGoodsNum = 0
-            if(reimbursePrices>0){
+            for(let j = 0; j < orderGoods.length; j++){
+                totalPrice = orderGoods[j].num*orderGoods[j].price+totalPrice
+                num = orderGoods[j].num+num
+            }
+            if(reimbursePrice>0){
                 for(let j = 0; j < orderGoods.length; j++){
                     // totalPrice = orderGoods[j].num*orderGoods[j].price+total
                     reimburseGoodsNum = orderGoods[j].num+reimburseGoodsNum
                 }
             }
-            if(totalPrice!=paymentreqs.total_amount){
-                discounts = totalPrice-paymentreqs.total_amount
-                num++
+            console.log("总金额"+totalPrice)
+            console.log("付款金额"+paymentreqs.total_amount)
+            discounts = totalPrice-paymentreqs.total_amount
+            if(paymentreqs.refund_amount!=0){
+                reimburseGoodsNums++
             }
             totalPrices = totalPrice+totalPrices
             discountss = discounts + discountss
-            reimbursePrices = reimbursePrice + reimbursePrices
-
-            reimburseGoodsNums = num
+            reimbursePrices = Number(reimbursePrice) + reimbursePrices
         }
-        orderJson.gatheringOrderPrice = totalPrices
-        orderJson.discounts = discountss
-        orderJson.reimbursePrice = reimbursePrices
-        orderJson.writeOffGoodsNum = orders.length-reimburseGoodsNums
-         orderJson.reimburseGoodsNum = reimburseGoodsNums
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderJson)
+        let revenueReceived = totalPrices-discountss-reimbursePrices
+        orderJson.revenueReceived = revenueReceived
+        orderJson.receivedOrderAmount = totalPrices
+        orderJson.receivedOrderMerchantDiscount = discountss
+        orderJson.receivedRefundAmount = reimbursePrices
+        orderJson.receivedOrderCount = orders.length-reimburseGoodsNums
+        orderJson.receivedOrderRefundCount = reimburseGoodsNums
+        orderJson.revenueReceivedNet = revenueReceived
+        let OrderArray = []
+        OrderArray.push(orderJson)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,OrderArray)
     },
     async getPractical(ctx,next){
         ctx.checkQuery('aaa').notEmpty()

@@ -19,6 +19,8 @@ module.exports = function (sequelize, DataTypes) {
         info : shortDataTypes.String(255,true),
         //总订单价格
         totalPrice : shortDataTypes.Double(),
+        //供应商
+        supplierId : shortDataTypes.String(),
         //优惠金额
         discountsPrice : shortDataTypes.Double(),
         //其他金额

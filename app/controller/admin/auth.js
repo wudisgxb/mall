@@ -130,13 +130,14 @@ module.exports = {
                         tenantId : adminCorresponding.correspondingId
                     }
                 })
+
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
                     alliancesId : getOperation==null?"":getOperation.alliancesId,
                     tenantId : adminCorresponding.correspondingId,
                     correspondingType : adminCorresponding.correspondingType,
                     style :admin.style,
                     name : admin.nickname,
-                    merchantName : merchant==null?"":merchant.name,
+                    aliasName : merchant==null?"":merchant.name,
                     token
                 })
             }

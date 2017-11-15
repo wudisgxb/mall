@@ -4,7 +4,7 @@ const logger = require('koa-log4').getLogger('AddressController')
 
 const Tool = require('../../Tool/tool')
 const db = require('../../db/mysql/index')
-const SupplierManage = db.models.SupplierManage
+const SupplierManages = db.models.SupplierManages
 
 module.exports = {
     async saveSupplierManage (ctx, next) {
@@ -20,18 +20,19 @@ module.exports = {
         }
         let body = ctx.request.body
 
-        let goodNumber = (Math.random()*8999+1000)+""+new Date().getTime()
-        let createJson = {
-            name :body.name,
-            supplierProperty :body.supplierProperty,
-            phone :body.phone,
-            principal :body.principal,
-            principalPhone :body.principalPhone,
-            tenantId :body.tenantId,
-            supplierNumber : goodNumber
-        }
+        let goodNumber = Math.floor(Math.random()*8999+1000)+""+new Date().getTime()
+
         try{
-            await SupplierManage.save(createJson)
+            let createJson = {
+                name :body.name,
+                supplierProperty :body.supplierProperty==null?"":body.supplierProperty,
+                phone :body.phone==null?"":body.phone,
+                principal :body.principal==null?"":body.principal,
+                principalPhone :body.principalPhone==null?"":body.principalPhone,
+                tenantId :body.tenantId,
+                supplierNumber : goodNumber
+            }
+            await SupplierManages.create(createJson)
         }catch (e){
             ctx.body = new ApiResult(ApiResult.Result.CREATE_ERROR,e)
             return
@@ -69,14 +70,14 @@ module.exports = {
             supplierNumber : body.condition.supplierNumber,
         }
         try{
-            let supplierManage = await SupplierManage.findOne({
+            let supplierManage = await SupplierManages.findOne({
                 where:whereJson
             })
             if(supplierManage==null){
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没找到此供应商")
                 return
             }
-            await SupplierManage.update(updateJson,{where:whereJson})
+            await SupplierManages.update(updateJson,{where:whereJson})
         }catch (e){
             ctx.body = new ApiResult(ApiResult.Result.CREATE_ERROR,e)
             return
@@ -94,7 +95,9 @@ module.exports = {
         }
         let supplierManages
         try{
-            supplierManages = await SupplierManage.findAll(whereJson)
+            supplierManages = await SupplierManages.findAll({
+                where:whereJson
+            })
         }catch (e){
             ctx.body = new ApiResult(ApiResult.Result.CREATE_ERROR,e)
             return
@@ -114,17 +117,22 @@ module.exports = {
         }
         let supplierManages
         try{
-            supplierManages = await SupplierManage.findOne(whereJson)
+            console.log(ctx.query.tenantId)
+            console.log(ctx.query.supplierNumber)
+            supplierManages = await SupplierManages.findOne({
+                where:whereJson
+            })
             if(supplierManages==null){
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有找到需要删除的供应商")
                 return
             }
-            await supplierManages.destroy()
         }catch (e){
             ctx.body = new ApiResult(ApiResult.Result.CREATE_ERROR,e)
             return
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+        let supplierManagesArray = []
+        supplierManagesArray.push(supplierManages)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,supplierManages)
     },
     async deleteSupplierManage (ctx, next) {
         ctx.checkQuery("tenantId").notBlank()
@@ -139,7 +147,12 @@ module.exports = {
         }
         let supplierManages
         try{
-            supplierManages = await SupplierManage.findAll(whereJson)
+            supplierManages = await SupplierManages.findOne({where:whereJson})
+            if(supplierManages==null){
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"您删除的数据不存在")
+                return
+            }
+            await supplierManages.destroy()
         }catch (e){
             ctx.body = new ApiResult(ApiResult.Result.CREATE_ERROR,e)
             return

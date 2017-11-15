@@ -4,7 +4,7 @@ var Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
 
-    var SupplierManage = sequelize.define('SupplierManage', {
+    var SupplierManages = sequelize.define('SupplierManages', {
         //供应商名称
         name : shortDataTypes.String(),
         //供应商编号  (商品的唯一编号，可以处理同种商品，不同进货价格的商品)
@@ -12,11 +12,11 @@ module.exports = function (sequelize, DataTypes) {
         //供应商属性 --零食厂商，酒水厂商
         supplierProperty: shortDataTypes.String(255,true),
         //单位电话
-        phone : shortDataTypes.String(),
+        phone : shortDataTypes.String(255,true),
         //负责人
-        principal : shortDataTypes.String(),
+        principal : shortDataTypes.String(255,true),
         //负责人电话
-        principalPhone : shortDataTypes.String(),
+        principalPhone : shortDataTypes.String(255,true),
         //对应的租户
         tenantId : shortDataTypes.String(),
 
@@ -27,5 +27,5 @@ module.exports = function (sequelize, DataTypes) {
         classMethods: {}
     });
 
-    return SupplierManage;
+    return SupplierManages;
 };
