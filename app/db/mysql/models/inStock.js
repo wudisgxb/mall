@@ -32,7 +32,6 @@ module.exports = function (sequelize, DataTypes) {
         //入库数量
         storageNum : shortDataTypes.Int(),
 
-
         tenantId : shortDataTypes.String(),
     }, {
         associate: function (models) {

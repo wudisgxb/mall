@@ -2,7 +2,7 @@ const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
-let WareHouseManage = db.models.WareHouseManage
+let WareHouseManage = db.models.WareHouseManages
 const sqlStockManage = (function () {
 
     //进货添加商品
@@ -21,25 +21,27 @@ const sqlStockManage = (function () {
         return wareHouseManage
     }
     let getStockGoods = async function (whereJson,LimitJson,OrderJson) {
+        console.log(WareHouseManage)
         let wareHouseManage
         if(arguments.length==1){
+            console.log(1111)
             wareHouseManage = await WareHouseManage.findAll({
                 where:whereJson
             })
         }
         if(arguments.length==2){
+
             wareHouseManage = await WareHouseManage.findAll({
                 where:whereJson,
-                offset: Number(LimitJson.place),
-                limit: Number(LimitJson.pageSize)
+                offset : LimitJson.offset,
+                limit : LimitJson.limit
             })
         }
         if(arguments.length==3){
             wareHouseManage = await WareHouseManage.findAll({
                 where:whereJson,
-                offset: Number(LimitJson.place),
-                limit: Number(LimitJson.pageSize),
-                order : OrderJson.order
+                LimitJson,
+                OrderJson
             })
         }
         return wareHouseManage

@@ -9,8 +9,9 @@ let db = require('../../db/mysql/index');
 let Tool = require('../../Tool/tool')
 let Captcha = db.models.Captcha
 const AllianceMerchants = db.models.AllianceMerchants;
-const Merchants = db.models.Merchants
-const Alliances = db.models.Alliances
+const Merchants = db.models.Merchants;
+const TenantInfo = db.models.TenantConfigs;
+const Alliances = db.models.Alliances;
 let Admins = db.models.Adminer
 let Caap = require('ccap')();
 let http = require('http')
@@ -19,13 +20,14 @@ const sqlAllianceMerchants = require('../businessAlliance/allianceMerchants')
 const sqlHeadquarters = require('../businessAlliance/headquarters')
 const headQuarters = require('../businessAlliance/headquarters')
 const jwtSecret = require('../../config/config').jwtSecret
+const Oauth = require('../wechatPay/wechatOauth')
 // console.log(jwtSecret)
 module.exports = {
 
-    async getAdminLoginUser(ctx, next){
+    async getAdminLoginUser(ctx, next) {
         let admin = await auth.getAdminLoginUsers();
         // console.log(admin)
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,admin)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, admin)
         // //if (request.url == '/favicon.ico')return response.end('');
         // //实例化caap包
         // let ary = Caap.get();
@@ -49,10 +51,10 @@ module.exports = {
         // });
     },
 
-    async getadminLong(ctx, next){
+    async getadminLong(ctx, next) {
         ctx.checkBody('userName').notEmpty();
         ctx.checkBody('password').notEmpty();
-        ctx.checkBody('mode').notBlank()
+        ctx.checkBody('loginMode').notBlank()
         //ctx.checkBody('captcha').notEmpty();
         //ctx.checkBody('key').notEmpty();
         let body = ctx.request.body;
@@ -62,9 +64,9 @@ module.exports = {
         }
 
         //根据key查询Captcha中的记录
-        if(body.mode==="pc"){
-            if(body.captcha!=null){
-                if(body.captcha==""){
+        if (body.loginMode === "pc") {
+            if (body.captcha != null) {
+                if (body.captcha == "") {
                     ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
                     return;
                 }
@@ -90,14 +92,10 @@ module.exports = {
                     ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
                     return;
                 }
-            }else{
-                ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR,"输入不正确,请输入验证码")
+            } else {
+                ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR, "输入不正确,请输入验证码")
                 return
             }
-        }
-        if(body.mode!="pc"&&body.mode!="mobile"){
-            ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR,"输入不正确mode必须为pc或者mobile")
-            return
         }
 
         let whereJson = {
@@ -107,66 +105,170 @@ module.exports = {
         let admin = await auth.getadmin(whereJson)
         //如果匹配查询用户名密码是否正确
 
-            //判断查询的记录数是否等于0
+        //判断查询的记录数是否等于0
         if (admin == null) {
             //如果等于0那么就返回给前台用户名密码错误
             ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_MATCH)
             return;
         } else {
             let correspondingJson = {
-                phone : admin.phone
+                phone: admin.phone
             }
 
             let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
             const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
             // console.log(token)
-            if(adminCorresponding.correspondingType==3){
-                let tenantJson = {
-                    tenantId : adminCorresponding.correspondingId
+            if (adminCorresponding.correspondingType == 3) {
+                //微信公众号登录，绑定公众号消息推送的openId
+                if (body.loginMode == "wechat" && body.code != null) {
+                    let tenantInfo = await TenantInfo.findOne({
+                        where: {
+                            tenantId: adminCorresponding.correspondingId,
+                        }
+                    })
+
+                    let openId = await Oauth.getMyOpenId(body.code);
+                    console.log("openId ====" + openId);
+                    let openIds = [];
+                    if (tenantInfo.openIds == null) {
+                        openIds.push(openId);
+                        tenantInfo.openIds = JSON.stringify(openIds);
+                        await tenantInfo.save();
+                    } else {
+                        openIds = JSON.parse(tenantInfo.openIds);
+                        if (openIds.contains(openId) == false) {
+                            openIds.push(openId);
+                            tenantInfo.openIds = JSON.stringify(openIds);
+                            await tenantInfo.save();
+                        }
+                    }
                 }
-                let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants,tenantJson)
+
+                let tenantJson = {
+                    tenantId: adminCorresponding.correspondingId
+                }
+                let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants, tenantJson)
                 let merchant = await Merchants.findOne({
-                    where:{
-                        tenantId : adminCorresponding.correspondingId
+                    where: {
+                        tenantId: adminCorresponding.correspondingId
                     }
                 })
 
-                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                    alliancesId : getOperation==null?"":getOperation.alliancesId,
-                    tenantId : adminCorresponding.correspondingId,
-                    correspondingType : adminCorresponding.correspondingType,
-                    style :admin.style,
-                    name : admin.nickname,
-                    aliasName : merchant==null?"":merchant.name,
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
+                    alliancesId: getOperation == null ? "" : getOperation.alliancesId,
+                    tenantId: adminCorresponding.correspondingId,
+                    correspondingType: adminCorresponding.correspondingType,
+                    style: admin.style,
+                    name: admin.nickname,
+                    aliasName: merchant == null ? "" : merchant.name,
                     token
-                })
+                }])
             }
-            if(adminCorresponding.correspondingType==2){
+            if (adminCorresponding.correspondingType == 2) {
                 let alliancesJson = {
-                    alliancesId:adminCorresponding.correspondingId
+                    alliancesId: adminCorresponding.correspondingId
                 }
                 let getHeadquarter = await sqlHeadquarters.getHeadquarter(alliancesJson);
-                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                    alliancesId : adminCorresponding.correspondingId,
-                    headquartersId : getHeadquarter.headquartersId,
-                    correspondingType : adminCorresponding.correspondingType,
-                    style :admin.style,
-                    name : admin.nickname,
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
+                    alliancesId: adminCorresponding.correspondingId,
+                    headquartersId: getHeadquarter.headquartersId,
+                    correspondingType: adminCorresponding.correspondingType,
+                    style: admin.style,
+                    name: admin.nickname,
                     token
-                })
+                }])
             }
-            if(adminCorresponding.correspondingType==1){
+            if (adminCorresponding.correspondingType == 1) {
                 // let headquarterJson = {
                 //     headquartersId: adminCorresponding.correspondingId
                 // }
                 // let getHeadquarter = await headQuarters.getHeadquarter(headquarterJson)
-                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
-                    headquartersId : adminCorresponding.correspondingId,
-                    correspondingType : adminCorresponding.correspondingType,
-                    style :admin.style,
-                    name : admin.nickname,
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
+                    headquartersId: adminCorresponding.correspondingId,
+                    correspondingType: adminCorresponding.correspondingType,
+                    style: admin.style,
+                    name: admin.nickname,
                     token
+                }])
+            }
+        }
+    },
+
+    async bindOpenId(ctx, next) {
+        ctx.checkBody('userName').notEmpty();
+        ctx.checkBody('password').notEmpty();
+        ctx.checkBody('code').notEmpty()
+        let body = ctx.request.body;
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, ctx.errors);
+            return;
+        }
+
+        let whereJson = {
+            nickname: body.userName,
+            password: body.password
+        }
+        let admin = await auth.getadmin(whereJson)
+        //如果匹配查询用户名密码是否正确
+
+        //判断查询的记录数是否等于0
+        if (admin == null) {
+            //如果等于0那么就返回给前台用户名密码错误
+            ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_MATCH)
+            return;
+        } else {
+            let correspondingJson = {
+                phone: admin.phone
+            }
+
+            let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
+            const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
+            // console.log(token)
+            if (adminCorresponding.correspondingType == 3) {
+                //微信公众号登录，绑定公众号消息推送的openId
+                let tenantInfo = await TenantInfo.findOne({
+                    where: {
+                        tenantId: adminCorresponding.correspondingId,
+                    }
                 })
+
+                let openId = await Oauth.getMyOpenId(body.code);
+                console.log("openId ====" + openId);
+                let openIds = [];
+                if (tenantInfo.openIds == null) {
+                    openIds.push(openId);
+                    tenantInfo.openIds = JSON.stringify(openIds);
+                    await tenantInfo.save();
+                } else {
+                    openIds = JSON.parse(tenantInfo.openIds);
+                    if (openIds.contains(openId) == false) {
+                        openIds.push(openId);
+                        tenantInfo.openIds = JSON.stringify(openIds);
+                        await tenantInfo.save();
+                    }
+                }
+
+                let tenantJson = {
+                    tenantId: adminCorresponding.correspondingId
+                }
+                let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants, tenantJson)
+                let merchant = await Merchants.findOne({
+                    where: {
+                        tenantId: adminCorresponding.correspondingId
+                    }
+                })
+
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
+                    alliancesId: getOperation == null ? "" : getOperation.alliancesId,
+                    tenantId: adminCorresponding.correspondingId,
+                    correspondingType: adminCorresponding.correspondingType,
+                    style: admin.style,
+                    name: admin.nickname,
+                    aliasName: merchant == null ? "" : merchant.name,
+                    token
+                }])
+            } else {
+                ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_MATCH);
             }
         }
     },

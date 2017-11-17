@@ -7,6 +7,66 @@ const Consignees = db.models.Consignees;
 const Merchants = db.models.Merchants;
 
 module.exports = {
+
+    //房间号生成
+    async saveTableName(ctx,next){
+        // ctx.checkBody("name").notBlank();
+        // ctx.checkBody("status").notBlank();
+        // ctx.checkBody("info").notBlank();
+        // ctx.checkBody("tenantId").notBlank();
+        // ctx.checkBody("consigneeId").notBlank();
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let body = ctx.request.body
+        // if(body.name.length==0){
+        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        //     return
+        // }
+
+        let name =8200
+        let nameArray = []
+        for(let j = 0; j < 25; j ++){
+            name ++
+            if(name%10==4){
+                name ++
+            }
+            if(name%100==25){
+                name++
+            }
+            nameArray.push(name)
+        }
+        console.log(nameArray)
+        // let namesArray = []
+        let names = 8300
+        for(let g = 0; g < 42; g++){
+            names ++
+            if(names%10==4){
+                names ++
+            }
+            if(names%100==25){
+                names++
+            }
+            if(names/10%10==4){
+                names+=10
+            }
+            nameArray.push(names)
+        }
+        console.log(nameArray)
+        console.log(nameArray.length)
+        // for(let i = 0 ; i < nameArray.length; i ++){
+        //     await Tables.create({
+        //         name : nameArray[i],
+        //         status : 0,
+        //         info : "房间号",
+        //         tenantId :"33334f14444089f1334e0fb32d6f17b6",
+        //         consigneeId : "44b1514a72e7c30cd10b969ee28fbce6"
+        //     })
+        // }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    },
+
     //获取租户下桌信息
     async getAdminTable(ctx, next) {
         ctx.checkQuery('tenantId').notEmpty();

@@ -19,6 +19,9 @@ router.get('/api/test/customer/eshop/wechatpay/wap', Oauth.getUserEshopWechatPay
 //获取openid
 router.get('/api/test/customer/eshop/fetch-openid/wap', Oauth.getOpenId)
 
+//通过code找租户，可能是数组
+router.get('/api/test/customer/eshop/tenantIds', Oauth.getTenantIdsByCode)
+
 router.post('/api/test/wechatPayNotify', Oauth.wechatPayNotify)
 
 //router.get('/api/v3/transfers', Oauth.transfers)

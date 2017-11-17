@@ -34,6 +34,10 @@ const axios = require('axios');
 const getstatistics = require('../statistics/orderStatistic');
 
 const ip = require('ip').address();
+const auth = require('../auth/auth');
+const jwtSecret = require('../../config/config').jwtSecret;
+const jsonwebtoken = require('jsonwebtoken');
+const sqlAllianceMerchants = require('../businessAlliance/allianceMerchants')
 
 const client = new OAuth(config.wechat.appId, config.wechat.secret)
 const wxpay = new WXPay({
@@ -127,7 +131,68 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {openId: token.data.openid})
     },
 
-    async getUserDealWechatPayParams(ctx, next) {
+    async getMyOpenId(code) {
+        const token = await client.getAccessToken(code);
+
+        return token.data.openid
+    },
+    async  getTenantIdsByCode(ctx, next) {
+        const token = await client.getAccessToken(ctx.query.code);
+        let openId = token.data.openid;
+
+        //通过openId查找租户
+        let tenantConfigs = await TenantConfigs.findAll({
+            where: {
+                openIds: {
+                    $like: openId
+                }
+            }
+        });
+
+        let ret = [];
+
+        for (let i = 0; i<tenantConfigs.length;i++) {
+            let correspondingJson = {
+                correspondingId: tenantConfigs[i].tenantId
+            }
+
+            let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
+
+            let whereJson = {
+                phone: adminCorresponding.phone
+            }
+            let admin = await auth.getadmin(whereJson);
+
+            let tmpToken = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
+
+            let merchant = await Merchants.findOne({
+                where: {
+                    tenantId: tenantConfigs[i].tenantId
+                }
+            })
+
+            let tenantJson = {
+                tenantId: tenantConfigs[i].tenantId
+            }
+            let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants, tenantJson)
+
+            ret.push({
+                alliancesId: getOperation == null ? "" : getOperation.alliancesId,
+                tenantId: tenantConfigs[i].tenantId,
+                correspondingType: adminCorresponding.correspondingType,
+                style: admin.style,
+                name: admin.nickname,
+                aliasName: merchant == null ? "" : merchant.name,
+                token:tmpToken
+            })
+        }
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, ret)
+    },
+
+
+
+async getUserDealWechatPayParams(ctx, next) {
         //start
         ctx.checkQuery('code').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();

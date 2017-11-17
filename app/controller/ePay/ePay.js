@@ -96,8 +96,6 @@ module.exports = {
         let total_amount = biz_json.total_amount;
 
         console.log("支付宝需要支付金额 ====" + total_amount);
-
-
         await EPays.create({
             params: new_params,
             paymentMethod: '支付宝',

@@ -6,7 +6,7 @@ let InStocks = db.models.InStocks;
 let GoodsInfos = db.models.GoodsInfos
 let WareHouseManages = db.models.WareHouseManages
 let StockOrderBatchs = db.models.StockOrderBatchs
-let SupplierManage = db.models.SupplierManage
+let SupplierManage = db.models.SupplierManages
 let Tool = require('../../Tool/tool')
 
 let getFoodNum = require('../../controller/statistics/statistics');
@@ -103,8 +103,8 @@ module.exports = {
     async saveInStockPatch(ctx,next) {
         ctx.checkBody('instock').notBlank()
         ctx.checkBody('tenantId').notBlank()
-        ctx.checkBody('supplierId').notBlank()
-        ctx.checkBody('info').notEmpty()
+        // ctx.checkBody('supplierId').notBlank()
+        // ctx.checkBody('info').notEmpty()
         ctx.checkBody('discountsPrice').notBlank()
         ctx.checkBody('restPrice').notBlank()
         ctx.checkBody('alreadyPaymentPrice').notBlank()
@@ -166,7 +166,7 @@ module.exports = {
                 tenantId : body.tenantId,
                 batch : patch,
                 status : 0,
-                supplierId : body.supplierId,
+                supplierId : body.supplierId==null?"1":body.supplierId,
                 info : body.info==null?"":body.info,
                 totalPrice : totalPrices,
                 discountsPrice : Number(body.discountsPrice),
@@ -228,59 +228,118 @@ module.exports = {
             where:{
                 tenantId : body.tenantId,
                 batch : body.batch,
-                goodsNumber : body.goodsNumber
+                goodsNumber : body.goodsNumber,
+                status : {
+                    $ne : 2
+                }
             }
         })
-
-
-
-
-
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-    },
-    async getInStockByName(ctx,next){
-        ctx.checkQuery('name').notEmpty()
-        ctx.checkQuery('tenantId').notEmpty()
-        // ctx.checkQuery('goodsStatus').notEmpty()
-        // ctx.checkQuery('unitPrice').notEmpty()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        if(inStock==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没找到带进货商品")
             return
         }
-        let inStocks
-        if(ctx.query.goodsStatus!=null){
-            inStocks = await InStocks.findAll({
-                where:{
-                    name : ctx.query.name,
-                    tenantId :ctx.query.tenantId,
-                    goodsStatus : ctx.query.goodsStatus
-                }
+        let wareHouseManages = await WareHouseManages.findOne({
+            where:{
+                tenantId:  body.tenantId,
+                goodsNumber : body.goodsNumber,
+            }
+        })
+        if(wareHouseManages==null){
+            await WareHouseManages.create({
+                name : inStock.name,
+                goodsNumber : inStock.goodsNumber,
+                property : inStock.property==null?"":inStock.property,
+                unit : inStock.unit,
+                goodsNum : body.storageNum,
+                tenantId : body.tenantId,
+                info : "",
+                inventoryNum:0,
+                constPrice : inStock.unitPrice
             })
         }else{
-            inStocks = await InStocks.findAll({
-                where:{
-                    name : ctx.query.name,
-                    tenantId :ctx.query.tenantId
-                }
-            })
+            wareHouseManages.goodsNum=Number(wareHouseManages.goodsNum)+Number(body.storageNum)
+            await wareHouseManages.save()
+        }
+        let storageNum = Number(inStock.storageNum)+ Number(body.storageNum)
+        inStock.storageNum = storageNum
+        if(storageNum<inStock.num){
+            inStock.status = 1;
+        }
+        if(storageNum==inStock.num){
+            inStock.status = 2;
+        }
+        let stockOrderBatchs = await StockOrderBatchs.findOne({
+            where:{
+                tenantId : body.tenantId,
+                batch : body.batch,
+            }
+        })
+        stockOrderBatchs.status = 1
+        await stockOrderBatchs.save()
+        await inStock.save()
+
+        let instocks = await InStocks.findAll({
+            where:{
+                tenantId : body.tenantId,
+                batch : body.batch,
+            }
+        })
+        let aaa =0
+        for(let inst of instocks){
+            if(inst.status!=2){
+                aaa+=1
+            }
         }
 
-        let goodNum = 0 //总个数
-        let constPrice = 0//单价
-        let totalPrice = 0 //总价格
-
-        for(let i = 0; i < inStocks.length; i++){
-            goodNum+= Number(inStocks[i].num)
-            totalPrice += Number(inStocks[i].totalPrice)
-            constPrice += Number(inStocks[i].unitPrice)
+        if(aaa == 0){
+            stockOrderBatchs.status = 2
+            await stockOrderBatchs.save()
         }
-        let inStockJson = {}
-        inStockJson.goodNum = goodNum;
-        inStockJson.totalPrice = totalPrice;
-        inStockJson.constPrice = constPrice;
-        inStockJson.inStocks = inStocks;
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,inStockJson)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
+    // async getInStockByName(ctx,next){
+    //     ctx.checkQuery('name').notEmpty()
+    //     ctx.checkQuery('tenantId').notEmpty()
+    //     // ctx.checkQuery('goodsStatus').notEmpty()
+    //     // ctx.checkQuery('unitPrice').notEmpty()
+    //     if(ctx.errors){
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+    //         return
+    //     }
+    //     let inStocks
+    //     if(ctx.query.goodsStatus!=null){
+    //         inStocks = await InStocks.findAll({
+    //             where:{
+    //                 name : ctx.query.name,
+    //                 tenantId :ctx.query.tenantId,
+    //                 goodsStatus : ctx.query.goodsStatus
+    //             }
+    //         })
+    //     }else{
+    //         inStocks = await InStocks.findAll({
+    //             where:{
+    //                 name : ctx.query.name,
+    //                 tenantId :ctx.query.tenantId
+    //             }
+    //         })
+    //     }
+    //
+    //     let goodNum = 0 //总个数
+    //     let constPrice = 0//单价
+    //     let totalPrice = 0 //总价格
+    //
+    //     for(let i = 0; i < inStocks.length; i++){
+    //         goodNum+= Number(inStocks[i].num)
+    //         totalPrice += Number(inStocks[i].totalPrice)
+    //         constPrice += Number(inStocks[i].unitPrice)
+    //     }
+    //     let inStockJson = {}
+    //     inStockJson.goodNum = goodNum;
+    //     inStockJson.totalPrice = totalPrice;
+    //     inStockJson.constPrice = constPrice;
+    //     inStockJson.inStocks = inStocks;
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS,inStockJson)
+    // },
     async getInStockByTenantId(ctx,next){
         // ctx.checkQuery('name').notEmpty()
         ctx.checkQuery('tenantId').notEmpty()
@@ -318,9 +377,16 @@ module.exports = {
                     batch : stockOrderBatchs[i].batch,
                 }
             })
-            console.log(instock)
+            console.log(SupplierManage)
+            let supplier = await SupplierManage.findOne({
+                where:{
+                    id : stockOrderBatchs[i].supplierId
+                }
+            })
+            // console.log(instock)
             stockOrderBatchsJson.batch = stockOrderBatchs[i].batch
             stockOrderBatchsJson.tenantId = stockOrderBatchs[i].tenantId
+            stockOrderBatchsJson.supplier = supplier==null?"":supplier.name
             stockOrderBatchsJson.status = stockOrderBatchs[i].status
             stockOrderBatchsJson.personInCharge = stockOrderBatchs[i].personInCharge
             stockOrderBatchsJson.totalPrice = stockOrderBatchs[i].totalPrice

@@ -8,10 +8,46 @@ const Alliances = db.models.Alliances
 const AllianceHeadquarters = db.models.AllianceHeadquarters
 const Merchants = db.models.Merchants;
 const Consignees = db.models.Consignees;
+const Tables = db.models.Tables;
 const Tool = require('../../Tool/tool');
 
 module.exports = {
 
+    async saveAllQRCodeTemplateBytable(ctx,next){
+        ctx.checkBody('tenantId').notEmpty()
+        ctx.checkBody('consigneeId').notEmpty()
+        let body = ctx.request.body
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let table = await Tables.findAll({
+            where:{
+                tenantId: body.tenantId,
+                consigneeId: body.consigneeId,
+            }
+        })
+        for(let i  = 0; i < table.length; i++){
+            let name = table[i].name
+            let qrcodeId = new Date().format("yyyyMMddhhmmssS")+""+Math.floor(Math.random()*8999+1000)
+            console.log(qrcodeId)
+            await QRCodeTemplates.create({
+                QRCodeTemplateId : qrcodeId,
+                bizType : "eshop",
+                tableName : name,
+                couponType : null,
+                couponValue : null,
+                couponRate : null,
+                tenantId : table[i].tenantId,
+                consigneeId : table[i].consigneeId,
+                descriptor : "",
+                orderLimit : -1,
+                isShared : 0,
+            })
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+
+    },
     async saveAllQRCodeTemplate (ctx, next) {
         // ctx.checkBody('bizType').notEmpty();
         ctx.checkBody('coupons').notEmpty()

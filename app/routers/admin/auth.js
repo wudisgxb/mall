@@ -5,5 +5,6 @@ const router = new (require('koa-router'))()
 // todo: redirect
 router.get('/api/test/admin/Login', auth.getAdminLoginUser);
 router.post('/api/test/admin/Login', auth.getadminLong);
+router.post('/api/test/admin/bindOpenId', auth.bindOpenId);
 module.exports = router
 

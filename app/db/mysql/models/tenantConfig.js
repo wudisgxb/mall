@@ -16,6 +16,10 @@ module.exports = function (sequelize, DataTypes) {
         payee_account: {
             type: Sequelize.STRING,
         },
+        //公众号推送，openId数组
+        openIds: {
+            type: Sequelize.STRING,
+        },
         //是否实时转账
         isRealTime: shortDataTypes.Bool(),
         //是否需要VIP

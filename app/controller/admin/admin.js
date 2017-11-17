@@ -7,10 +7,12 @@ let Admins = db.models.Adminer
 let Alliances = db.models.Alliances
 let AdminCorresponding = db.models.AdminCorresponding
 let Merchants = db.models.Merchants
+let Consignees = db.models.Consignees
 let Headquarters = db.models.Headquarters
-
+let ProfitSharings = db.models.ProfitSharings
+let TenantConfigs = db.models.TenantConfigs
 module.exports = {
-    async register (ctx, next) {
+    async register(ctx, next) {
         ctx.checkBody('userName').notEmpty()
         ctx.checkBody('password').notEmpty()
         ctx.checkBody('phone').notEmpty()
@@ -40,67 +42,157 @@ module.exports = {
             }
         })
         console.log(adminPhone)
-        if (adminPhone.length>0) {
+        if (adminPhone.length > 0) {
             ctx.body = new ApiResult(ApiResult.Result.EXISTED, "手机号已存在已存在！");
             return;
         }
 
-        let industry = body.industry!=null?body.industry:null
+        let industry = body.industry != null ? body.industry : null
         let correspondingId
-        if(body.role !=null&&body.industry!=null){
+        if (body.role != null && body.industry != null) {
 
 
             if (body.role == 1) {
                 correspondingId = "1111" + (Tool.allocTenantId().substring(4))//平台
                 industry = ""
-            }else if (body.role == 2) {
+            } else if (body.role == 2) {
                 correspondingId = "2222" + (Tool.allocTenantId().substring(4))//商圈
-                industry =""
-            }else if (body.role == 3) {
+                industry = ""
+            } else if (body.role == 3) {
                 correspondingId = "3333" + (Tool.allocTenantId().substring(4))//租户
-            }else{
+            } else {
                 correspondingId = Tool.allocTenantId()
             }
         }
-
-        await Admins.create({
-            nickname: body.userName,
-            name: body.name == null ? "超级管理员" : body.name,
-            password: body.password,
-            phone: body.phone,
-            style :industry==null?"":industry,
-            status: body.status == null ? 0 : body.status,
-            type: body.type == null ? 100 : body.type,
-        })
-        console.log(correspondingId)
-
-        if(body.role !=null&&body.industry!=null){
-            await AdminCorresponding.create({
+        try {
+            await Admins.create({
+                nickname: body.userName,
+                name: body.name == null ? "超级管理员" : body.name,
+                password: body.password,
                 phone: body.phone,
-                correspondingType: body.role,
-                adminType : 1000,
-                correspondingId: correspondingId==null?Tool.allocTenantId():correspondingId
+                style: industry == null ? "" : industry,
+                status: body.status == null ? 0 : body.status,
+                type: body.type == null ? 100 : body.type,
             })
+            console.log(correspondingId)
+
+            if (body.role != null && body.industry != null) {
+                await AdminCorresponding.create({
+                    phone: body.phone,
+                    correspondingType: body.role,
+                    adminType: 1000,
+                    correspondingId: correspondingId == null ? Tool.allocTenantId() : correspondingId
+                })
+            }
+            if (body.role == 3) {
+                console.log(11111)
+                await Merchants.create({
+                    name: body.userName,
+                    phone: body.phone,
+                    address: "",
+                    tenantId: correspondingId,
+                    needOrderConfirmPage: false,
+                    style: body.type == null ? 100 : body.type,
+                    aggregateScore: 0,
+                    isDefaultOrder: false,
+                    isAutomatedTransit: false
+                })
+                console.log(222222222222)
+                await TenantConfigs.create({
+                    tenantId: correspondingId,
+                    name: body.userName,
+                    wecharPayee_account: null,
+                    payee_account: null,
+                    openIds: null,
+                    isRealTime: null,
+                    needVip: null,
+                    vipFee: null,
+                    vipRemindFee: null,
+                    homeImage: "",
+                    invaildTime: 100000,
+                    longitude: null,
+                    latitude: null,
+                    officialNews: null,
+                    needOrderConfirmPage: null,
+                    firstDiscount: -1,
+                    openFlag: false,
+                    startTime: "",
+                    endTime: "",
+                    isProfitRate: false,
+                    profitRate: 0
+                })
+                let consigneeId = Tool.allocTenantId()
+                await Consignees.create({
+                    name: body.userName,
+                    phone: body.phone,
+                    wecharPayee_account: null,
+                    payee_account: null,
+                    longitude: null,
+                    latitude: null,
+                    tenantId: correspondingId,
+                    consigneeId: consigneeId,
+                })
+                await ProfitSharings.create({
+                    tenantId: correspondingId,
+                    consigneeId: consigneeId,
+                    merchantRemark: body.userName + "代售-转账",
+                    consigneeRemark: body.userName + "-代售分润",
+                    rate: 0,
+                    ownRate: 0,
+                    distributionFee: 0,
+                    excludeFoodId: null,
+                    consigneeName: body.userName
+                })
+                console.log(333333333)
+            }
+            if (body.role == 2) {
+                await Alliances.create({
+                    industry: "",
+                    name: body.userName,
+                    alliancesId: correspondingId,
+                    phone: body.phone,
+                    address: null,
+                    wecharPayee_account: null,
+                    payee_account: null,
+                    longitude: null,
+                    latitude: null,
+                    officialNews: null,
+                    homeImage: null,
+                    aggregateScore: 0
+                })
+            }
+            if (body.role == 1) {
+                await Headquarters.create({
+                    name: body.userName,
+                    headquartersId: correspondingId,
+                    phone: body.phone,
+                    industry: null,
+                    address: null,
+                    wecharPayee_account: null,
+                    payee_account: null,
+                    homeImage: null,
+                    longitude: null,
+                    latitude: null,
+                    officialNews: null,
+                    aggregateScore: 0,
+
+                })
+            }
+
+        } catch (e) {
+            console.log(e)
+            ctx.body = new ApiResult(ApiResult.Result.CREATE_ERROR, "添加数据有误")
         }
 
-
-        // await AdminCorresponding.create({
-        //     phone: body.phone,
-        //     correspondingType: body.adminType,
-        //     correspondingId: correspondingId
-        // })
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
             phone: body.phone,
             userName: body.userName,
-            style: industry==null?"":industry,
+            style: industry == null ? "" : industry,
             correspondingId: correspondingId
         });
-
-
-
     },
-    async roleRegister(ctx,next){
+    async roleRegister(ctx, next) {
         ctx.checkBody('phone').notEmpty()
         ctx.checkBody('adminType').notEmpty()
         if (ctx.errors) {
@@ -114,8 +206,8 @@ module.exports = {
             }
         })
         console.log(body.adminType)
-        if(adminPhone==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此电话号码,请注册")
+        if (adminPhone == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此电话号码,请注册")
             return
         }
         let correspondingId
@@ -130,13 +222,13 @@ module.exports = {
         }
         await AdminCorresponding.create({
             phone: body.phone,
-            adminType : 1000,
+            adminType: 1000,
             correspondingType: body.adminType,
             correspondingId: correspondingId
         })
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,correspondingId)
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, correspondingId)
     },
-    async putAdmins(ctx,next){
+    async putAdmins(ctx, next) {
         // ctx.checkBody('userName').notEmpty()
         // ctx.checkBody('password').notEmpty()
         // ctx.checkBody('phone').notEmpty()
@@ -154,15 +246,15 @@ module.exports = {
                 nickname: body.userName
             }
         })
-        if(admins==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"用户名和密码不能为空")
+        if (admins == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "用户名和密码不能为空")
             return
-        }else{
+        } else {
             await Admins.update({
                 name: body.name == null ? "超级管理员" : body.name,
                 password: body.password,
-                style : body.style
-            },{
+                style: body.style
+            }, {
                 where: {
                     nickname: body.userName,
                     phone: body.phone,
@@ -181,8 +273,8 @@ module.exports = {
                 name: body.name == null ? "超级管理员" : body.name,
                 password: body.password,
                 phone: body.phone,
-                style : body.style
-            },{
+                style: body.style
+            }, {
                 where: {
                     nickname: body.userName,
                 }
@@ -200,8 +292,8 @@ module.exports = {
                 nickname: body.userName,
                 name: body.name == null ? "超级管理员" : body.name,
                 password: body.password,
-                style : body.style
-            },{
+                style: body.style
+            }, {
                 where: {
                     phone: body.phone,
                 }
@@ -211,120 +303,118 @@ module.exports = {
         }
         ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR)
     },
-    async putAdmin(ctx, next){
+    async putAdmin(ctx, next) {
         let admin = await Admins.findAll({})
-        for(let i = 0; i < admin.length; i++){
+        for (let i = 0; i < admin.length; i++) {
             let adminCorresponding = await AdminCorresponding.findOne({
-                where:{
-                    phone : admin[i].phone
+                where: {
+                    phone: admin[i].phone
                 }
             })
-            if(adminCorresponding.correspondingType==1){
+            if (adminCorresponding.correspondingType == 1) {
                 let headquarters = await Headquarters.findOne({
-                    where:{
-                        headquartersId : adminCorresponding.correspondingId
+                    where: {
+                        headquartersId: adminCorresponding.correspondingId
                     }
                 })
                 let admins = await Admins.findOne({
-                    where:{
-                        phone : admin[i].phone
+                    where: {
+                        phone: admin[i].phone
                     }
                 })
-                admins.name = headquarters==null?"":headquarters.name
+                admins.name = headquarters == null ? "" : headquarters.name
                 await admins.save()
             }
-            if(adminCorresponding.correspondingType==2){
+            if (adminCorresponding.correspondingType == 2) {
                 let alliance = await Alliances.findOne({
-                    where:{
-                        alliancesId : adminCorresponding.correspondingId
+                    where: {
+                        alliancesId: adminCorresponding.correspondingId
                     }
                 })
                 let admins = await Admins.findOne({
-                    where:{
-                        phone : admin[i].phone
+                    where: {
+                        phone: admin[i].phone
                     }
                 })
-                admins.name = alliance==null?"":alliance.name
+                admins.name = alliance == null ? "" : alliance.name
                 await admins.save()
             }
-            if(adminCorresponding.correspondingType==3){
+            if (adminCorresponding.correspondingType == 3) {
                 let merchant = await Merchants.findOne({
-                    where:{
-                        tenantId : adminCorresponding.correspondingId
+                    where: {
+                        tenantId: adminCorresponding.correspondingId
                     }
                 })
                 let admins = await Admins.findOne({
-                    where:{
-                        phone : admin[i].phone
+                    where: {
+                        phone: admin[i].phone
                     }
                 })
-                admins.name = merchant==null?admin.name:merchant.name
+                admins.name = merchant == null ? admin.name : merchant.name
                 await admins.save()
             }
         }
         ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR)
     },
 
-    async getAdminAllTenantId(ctx, next){
+    async getAdminAllTenantId(ctx, next) {
         ctx.checkQuery('adminType').notEmpty()
         //查询tenantId不为All的所有数据
         let id = []
-        if(ctx.query.adminType=="3"){
-            id = await Merchants.findAll({
-            })
+        if (ctx.query.adminType == "3") {
+            id = await Merchants.findAll({})
         }
-        if(ctx.query.adminType=="2"){
-            id = await Alliances.findAll({
-            })
+        if (ctx.query.adminType == "2") {
+            id = await Alliances.findAll({})
         }
-        if(ctx.query.adminType=="1"){
+        if (ctx.query.adminType == "1") {
             id = await Headquarters.findAll({})
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,id);
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, id);
     },
     //公司员工注册
-    async getAdminAllByPhone(ctx, next){
+    async getAdminAllByPhone(ctx, next) {
         //角色的Id
         ctx.checkBody('adminId').notEmpty()
         ctx.checkBody('phone').notEmpty()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        if (ctx.errors) {
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
         let body = ctx.request.body
         let admin = await Admins.findOne({
-            where:{
-                phone:body.phone
+            where: {
+                phone: body.phone
             }
         })
-        if(admin==null){
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此电话号码")
+        if (admin == null) {
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "没有此电话号码")
             return
         }
-        let adminId = (body.adminId).substring(0,4)
-        if(adminId="1111"){
+        let adminId = (body.adminId).substring(0, 4)
+        if (adminId = "1111") {
             await AdminCorresponding.create({
-                phone : body.phone,
-                correspondingType : 1,
-                correspondingId : adminId
+                phone: body.phone,
+                correspondingType: 1,
+                correspondingId: adminId
             })
-        }else if(adminId="2222"){
+        } else if (adminId = "2222") {
             await AdminCorresponding.create({
-                phone : body.phone,
-                correspondingType : 2,
-                correspondingId : adminId
+                phone: body.phone,
+                correspondingType: 2,
+                correspondingId: adminId
             })
-        }else{
+        } else {
             await AdminCorresponding.create({
-                phone : body.phone,
-                correspondingType : 3,
-                correspondingId : adminId
+                phone: body.phone,
+                correspondingType: 3,
+                correspondingId: adminId
             })
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
-    async updateAdmin(ctx, next){
+    async updateAdmin(ctx, next) {
         let admins = await Admins.findAll({});
         for (let i = 0; i < admins.length; i++) {
             if (admins.type == 100) {

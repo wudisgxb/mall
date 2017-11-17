@@ -80,62 +80,104 @@ module.exports = {
     },
 
     async getStockManageOne (ctx, next) {
-        ctx.checkQuery('name').notBlank()
-        ctx.checkQuery('goodNumber').notBlank()
+        // ctx.checkQuery('tenantId').notBlank()
+        let keys = ['name', 'property', 'unit', 'goodsNumber','tenantId'];
+        const condition = keys.reduce((accu, curr) => {
+            if (ctx.query[curr]) {
+                accu[curr] = ctx.query[curr]
+            }
+            return accu;
+        }, {})
+
+        let pageNumber = parseInt(ctx.query.pageNumber);
+
+        if(pageNumber<1){
+            pageNumber=1
+        }
+
+        let pageSize = parseInt(ctx.query.pageSize);
+        if(pageSize<1){
+            pageSize=1
+        }
+        let place = (pageNumber - 1) * pageSize;
+
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
         }
-        let whereJson = {
-            name : ctx.query.name,
-            goodNumber : ctx.query.goodNumber,
+        if(condition.name!=null){
+            condition.name = {
+                $like : "%"+condition.name+"%"
+            }
         }
+        if(condition.goodsNumber!=null){
+            condition.goodsNumber = {
+                $like : "%"+condition.goodsNumber+"%"
+            }
+        }
+        if(condition.property!=null){
+            condition.property = {
+                $like : "%"+condition.property+"%"
+            }
+        }
+
+        condition.tenantId = ctx.query.tenantId
         let stock
-        try{
-            stock = await stockManage.getStockGoodOne(whereJson)
+        let limitJson ={}
+        if(ctx.query.pageSize!=null&&ctx.query.pageSize!=""&&ctx.query.pageNumber!=null&&ctx.query.pageNumber!=""){
+            limitJson = {
+                offset: Number(place),
+                limit: Number(pageSize)
+            }
+        }
+
+        // try{
+            console.log(limitJson)
+            stock = await stockManage.getStockGoods(condition,limitJson)
             if(stock==null){
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此进货记录")
                 return
             }
-        }catch (e){
-            ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,e)
-            return
-        }
-        ctx.body = new ApiResult(ApiResult.Result)
-    },
-    async getStockManagesBytime (ctx, next) {
+        // }catch (e){
+        //     ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,e)
+        //     return
+        // }
 
-        ctx.checkQuery('tenantId').notBlank()
-        ctx.checkQuery('startTime').notBlank()
-        ctx.checkQuery('endTime').notBlank()
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
-            return
-        }
-        let whereJson = {
-            stockTime : {
-                $gte : ctx.query.startTime,
-                $lt : ctx.query.endTime
-            },
-            tenantId : ctx.query.tenantId
-        }
-        let stocks = []
-        try{
-            stocks = await stockManage.getStockGoods(whereJson)
-            if(stocks.length==0){
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此进货记录")
-                return
-            }
-        }catch (e){
-            ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,e)
-            return
-        }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,stocks)
-
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,stock)
     },
+    // async getStockManagesBytime (ctx, next) {
+    //
+    //     ctx.checkQuery('tenantId').notBlank()
+    //     ctx.checkQuery('startTime').notBlank()
+    //     ctx.checkQuery('endTime').notBlank()
+    //     if(ctx.errors){
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+    //         return
+    //     }
+    //     let whereJson = {
+    //         stockTime : {
+    //             $gte : ctx.query.startTime,
+    //             $lt : ctx.query.endTime
+    //         },
+    //         tenantId : ctx.query.tenantId
+    //     }
+    //     let stocks = []
+    //     try{
+    //         stocks = await stockManage.getStockGoods(whereJson)
+    //         if(stocks.length==0){
+    //             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此进货记录")
+    //             return
+    //         }
+    //     }catch (e){
+    //         ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,e)
+    //         return
+    //     }
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS,stocks)
+    //
+    // },
     async getStockManagesByGoodSum (ctx, next) {
         ctx.checkQuery('tenantId').notBlank()
-        ctx.checkQuery('goodNumber').notBlank()
+        // ctx.checkQuery('goodNumber').notBlank()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return

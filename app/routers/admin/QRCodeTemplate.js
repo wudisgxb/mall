@@ -22,4 +22,7 @@ router.delete('/api/test/admin/QRCodeTemplate', QRCodeTemplate.deleteQRCodeTempl
 //新增总二维码模板
 router.post('/api/test/admin/QRCodeTemplateAll', QRCodeTemplate.saveAllQRCodeTemplate);
 
+//新增总二维码模板（添加数据用的）
+router.post('/api/test/admin/QRCodeTemplateByTable', QRCodeTemplate.saveAllQRCodeTemplateBytable);
+
 module.exports = router
