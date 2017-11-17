@@ -15,11 +15,11 @@ module.exports = {
         // ctx.checkBody("info").notBlank();
         // ctx.checkBody("tenantId").notBlank();
         // ctx.checkBody("consigneeId").notBlank();
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
-            return
-        }
-        let body = ctx.request.body
+        // if(ctx.errors){
+        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+        //     return
+        // }
+        // let body = ctx.request.body
         // if(body.name.length==0){
         //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
         //     return
