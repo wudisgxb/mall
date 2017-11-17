@@ -55,16 +55,16 @@ module.exports = {
         }
         console.log(nameArray)
         console.log(nameArray.length)
-        // for(let i = 0 ; i < nameArray.length; i ++){
-        //     await Tables.create({
-        //         name : nameArray[i],
-        //         status : 0,
-        //         info : "房间号",
-        //         tenantId :"33334f14444089f1334e0fb32d6f17b6",
-        //         consigneeId : "44b1514a72e7c30cd10b969ee28fbce6"
-        //     })
-        // }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+        for(let i = 0 ; i < nameArray.length; i ++){
+            await Tables.create({
+                name : nameArray[i],
+                status : 0,
+                info : "房间号",
+                tenantId :"33334f14444089f1334e0fb32d6f17b6",
+                consigneeId : "44b1514a72e7c30cd10b969ee28fbce6"
+            })
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,nameArray)
     },
 
     //获取租户下桌信息

@@ -29,7 +29,7 @@ module.exports = {
         })
         for(let i  = 0; i < table.length; i++){
             let name = table[i].name
-            let qrcodeId = new Date().format("yyyyMMddhhmmssS")+""+Math.floor(Math.random()*8999+1000)
+            let qrcodeId = "201711171042"+"00000"+name
             console.log(qrcodeId)
             await QRCodeTemplates.create({
                 QRCodeTemplateId : qrcodeId,
