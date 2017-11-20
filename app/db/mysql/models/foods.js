@@ -45,9 +45,12 @@ module.exports = function (sequelize, DataTypes) {
         //卡包ID，公众号推卡包场景用，正常不用
         cardId: shortDataTypes.String(255, true),
 
+        goodsNumber : shortDataTypes.String(255, true),
+
         tenantId: {
             type: Sequelize.STRING
         }
+
     }, {
         paranoid: true,
         associate: function (models) {

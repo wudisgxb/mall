@@ -273,6 +273,10 @@ module.exports = {
         }
 
         //从购物车获取
+        console.log(table.id)
+        console.log(body.consigneeId)
+        console.log(body.phoneNumber)
+        console.log(body.tenantId)
         let foodsJson = await ShoppingCarts.findAll({
             where: {
                 TableId: table.id,
@@ -281,6 +285,7 @@ module.exports = {
                 tenantId: body.tenantId
             }
         })
+
         console.log("购物车" + JSON.stringify(foodsJson))
 
         //取之前的订单号，获取请求参数用一个订单号
