@@ -27,6 +27,8 @@ module.exports = {
     async getAdminLoginUser(ctx, next) {
         let admin = await auth.getAdminLoginUsers();
         // console.log(admin)
+        let adminArray = []
+        adminArray.push(admin)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, admin)
         // //if (request.url == '/favicon.ico')return response.end('');
         // //实例化caap包
