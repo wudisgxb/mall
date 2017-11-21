@@ -34,8 +34,9 @@ router.post('/api/test/upload', async function (ctx, next) {
     console.log('uploading %s -> %s', file.name, stream.path);
 
     ctx.body = {
-        success: true,
-        file_path: filename.url.replace(/http:/, "https:")
+        resCode: 0,
+        resMsg: 'success',
+        result: [filename.url.replace(/http:/, "https:")] 
     };
 });
 module.exports = router

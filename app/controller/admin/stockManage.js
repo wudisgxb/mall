@@ -60,7 +60,7 @@ module.exports = {
             return
         }
         let body = ctx.request.body
-        let keys = ['name', 'property', 'specification', 'unit', 'paymentMethod'];
+        let keys = ['name', 'property', 'specification', 'unit', 'paymentMethod','stockNumNotice'];
         const condition = await keys.reduce((accu, curr) => {
             if (ctx[curr]) {
                 accu[curr] = body.condition[curr]
@@ -246,29 +246,43 @@ module.exports = {
 
     },
     async getStockManagesByTenantIdCount (ctx, next) {
-        ctx.checkQuery('tenantId').notBlank()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
         }
-        let whereJson = {
-            tenantId : ctx.query.tenantId
+        let keys = ['name', 'property', 'unit', 'goodsNumber','tenantId'];
+        const condition = keys.reduce((accu, curr) => {
+            if (ctx.query[curr]) {
+                accu[curr] = ctx.query[curr]
+            }
+            return accu;
+        }, {})
+        if(condition.name!=null){
+            condition.name = {
+                $like : "%"+condition.name+"%"
+            }
+        }
+        if(condition.property!=null){
+            condition.property={
+                $like : "%"+condition.property+"%"
+            }
+        }
+        if(condition.goodsNumber!=null){
+            condition.goodsNumber={
+                $like : "%"+condition.goodsNumber+"%"
+            }
         }
         let stocks
         try{
-            stocks = await stockManage.getStockGoodsCount(whereJson)
-            if(stocks.length==0){
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此进货记录")
-                return
-            }
+            stocks = await stockManage.getStockGoodsCount(condition)
+            // if(stocks==0){
+            //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此进货记录")
+            //     return
+            // }
         }catch (e){
-            ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,e)
-            return
+            console.log(e)
+            ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,"查询错误")
         }
-
-
-
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,stocks)
-
     },
 }

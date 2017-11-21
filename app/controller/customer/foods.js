@@ -61,7 +61,7 @@ module.exports = {
                 order: ["sort"]
             });
         } else {
-            let menus = await Menus.findAll({
+            menus = await Menus.findAll({
                 where: {
                     id: menuId,
                 },

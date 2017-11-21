@@ -73,17 +73,12 @@ module.exports = {
                 style: industry == null ? "" : industry,
                 status: body.status == null ? 0 : body.status,
                 type: body.type == null ? 100 : body.type,
+                correspondingType: body.role,
+                adminType: 1000,
+                correspondingId: correspondingId == null ? Tool.allocTenantId() : correspondingId
             })
-            console.log(correspondingId)
 
-            if (body.role != null && body.industry != null) {
-                await AdminCorresponding.create({
-                    phone: body.phone,
-                    correspondingType: body.role,
-                    adminType: 1000,
-                    correspondingId: correspondingId == null ? Tool.allocTenantId() : correspondingId
-                })
-            }
+            
             if (body.role == 3) {
                 console.log(11111)
                 await Merchants.create({
@@ -304,57 +299,22 @@ module.exports = {
         ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR)
     },
     async putAdmin(ctx, next) {
-        let admin = await Admins.findAll({})
-        for (let i = 0; i < admin.length; i++) {
-            let adminCorresponding = await AdminCorresponding.findOne({
-                where: {
-                    phone: admin[i].phone
+        let adminCorresponding = await AdminCorresponding.findAll({})
+        let admin = await  Admins.findAll({})
+        console.log(adminCorresponding.length)
+        console.log(admin.length)
+        for(let i = 0 ; i < admin.length; i++){
+            await Admins.update({
+                correspondingId :adminCorresponding[i].correspondingId,
+                correspondingType :adminCorresponding[i].correspondingType,
+                adminType :adminCorresponding[i].adminType,
+            },{
+                where:{
+                    id : admin[i].id
                 }
             })
-            if (adminCorresponding.correspondingType == 1) {
-                let headquarters = await Headquarters.findOne({
-                    where: {
-                        headquartersId: adminCorresponding.correspondingId
-                    }
-                })
-                let admins = await Admins.findOne({
-                    where: {
-                        phone: admin[i].phone
-                    }
-                })
-                admins.name = headquarters == null ? "" : headquarters.name
-                await admins.save()
-            }
-            if (adminCorresponding.correspondingType == 2) {
-                let alliance = await Alliances.findOne({
-                    where: {
-                        alliancesId: adminCorresponding.correspondingId
-                    }
-                })
-                let admins = await Admins.findOne({
-                    where: {
-                        phone: admin[i].phone
-                    }
-                })
-                admins.name = alliance == null ? "" : alliance.name
-                await admins.save()
-            }
-            if (adminCorresponding.correspondingType == 3) {
-                let merchant = await Merchants.findOne({
-                    where: {
-                        tenantId: adminCorresponding.correspondingId
-                    }
-                })
-                let admins = await Admins.findOne({
-                    where: {
-                        phone: admin[i].phone
-                    }
-                })
-                admins.name = merchant == null ? admin.name : merchant.name
-                await admins.save()
-            }
         }
-        ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR)
+	ctx.body = new ApiResult(ApiResult.Result.IMPORT_ERROR)
     },
 
     async getAdminAllTenantId(ctx, next) {

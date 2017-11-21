@@ -59,10 +59,12 @@ module.exports = function (app) {
 
     require('koa-validate')(app);
 
-    app.use(convert(cors()))
+    app.use(convert(cors({
+        credentials : true
+    })))
     app.use(convert(json()))
 
-    // app.use(jwt({secret: require('../config/config').jwtSecret}).unless({ path: [/login|register|upload|(api\/test\/customer)/i] }))
+    app.use(jwt({secret: require('../config/config').jwtSecret}).unless({ path: [/login|register|upload|(api\/test\/customer)/i] }))
 
     app.use(timeCost())
 

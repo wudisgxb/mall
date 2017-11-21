@@ -14,5 +14,5 @@ router.get('/api/test/admin/stockManageByGoodNameSum', stockManage.getStockManag
 //根据tenantId分页查询所有记录
 router.get('/api/test/admin/stockManageByTenantId', stockManage.getStockManagesByTenantId);
 //查询tenantId的总记录数
-router.get('/api/test/admin/getStockManagesByTenantIdCount', stockManage.getStockManagesByTenantIdCount);
+router.get('/api/test/admin/getStockManagesByCount', stockManage.getStockManagesByTenantIdCount);
 module.exports = router

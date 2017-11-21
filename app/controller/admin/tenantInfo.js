@@ -41,6 +41,7 @@ module.exports = {
             result.longitude = tenantInfo.longitude;
             result.latitude = tenantInfo.latitude;
             result.phone = merchant.phone;
+            result.address = merchant.address;
             result.needChoosePeopleNumberPage = tenantInfo.needChoosePeopleNumberPage;
             result.openFlag = tenantInfo.openFlag;
             result.officialNews = tenantInfo.officialNews;
@@ -48,11 +49,12 @@ module.exports = {
             result.startTime = tenantInfo.startTime;
             result.endTime = tenantInfo.endTime;
             result.needOrderConfirmPage = merchant.needOrderConfirmPage;
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result);
+            let tenantInfoArray = []
+            tenantInfoArray.push(result)
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, tenantInfoArray);
         } else {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '没有该租户的基本信息！');
         }
-
     },
 
     //新增租户信息
@@ -118,61 +120,60 @@ module.exports = {
 
     //编辑租户信息
     async updateTenantInfoByTenantId(ctx, next){
-        ctx.checkBody('/tenantConfig/wecharPayee_account', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/payee_account', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/isRealTime', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/vipFee', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/vipRemindFee', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/homeImage', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/startTime', true).first().notEmpty()
-        ctx.checkBody('/tenantConfig/name', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/endTime', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/needVip', true).first().notEmpty();
         ctx.checkBody('/condition/tenantId', true).first().notEmpty();
-
-        ctx.checkBody('/tenantConfig/longitude', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/latitude', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/officialNews', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/needChoosePeopleNumberPage', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/openFlag', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/firstDiscount', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/invaildTime', true).first().notEmpty();
-
+        let keys = ['wecharPayee_account', 'payee_account', 'isRealTime', 'vipFee', 'vipRemindFee',
+            'homeImage', 'startTime', 'name','endTime','needVip','longitude','address','phone','latitude',
+            'officialNews','needChoosePeopleNumberPage','openFlag','firstDiscount','invaildTime'];
         let body = ctx.request.body;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-
-        let TenantConfig = await TenantInfo.findOne({
-            where: {
-                tenantId: body.condition.tenantId,
+        const condition = keys.reduce((accu, curr) => {
+            if (body.tenantConfig[curr]!=null) {
+                accu[curr] = body.tenantConfig[curr]
+            }
+            return accu;
+        }, {})
+        if(condition.name!=null){
+            await Merchants.update({
+                name : condition.name
+            }, {
+                where:{
+                    tenantId : body.condition.tenantId
+                }
+            })
+            console.log(condition)
+        }
+        console.log(condition)
+        if(condition.address!=null){
+            await Merchants.update({
+                address : condition.address
+            }, {
+                where:{
+                    tenantId : body.condition.tenantId
+                }
+            })
+            await delete condition.address
+        }
+        console.log(condition)
+        if(condition.phone!=null){
+            await Merchants.update({
+                phone : condition.phone
+            }, {
+                where:{
+                    tenantId : body.condition.tenantId
+                }
+            })
+            await delete condition.phone
+        }
+        // console.log(condition)
+        await TenantInfo.update(condition,{
+            where:{
+                tenantId : body.condition.tenantId
             }
         })
 
-        if (TenantConfig == null) {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "未找到租户信息")
-            return;
-        }
-        TenantConfig.wecharPayee_account = body.tenantConfig.wecharPayee_account;
-        TenantConfig.payee_account = body.tenantConfig.payee_account;
-        TenantConfig.isRealTime = body.tenantConfig.isRealTime;
-        TenantConfig.vipFee = body.tenantConfig.vipFee;
-        TenantConfig.vipRemindFee = body.tenantConfig.vipRemindFee;
-        TenantConfig.homeImage = body.tenantConfig.homeImage;
-        TenantConfig.startTime = body.tenantConfig.startTime;
-        TenantConfig.endTime = body.tenantConfig.endTime;
-        TenantConfig.needVip = body.tenantConfig.needVip;
-        TenantConfig.name = body.tenantConfig.name;
-        TenantConfig.tenantId = body.condition.tenantId;
-        TenantConfig.longitude = body.tenantConfig.longitude;
-        TenantConfig.latitude = body.tenantConfig.latitude;
-        TenantConfig.officialNews = body.tenantConfig.officialNews;
-        TenantConfig.needChoosePeopleNumberPage = body.tenantConfig.needChoosePeopleNumberPage;
-        TenantConfig.openFlag = body.tenantConfig.openFlag;
-        TenantConfig.firstDiscount = body.tenantConfig.firstDiscount;
-        TenantConfig.invaildTime = body.tenantConfig.invaildTime;
-        await TenantConfig.save();
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 

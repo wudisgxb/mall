@@ -9,10 +9,10 @@ const SupplierManages = db.models.SupplierManages
 module.exports = {
     async saveSupplierManage (ctx, next) {
         ctx.checkBody("name").notBlank()
-        ctx.checkBody("supplierProperty").notBlank()
-        ctx.checkBody("phone").notBlank()
-        ctx.checkBody("principal").notBlank()
-        ctx.checkBody("principalPhone").notBlank()
+        // ctx.checkBody("supplierProperty").notBlank()
+        // ctx.checkBody("phone").notBlank()
+        // ctx.checkBody("principal").notBlank()
+        // ctx.checkBody("principalPhone").notBlank()
         ctx.checkBody("tenantId").notBlank()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)

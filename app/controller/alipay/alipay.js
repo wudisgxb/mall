@@ -38,7 +38,7 @@ const aliDeal = new Alipay({
     return_url: config.alipay.return_url,//前台回调
     rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
-    sandbox: true,
+    sandbox: false,
     signType: 'RSA2'
 });
 
@@ -48,7 +48,7 @@ const aliEshop = new Alipay({
     return_url: config.alipay.return_url,
     rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
     rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
-    sandbox: true,
+    sandbox: false,
     signType: 'RSA2'
 });
 
@@ -58,7 +58,7 @@ module.exports = {
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('tableName').notEmpty();
         ctx.checkQuery('tradeNo').notEmpty();
-        NSString *privateKey
+        
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -95,7 +95,7 @@ module.exports = {
         //首单折扣，-1表示不折扣，根据手机号和租户id
         let firstDiscount = await orderManager.getFirstDiscount(order.phone, ctx.query.tenantId);
 
-        //根据订单查询需要支付多少
+        //根据订单查询需要支付多少se
         let total_amount = await orderManager.getOrderPriceByOrder(order, firstDiscount);
 
         //查找主商户名称
@@ -278,7 +278,7 @@ module.exports = {
             subject: merchant + '-' + tableName + '账单',
             body: '消费',
             outTradeId: ctx.query.tradeNo,
-            sellerId : 18551663417,
+            
             timeout: '10m',
             amount: total_amount,
             goodsType: '1'

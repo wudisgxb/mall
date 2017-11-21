@@ -273,10 +273,6 @@ module.exports = {
         }
 
         //从购物车获取
-        console.log(table.id)
-        console.log(body.consigneeId)
-        console.log(body.phoneNumber)
-        console.log(body.tenantId)
         let foodsJson = await ShoppingCarts.findAll({
             where: {
                 TableId: table.id,

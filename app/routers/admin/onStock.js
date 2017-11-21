@@ -4,6 +4,6 @@ const router = new (require('koa-router'))()
 router.post('/api/test/admin/onStock',onStock.saveOnStock)
 // router.post('/api/test/admin/onStockByWareHouseManages',inStonStockock.saveWareHouseManages)
 router.get('/api/test/admin/onStock',onStock.getOnStock)
-// router.get('/api/test/admin/onStockByTenantId',onStock.getInStockByTenantId)
+router.put('/api/test/admin/onStockByTenantId',onStock.updateFoodsNumber)
 
 module.exports = router

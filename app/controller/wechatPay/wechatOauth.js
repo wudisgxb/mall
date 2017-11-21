@@ -137,62 +137,73 @@ module.exports = {
         return token.data.openid
     },
     async  getTenantIdsByCode(ctx, next) {
-        const token = await client.getAccessToken(ctx.query.code);
-        let openId = token.data.openid;
+        try {
+            const token = await client.getAccessToken(ctx.query.code);       
+            let openId = token.data.openid;
 
-        //通过openId查找租户
-        let tenantConfigs = await TenantConfigs.findAll({
-            where: {
-                openIds: {
-                    $like: openId
-                }
-            }
-        });
+            console.log("-----openId===" + openId);
 
-        let ret = [];
-
-        for (let i = 0; i<tenantConfigs.length;i++) {
-            let correspondingJson = {
-                correspondingId: tenantConfigs[i].tenantId
-            }
-
-            let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
-
-            let whereJson = {
-                phone: adminCorresponding.phone
-            }
-            let admin = await auth.getadmin(whereJson);
-
-            let tmpToken = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
-
-            let merchant = await Merchants.findOne({
+            //通过openId查找租户
+            let tenantConfigs = await TenantConfigs.findAll({
                 where: {
+                    openIds: {
+                        $like: `%${openId}%`
+                    }
+                }
+            });
+
+            if (tenantConfigs.length == 0) {
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"未绑定微信账号")
+                return;
+            }
+
+
+
+            let ret = [];
+
+            for (let i = 0; i<tenantConfigs.length;i++) {
+                let correspondingJson = {
+                    correspondingId: tenantConfigs[i].tenantId
+                }
+
+                let admin = await auth.getadmin(correspondingJson);
+
+                let tmpToken = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
+
+                let merchant = await Merchants.findOne({
+                    where: {
+                        tenantId: tenantConfigs[i].tenantId
+                    }
+                })
+
+                let tenantJson = {
                     tenantId: tenantConfigs[i].tenantId
                 }
-            })
+                let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants, tenantJson)
 
-            let tenantJson = {
-                tenantId: tenantConfigs[i].tenantId
+                ret.push({
+                    alliancesId: getOperation == null ? "" : getOperation.alliancesId,
+                    tenantId: tenantConfigs[i].tenantId,
+                    correspondingType: adminCorresponding.correspondingType,
+                    style: admin.style,
+                    name: admin.nickname,
+                    aliasName: merchant == null ? "" : merchant.name,
+                    token:tmpToken
+                })
             }
-            let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants, tenantJson)
 
-            ret.push({
-                alliancesId: getOperation == null ? "" : getOperation.alliancesId,
-                tenantId: tenantConfigs[i].tenantId,
-                correspondingType: adminCorresponding.correspondingType,
-                style: admin.style,
-                name: admin.nickname,
-                aliasName: merchant == null ? "" : merchant.name,
-                token:tmpToken
-            })
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, ret)
+        } catch(e) {
+            ctx.body = new ApiLoginResult(ApiLoginResult.Result.PARAMS_ERROR,e.message);
+            return;
         }
 
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS, ret)
+
     },
 
 
 
-async getUserDealWechatPayParams(ctx, next) {
+    async getUserDealWechatPayParams(ctx, next) {
         //start
         ctx.checkQuery('code').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
@@ -854,7 +865,7 @@ async getUserDealWechatPayParams(ctx, next) {
                     amountJson.consigneeId = consigneeId;
                     amountJson.phone = order.phone;
                     amountJson.trade_no = trade_no;
-                    // console.log("amountJson===="+amountJson)
+                    console.log("amountJson====111111111"+amountJson)
                     await getstatistics.setOrders(amountJson);
                 } catch (e) {
                     console.log(e);

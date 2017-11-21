@@ -27,6 +27,9 @@ module.exports = function (sequelize, DataTypes) {
          * 100 => 超级管理员
          */
         type: shortDataTypes.Int(),
+        correspondingId : shortDataTypes.String(),
+        correspondingType : shortDataTypes.String(),
+        adminType : shortDataTypes.String(),
         /**
          * 1.为平台
          * 2.为商圈

@@ -286,7 +286,7 @@ module.exports = {
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('tableName').notEmpty();
         ctx.checkQuery('consigneeId').notEmpty();
-        // ctx.checkQuery('phoneNumber').notEmpty();
+        ctx.checkQuery('phoneNumber').notEmpty();
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -296,7 +296,7 @@ module.exports = {
         const tenantId = ctx.query.tenantId;
         const tableName = ctx.query.tableName;
         const consigneeId = ctx.query.consigneeId;
-        // const phoneNumber = ctx.query.phoneNumber;
+        const phoneNumber = ctx.query.phoneNumber;
         let goodsDiscountJson = {};
         let totalGoodsDiscount = 0;
 
@@ -323,7 +323,7 @@ module.exports = {
                 TableId: table.id,
                 tenantId: tenantId,
                 consigneeId: consigneeId,
-                // phone: phoneNumber
+                phone: phoneNumber
             }
         })
 
@@ -360,7 +360,7 @@ module.exports = {
             totalVipPrice += food[0].vipPrice * shoppingCarts[i].num;
         }
         result.tableName = tableName;
-        // result.phoneNumber = phoneNumber;
+        result.phoneNumber = phoneNumber;
         result.foods = foodArr;
         result.totalNum = totalNum;
         result.totalPrice = Math.round(totalPrice * 100) / 100;
@@ -374,7 +374,7 @@ module.exports = {
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('tableName').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
-        // ctx.checkBody('phoneNumber').notEmpty();
+        ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('foods').notEmpty();
         //ctx.checkParams('tableUserNumber').notEmpty().isInt().toInt();
         //ctx.checkBody('tableUser').notEmpty();
@@ -414,7 +414,7 @@ module.exports = {
                 where: {
                     FoodId: foods[i].foodId,
                     tenantId: body.tenantId,
-                    // phone: body.phoneNumber,
+                    phone: body.phoneNumber,
                     TableId: table.id
                 }
             })
@@ -430,7 +430,7 @@ module.exports = {
                     remark: foods[i].foodRemark,
                     TableId: table.id,
                     consigneeId: body.consigneeId,
-                    // phone: body.phoneNumber,
+                    phone: body.phoneNumber,
                     tenantId: body.tenantId,
                 });
             }

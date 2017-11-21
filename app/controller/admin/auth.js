@@ -111,81 +111,52 @@ module.exports = {
             ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_MATCH)
             return;
         } else {
-            let correspondingJson = {
-                phone: admin.phone
-            }
-
-            let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
+           
             const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
             // console.log(token)
-            if (adminCorresponding.correspondingType == 3) {
+            if (admin.correspondingType == 3) {
                 //微信公众号登录，绑定公众号消息推送的openId
-                if (body.loginMode == "wechat" && body.code != null) {
-                    let tenantInfo = await TenantInfo.findOne({
-                        where: {
-                            tenantId: adminCorresponding.correspondingId,
-                        }
-                    })
-
-                    let openId = await Oauth.getMyOpenId(body.code);
-                    console.log("openId ====" + openId);
-                    let openIds = [];
-                    if (tenantInfo.openIds == null) {
-                        openIds.push(openId);
-                        tenantInfo.openIds = JSON.stringify(openIds);
-                        await tenantInfo.save();
-                    } else {
-                        openIds = JSON.parse(tenantInfo.openIds);
-                        if (openIds.contains(openId) == false) {
-                            openIds.push(openId);
-                            tenantInfo.openIds = JSON.stringify(openIds);
-                            await tenantInfo.save();
-                        }
-                    }
-                }
+                
 
                 let tenantJson = {
-                    tenantId: adminCorresponding.correspondingId
+                    tenantId: admin.correspondingId
                 }
                 let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants, tenantJson)
                 let merchant = await Merchants.findOne({
                     where: {
-                        tenantId: adminCorresponding.correspondingId
+                        tenantId: admin.correspondingId
                     }
                 })
 
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
                     alliancesId: getOperation == null ? "" : getOperation.alliancesId,
-                    tenantId: adminCorresponding.correspondingId,
-                    correspondingType: adminCorresponding.correspondingType,
+                    tenantId: admin.correspondingId,
+                    correspondingType: admin.correspondingType,
                     style: admin.style,
                     name: admin.nickname,
                     aliasName: merchant == null ? "" : merchant.name,
                     token
                 }])
             }
-            if (adminCorresponding.correspondingType == 2) {
+            if (admin.correspondingType == 2) {
                 let alliancesJson = {
-                    alliancesId: adminCorresponding.correspondingId
+                    alliancesId: admin.correspondingId
                 }
                 let getHeadquarter = await sqlHeadquarters.getHeadquarter(alliancesJson);
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
-                    alliancesId: adminCorresponding.correspondingId,
+                    alliancesId: admin.correspondingId,
                     headquartersId: getHeadquarter.headquartersId,
-                    correspondingType: adminCorresponding.correspondingType,
+                    correspondingType: admin.correspondingType,
                     style: admin.style,
                     name: admin.nickname,
                     token
                 }])
             }
-            if (adminCorresponding.correspondingType == 1) {
-                // let headquarterJson = {
-                //     headquartersId: adminCorresponding.correspondingId
-                // }
-                // let getHeadquarter = await headQuarters.getHeadquarter(headquarterJson)
+            if (admin.correspondingType == 1) {
+                
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
-                    headquartersId: adminCorresponding.correspondingId,
-                    correspondingType: adminCorresponding.correspondingType,
+                    headquartersId: admin.correspondingId,
+                    correspondingType: admin.correspondingType,
                     style: admin.style,
                     name: admin.nickname,
                     token
@@ -203,7 +174,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, ctx.errors);
             return;
         }
-
+	
         let whereJson = {
             nickname: body.userName,
             password: body.password
@@ -217,23 +188,25 @@ module.exports = {
             ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_MATCH)
             return;
         } else {
-            let correspondingJson = {
-                phone: admin.phone
-            }
 
-            let adminCorresponding = await auth.getadminCorresponding(correspondingJson)
             const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
             // console.log(token)
-            if (adminCorresponding.correspondingType == 3) {
+            if (admin.correspondingType == 3) {
                 //微信公众号登录，绑定公众号消息推送的openId
                 let tenantInfo = await TenantInfo.findOne({
                     where: {
-                        tenantId: adminCorresponding.correspondingId,
+                        tenantId: admin.correspondingId,
                     }
                 })
-
-                let openId = await Oauth.getMyOpenId(body.code);
-                console.log("openId ====" + openId);
+                let openId;
+                try {
+                    openId = await Oauth.getMyOpenId(body.code);
+                } catch(e) {
+                    console.log("333333")
+                    ctx.body = new ApiLoginResult(ApiLoginResult.Result.PARAMS_ERROR,e.message);
+                    return;
+                }
+		
                 let openIds = [];
                 if (tenantInfo.openIds == null) {
                     openIds.push(openId);
@@ -249,19 +222,20 @@ module.exports = {
                 }
 
                 let tenantJson = {
-                    tenantId: adminCorresponding.correspondingId
+                    tenantId: admin.correspondingId
                 }
                 let getOperation = await sqlAllianceMerchants.getOperation(AllianceMerchants, tenantJson)
                 let merchant = await Merchants.findOne({
                     where: {
-                        tenantId: adminCorresponding.correspondingId
+                        tenantId: admin.correspondingId
                     }
                 })
 
+
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
                     alliancesId: getOperation == null ? "" : getOperation.alliancesId,
-                    tenantId: adminCorresponding.correspondingId,
-                    correspondingType: adminCorresponding.correspondingType,
+                    tenantId: admin.correspondingId,
+                    correspondingType: admin.correspondingType,
                     style: admin.style,
                     name: admin.nickname,
                     aliasName: merchant == null ? "" : merchant.name,
