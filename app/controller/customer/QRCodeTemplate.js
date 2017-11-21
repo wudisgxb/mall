@@ -244,8 +244,9 @@ module.exports = {
         }
         let qrCodesArray = []
         qrCodesArray = qrCodes.sort((a,b) => b.aggregateScore - a.aggregateScore)
+
         if (qrCodesArray.length == 1) {
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodesArray[0]);
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [qrCodesArray[0]]);
         } else {
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, qrCodesArray);
         }
