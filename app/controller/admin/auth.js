@@ -143,8 +143,8 @@ module.exports = {
                     aliasName: merchant == null ? "" : merchant.name,
                     token
                 }])
+                return
             }
-
             if (admin.correspondingType == 2) {
                 console.log("0000000000")
                 let alliancesJson = {
@@ -159,9 +159,9 @@ module.exports = {
                     name: admin.nickname,
                     token
                 }])
+                return
             }
             if (admin.correspondingType == 1) {
-
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
                     headquartersId: admin.correspondingId,
                     correspondingType: admin.correspondingType,
@@ -169,6 +169,7 @@ module.exports = {
                     name: admin.nickname,
                     token
                 }])
+                return
             }
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
         }
