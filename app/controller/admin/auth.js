@@ -112,6 +112,7 @@ module.exports = {
         let admin = await auth.getadmin(whereJson)
         //如果匹配查询用户名密码是否正确
         console.log("77777777777777")
+        console.log(admin.correspondingType)
         //判断查询的记录数是否等于0
         if (admin == null) {
             //如果等于0那么就返回给前台用户名密码错误
@@ -145,7 +146,9 @@ s
                     token
                 }])
             }
+
             if (admin.correspondingType == 2) {
+                console.log("0000000000")
                 let alliancesJson = {
                     alliancesId: admin.correspondingId
                 }
@@ -160,7 +163,7 @@ s
                 }])
             }
             if (admin.correspondingType == 1) {
-                
+                console.log("10101010")
                 ctx.body = new ApiResult(ApiResult.Result.SUCCESS, [{
                     headquartersId: admin.correspondingId,
                     correspondingType: admin.correspondingType,
@@ -170,6 +173,7 @@ s
                 }])
             }
         }
+
     },
 
     async bindOpenId(ctx, next) {
