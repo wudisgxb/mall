@@ -59,6 +59,7 @@ module.exports = {
         ctx.checkBody('loginMode').notBlank()
         //ctx.checkBody('captcha').notEmpty();
         //ctx.checkBody('key').notEmpty();
+        console.log("11111111111111")
         let body = ctx.request.body;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, ctx.errors);
@@ -66,12 +67,15 @@ module.exports = {
         }
 
         //根据key查询Captcha中的记录
-        if (body.loginMode === "pc") {
+        if (body.loginMode == "pc") {
+            console.log("22222222222")
             if (body.captcha != null) {
+                console.log("33333333333")
                 if (body.captcha == "") {
                     ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
                     return;
                 }
+                console.log("4444444444444")
                 let captcha = await Captcha.findOne({
                     where: {
                         key: body.key,
@@ -90,6 +94,7 @@ module.exports = {
                     ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_TIMEOUT)
                     return;
                 }
+                console.log("5555555555555")
                 if (body.captcha.toLowerCase() != captcha.captcha.toLowerCase()) {
                     ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
                     return;
@@ -99,27 +104,27 @@ module.exports = {
                 return
             }
         }
-
+        console.log("66666666666666")
         let whereJson = {
             nickname: body.userName,
             password: body.password
         }
         let admin = await auth.getadmin(whereJson)
         //如果匹配查询用户名密码是否正确
-
+        console.log("77777777777777")
         //判断查询的记录数是否等于0
         if (admin == null) {
             //如果等于0那么就返回给前台用户名密码错误
             ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_MATCH)
             return;
         } else {
-           
+            console.log("88888888")
             const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
             // console.log(token)
             if (admin.correspondingType == 3) {
                 //微信公众号登录，绑定公众号消息推送的openId
-                
-
+                console.log("99999999")
+s
                 let tenantJson = {
                     tenantId: admin.correspondingId
                 }
