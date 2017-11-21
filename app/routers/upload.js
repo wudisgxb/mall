@@ -17,6 +17,8 @@ var newFileName = (filename) => {
         ret = path.join(uploadDir, newfilename);
     } while (fs.exists(ret));
     return {
+        resCode: 0,
+        resMsg: 'success',
         path: ret,
         url: `test/upload/${newfilename}`
     };
@@ -36,7 +38,7 @@ router.post('/api/test/upload', async function (ctx, next) {
     ctx.body = {
         resCode: 0,
         resMsg: 'success',
-        result: [filename.url.replace(/http:/, "https:")] 
+        file_path: filename.url.replace(/http:/, "https:")
     };
 });
 module.exports = router
