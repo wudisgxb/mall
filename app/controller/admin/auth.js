@@ -119,7 +119,7 @@ module.exports = {
             return;
         } else {
 
-            const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60 * 60 * 1000})
+            const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 24 * 60 * 60 * 1000})
             // console.log(token)
             if (admin.correspondingType == 3) {
                 //微信公众号登录，绑定公众号消息推送的openId
