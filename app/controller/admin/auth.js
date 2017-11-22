@@ -56,7 +56,7 @@ module.exports = {
     async getadminLong(ctx, next) {
         ctx.checkBody('userName').notEmpty();
         ctx.checkBody('password').notEmpty();
-        ctx.checkBody('loginMode').notBlank()
+        // ctx.checkBody('loginMode').notBlank()
         //ctx.checkBody('captcha').notEmpty();
         //ctx.checkBody('key').notEmpty();
         let body = ctx.request.body;
@@ -64,7 +64,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, ctx.errors);
             return;
         }
-
+        // console.log(1111)
         //根据key查询Captcha中的记录
         if (body.loginMode == "pc") {
 
@@ -119,11 +119,11 @@ module.exports = {
             return;
         } else {
 
-            const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
+            const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60 * 60 * 1000})
             // console.log(token)
             if (admin.correspondingType == 3) {
                 //微信公众号登录，绑定公众号消息推送的openId
-                console.log("99999999")
+
                 let tenantJson = {
                     tenantId: admin.correspondingId
                 }
@@ -146,7 +146,7 @@ module.exports = {
                 return
             }
             if (admin.correspondingType == 2) {
-                console.log("0000000000")
+
                 let alliancesJson = {
                     alliancesId: admin.correspondingId
                 }
