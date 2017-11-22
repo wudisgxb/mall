@@ -127,6 +127,7 @@ module.exports = {
     // },
     async getOpenId(ctx, next) {
         const token = await client.getAccessToken(ctx.query.code);
+        console.log(ctx.query.code)
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {openId: token.data.openid})
     },
@@ -138,7 +139,8 @@ module.exports = {
     },
     async  getTenantIdsByCode(ctx, next) {
         try {
-            const token = await client.getAccessToken(ctx.query.code);       
+            const token = await client.getAccessToken(ctx.query.code);
+            console.log(ctx.query.code)
             let openId = token.data.openid;
 
             console.log("-----openId===" + openId);
@@ -184,7 +186,7 @@ module.exports = {
                 ret.push({
                     alliancesId: getOperation == null ? "" : getOperation.alliancesId,
                     tenantId: tenantConfigs[i].tenantId,
-                    correspondingType: adminCorresponding.correspondingType,
+                    correspondingType: admin.correspondingType,
                     style: admin.style,
                     name: admin.nickname,
                     aliasName: merchant == null ? "" : merchant.name,
@@ -194,7 +196,7 @@ module.exports = {
 
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, ret)
         } catch(e) {
-            ctx.body = new ApiLoginResult(ApiLoginResult.Result.PARAMS_ERROR,e.message);
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,e.message);
             return;
         }
 
@@ -865,7 +867,8 @@ module.exports = {
                     amountJson.consigneeId = consigneeId;
                     amountJson.phone = order.phone;
                     amountJson.trade_no = trade_no;
-                    console.log("amountJson====111111111"+amountJson)
+                    console.log(amountJson+"111111111111111111111111")
+                    // console.log("amountJson===="+amountJson)
                     await getstatistics.setOrders(amountJson);
                 } catch (e) {
                     console.log(e);
@@ -884,6 +887,52 @@ module.exports = {
                 infoPushManager.infoPush(content, tenantId);
                 console.log("111111111111111111111111111111111111111"+amountJson.totalAmount)
                 if (tenantConfig != null) {
+
+                    if (tenantConfig.openIds != null) {
+                        let openIds = JSON.stringify(tenantConfig.openIds);
+                        for (let j = 0; j < openIds.length; j++) {
+                            //先获取token
+                            let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
+                            let token = ret1.data.access_token;
+
+                            await axios.post(`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`, {
+                                "touser": openIds[j],
+                                "template_id": "Etp21FVqbhHEvDMyWjBEU71ahOw9tdoeHkZWXVF4STE",
+                                "data": {
+                                    "first": {
+                                        "value": "新订单来啦！",
+                                        "color": "#173177"
+                                    },
+                                    "keyword1": {
+                                        "value": tenantConfig.name,
+                                        "color": "#173177"
+                                    },
+                                    "keyword2": {
+                                        "value": "无",
+                                        "color": "#173177"
+                                    },
+                                    "keyword3": {
+                                        "value": trade_no,
+                                        "color": "#173177"
+                                    },
+
+                                    "keyword4": {
+                                        "value": "已支付",
+                                        "color": "#173177"
+                                    },
+                                    "keyword5": {
+                                        "value": amountJson.totalPrice,
+                                        "color": "#173177"
+                                    },
+                                    "remark": {
+                                        "value": order.info,
+                                        "color": "#173177"
+                                    }
+                                }
+                            })
+                        }
+                    }
+
                     if (tenantConfig.isRealTime) {
                         //判断商户是否开启利润分配
                         if(!tenantConfig.isProfitRate){
