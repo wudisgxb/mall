@@ -301,7 +301,8 @@ module.exports = {
                         createdAt: {
                             $between: [startTime, endTime]
                         }
-                    }
+                    },
+                    order: [['createdAt', 'DESC']],
                 })
             } else {
                 orders = await Orders.findAll({
