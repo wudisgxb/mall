@@ -276,7 +276,8 @@ module.exports = {
                             $between: [startTime, endTime]
                         },
                         status : ctx.query.status
-                    }
+                    },
+                    order: [['createdAt', 'DESC']]
                 })
             } else {
                 orders = await Orders.findAll({

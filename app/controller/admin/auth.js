@@ -67,9 +67,7 @@ module.exports = {
         // console.log(1111)
         //根据key查询Captcha中的记录
         if (body.loginMode == "pc") {
-
             if (body.captcha != null) {
-
                 if (body.captcha == "") {
                     ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
                     return;
