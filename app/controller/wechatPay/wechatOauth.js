@@ -598,6 +598,7 @@ module.exports = {
     },
 
     async wechatPayNotify(ctx, next) {
+        console.log("进入微信回调")
         console.log(JSON.stringify(ctx.xmlBody));
         let xmlBody = ctx.xmlBody;
         // var xmlBody = {
@@ -671,7 +672,7 @@ module.exports = {
         const sign = await fn(str, 'MD5')
 
         let trade_no = xml.out_trade_no.toString().substr(0, xml.out_trade_no.toString().length - 4);
-
+        console.log(trade_no)
         if (sign !== xml.sign[0]) {
             AlipayErrors.create({
                 errRsp: JSON.stringify(ctx.xmlBody),
@@ -728,8 +729,9 @@ module.exports = {
             console.log("trade_no=" + trade_no);
             console.log("app_id=" + xml.appid);
             console.log("total_amount=" + parseFloat(xml.total_fee));
-
+            console.log("paymentReqs.length+======"+paymentReqs.length)
             if (paymentReqs.length > 0) {
+
                 //桌状态改成0，空桌
                 tableId = paymentReqs[0].tableId;
                 console.log("tableId:" + tableId);
@@ -747,7 +749,7 @@ module.exports = {
                     table.status = 0;
                     await table.save();
                 }
-
+                console.log(11111111111111111111111111111111)
                 //order状态改成2-已支付
                 let order = await Orders.findOne({
                     where: {
@@ -759,7 +761,7 @@ module.exports = {
                     },
                     paranoid: false
                 });
-
+                console.log(777777777777777777777)
                 order.status = 2;
                 await order.save();
 
@@ -803,7 +805,7 @@ module.exports = {
                 //output:object（总金额，租户金额，代售金额）
 
                 let amountJson
-
+                console.log("order================"+order)
                 amountJson= await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
                 console.log(amountJson)
                 let allianceMerchants = await AllianceMerchants.findOne({
@@ -847,6 +849,7 @@ module.exports = {
                         tenantId :tenantId
                     }
                 })
+                console.log(2222222222222222222222222222)
                 let pay = "微信"
                 if(isVip){
                     // console.log("1111111111111111111111111111111111111111111111111111111111111111")
