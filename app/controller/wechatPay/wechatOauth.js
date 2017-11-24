@@ -707,13 +707,16 @@ module.exports = {
                 }
             })
             let FoodNameArray = []
+            // let foodNumArray = []
             //根据查询到的foodId在菜单中查询当前的菜
             for (let i = 0; i < orders.length; i++) {
                 let food = await Foods.findById(orders[i].FoodId);
                 food.sellCount = food.sellCount + orders[i].num;
                 food.todaySales = food.todaySales + orders[i].num;
                 await food.save();
-                FoodNameArray.push(orders[i].goodsName)
+                for(let i = 0; i <orders[i].num; i++){
+                    FoodNameArray.push(orders[i].goodsName)
+                }
             }
 
             let paymentReqs = await PaymentReqs.findAll({
@@ -849,7 +852,7 @@ module.exports = {
                         tenantId :tenantId
                     }
                 })
-                console.log(2222222222222222222222222222)
+
                 let pay = "微信"
                 if(isVip){
                     // console.log("1111111111111111111111111111111111111111111111111111111111111111")
@@ -928,7 +931,7 @@ module.exports = {
                                         "color": "#173177"
                                     },
                                     "keyword5": {
-                                        "value": new Date(),
+                                        "value": new Date().toLocaleString(),
                                         "color": "#173177"
                                     },
                                     "remark": {
