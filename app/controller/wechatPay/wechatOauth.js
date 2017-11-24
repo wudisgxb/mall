@@ -928,11 +928,12 @@ module.exports = {
                                         "color": "#173177"
                                     },
                                     "keyword5": {
-                                        "value": amountJson.totalPrice,
+                                        "value": new Date(),
                                         "color": "#173177"
                                     },
                                     "remark": {
-                                        "value": order.info,
+                                        "value": order.info+"/n订单总价格:"+amountJson.totalPrice+"/n"+
+                                        "商品:"+FoodNameArray,
                                         "color": "#173177"
                                     }
                                 }
