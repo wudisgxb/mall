@@ -888,16 +888,18 @@ module.exports = {
                     content = table.name + ' 已结账 订单总价： ' + amountJson.totalPrice + '元 ' + date;
                 }
                 infoPushManager.infoPush(content, tenantId);
-                console.log("111111111111111111111111111111111111111"+amountJson.totalAmount)
+                console.log("111111111111111111"+amountJson.totalAmount)
                 if (tenantConfig != null) {
 
                     if (tenantConfig.openIds != null) {
+                        console.log("进入openId")
                         let openIds = JSON.stringify(tenantConfig.openIds);
                         for (let j = 0; j < openIds.length; j++) {
                             //先获取token
+                            console.log("获取token")
                             let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
                             let token = ret1.data.access_token;
-
+                            console.log(axios)
                             await axios.post(`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`, {
                                 "touser": openIds[j],
                                 "template_id": "Etp21FVqbhHEvDMyWjBEU71ahOw9tdoeHkZWXVF4STE",
