@@ -893,7 +893,7 @@ module.exports = {
 
                     if (tenantConfig.openIds != null) {
 
-                        let openIds = JSON.stringify(tenantConfig.openIds);
+                        let openIds = JSON.parse(tenantConfig.openIds);
                         console.log(openIds.length)
                         console.log(openIds)
                         for (let j = 0; j < openIds.length; j++) {
