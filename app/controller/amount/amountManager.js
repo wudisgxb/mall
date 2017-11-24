@@ -893,7 +893,7 @@ const amountManger = (function () {
                 tenantId : tenantId
             }
         })
-        console.log(tenantConfigs)
+
         if (tenantConfigs == null) {
             return "没找到当前租户信息"
         }
@@ -948,7 +948,7 @@ const amountManger = (function () {
             }
             goodsArray.push(goodsMessgae)
         }
-        console.log(totalPrices)
+
         goodsJson.totalPrices= totalPrices,
         goodsJson.saleGoodsTotalPrices = saleGoodsTotalPrices,
         goodsJson.profitPrice = profitPrice,

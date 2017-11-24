@@ -56,7 +56,7 @@ module.exports = {
     async getadminLong(ctx, next) {
         ctx.checkBody('userName').notEmpty();
         ctx.checkBody('password').notEmpty();
-        ctx.checkBody('loginMode').notBlank()
+        // ctx.checkBody('loginMode').notBlank()
         //ctx.checkBody('captcha').notEmpty();
         //ctx.checkBody('key').notEmpty();
         let body = ctx.request.body;

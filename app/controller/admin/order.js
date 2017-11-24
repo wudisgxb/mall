@@ -268,6 +268,7 @@ module.exports = {
         //根据tenantId，查询当前时间的订单
         let orders = [];
         if(ctx.query.status!=null){
+            console.log(222222222222222222)
             if (ctx.query.pageNumber == null && ctx.query.pageSize == null) {
                 orders = await Orders.findAll({
                     where: {
@@ -276,7 +277,8 @@ module.exports = {
                             $between: [startTime, endTime]
                         },
                         status : ctx.query.status
-                    }
+                    },
+                    order: [['createdAt', 'DESC']]
                 })
             } else {
                 orders = await Orders.findAll({
@@ -300,7 +302,8 @@ module.exports = {
                         createdAt: {
                             $between: [startTime, endTime]
                         }
-                    }
+                    },
+                    order: [['createdAt', 'DESC']],
                 })
             } else {
                 orders = await Orders.findAll({
@@ -311,6 +314,7 @@ module.exports = {
                     offset: place,
                     limit: pageSize
                 })
+
             }
         }
 
@@ -330,6 +334,7 @@ module.exports = {
                     consigneeId: orders[k].consigneeId
                 }
             });
+
             //根据创建时间和订单号查询所有记录
             orderGoods = await OrderGoods.findAll({
                 where: {
@@ -408,6 +413,7 @@ module.exports = {
                     tenantId : ctx.query.tenantId
                 }
             })
+
             if(tenantconfig.isProfitRate){
                 let getProfitRate = await amoutManager.getProfitRate(ctx.query.tenantId,orders[k].trade_no)
                 if(getProfitRate.totalPrices > 0){
@@ -444,7 +450,6 @@ module.exports = {
                     result[k].couponValue = null
                 }
             }
-
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, result)
     },
