@@ -714,7 +714,7 @@ module.exports = {
                 food.sellCount = food.sellCount + orders[i].num;
                 food.todaySales = food.todaySales + orders[i].num;
                 await food.save();
-                for(let i = 0; i <orders[i].num; i++){
+                for(let j = 0; j <orders[i].num; j++){
                     FoodNameArray.push(orders[i].goodsName)
                 }
             }
@@ -752,7 +752,7 @@ module.exports = {
                     table.status = 0;
                     await table.save();
                 }
-                console.log(11111111111111111111111111111111)
+
                 //order状态改成2-已支付
                 let order = await Orders.findOne({
                     where: {
@@ -764,7 +764,7 @@ module.exports = {
                     },
                     paranoid: false
                 });
-                console.log(777777777777777777777)
+
                 order.status = 2;
                 await order.save();
 
@@ -891,7 +891,7 @@ module.exports = {
                     content = table.name + ' 已结账 订单总价： ' + amountJson.totalPrice + '元 ' + date;
                 }
                 infoPushManager.infoPush(content, tenantId);
-                console.log("111111111111111111"+amountJson.totalAmount)
+
                 if (tenantConfig != null) {
 
                     if (tenantConfig.openIds != null) {
@@ -904,7 +904,7 @@ module.exports = {
 
                             let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
                             let token = ret1.data.access_token;
-                            console.log("获取token==========="+token)
+
                             await axios.post(`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`, {
                                 "touser": openIds[j],
                                 "template_id": "Etp21FVqbhHEvDMyWjBEU71ahOw9tdoeHkZWXVF4STE",
