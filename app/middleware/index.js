@@ -64,7 +64,7 @@ module.exports = function (app) {
     })))
     app.use(convert(json()))
 
-    // app.use(jwt({secret: require('../config/config').jwtSecret}).unless({ path: [/login|register|upload|(api\/test\/customer)/i] }))
+    app.use(jwt({secret: require('../config/config').jwtSecret}).unless({ path: [/login|register|upload|(api\/test\/customer)|wechatPayNotify|alipay/i] }))
 
     app.use(timeCost())
 
