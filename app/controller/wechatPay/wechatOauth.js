@@ -932,7 +932,7 @@ module.exports = {
                                         "color": "#173177"
                                     },
                                     "remark": {
-                                        "value": order.info+"/n订单总价格:"+amountJson.totalPrice+"/n"+
+                                        "value": order.info+"\n订单总价格:"+amountJson.totalPrice+"\n"+
                                         "商品:"+FoodNameArray,
                                         "color": "#173177"
                                     }
