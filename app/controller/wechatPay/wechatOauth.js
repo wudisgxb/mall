@@ -591,7 +591,7 @@ module.exports = {
             order.status = 1;//待支付
             order.paymentMethod = '微信';
             await order.save();
-
+            console.log("支付完成下面进入回调")
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
 
