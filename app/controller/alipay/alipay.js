@@ -662,7 +662,7 @@ module.exports = {
                                         "color": "#173177"
                                     },
                                     "keyword5": {
-                                        "value": amountJson.totalPrice,
+                                        "value": new Date().toLocaleString(),
                                         "color": "#173177"
                                     },
                                     "remark": {
