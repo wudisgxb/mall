@@ -3,7 +3,7 @@ const logger = require('koa-log4').getLogger('AddressController')
 let db = require('../../db/mysql/index');
 const util = require('../alipay/util');
 let path = require('path');
-
+const axios = require('axios');
 const fs = require('fs');
 const Alipay = require('../alipay/index');
 const Tables = db.models.Tables;
@@ -632,6 +632,7 @@ module.exports = {
 
                         for (let j = 0; j < openIds.length; j++) {
                             //先获取token
+                            console.log(axios)
                             let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
                             let token = ret1.data.access_token;
 
