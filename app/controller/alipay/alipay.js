@@ -58,7 +58,6 @@ module.exports = {
         ctx.checkQuery('tenantId').notEmpty();
         ctx.checkQuery('tableName').notEmpty();
         ctx.checkQuery('tradeNo').notEmpty();
-        
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -95,7 +94,7 @@ module.exports = {
         //首单折扣，-1表示不折扣，根据手机号和租户id
         let firstDiscount = await orderManager.getFirstDiscount(order.phone, ctx.query.tenantId);
 
-        //根据订单查询需要支付多少se
+        //根据订单查询需要支付多少
         let total_amount = await orderManager.getOrderPriceByOrder(order, firstDiscount);
 
         //查找主商户名称
@@ -278,7 +277,7 @@ module.exports = {
             subject: merchant + '-' + tableName + '账单',
             body: '消费',
             outTradeId: ctx.query.tradeNo,
-            
+            sellerId : 18551663417,
             timeout: '10m',
             amount: total_amount,
             goodsType: '1'
@@ -430,7 +429,9 @@ module.exports = {
                 food.sellCount = food.sellCount + orders[i].num;
                 food.todaySales = food.todaySales + orders[i].num;
                 await food.save();
-                FoodNameArray.push(food.name)
+                for(let j = 0; j <orders[i].num; j++){
+                    FoodNameArray.push(orders[i].goodsName)
+                }
             }
 
             let paymentReqs = await PaymentReqs.findAll({
@@ -627,6 +628,52 @@ module.exports = {
 
                 let result;
                 if (tenantConfig != null) {
+                    if (tenantConfig.openIds != null) {
+                        let openIds = JSON.stringify(tenantConfig.openIds);
+
+                        for (let j = 0; j < openIds.length; j++) {
+                            //先获取token
+                            let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
+                            let token = ret1.data.access_token;
+
+                            await axios.post(`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`, {
+                                "touser": openIds[j],
+                                "template_id": "Etp21FVqbhHEvDMyWjBEU71ahOw9tdoeHkZWXVF4STE",
+                                "data": {
+                                    "first": {
+                                        "value": "新订单来啦！",
+                                        "color": "#173177"
+                                    },
+                                    "keyword1": {
+                                        "value": tenantConfig.name,
+                                        "color": "#173177"
+                                    },
+                                    "keyword2": {
+                                        "value": table.name,
+                                        "color": "#173177"
+                                    },
+                                    "keyword3": {
+                                        "value": ret.out_trade_no,
+                                        "color": "#173177"
+                                    },
+
+                                    "keyword4": {
+                                        "value": "已支付",
+                                        "color": "#173177"
+                                    },
+                                    "keyword5": {
+                                        "value": amountJson.totalPrice,
+                                        "color": "#173177"
+                                    },
+                                    "remark": {
+                                        "value": order.info+"\n订单总价格:"+amountJson.totalPrice+"\n"+
+                                        "商品:"+FoodNameArray,
+                                        "color": "#173177"
+                                    }
+                                }
+                            })
+                        }
+                    }
                     if (tenantConfig.isRealTime) {
                         if(tenantConfig.isProfitRate){
                             if (consignee == null) {
@@ -797,7 +844,9 @@ module.exports = {
                             }
                         }
                     }
+
                 }
+
             } else {
                 AlipayErrors.create({
                     errRsp: JSON.stringify(response),
