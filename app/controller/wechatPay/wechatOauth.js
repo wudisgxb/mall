@@ -893,6 +893,7 @@ module.exports = {
                 infoPushManager.infoPush(content, tenantId);
 
                 if (tenantConfig != null) {
+                    console.log()
 
                     if (tenantConfig.openIds != null) {
 
@@ -1036,7 +1037,7 @@ module.exports = {
                                             console.log("代售点分润：" + amountJson.consigneeAmount);
                                             params = {
                                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                                openid: consignee.wecharPayee_account,
+                                                openid: tenantConfig.wecharPayee_account,
                                                 check_name: 'NO_CHECK',
                                                 amount: Math.round(amountJson.consigneeAmount * 100),
                                                 desc: profitsharing.consigneeRemark,
