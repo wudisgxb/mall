@@ -277,7 +277,6 @@ module.exports = {
             subject: merchant + '-' + tableName + '账单',
             body: '消费',
             outTradeId: ctx.query.tradeNo,
-            sellerId : 18551663417,
             timeout: '10m',
             amount: total_amount,
             goodsType: '1'

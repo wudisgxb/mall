@@ -19,7 +19,7 @@ let auth = require('../auth/auth')
 const sqlAllianceMerchants = require('../businessAlliance/allianceMerchants')
 const sqlHeadquarters = require('../businessAlliance/headquarters')
 const headQuarters = require('../businessAlliance/headquarters')
-// const jwtSecret = require('../../config/config').jwtSecret
+const jwtSecret = require('../../config/config').jwtSecret
 const Oauth = require('../wechatPay/wechatOauth')
 // console.log(jwtSecret)
 module.exports = {
@@ -67,7 +67,9 @@ module.exports = {
 
         //根据key查询Captcha中的记录
         if (body.loginMode == "pc") {
+
             if (body.captcha != null) {
+
                 if (body.captcha == "") {
                     ctx.body = new ApiLoginResult(ApiLoginResult.Result.CAPTCHA_ERROR)
                     return;
@@ -117,7 +119,7 @@ module.exports = {
             return;
         } else {
 
-            // const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 24 * 60 * 60 * 1000})
+            const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 24 * 60 * 60 * 1000})
             // console.log(token)
             if (admin.correspondingType == 3) {
                 //微信公众号登录，绑定公众号消息推送的openId
@@ -139,7 +141,7 @@ module.exports = {
                     style: admin.style,
                     name: admin.nickname,
                     aliasName: merchant == null ? "" : merchant.name,
-                    // token
+                    token
                 }])
                 return
             }
@@ -155,7 +157,7 @@ module.exports = {
                     correspondingType: admin.correspondingType,
                     style: admin.style,
                     name: admin.nickname,
-                    // token
+                    token
                 }])
                 return
             }
@@ -165,7 +167,7 @@ module.exports = {
                     correspondingType: admin.correspondingType,
                     style: admin.style,
                     name: admin.nickname,
-                    // token
+                    token
                 }])
                 return
             }
@@ -198,7 +200,7 @@ module.exports = {
             return;
         } else {
 
-            // const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
+            const token = jsonwebtoken.sign({phone: admin.phone}, jwtSecret, {expiresIn: 5 * 60})
             // console.log(token)
             if (admin.correspondingType == 3) {
                 //微信公众号登录，绑定公众号消息推送的openId
@@ -248,7 +250,7 @@ module.exports = {
                     style: admin.style,
                     name: admin.nickname,
                     aliasName: merchant == null ? "" : merchant.name,
-                    // token
+                    token
                 }])
             } else {
                 ctx.body = new ApiLoginResult(ApiLoginResult.Result.NOT_MATCH);
