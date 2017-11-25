@@ -628,7 +628,7 @@ module.exports = {
                 let result;
                 if (tenantConfig != null) {
                     if (tenantConfig.openIds != null) {
-                        let openIds = JSON.stringify(tenantConfig.openIds);
+                        let openIds = JSON.parse(tenantConfig.openIds);
 
                         for (let j = 0; j < openIds.length; j++) {
                             //先获取token
