@@ -364,7 +364,8 @@ const amountManger = (function () {
                         //ownRate为平台分成比率
                         //1-平台分成比率 = 商家分成比率
                         console.log(11111111111111111111)
-                        merchantAmount = totalAmount * (1-profitsharing.ownRate);
+                        merchantAmount = totalAmount * (1-profitsharing.ownRate)*0.994;
+                        console.log("merchantAmount=============="+merchantAmount)
                         consigneeAmount = 0;
                     }
 

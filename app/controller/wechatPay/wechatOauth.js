@@ -918,7 +918,7 @@ module.exports = {
                                         "color": "#173177"
                                     },
                                     "keyword2": {
-                                        "value": "无",
+                                        "value": table.name=="0号桌"?order.info:table.name,
                                         "color": "#173177"
                                     },
                                     "keyword3": {
