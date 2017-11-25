@@ -987,7 +987,7 @@ module.exports = {
                                 });
                                 console.log(consigneeId)
                                 console.log(tenantId)
-                                console.log(profitsharing)
+                                console.log(tenantConfig.wecharPayee_account)
                                 // console.log(consigneeId)
                                 if (profitsharing == null) {
                                     params = {
@@ -1035,9 +1035,10 @@ module.exports = {
 
                                             //主商户转账成功才能给代售商户转账
                                             console.log("代售点分润：" + amountJson.consigneeAmount);
+                                            console.log()
                                             params = {
                                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
-                                                openid: tenantConfig.wecharPayee_account,
+                                                openid: consignee.wecharPayee_account,
                                                 check_name: 'NO_CHECK',
                                                 amount: Math.round(amountJson.consigneeAmount * 100),
                                                 desc: profitsharing.consigneeRemark,
