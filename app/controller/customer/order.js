@@ -41,9 +41,6 @@ module.exports = {
             where:{
                 tenantId : body.tenantId,
                 trade_no : body.tradeNo,
-                isOnlinePayment : {
-                    $ne : "true"
-                }
             }
         })
         console.log(orders)
