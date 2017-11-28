@@ -34,6 +34,8 @@ module.exports = {
         }
         let body = ctx.request.body
 
+        console.log(body.tradeNo)
+        console.log(body.tenantId)
         let orders = await Orders.findOne({
             where:{
                 tenantId : body.tenantId,
