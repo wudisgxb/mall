@@ -237,7 +237,10 @@ module.exports = {
                 TableId: table.id,
                 $or: [{status: 0}, {status: 1}],
                 tenantId: ctx.query.tenantId,
-                consigneeId: null
+                consigneeId: null,
+                isOnlinePayment : {
+                    $ne : 1
+                }
             }
         })
 
@@ -428,7 +431,10 @@ module.exports = {
                 $or: [{status: 0}, {status: 1}],
                 tenantId: ctx.query.tenantId,
                 consigneeId: ctx.query.consigneeId,
-                phone: ctx.query.phoneNumber
+                phone: ctx.query.phoneNumber,
+                isOnlinePayment : {
+                    $ne : 1
+                }
             }
         })
 

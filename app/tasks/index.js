@@ -1181,6 +1181,9 @@ module.exports = async function tasks(app) {
                     $or: [{status: 0}, {status: 1}],
                     'consigneeId': {
                         $ne: null
+                    },
+                    isOnlinePayment :{
+                        $ne : 1
                     }
                 }
             });
