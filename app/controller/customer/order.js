@@ -761,7 +761,7 @@ module.exports = {
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
                     consigneeId: ctx.query.consigneeId,
-                    
+
                 }
             })
             console.log(order)
@@ -1190,9 +1190,7 @@ module.exports = {
         let order = await Orders.findOne({
             where: {
                 trade_no: trade_no,
-                isOnlinePayment : {
-                    $ne : 1
-                }
+
             }
         })
 
