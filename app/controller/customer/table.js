@@ -101,7 +101,10 @@ module.exports = {
                         phone: ctx.query.phoneNumber,
                         tenantId: ctx.query.tenantId,
                         TableId: table.id,
-                        $or: [{status: 0}, {status: 1}]
+                        $or: [{status: 0}, {status: 1}],
+                        isOnlinePayment : {
+                            $ne : true
+                        }
                     }
                 });
                 //下单状态
