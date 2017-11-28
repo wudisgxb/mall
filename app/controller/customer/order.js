@@ -761,7 +761,10 @@ module.exports = {
                     $or: [{status: 0}, {status: 1}],
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
-                    consigneeId: ctx.query.consigneeId
+                    consigneeId: ctx.query.consigneeId,
+                    isOnlinePayment : {
+                        $ne : 1
+                    }
                 }
             })
 
