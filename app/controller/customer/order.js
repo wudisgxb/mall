@@ -42,7 +42,7 @@ module.exports = {
                 tenantId : body.tenantId,
                 trade_no : body.tradeNo,
                 isOnlinePayment : {
-                    $ne : 1
+                    $ne : true
                 }
             }
         })
@@ -51,6 +51,7 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
             return
         }
+        orders.status = 1
         orders.isOnlinePayment = 1
         await orders.save()
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
@@ -755,6 +756,7 @@ module.exports = {
         let order;
 
         if (trade_no == undefined) {
+            console.log(1111111)
             order = await Orders.findOne({
                 where: {
                     TableId: tableId,
@@ -767,6 +769,7 @@ module.exports = {
                     }
                 }
             })
+            console.log(order)
 
             if (order != null) {
                 trade_no = order.trade_no;
