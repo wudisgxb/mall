@@ -14,7 +14,7 @@ router.delete('/api/test/customer/eshop/order', order.deleteUserEshopOrder);
 
 router.get('/api/test/customer/eshop/order', order.getUserEshopOrder.bind(order));
 
-router.put('/api/test/customer/eshop/offlinePayment', order.onlinePayment);
+router.put('/api/test/customer/eshop/offlinePayment', order.onlinePaymentBytrade_no);
 
 router.get('/api/test/admin/eshop/offlinePayment', order.getOnlinePayment);
 

@@ -24,7 +24,7 @@ const Promise = require('Promise');
 
 module.exports = {
 
-    async onlinePayment(ctx, next){
+    async onlinePaymentBytrade_no(ctx, next){
         ctx.checkBody('tenantId').notBlank()
         // ctx.checkBody('tableName').notBlank()
         ctx.checkBody('tradeNo').notBlank()
