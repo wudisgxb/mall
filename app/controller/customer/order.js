@@ -762,6 +762,9 @@ module.exports = {
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
                     consigneeId: ctx.query.consigneeId,
+                    isOnlinePayment : {
+                        $ne : 1
+                    }
                 }
             })
 
@@ -1188,7 +1191,10 @@ module.exports = {
         //获取newOrder表内容
         let order = await Orders.findOne({
             where: {
-                trade_no: trade_no
+                trade_no: trade_no,
+                isOnlinePayment : {
+                    $ne : 1
+                }
             }
         })
 
