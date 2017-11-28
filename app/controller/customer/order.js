@@ -762,9 +762,6 @@ module.exports = {
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
                     consigneeId: ctx.query.consigneeId,
-                    isOnlinePayment : {
-                        $ne : 1
-                    }
                 }
             })
 
