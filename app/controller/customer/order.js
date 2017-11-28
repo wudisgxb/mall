@@ -26,7 +26,7 @@ module.exports = {
 
     async onlinePayment(ctx, next){
         ctx.checkBody('tenantId').notBlank()
-        ctx.checkBody('tableName').notBlank()
+        // ctx.checkBody('tableName').notBlank()
         ctx.checkBody('tradeNo').notBlank()
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
