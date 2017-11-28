@@ -42,7 +42,7 @@ module.exports = {
                 tenantId : body.tenantId,
                 trade_no : body.tradeNo,
                 isOnlinePayment : {
-                    $ne : true
+                    $ne : "true"
                 }
             }
         })
