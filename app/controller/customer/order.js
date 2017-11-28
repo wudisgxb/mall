@@ -36,12 +36,17 @@ module.exports = {
 
         console.log(body.tradeNo)
         console.log(body.tenantId)
+        console.log(Orders)
         let orders = await Orders.findOne({
             where:{
                 tenantId : body.tenantId,
                 trade_no : body.tradeNo,
+                isOnlinePayment : {
+                    $ne : 1
+                }
             }
         })
+        console.log(orders)
         if(orders==null){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
             return
