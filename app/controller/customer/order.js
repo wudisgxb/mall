@@ -43,9 +43,14 @@ module.exports = {
                 trade_no : body.tradeNo,
             }
         })
+
         console.log(orders)
         if(orders==null){
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
+            return
+        }
+        if(orders.isOnlinePayment == 1){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"该订单已支付")
             return
         }
         orders.status = 1
