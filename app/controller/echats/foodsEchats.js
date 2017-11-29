@@ -137,6 +137,7 @@ const getFoodEchats = (function () {
             for (let name of foodName) {
                 let num = await OrderGoods.sum('num', {
                     where: {
+
                         tenantId : tenantId,
                         goodsName: name,
                         createdAt: {
@@ -156,6 +157,7 @@ const getFoodEchats = (function () {
                     }
                 })
                 result.push({
+                    price : order.price,
                     goodsName : name,
                     consume : order.price*num,
                     vipConsume:order.vipPrice*num,
@@ -224,6 +226,7 @@ const getFoodEchats = (function () {
                 })
 
                 result.push({
+                    price : order.price,
                     goodsName : name,
                     consume : order.price*num,
                     vipConsume:order.vipPrice*num,
@@ -294,6 +297,7 @@ const getFoodEchats = (function () {
                 })
 
                 result.push({
+                    price : order.price,
                     goodsName : name,
                     consume : order.price*num,
                     vipConsume:order.vipPrice*num,
