@@ -15,7 +15,9 @@ const getFoodEchats = (function () {
         //type为1是日报表，2为月报表，3为周报表，4为季度报表，5为年报表
         if(type==1){
             let startDate = new Date(startTime)
+
             let start = startDate.format("yyyy-MM-dd");
+
             let endDate = startDate.setDate(new Date(startTime).getDate()+1)
 
             let end = new Date(endDate).format("yyyy-MM-dd")
@@ -47,7 +49,8 @@ const getFoodEchats = (function () {
                         }
                     }
                 }
-
+                console.log(day[i].start)
+                console.log(ArrayFoodName)
                 for(let g = 0; g<ArrayFoodName.length; g++){
                     console.log(ArrayFoodName[g])
                     let ordergoodsNum = await OrderGoods.sum("num",{
@@ -64,17 +67,15 @@ const getFoodEchats = (function () {
                         where:{
                             tenantId : tenantId,
                             goodsName: ArrayFoodName[g],
-                            createdAt: {
-                                $gt:new Date(startDate),
-                                $lt:new Date(endDate)
-                            }
+
                         }
                     })
                     jsonFoodName={
+                        price : ordergood.price,
                         goodsName : ArrayFoodName[g],
-                        consume : ordergood.price*num,
-                        vipConsume:ordergood.vipPrice*num,
-                        time: startDate,
+                        consume : Number(ordergood.price)*ordergoodsNum,
+                        vipConsume:ordergood.vipPrice*ordergoodsNum,
+                        time: day[i].start,
                         num : ordergoodsNum
                     }
                     result.push(jsonFoodName)

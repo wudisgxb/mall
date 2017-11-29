@@ -50,6 +50,7 @@ module.exports = {
             return
         }
         if(orders.isOnlinePayment == 1){
+            console.log("00000000000")
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"该订单已支付")
             return
         }

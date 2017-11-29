@@ -6,6 +6,7 @@ const PaymentReqs = db.models.PaymentReqs;
 const Orders = db.models.NewOrders;
 const OrderGoods = db.models.OrderGoods;
 const Tool = require('../../Tool/tool')
+let  getFoodEchats = require('../echats/foodsEchats')
 let orderStatistic = require('../statistics/orderStatistic')
 
 module.exports = {

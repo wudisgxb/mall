@@ -48,6 +48,7 @@ const wxpay = new WXPay({
 })
 
 module.exports = {
+
     async  getWechatInfo(ctx, next) {
         var token = await client.getAccessToken(ctx.query.code);
         var openid = token.data.openid;
