@@ -107,6 +107,7 @@ module.exports = {
                         }
                     }
                 });
+                console.log(order)
                 //下单状态
                 if (order != null) {
                     ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {
