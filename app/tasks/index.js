@@ -1183,7 +1183,7 @@ module.exports = async function tasks(app) {
                         $ne: null
                     },
                     isOnlinePayment :{
-                        $ne : "1"
+                        $ne : 1
                     }
                 }
             });
