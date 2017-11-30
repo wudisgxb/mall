@@ -115,7 +115,6 @@ module.exports = {
                     tenantId : ctx.query.tenantId,
                     TableId : table.id,
                     isOnlinePayment : 1,
-                    status : 1
                 },
                 // limitJson
             })
@@ -443,7 +442,10 @@ module.exports = {
                 tenantId: body.tenantId,
                 phone: body.phoneNumber,
                 $or: [{status: 0}, {status: 1}],
-                consigneeId: body.consigneeId
+                consigneeId: body.consigneeId,
+                isOnlinePayment : {
+                    $ne : "1"
+                }
             }
         })
 
@@ -459,14 +461,6 @@ module.exports = {
         }
 
         let deliveryTime = "30分钟"
-        if (body.deliveryFeeId != null && body.deliveryFeeId != "") {
-            let distanceandpriceOne = await DistanceAndPrices.findOne({
-                where: {
-                    deliveryFeeId: body.deliveryFeeId
-                }
-            })
-            deliveryTime = distanceandpriceOne.deliveryTime
-        }
 
         if (body.deliveryFeeId != null && body.deliveryFeeId != "") {
             let distanceAndPrice = await DistanceAndPrices.findOne({
@@ -767,7 +761,9 @@ module.exports = {
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
                     consigneeId: ctx.query.consigneeId,
-
+                    isOnlinePayment :{
+                        $ne : "1",
+                    }
                 }
             })
             console.log(order)
