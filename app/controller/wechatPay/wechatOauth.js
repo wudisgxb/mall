@@ -1059,15 +1059,19 @@ module.exports = {
                     FoodNameArray.push(json)
                 }
             }
-            let foodArray = FoodNameArray.reduce((accu,curr)=>{
-                let aaa = accu.find(e=>e.name==curr.name)
-                if(aaa){
-                    aaa.num+curr.num
-                }else{
+
+            let foodArray = FoodNameArray.reduce((accu,curr) => {
+                const sameNameEle = accu.find(e => e.name === curr.name)
+                if (sameNameEle) {
+                    sameNameEle.num += curr.num
+                } else {
                     accu.push(curr)
                 }
                 return accu
             },[])
+
+            console.log(foodArray)
+            let aaa = foodArray.map(e=>e.name+"*"+e.num).join()
 
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
@@ -1145,6 +1149,8 @@ module.exports = {
                         tenantId: tenantId
                     }
                 });
+                let info = order.info==""||order.info==null?"无":order.info
+                let remark = "订单总价格:  "+totalPrice+"\n"+"商品:  "+aaa+"\n备注信息:  "+info
 
                 //查找代售商户信息
                 let consignee = await Consignees.findOne({
@@ -1284,8 +1290,7 @@ module.exports = {
                                         "color": "#173177"
                                     },
                                     "remark": {
-                                        "value": order.info+"\n订单总价格:"+amountJson.totalPrice+"\n"+
-                                        "商品:"+FoodNameArray,
+                                        "value": remark,
                                         "color": "#173177"
                                     }
                                 }
