@@ -449,9 +449,9 @@ module.exports = {
     // async getUser(ctx, next) {
     //   console.log(`code: ${ctx.query.code}`)
     //   const token = await client.getAccessToken(ctx.query.code)
-
+    //
     //   console.log(JSON.stringify(token, null, 2))
-
+    //
     //   console.log(`openid: ${token.data.openid}`)
     //   const userInfo = await client.getUser(openid)
     //   console.log(`userInfo: ${userInfo}`)
@@ -464,7 +464,6 @@ module.exports = {
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {openId: token.data.openid})
     },
-
     async getMyOpenId(code) {
         const token = await client.getAccessToken(code);
 
