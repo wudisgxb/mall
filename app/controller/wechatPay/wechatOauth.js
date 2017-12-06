@@ -449,9 +449,9 @@ module.exports = {
     // async getUser(ctx, next) {
     //   console.log(`code: ${ctx.query.code}`)
     //   const token = await client.getAccessToken(ctx.query.code)
-    //
+
     //   console.log(JSON.stringify(token, null, 2))
-    //
+
     //   console.log(`openid: ${token.data.openid}`)
     //   const userInfo = await client.getUser(openid)
     //   console.log(`userInfo: ${userInfo}`)
@@ -464,6 +464,7 @@ module.exports = {
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {openId: token.data.openid})
     },
+
     async getMyOpenId(code) {
         const token = await client.getAccessToken(code);
 
@@ -760,7 +761,10 @@ module.exports = {
                 $or: [{status: 0}, {status: 1}],
                 tenantId: ctx.query.tenantId,
                 consigneeId: ctx.query.consigneeId,
-                phone: ctx.query.phoneNumber
+                phone: ctx.query.phoneNumber,
+                isOnlinePayment : {
+                    $ne : true
+                }
             }
         })
 
@@ -770,6 +774,7 @@ module.exports = {
         }
 
         let trade_no = order.trade_no;
+        console.log(trade_no)
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
         let firstDiscount = await orderManager.getFirstDiscount(order.phone, ctx.query.tenantId);
@@ -818,7 +823,7 @@ module.exports = {
         });
 
         const fn = co.wrap(wxpay.getBrandWCPayRequestParams.bind(wxpay))
-
+        //
         console.log("total_amount ============" + total_amount);
 
         let new_params = await fn({
@@ -1900,5 +1905,4 @@ module.exports = {
         const result = await fn(params)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
-
 }
