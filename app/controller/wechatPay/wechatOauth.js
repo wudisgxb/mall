@@ -30,6 +30,7 @@ const transAccounts = require('../customer/transAccount')
 const orderManager = require('../customer/order');
 const config = require('../../config/config')
 const axios = require('axios');
+const Tool = require('../../Tool/tool')
 
 const getstatistics = require('../statistics/orderStatistic');
 
@@ -48,6 +49,336 @@ const wxpay = new WXPay({
 })
 
 module.exports = {
+
+    async onlinePayment(ctx, next){
+        ctx.checkBody('tenantId').notBlank()
+        // ctx.checkBody('tableName').notBlank()
+        ctx.checkBody('tradeNo').notBlank()
+
+        console.log(this)
+
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let body = ctx.request.body
+        try{
+            let orders = await Orders.findOne({
+                where:{
+                    tenantId : body.tenantId,
+                    trade_no : body.tradeNo,
+                }
+            })
+
+            if(orders==null){
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
+                return
+            }
+
+            orders.status = 1
+            orders.isOnlinePayment = 1
+            await orders.save()
+            let order = await Orders.findOne({
+                where:{
+                    tenantId : body.tenantId,
+                    trade_no : body.tradeNo,
+                }
+            })
+
+            let orderJson = {
+                trade_no : order.trade_no,
+                status : order.status,
+                tenantId : order.tenantId,
+                isOnlinePayment : order.isOnlinePayment,
+                tableId : order.TableId,
+                result : "SUCCESS"
+            }
+
+
+            let onlinePaymentCallback = await this.onlinePaymentCallback(orderJson.tenantId, orderJson.tableId,orderJson.trade_no)
+
+            if(onlinePaymentCallback!=true){
+                ctx.body = new ApiResult(ApiResult.Result.SUCCESS,onlinePaymentCallback)
+                return
+            }
+
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS,[ orderJson ])
+
+        } catch (e){
+            ctx.body = new ApiResult(ApiResult.Result.OPERATION_ERROR,[])
+        }
+
+    },
+
+    async onlinePaymentCallback(tenantId, tableId,tradeNo){
+
+        try{
+            let table = await Tables.findOne({
+                where:{
+                    id : tableId
+                }
+            })
+
+            let tenantConfig = await TenantConfigs.findOne({
+                where :{
+                    tenantId : tenantId
+                }
+            })
+            let order = await Orders.findOne({
+                where:{
+                    tenantId : tenantId,
+                    trade_no : tradeNo,
+                }
+            })
+            console.log(order.info=="")
+            let orderGoods = await OrderGoods.findAll({
+                where:{
+                    tenantId : tenantId,
+                    trade_no : tradeNo,
+                }
+            })
+            let FoodNameArray = []
+            let totalPrice = 0
+            for(let i = 0; i < orderGoods.length; i++){
+                let food = await Foods.findById(orderGoods[i].FoodId)
+                food.sellCount = food.sellCount + orderGoods[i].num;
+                food.todaySales = food.todaySales + orderGoods[i].num;
+                await food.save();
+                for(let j = 0; j <orderGoods[i].num; j++){
+                    let json = {
+                        name : orderGoods[i].goodsName,
+                        num : orderGoods[i].num
+                    }
+                    FoodNameArray.push(json)
+                }
+                totalPrice += orderGoods[i].price*orderGoods[i].num
+            }
+            let foodArray = FoodNameArray.reduce((accu,curr) => {
+                const sameNameEle = accu.find(e => e.name === curr.name)
+                if (sameNameEle) {
+                    sameNameEle.num += curr.num
+                } else {
+                    accu.push(curr)
+                }
+                return accu
+            },[])
+
+            console.log(foodArray)
+            let aaa = foodArray.map(e=>e.name+"*"+e.num).join()
+            let info = order.info==""||order.info==null?"无":order.info
+            let remark = "订单总价格:  "+totalPrice+"\n"+"商品:  "+aaa+"\n备注信息:  "+info
+            console.log(remark)
+            if(tenantConfig!=null){
+                if (tenantConfig.openIds != null) {
+
+                    let openIds = JSON.parse(tenantConfig.openIds);
+
+                    for (let j = 0; j < openIds.length; j++) {
+                        //先获取token
+
+                        let ret1 = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.wechat.appId}&secret=${config.wechat.secret}`);
+                        let token = ret1.data.access_token;
+
+                        await axios.post(`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`, {
+                            "touser": openIds[j],
+                            "template_id": "Etp21FVqbhHEvDMyWjBEU71ahOw9tdoeHkZWXVF4STE",
+                            "data": {
+                                "first": {
+                                    "value": "新订单来啦！",
+                                    "color": "#173177"
+                                },
+                                "keyword1": {
+                                    "value": tenantConfig.name,
+                                    "color": "#173177"
+                                },
+                                "keyword2": {
+                                    "value": table.name=="0号桌"?order.info:table.name,
+                                    "color": "#173177"
+                                },
+                                "keyword3": {
+                                    "value": tradeNo,
+                                    "color": "#173177"
+                                },
+                                "keyword4": {
+                                    "value": "已支付",
+                                    "color": "#173177"
+                                },
+                                "keyword5": {
+                                    "value": new Date().toLocaleString(),
+                                    "color": "#173177"
+                                },
+                                "remark": {
+                                    "value": remark,
+                                    "color": "#173177"
+                                }
+                            }
+                        })
+                    }
+                }else{
+                    return "当前用户未绑定任何openId"
+                }
+            }else{
+                return "未找到当前商户信息"
+            }
+            return true
+        }catch (e){
+            return e.message
+        }
+
+    },
+
+    async getOnlinePayment(ctx, next){
+        ctx.checkQuery('tenantId').notBlank()
+        ctx.checkQuery('tableName').notBlank()
+        if(ctx.errors){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+            return
+        }
+        let startTime
+        if(ctx.query.startTime==null||ctx.query.startTime==""){
+            startTime = new Date("2000-1-1")
+        }
+        let endTime
+        if(ctx.query.endTime==null||ctx.query.endTime==""){
+            endTime = new Date()
+        }
+
+        // let pageNumber = parseInt(ctx.query.pageNumber);
+        //
+        // if(pageNumber<1){
+        //     pageNumber=1
+        // }
+        //
+        // let pageSize = parseInt(ctx.query.pageSize);
+        // if(pageSize<1){
+        //     pageSize=1
+        // }
+        // let place = (pageNumber - 1) * pageSize;
+        // let limitJson = {}
+        // if(pageNumber!=null&&pageNumber!=""&&pageSize!=null&&pageSize!=""){
+        //     limitJson = {
+        //         offset: Number(place),
+        //         limit: Number(pageSize)
+        //     }
+        // }
+        try{
+            let table = await Tables.findOne({
+                where:{
+                    tenantId : ctx.query.tenantId,
+                    name : ctx.query.tableName,
+                    createdAt:{
+                        $gte : startTime,
+                        $lt : endTime
+                    }
+                }
+            })
+            if(table==null){
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此房间号")
+                return
+            }
+            //查询所有线下支付的订单
+            let orders = await Orders.findAll({
+                where:{
+                    tenantId : ctx.query.tenantId,
+                    TableId : table.id,
+                    isOnlinePayment : 1,
+                    status : 1
+                },
+                // limitJson
+            })
+            if(orders.length==0){
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
+                return
+            }
+            let orderArray = []
+            for(let i = 0; i < orders.length; i++){
+                let tradeNo = orders[i].trade_no
+                let ordersGoods = await OrderGoods.findAll({
+                    where:{
+                        tenantId : ctx.query.tenantId,
+                        trade_no : tradeNo
+                    }
+                })
+                let totalPrice = 0
+                for(let j = 0; j<ordersGoods.length; j++){
+                    totalPrice += ordersGoods[j].num*ordersGoods[j].price
+                }
+                orders[i].dataValues.orderGoods = ordersGoods
+                orders[i].dataValues.totalPrice = totalPrice
+                orderArray.push(orders[i].dataValues)
+            }
+            ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderArray)
+        }catch(e){
+            ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,e)
+            return
+        }
+    },
+
+    async onlinePaymentByCarryOut(ctx, next){
+
+        // ctx.checkBody('tenantId').notBlank()
+        // ctx.checkBody('tradeNo').notBlank()
+        let body = ctx.request.body
+        let key = ["tenantId","trade_no","tableName"]
+        let condition = key.reduce((accu,curr)=>{
+            if(body[curr]){
+                accu[curr] = body[curr]
+            }
+            return accu
+        },{})
+
+        console.log(condition)
+        try{
+            // let tableJson = {}
+            // console.log(2222222222222)
+            if(condition.tableName!=null){
+                console.log(Tables)
+                let table = await Tables.findOne({
+                    where:{
+                        tenantId : condition.tenantId,
+                        name : condition.tableName
+                    }
+                })
+                condition.TableId = table.id
+                delete condition.tableName
+            }
+            console.log(condition)
+            // let trade_noJson = {}
+            if(condition.trade_no!=null){
+                if(Tool.isArray(condition.trade_no)){
+
+                    condition.trade_no = {
+                        $in : condition.trade_no
+                    }
+
+                }else{
+                    ctx.body = new ApiResult(ApiResult.Result.TYPE_ERROR,"trade_no必须是数组")
+                    return
+                }
+            }
+            condition.isOnlinePayment = 1
+            condition.status = 1
+            console.log(condition)
+            let orders = await Orders.findAll({
+                where: condition
+            })
+
+            console.log(orders)
+            if(orders.length==0){
+                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
+                return
+            }
+            // console.log(444444444444444444)
+            for(let o of orders){
+                o.status = 2
+                await o.save()
+            }
+        }catch (e){
+            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,e.message)
+            return
+        }
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    },
 
     async  getWechatInfo(ctx, next) {
         var token = await client.getAccessToken(ctx.query.code);
@@ -126,6 +457,7 @@ module.exports = {
     //   console.log(`userInfo: ${userInfo}`)
     //   ctx.body = userInfo
     // },
+
     async getOpenId(ctx, next) {
         const token = await client.getAccessToken(ctx.query.code);
         console.log(ctx.query.code)
@@ -238,10 +570,7 @@ module.exports = {
                 TableId: table.id,
                 $or: [{status: 0}, {status: 1}],
                 tenantId: ctx.query.tenantId,
-                consigneeId: null,
-                isOnlinePayment : {
-                    $ne : 1
-                }
+                consigneeId: null
             }
         })
 
@@ -432,10 +761,7 @@ module.exports = {
                 $or: [{status: 0}, {status: 1}],
                 tenantId: ctx.query.tenantId,
                 consigneeId: ctx.query.consigneeId,
-                phone: ctx.query.phoneNumber,
-                isOnlinePayment : {
-                    $ne : 1
-                }
+                phone: ctx.query.phoneNumber
             }
         })
 
@@ -722,9 +1048,22 @@ module.exports = {
                 food.todaySales = food.todaySales + orders[i].num;
                 await food.save();
                 for(let j = 0; j <orders[i].num; j++){
-                    FoodNameArray.push(orders[i].goodsName)
+                    let json = {
+                        name : orders[i].goodsName,
+                        num : orders[i].num
+                    }
+                    FoodNameArray.push(json)
                 }
             }
+            let foodArray = FoodNameArray.reduce((accu,curr)=>{
+                let aaa = accu.find(e=>e.name==curr.name)
+                if(aaa){
+                    aaa.num+curr.num
+                }else{
+                    accu.push(curr)
+                }
+                return accu
+            },[])
 
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
@@ -900,7 +1239,6 @@ module.exports = {
                 infoPushManager.infoPush(content, tenantId);
 
                 if (tenantConfig != null) {
-                    console.log()
 
                     if (tenantConfig.openIds != null) {
 
@@ -933,7 +1271,6 @@ module.exports = {
                                         "value": trade_no,
                                         "color": "#173177"
                                     },
-
                                     "keyword4": {
                                         "value": "已支付",
                                         "color": "#173177"
@@ -994,7 +1331,7 @@ module.exports = {
                                 });
                                 console.log(consigneeId)
                                 console.log(tenantId)
-                                console.log(tenantConfig.wecharPayee_account)
+                                console.log(profitsharing)
                                 // console.log(consigneeId)
                                 if (profitsharing == null) {
                                     params = {
@@ -1042,7 +1379,6 @@ module.exports = {
 
                                             //主商户转账成功才能给代售商户转账
                                             console.log("代售点分润：" + amountJson.consigneeAmount);
-                                            console.log()
                                             params = {
                                                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                                                 openid: consignee.wecharPayee_account,
@@ -1083,7 +1419,7 @@ module.exports = {
                             let result;
                             fn = co.wrap(wxpay.transfers.bind(wxpay))
                             //获取利润分配后的商户所得到的价格
-                            let getProfitRate = await amountManager.getProfitRate(tenantId,trade_no)
+                            let getProfitRate = await amountManager.billyAndDividends(tenantId,trade_no,"weixin")
                             //判断是否有代售点
                             if (consignee == null) {
                                 //如果没有代售点
@@ -1096,7 +1432,7 @@ module.exports = {
                                     desc: '收益',
                                     spbill_create_ip: ip
                                 }
-                                console.log(params)
+
                                 try {
                                     result = await fn(params);
                                     console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
@@ -1105,7 +1441,6 @@ module.exports = {
                                         await paymentReqs[0].save();
                                     } else {
                                         if (amountJson.totalAmount > 0) {
-
                                             await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, amountJson.totalAmount, '收益', '微信', '租户', tenantId, consigneeId);
                                         }
                                     }
@@ -1209,10 +1544,8 @@ module.exports = {
                         }
 
                     } else {
-                        console.log("22222222222222222222222222")
                         if(tenantConfig.isProfitRate){
                             let getProfitRate = await amountManager.getProfitRate(tenantId,trade_no)
-                            console.log("33333333333333333333333")
                             if (consignee == null) {
                                 if (getProfitRate.merchantTotalPrice > 0) {
                                     await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, '收益', '微信', '租户', tenantId, consigneeId);
@@ -1224,9 +1557,7 @@ module.exports = {
                                         consigneeId: consigneeId
                                     }
                                 });
-                                console.log("4444444444444444444444444")
                                 if (profitsharing == null) {
-                                    console.log("555555555555555555555555")
                                     if (getProfitRate.merchantTotalPrice > 0) {
                                         await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, '收益', '微信', '租户', tenantId, consigneeId);
                                     }
@@ -1548,6 +1879,7 @@ module.exports = {
             }
         }
     },
+
     async reimburse(ctx,next){
         ctx.checkBody('tenantId').notEmpty();
         if(ctx.errors){
@@ -1569,4 +1901,5 @@ module.exports = {
         const result = await fn(params)
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     }
+
 }

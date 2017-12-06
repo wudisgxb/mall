@@ -15,7 +15,6 @@ router.get('/api/test/customer/deal/wechatpay/wap', Oauth.getUserDealWechatPayPa
 
 router.get('/api/test/customer/eshop/wechatpay/wap', Oauth.getUserEshopWechatPayParams)
 
-
 //获取openid
 router.get('/api/test/customer/eshop/fetch-openid/wap', Oauth.getOpenId)
 
@@ -23,6 +22,15 @@ router.get('/api/test/customer/eshop/fetch-openid/wap', Oauth.getOpenId)
 router.get('/api/test/customer/eshop/tenantIds', Oauth.getTenantIdsByCode)
 
 router.post('/api/test/wechatPayNotify', Oauth.wechatPayNotify)
+
+router.put('/api/test/customer/eshop/onlinePayment', Oauth.onlinePayment.bind(Oauth));
+
+// router.post('/api/test/customer/eshop/onlinePaymentCallback', Oauth.onlinePaymentCallback);
+
+router.get('/api/test/admin/eshop/onlinePayment', Oauth.getOnlinePayment);
+
+router.put('/api/test/admin/eshop/onlinePayment', Oauth.onlinePaymentByCarryOut);
+
 
 //router.get('/api/v3/transfers', Oauth.transfers)
 

@@ -32,16 +32,7 @@ const Tool = require('../../Tool/tool')
 
 const amountManger = (function () {
 
-    //根据tenantId，consigneeId，订单号获取分成转账金额
-    //原则：不管在哪个代售点领优惠券，在哪消费就算哪个代售点，优惠券只针对租户，优惠券表中consigneeId只看在哪领的
-    //totalPrice 订单价格
-    //merchantAmount 转给商户的钱
-    //consigneeAmount 转给代售的钱
-    //platformAmount  转给平台的钱 ---------totalPrice-merchantAmount-consigneeAmount
-    //deliveryFee     配送费
-    //refund_amount   退款
-    //platformCouponFee                平台优惠
-    //merchantCouponFee                商家优惠
+
     let getTransAccountAmount = async function (tenantId, consigneeId, trade_no, paymentMethod, refund_amount) {
         let amountJson = await this.getAmountByTradeNo(tenantId, consigneeId, trade_no);
 
@@ -209,7 +200,7 @@ const amountManger = (function () {
         if (paymentMethod == '支付宝') {
             //暂时我们出手续费
             // //四舍五入 千分之0.994转账
-            // totalAmount = Math.round(totalAmount * 99.4) / 100 - Math.round(deliveryFee * 0.6) / 100;//减去配送费的支付宝手续费
+            totalAmount = Math.round(totalAmount * 99.4) / 100;//减去配送费的支付宝手续费
             totalAmount = totalAmount - refund_amount; //减去退款
         } else {
             totalAmount = totalAmount - refund_amount; //减去退款
@@ -364,11 +355,9 @@ const amountManger = (function () {
                         //ownRate为平台分成比率
                         //1-平台分成比率 = 商家分成比率
                         console.log(11111111111111111111)
-                        merchantAmount = totalAmount * (1-profitsharing.ownRate)*0.994;
-                        console.log("merchantAmount=============="+merchantAmount)
+                        merchantAmount = totalAmount * (1-profitsharing.ownRate);
                         consigneeAmount = 0;
                     }
-
                 }
             }
         }
@@ -906,61 +895,102 @@ const amountManger = (function () {
             }
         })
         // let endDate = new Date().getTime()
-        
+
         let tenantConfigsJson = {}
         tenantConfigsJson.profitRate = tenantConfigs.profitRate != null ? tenantConfigs.profitRate + "%" : "0"
-
+        let totalPrice = 0
         for (let og of ordergoods){
-            let goodsMessgae = {}
-            //商品总价格
-            let totalPrice = 0
-            totalPrice=og.num * og.price
-            totalPrices += totalPrice
-            //卖出商品的进价价格
-            let saleGoodsTotalPrice = 0
-            saleGoodsTotalPrice = og.num*og.constPrice
-            saleGoodsTotalPrices += saleGoodsTotalPrice
-            //单个商品的利润
-            let profitPriceOne = 0
-            profitPriceOne = totalPrice - saleGoodsTotalPrice
-            profitPrice +=profitPriceOne
+            let food = await Foods.findById(og.FoodId)
+            if(food.isPlatformDelivery){
+                let goodsMessgae = {}
+                //商品总价格
 
-            let terracePriceOne = 0
-            let merchantTotalPriceOne = 0
-            //这个租户有没有设置利润比率
-            if (tenantConfigs.profitRate != null) {
-                //给租户的钱
+                totalPrice=og.num * og.price
+                totalPrices += totalPrice
+                //卖出商品的进价价格
+                let saleGoodsTotalPrice = 0
+                saleGoodsTotalPrice = og.num*og.constPrice
+                saleGoodsTotalPrices += saleGoodsTotalPrice
+                //单个商品的利润
+                let profitPriceOne = 0
+                profitPriceOne = totalPrice - saleGoodsTotalPrice
+                profitPrice +=profitPriceOne
 
-                merchantTotalPriceOne = profitPriceOne*(Number(tenantConfigs.profitRate))/100
-                merchantTotalPrice += merchantTotalPriceOne
-                //给平台的钱
+                let terracePriceOne = 0
+                let merchantTotalPriceOne = 0
+                //这个租户有没有设置利润比率
+                if (tenantConfigs.profitRate != null) {
+                    //给租户的钱
 
-                terracePriceOne = profitPriceOne*(100-Number(tenantConfigs.profitRate))/100
-                terracePrice += terracePriceOne
+                    merchantTotalPriceOne = profitPriceOne*(Number(tenantConfigs.profitRate))/100
+                    merchantTotalPrice += merchantTotalPriceOne
+                    //给平台的钱
+
+                    terracePriceOne = profitPriceOne*(100-Number(tenantConfigs.profitRate))/100
+                    terracePrice += terracePriceOne
+                }
+                goodsMessgae={
+                    type : "小V宝商品",
+                    totalPrices : totalPrice,//总价格
+                    saleGoodsTotalPrices : saleGoodsTotalPrice,//总进价
+                    profitPrice : profitPriceOne,//商品的利润
+                    merchantTotalPrice : merchantTotalPriceOne,
+                    terracePrice : terracePriceOne,
+                    foodName : og.goodsName,
+                    num : og.num
+                }
+                goodsArray.push(goodsMessgae)
+            }else{
+                let goodsMessgae = {}
+                //商品总价格
+                totalPrice=og.num * og.price
+                // totalPrices += totalPrice
+                //商家与平台的利率
+                let saleGoodsTotalPrice = 0
+                saleGoodsTotalPrice = og.num*og.constPrice
+                saleGoodsTotalPrices += saleGoodsTotalPrice
+                //单个商品的利润
+                let profitPriceOne = 0
+                profitPriceOne = totalPrice - saleGoodsTotalPrice
+                profitPrice +=profitPriceOne
+
+                let terracePriceOne = 0
+                let merchantTotalPriceOne = 0
+                //这个租户有没有设置利润比率
+                if (tenantConfigs.profitRate != null) {
+                    //给租户的钱
+
+                    merchantTotalPriceOne = profitPriceOne*(Number(tenantConfigs.profitRate))/100
+                    merchantTotalPrice += merchantTotalPriceOne
+                    //给平台的钱
+
+                    terracePriceOne = profitPriceOne*(100-Number(tenantConfigs.profitRate))/100
+                    terracePrice += terracePriceOne
+                }
+                goodsMessgae={
+                    type : "商家自己的商品",
+                    totalPrices : totalPrice,//总价格
+                    saleGoodsTotalPrices : saleGoodsTotalPrice,//总进价
+                    profitPrice : profitPriceOne,//商品的利润
+                    merchantTotalPrice : merchantTotalPriceOne,
+                    terracePrice : terracePriceOne,
+                    foodName : og.goodsName,
+                    num : og.num
+                }
+                goodsArray.push(goodsMessgae)
             }
-            goodsMessgae={
-                totalPrices : totalPrice,//总价格
-                saleGoodsTotalPrices : saleGoodsTotalPrice,//总进价
-                profitPrice : profitPriceOne,//商品的利润
-                merchantTotalPrice : merchantTotalPriceOne,
-                terracePrice : terracePriceOne,
-                foodName : og.goodsName,
-                num : og.num
-            }
-            goodsArray.push(goodsMessgae)
         }
 
-        goodsJson.totalPrices= totalPrices,
-        goodsJson.saleGoodsTotalPrices = saleGoodsTotalPrices,
-        goodsJson.profitPrice = profitPrice,
-        goodsJson.merchantTotalPrice = merchantTotalPrice,
-        goodsJson.terracePrice = terracePrice,
-        goodsJson.goodsArray = goodsArray
+        goodsJson.totalPrices = totalPrices,
+            goodsJson.saleGoodsTotalPrices = saleGoodsTotalPrices,
+            goodsJson.profitPrice = profitPrice,
+            goodsJson.merchantTotalPrice = merchantTotalPrice,
+            goodsJson.terracePrice = terracePrice,
+            goodsJson.goodsArray = goodsArray
         // console.log(goodsJson)
         return goodsJson
-
     }
-    
+
     let getNewOrder = async function (tenantId) {
         let orders = await Orders.findAll({
             where:{
@@ -1017,19 +1047,97 @@ const amountManger = (function () {
         ordersJson.orderArray = orderArray
         return ordersJson
     }
+    //比利和分润
+    let billyAndDividends = async function (tenantId,tradeNo,paymentMethod) {
+        // console.log(222222222)
+        // let order = await Orders.findOne({
+        //     where:{
+        //         tenantId : tenantId,
+        //         trade_no : tradeNo
+        //     }
+        // })
+        let ordergoods = await OrderGoods.findAll({
+            where:{
+                tenantId : tenantId,
+                trade_no : tradeNo
+            }
+        })
+        let tenantConfig = await TenantConfigs.findOne({
+            where:{
+                tenantId : tenantId
+            }
+        })
+        if(tenantConfig==null){
+            return "找不到此租户信息"
+        }
+        let merchantIntos = 0
+        let platformInfos = 0
+        let totalPrice = 0
+        let serviceFee = 0.006
+        if(paymentMethod=="ali"){
+            serviceFee = 0.006
+        }else if(paymentMethod=="weixin"){
+            serviceFee = 0.01
+        }
 
-    let instance = {
+        let serviceFeePrice = 0
+        let constPrices = 0
+        let customerPaymentPrice = 0
+        for(let og of ordergoods){
+
+            let goodsOrder =0
+            //单个商品的总价格
+            let goodsTotalPrice = og.num*og.price
+            customerPaymentPrice += goodsTotalPrice
+            //用户转给的钱（）
+            let realGoodsPrice = goodsTotalPrice*(1-serviceFee)
+            serviceFeePrice += goodsTotalPrice*serviceFee
+            totalPrice += realGoodsPrice
+            // let merchantPrice =0
+
+            let food = await Foods.findById(og.FoodId)
+            //判断当前商品是否来自平台
+            if(food.isPlatformDelivery){
+                console.log()
+                //判断利润分成的值
+                let profitRate = tenantConfig.profitRate
+                //算出商品的进价
+                let constPrice = Number(og.constPrice)*Number(og.num)
+                constPrices += constPrice
+                //计算给商家的钱()
+                merchantIntos += (realGoodsPrice-constPrice)*profitRate/100
+                //计算给平台的钱()
+                platformInfos += realGoodsPrice-realGoodsPrice*profitRate/100
+
+            }else{
+                let rate = tenantConfig.rate
+                merchantIntos += realGoodsPrice*(1-rate)
+                platformInfos += realGoodsPrice*rate
+            }
+        }
+        let json = {
+            customerPaymentPrice : customerPaymentPrice.toFixed(2),
+            merchantPrice : (merchantIntos).toFixed(2),
+            platformPrice : (platformInfos).toFixed(2),
+            totalPrice : (totalPrice).toFixed(2),
+            serviceFeePrice : serviceFeePrice.toFixed(2),
+            constPrice : constPrices
+        }
+        return json
+    }
+
+    let aaa = {
         getTransAccountAmount: getTransAccountAmount,
         getAmountByTradeNo: getAmountByTradeNo,
         isTenantIdAndConsigneeIdSame: isTenantIdAndConsigneeIdSame,
         integralAllocation : integralAllocation,
         rechargeIntegral : rechargeIntegral,
         getProfitRate : getProfitRate,
-        getNewOrder : getNewOrder,
-        getBill : getBill
+        // getNewOrder : getNewOrder,
+        getBill : getBill,
+        billyAndDividends : billyAndDividends,
     }
-
-    return instance;
+    return aaa
 })();
 
 module.exports = amountManger;
