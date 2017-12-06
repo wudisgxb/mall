@@ -1150,7 +1150,7 @@ module.exports = {
                     }
                 });
                 let info = order.info==""||order.info==null?"无":order.info
-                let remark = "订单总价格:  "+totalPrice+"\n"+"商品:  "+aaa+"\n备注信息:  "+info
+
 
                 //查找代售商户信息
                 let consignee = await Consignees.findOne({
@@ -1255,6 +1255,7 @@ module.exports = {
                         let openIds = JSON.parse(tenantConfig.openIds);
                         console.log(openIds.length)
                         console.log(openIds)
+                        let remark = "订单总价格:  "+amountJson.totalPrice+"\n"+"商品:  "+aaa+"\n备注信息:  "+info
                         for (let j = 0; j < openIds.length; j++) {
                             //先获取token
 
