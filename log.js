@@ -14,34 +14,8 @@ try {
 //邮件告警功能未配置成功
 //http://www.nodepeixun.com/a/nodekuangjia/20170122/138.html
 log4js.configure({
-    "appenders": [{
-      "type": "logLevelFilter",
-      "level": "DEBUG",
-      "appender": {
-        "type": "console"
-      }
-    }, {
-      "type": "clustered",
-      "appenders": [{
-        "type": "dateFile",
-        "filename": "http.log",
-        "pattern": "-yyyy-MM-dd",
-        "category": "http"
-      }, {
-        "type": "file",
-        "filename": "app.log",
-        "maxLogSize": 10485760,
-        "pattern": "-yyyy-MM-dd",
-        "numBackups": 5
-      }, {
-        "type": "logLevelFilter",
-        "level": "ERROR",
-        "appender": {
-          "type": "file",
-          "filename": "errors.log"
-        }
-      }]
-    }],
+  appenders: { cheese: { type: 'file', filename: 'cheese.log' } },
+  categories: { default: { appenders: ['cheese'], level: 'error' } },
     "replaceConsole":true
   }, { cwd: logDir })
   //注册日志： 日志名（前缀）startup

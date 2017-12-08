@@ -5,7 +5,7 @@
 process.title = 'node-chat';
 
 // Port where we'll run the websocket server
-var webSocketsServerPort = 9094;
+var webSocketsServerPort = 9099;
 
 // websocket and http servers
 var webSocketServer = require('websocket').server;

@@ -28,11 +28,11 @@ module.exports.Result = {
         resMsg: '记录已存在'
     },
     CREATE_ERROR: {
-        resCode: 1002,
+        resCode: 10002,
         resMsg: '数据添加错误'
     },
     UPDATE_ERROR: {
-        resCode: 1003,
+        resCode: 10003,
         resMsg: '数据库编辑错误'
     },
     SELECT_ERROR: {
@@ -40,12 +40,20 @@ module.exports.Result = {
         resMsg: '数据库查询错误'
     },
     IMPORT_ERROR: {
-        resCode: 1004,
+        resCode: 10005,
         resMsg: '数据库查询错误'
     },
-
-    PARAMS_ERROR: {
-    resCode: PARAMS_ERROR,
-    resMsg: 'PARAMS_ERROR'
+    PARAMS_ERROR:{
+        resCode: PARAMS_ERROR,
+        resMsg: 'PARAMS_ERROR'
+    },
+    TYPE_ERROR : {
+        resCode: 10006,
+        resMsg: 'TYPE_ERROR'
+    },
+    OPERATION_ERROR: {
+        resCode: 10007,
+        resMsg: 'sql statement execution error'
     }
 }
+

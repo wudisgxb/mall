@@ -55,8 +55,6 @@ module.exports = {
         // ctx.checkBody('tableName').notBlank()
         ctx.checkBody('tradeNo').notBlank()
 
-        console.log(this)
-
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
@@ -76,7 +74,7 @@ module.exports = {
             }
 
             orders.status = 1
-            orders.isOnlinePayment = 1
+            orders.isOfflinePayment = 1
             await orders.save()
             let order = await Orders.findOne({
                 where:{
@@ -89,7 +87,7 @@ module.exports = {
                 trade_no : order.trade_no,
                 status : order.status,
                 tenantId : order.tenantId,
-                isOnlinePayment : order.isOnlinePayment,
+                isOfflinePayment : order.isOfflinePayment,
                 tableId : order.TableId,
                 result : "SUCCESS"
             }
@@ -228,8 +226,13 @@ module.exports = {
     },
 
     async getOnlinePayment(ctx, next){
-        ctx.checkQuery('tenantId').notBlank()
-        ctx.checkQuery('tableName').notBlank()
+        let keys = ["tenantId","tableName","startDate","endDate"]
+        let condition = keys.reduce((accu,curr)=>{
+            if(ctx.query[curr]){
+                accu[curr] = ctx.query[cuur]
+            }
+            return accu
+        })
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
@@ -281,7 +284,7 @@ module.exports = {
                 where:{
                     tenantId : ctx.query.tenantId,
                     TableId : table.id,
-                    isOnlinePayment : 1,
+                    isOfflinePayment : 1,
                     status : 1
                 },
                 // limitJson
@@ -356,7 +359,7 @@ module.exports = {
                     return
                 }
             }
-            condition.isOnlinePayment = 1
+            condition.isOfflinePayment = 1
             condition.status = 1
             console.log(condition)
             let orders = await Orders.findAll({
@@ -762,7 +765,7 @@ module.exports = {
                 tenantId: ctx.query.tenantId,
                 consigneeId: ctx.query.consigneeId,
                 phone: ctx.query.phoneNumber,
-                isOnlinePayment : {
+                isOfflinePayment : {
                     $ne : true
                 }
             }

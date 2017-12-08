@@ -5,6 +5,7 @@ let db = require('../../db/mysql/index');
 let Tables = db.models.Tables;
 const Consignees = db.models.Consignees;
 const Merchants = db.models.Merchants;
+const Tool = require('../../Tool/tool')
 
 module.exports = {
 
@@ -24,37 +25,45 @@ module.exports = {
         //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
         //     return
         // }
+        ctx.checkBody("tenantId").notBlank()
+        ctx.checkBody("consigneeId").notBlank()
+        ctx.checkBody("tableName").notBlank()
+        if(ctx.errors){
 
-        let name =8200
-        let nameArray = []
-        for(let j = 0; j < 25; j ++){
-            name ++
-            if(name%10==4){
-                name ++
-            }
-            if(name%100==25){
-                name++
-            }
-            nameArray.push(name)
         }
-        console.log(nameArray)
-        // let namesArray = []
-        let names = 8300
-        for(let g = 0; g < 42; g++){
-            names ++
-            if(names%10==4){
-                names ++
-            }
-            if(names%100==25){
-                names++
-            }
-            if(names/10%10==4){
-                names+=10
-            }
-            nameArray.push(names)
-        }
-        console.log(nameArray)
-        console.log(nameArray.length)
+        let tenantInfo = await Merchants.findOne({
+
+        })
+        // let name =8200
+        // let nameArray = []
+        // for(let j = 0; j < 25; j ++){
+        //     name ++
+        //     if(name%10==4){
+        //         name ++
+        //     }
+        //     if(name%100==25){
+        //         name++
+        //     }
+        //     nameArray.push(name)
+        // }
+        // console.log(nameArray)
+        // // let namesArray = []
+        // let names = 8300
+        // for(let g = 0; g < 42; g++){
+        //     names ++
+        //     if(names%10==4){
+        //         names ++
+        //     }
+        //     if(names%100==25){
+        //         names++
+        //     }
+        //     if(names/10%10==4){
+        //         names+=10
+        //     }
+        //     nameArray.push(names)
+        // }
+        // console.log(nameArray)
+        // console.log(nameArray.length)
         for(let i = 0 ; i < nameArray.length; i ++){
             await Tables.create({
                 name : nameArray[i],
@@ -197,6 +206,18 @@ module.exports = {
             }
             return;
         }
+
+        if(!Tool.isArray(body.table.name)){
+            ctx.body = new ApiResult(ApiResult.Result.TYPE_ERROR,"名字必须为数组类型")
+            return
+        }
+        let tableName = body.table.name
+        let tableArray = []
+        for(let name of tableName ){
+            
+        }
+
+
         await Tables.create({
             name: body.table.name,
             status: 0,

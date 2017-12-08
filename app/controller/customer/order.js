@@ -49,13 +49,13 @@ module.exports = {
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
             return
         }
-        if(orders.isOnlinePayment == 1){
+        if(orders.isOfflinePayment == 1){
             console.log("00000000000")
             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"该订单已支付")
             return
         }
         orders.status = 1
-        orders.isOnlinePayment = 1
+        orders.isOfflinePayment = 1
         await orders.save()
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
@@ -114,7 +114,7 @@ module.exports = {
                 where:{
                     tenantId : ctx.query.tenantId,
                     TableId : table.id,
-                    isOnlinePayment : 1,
+                    isOfflinePayment : 1,
                 },
                 // limitJson
             })
@@ -162,7 +162,7 @@ module.exports = {
             where:{
                 tenantId : body.tenantId,
                 trade_no : body.tradeNo,
-                isOnlinePayment : 1
+                isOfflinePayment : 1
             }
         })
         if(orders==null){
@@ -443,7 +443,7 @@ module.exports = {
                 phone: body.phoneNumber,
                 $or: [{status: 0}, {status: 1}],
                 consigneeId: body.consigneeId,
-                isOnlinePayment : {
+                isOfflinePayment : {
                     $ne : "1"
                 }
             }
@@ -761,7 +761,7 @@ module.exports = {
                     phone: ctx.query.phoneNumber,
                     tenantId: ctx.query.tenantId,
                     consigneeId: ctx.query.consigneeId,
-                    isOnlinePayment :{
+                    isOfflinePayment :{
                         $ne : 1,
                     }
                 }

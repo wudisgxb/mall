@@ -48,7 +48,9 @@ module.exports = {
             result.firstDiscount = tenantInfo.firstDiscount;
             result.startTime = tenantInfo.startTime;
             result.endTime = tenantInfo.endTime;
-            result.needOrderConfirmPage = merchant.needOrderConfirmPage;
+            result.hotelDeliveryStartTime = tenantInfo.hotelDeliveryStartTime;
+            result.hotelDeliveryEndTime = tenantInfo.hotelDeliveryEndTime;
+            result.qrCodeType = merchant.qrCodeType;
             let tenantInfoArray = []
             tenantInfoArray.push(result)
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, tenantInfoArray);
@@ -69,7 +71,10 @@ module.exports = {
         ctx.checkBody('/tenantConfig/homeImage', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/startTime', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime', true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/hotelDeliveryStartTime', true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/hotelDeliveryEndTime', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/needVip', true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/qrCodeType', true).first().notEmpty();
 
         ctx.checkBody('/tenantConfig/longitude', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/latitude', true).first().notEmpty();
@@ -105,6 +110,9 @@ module.exports = {
             homeImage: body.tenantConfig.homeImage,
             startTime: body.tenantConfig.startTime,
             endTime: body.tenantConfig.endTime,
+            hotelDeliveryStartTime : body.tenantConfig.hotelDeliveryStartTime,
+            hotelDeliveryEndTime : body.tenantConfig.hotelDeliveryEndTime,
+            qrCodeType : body.tenantConfig.qrCodeType,
             tenantId: body.tenantId,
             longitude: body.tenantConfig.longitude,
             latitude: body.tenantConfig.latitude,
@@ -113,7 +121,6 @@ module.exports = {
             openFlag: body.tenantConfig.openFlag,
             firstDiscount: body.tenantConfig.firstDiscount,
             invaildTime: body.tenantConfig.invaildTime,
-
         })
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },

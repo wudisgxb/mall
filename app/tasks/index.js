@@ -730,8 +730,6 @@ module.exports = async function tasks(app) {
         }
     }
 
-
-
     // let wechatTransferAccounts = async function () {
     //     //把需要转账的租户，代售商户查询出来
     //     let tmpArray = [];//存放租户，代售商户对象的数组
@@ -1182,7 +1180,7 @@ module.exports = async function tasks(app) {
                     'consigneeId': {
                         $ne: null
                     },
-                    isOnlinePayment :{
+                    isOfflinePayment :{
                         $ne : 1
                     }
                 }

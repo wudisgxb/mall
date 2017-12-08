@@ -102,7 +102,7 @@ module.exports = {
                         tenantId: ctx.query.tenantId,
                         TableId: table.id,
                         $or: [{status: 0}, {status: 1}],
-                        isOnlinePayment : {
+                        isOfflinePayment : {
                             $ne : true
                         }
                     }

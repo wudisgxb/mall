@@ -67,7 +67,15 @@ module.exports = function (sequelize, DataTypes) {
         endTime: shortDataTypes.String(),
         isProfitRate : shortDataTypes.Bool(),
         //商家与平台的利润分成
-        profitRate : shortDataTypes.String()
+        profitRate : shortDataTypes.String(),
+        //商家给平台的比率
+        rate : shortDataTypes.String(),
+        //酒店配送的开始时间
+        hotelDeliveryStartTime : shortDataTypes.String(),
+        //酒店配送的结束时间
+        hotelDeliveryEndTime : shortDataTypes.String(),
+        //二维码类型（生成一个二维码，或者生成很多二维码）
+        qrCodeType : shortDataTypes.String(),
     }, {
         associate: function (models) {
         },
@@ -76,4 +84,3 @@ module.exports = function (sequelize, DataTypes) {
     });
     return TenantConfigs;
 };
-
