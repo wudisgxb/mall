@@ -50,7 +50,7 @@ const wxpay = new WXPay({
 
 module.exports = {
 
-   async onlinePayment(ctx, next){
+    async onlinePayment(ctx, next){
         ctx.checkBody('tenantId').notBlank()
         // ctx.checkBody('tableName').notBlank()
         ctx.checkBody('tradeNo').notBlank()
@@ -128,7 +128,7 @@ module.exports = {
                     trade_no : tradeNo,
                 }
             })
-            console.log(order.info=="")
+
             let orderGoods = await OrderGoods.findAll({
                 where:{
                     tenantId : tenantId,
@@ -227,12 +227,13 @@ module.exports = {
 
     async getOnlinePayment(ctx, next){
         let keys = ["tenantId","tableName","startDate","endDate"]
-        let condition = keys.reduce((accu,curr)=>{
-            if(ctx.query[curr]){
-                accu[curr] = ctx.query[cuur]
+        console.log(ctx.query.tenantId)
+        let condition = keys.reduce((accu, curr) => {
+            if (ctx.query[curr]) {
+                accu[curr] = ctx.query[curr]
             }
-            return accu
-        })
+            return accu;
+        }, {})
         if(ctx.errors){
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
             return
@@ -265,8 +266,9 @@ module.exports = {
         //     }
         // }
         try{
-            
+
             if(condition.tableName!=null){
+
                 let table = await Tables.findOne({
                     where:{
                         tenantId : ctx.query.tenantId,
@@ -274,21 +276,23 @@ module.exports = {
                     }
                 })
                 condition.TableId = table.id
-                
+                delete condition.tableName
+                if(table==null){
+                    ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此房间号")
+                    return
+                }
             }
-            delete condition.tableName
-            
-            if(table==null){
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此房间号")
-                return
-            }
+
             condition.isOfflinePayment = 1
+
             condition.status = 1
             //查询所有线下支付的订单
+
             let orders = await Orders.findAll({
-                where:condition,
+                where:condition
                 // limitJson
             })
+
             if(orders.length==0){
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
                 return
@@ -330,12 +334,11 @@ module.exports = {
             return accu
         },{})
 
-        console.log(condition)
         try{
             // let tableJson = {}
             // console.log(2222222222222)
             if(condition.tableName!=null){
-                console.log(Tables)
+
                 let table = await Tables.findOne({
                     where:{
                         tenantId : condition.tenantId,
@@ -343,9 +346,9 @@ module.exports = {
                     }
                 })
                 condition.TableId = table.id
+                delete condition.tableName
             }
-            delete condition.tableName
-            console.log(condition)
+
             // let trade_noJson = {}
             if(condition.trade_no!=null){
                 if(Tool.isArray(condition.trade_no)){
@@ -361,12 +364,9 @@ module.exports = {
             }
             condition.isOfflinePayment = 1
             condition.status = 1
-            console.log(condition)
             let orders = await Orders.findAll({
                 where: condition
             })
-
-            console.log(orders)
             if(orders.length==0){
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
                 return

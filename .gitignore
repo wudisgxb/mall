@@ -65,3 +65,4 @@ typings/
 .env
 /app/config
 /app/db/mysql/index.js
+/app/controller/socketManager/socketManager.js
