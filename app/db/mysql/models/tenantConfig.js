@@ -71,11 +71,11 @@ module.exports = function (sequelize, DataTypes) {
         //商家给平台的比率
         rate : shortDataTypes.String(),
         //酒店配送的开始时间
-        hotelDeliveryStartTime : shortDataTypes.String(),
+        deliveryStartTime : shortDataTypes.String(),
         //酒店配送的结束时间
-        hotelDeliveryEndTime : shortDataTypes.String(),
+        deliveryEndTime : shortDataTypes.String(),
         //二维码类型（生成一个二维码，或者生成很多二维码）
-        qrCodeType : shortDataTypes.String(),
+        // qrCodeType : shortDataTypes.String(),
     }, {
         associate: function (models) {
         },

@@ -48,8 +48,8 @@ module.exports = {
             result.firstDiscount = tenantInfo.firstDiscount;
             result.startTime = tenantInfo.startTime;
             result.endTime = tenantInfo.endTime;
-            result.hotelDeliveryStartTime = tenantInfo.hotelDeliveryStartTime;
-            result.hotelDeliveryEndTime = tenantInfo.hotelDeliveryEndTime;
+            result.deliveryStartTime = tenantInfo.deliveryStartTime;
+            result.deliveryEndTime = tenantInfo.deliveryEndTime;
             result.qrCodeType = merchant.qrCodeType;
             let tenantInfoArray = []
             tenantInfoArray.push(result)
@@ -71,10 +71,10 @@ module.exports = {
         ctx.checkBody('/tenantConfig/homeImage', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/startTime', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/endTime', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/hotelDeliveryStartTime', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/hotelDeliveryEndTime', true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/deliveryStartTime', true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/deliveryEndTime', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/needVip', true).first().notEmpty();
-        ctx.checkBody('/tenantConfig/qrCodeType', true).first().notEmpty();
+        // ctx.checkBody('/tenantConfig/qrCodeType', true).first().notEmpty();
 
         ctx.checkBody('/tenantConfig/longitude', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/latitude', true).first().notEmpty();
@@ -110,9 +110,9 @@ module.exports = {
             homeImage: body.tenantConfig.homeImage,
             startTime: body.tenantConfig.startTime,
             endTime: body.tenantConfig.endTime,
-            hotelDeliveryStartTime : body.tenantConfig.hotelDeliveryStartTime,
-            hotelDeliveryEndTime : body.tenantConfig.hotelDeliveryEndTime,
-            qrCodeType : body.tenantConfig.qrCodeType,
+            deliveryStartTime : body.tenantConfig.deliveryStartTime,
+            deliveryEndTime : body.tenantConfig.deliveryEndTime,
+            // qrCodeType : body.tenantConfig.qrCodeType,
             tenantId: body.tenantId,
             longitude: body.tenantConfig.longitude,
             latitude: body.tenantConfig.latitude,
@@ -130,7 +130,7 @@ module.exports = {
         ctx.checkBody('/condition/tenantId', true).first().notEmpty();
         let keys = ['wecharPayee_account', 'payee_account', 'isRealTime', 'vipFee', 'vipRemindFee',
             'homeImage', 'startTime', 'name','endTime','needVip','longitude','address','phone','latitude',
-            'officialNews','needChoosePeopleNumberPage','openFlag','firstDiscount','invaildTime'];
+            'officialNews','needChoosePeopleNumberPage','openFlag','firstDiscount','invaildTime','deliveryStartTime','deliveryEndTime'];
         let body = ctx.request.body;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
