@@ -50,7 +50,7 @@ const wxpay = new WXPay({
 
 module.exports = {
 
-    async onlinePayment(ctx, next){
+   async onlinePayment(ctx, next){
         ctx.checkBody('tenantId').notBlank()
         // ctx.checkBody('tableName').notBlank()
         ctx.checkBody('tradeNo').notBlank()
@@ -238,11 +238,11 @@ module.exports = {
             return
         }
         let startTime
-        if(ctx.query.startTime==null||ctx.query.startTime==""){
+        if(condition.startTime==null||condition.startTime==""){
             startTime = new Date("2000-1-1")
         }
         let endTime
-        if(ctx.query.endTime==null||ctx.query.endTime==""){
+        if(condition.endTime==null||condition.endTime==""){
             endTime = new Date()
         }
 
@@ -265,28 +265,28 @@ module.exports = {
         //     }
         // }
         try{
-            let table = await Tables.findOne({
-                where:{
-                    tenantId : ctx.query.tenantId,
-                    name : ctx.query.tableName,
-                    createdAt:{
-                        $gte : startTime,
-                        $lt : endTime
+            
+            if(condition.tableName!=null){
+                let table = await Tables.findOne({
+                    where:{
+                        tenantId : ctx.query.tenantId,
+                        name : ctx.query.tableName,
                     }
-                }
-            })
+                })
+                condition.TableId = table.id
+                
+            }
+            delete condition.tableName
+            
             if(table==null){
                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此房间号")
                 return
             }
+            condition.isOfflinePayment = 1
+            condition.status = 1
             //查询所有线下支付的订单
             let orders = await Orders.findAll({
-                where:{
-                    tenantId : ctx.query.tenantId,
-                    TableId : table.id,
-                    isOfflinePayment : 1,
-                    status : 1
-                },
+                where:condition,
                 // limitJson
             })
             if(orders.length==0){
@@ -343,8 +343,8 @@ module.exports = {
                     }
                 })
                 condition.TableId = table.id
-                delete condition.tableName
             }
+            delete condition.tableName
             console.log(condition)
             // let trade_noJson = {}
             if(condition.trade_no!=null){
