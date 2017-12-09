@@ -13,7 +13,6 @@ const Merchants = db.models.Merchants;
 const TenantInfo = db.models.TenantConfigs;
 const Alliances = db.models.Alliances;
 let Admins = db.models.Adminer
-let Caap = require('ccap')();
 let http = require('http')
 let auth = require('../auth/auth')
 const sqlAllianceMerchants = require('../businessAlliance/allianceMerchants')

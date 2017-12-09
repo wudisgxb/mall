@@ -1,4 +1,5 @@
-let Caap = require('ccap')();
+const svgCaptcha = require('svg-captcha');
+
 let db = require('../../db/mysql/index');
 let Captcha = db.models.Captcha
 let Admins = db.models.Adminer
@@ -6,12 +7,11 @@ let AdminCorresponding = db.models.AdminCorresponding
 const getAuth = (function () {
 
     let getAdminLoginUsers = async function () {
-        let ary = Caap.get();
+        const captcha = svgCaptcha.create();
+
         //获取当前时间
         let date = new Date().format("yyyyMMddhhmmssS");
         //ary中喊随机数，和验证码图片
-        let txt = ary[0];
-        let buf = ary[1];
         //用当前时间和随机数拼接一个唯一的建
         let rumber = Math.random()*8999+1000
         let key = date+rumber;
@@ -19,14 +19,12 @@ const getAuth = (function () {
         //将唯一的键和随机数存入数据库
         await Captcha.create({
             key: key,
-            captcha: txt
+            captcha: captcha.text
         });
-        // console.log(key)
-        // console.log(txt)
         let aaa = {
             "key": key,
-            // "number": txt,
-            "buf": buf.toString('base64')
+            // "buf": buf.toString('base64')
+            "svg": captcha.data
         }
         return aaa
     }
