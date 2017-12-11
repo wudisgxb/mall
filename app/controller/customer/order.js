@@ -678,46 +678,77 @@ module.exports = {
     },
 
     async deleteUserEshopOrder (ctx, next) {
+        // ctx.checkQuery('tenantId').notEmpty();
+        // ctx.checkQuery('phoneNumber').notEmpty();
+        // ctx.checkQuery('consigneeId').notEmpty();
+        // ctx.checkQuery('tableName').notEmpty();
         ctx.checkQuery('tenantId').notEmpty();
-        ctx.checkQuery('phoneNumber').notEmpty();
-        ctx.checkQuery('consigneeId').notEmpty();
-        ctx.checkQuery('tableName').notEmpty();
+        ctx.checkQuery('trade_no').notEmpty();
+
 
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
         }
-
-        //获取tableId
-        let table = await Tables.findOne({
-            where: {
-                tenantId: ctx.query.tenantId,
-                name: ctx.query.tableName,
-                consigneeId: ctx.query.consigneeId
-            }
-        })
-
-        if (table == null) {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
-            return;
-        }
-
         let order = await Orders.findOne({
-            where: {
-                consigneeId: ctx.query.consigneeId,
-                TableId: table.id,
-                phone: ctx.query.phoneNumber,
-                tenantId: ctx.query.tenantId,
-                $or: [{status: 0}, {status: 1}],
+            where:{
+                tenantId : ctx.query.tenantId,
+                trade_no : ctx.query.trade_no
             }
         });
-
-        if (order == null) {
-            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "订单食物不存在！无需删除！")
-            return;
+        if(order==null){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有当前订单")
+            return
+        }
+        let orderGoods = await OrderGoods.findAll({
+            where:{
+                tenantId : ctx.query.tenantId,
+                trade_no : ctx.query.trade_no
+            }
+        })
+        if(orderGoods.length==0){
+            ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有当前订单的商品")
+            return
+        }
+        try{
+            await order.destroy();
+            await orderGoods.destroy()
+        }catch (e){
+            console.log(e)
+            ctx.body = new ApiResult(ApiResult.Result.OPERATION_ERROR)
+            return
         }
 
-        await order.destroy();
+        //获取tableId
+        // let table = await Tables.findOne({
+        //     where: {
+        //         tenantId: ctx.query.tenantId,
+        //         name: ctx.query.tableName,
+        //         consigneeId: ctx.query.consigneeId
+        //     }
+        // })
+        //
+        // if (table == null) {
+        //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, '未找到桌号！')
+        //     return;
+        // }
+        //
+        // let order = await Orders.findOne({
+        //     where: {
+        //         consigneeId: ctx.query.consigneeId,
+        //         TableId: table.id,
+        //         phone: ctx.query.phoneNumber,
+        //         tenantId: ctx.query.tenantId,
+        //         $or: [{status: 0}, {status: 1}],
+        //     }
+        // });
+        //
+        // if (order == null) {
+        //     ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND, "订单食物不存在！无需删除！")
+        //     return;
+        // }
+        //
+        // await order.destroy();
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },

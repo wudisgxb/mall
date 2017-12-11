@@ -1431,8 +1431,9 @@ module.exports = {
                             let params;
                             let result;
                             fn = co.wrap(wxpay.transfers.bind(wxpay))
+                            console.log("77777777777777777777777777")
                             //获取利润分配后的商户所得到的价格
-                            let getProfitRate = await amountManager.billyAndDividends(tenantId,trade_no,"weixin")
+                            let getProfitRate = await amountManager.getProfitRate(tenantId,trade_no,"weixin")
                             //判断是否有代售点
                             if (consignee == null) {
                                 //如果没有代售点
@@ -1627,6 +1628,7 @@ module.exports = {
             webSocket.sendSocket(JSON.stringify(json));
         }
     },
+
 
     async transfers(ctx, next) {
         //const ip = ctx.request.headers['x-real-ip']

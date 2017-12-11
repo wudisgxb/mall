@@ -76,6 +76,7 @@ module.exports = function (sequelize, DataTypes) {
         deliveryEndTime : shortDataTypes.String(),
         //二维码类型（生成一个二维码，或者生成很多二维码）
         // qrCodeType : shortDataTypes.String(),
+        needChoosePayMode : shortDataTypes.String()
     }, {
         associate: function (models) {
         },

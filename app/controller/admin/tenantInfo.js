@@ -3,7 +3,9 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const OrderGoods = db.models.OrderGoods
+const Tool = require('../../Tool/tool')
 let TenantInfo = db.models.TenantConfigs;
+const Consignees = db.models.Consignees;
 const Merchants = db.models.Merchants;
 const amountManager = require('../amount/amountManager')
 
@@ -50,7 +52,8 @@ module.exports = {
             result.endTime = tenantInfo.endTime;
             result.deliveryStartTime = tenantInfo.deliveryStartTime;
             result.deliveryEndTime = tenantInfo.deliveryEndTime;
-            result.qrCodeType = merchant.qrCodeType;
+            result.needChoosePayMode = JSON.parse(tenantInfo.needChoosePayMode);
+            // result.qrCodeType = merchant.qrCodeType;
             let tenantInfoArray = []
             tenantInfoArray.push(result)
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, tenantInfoArray);
@@ -73,6 +76,7 @@ module.exports = {
         ctx.checkBody('/tenantConfig/endTime', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/deliveryStartTime', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/deliveryEndTime', true).first().notEmpty();
+        ctx.checkBody('/tenantConfig/needChoosePayMode', true).first().notEmpty();
         ctx.checkBody('/tenantConfig/needVip', true).first().notEmpty();
         // ctx.checkBody('/tenantConfig/qrCodeType', true).first().notEmpty();
 
@@ -112,12 +116,13 @@ module.exports = {
             endTime: body.tenantConfig.endTime,
             deliveryStartTime : body.tenantConfig.deliveryStartTime,
             deliveryEndTime : body.tenantConfig.deliveryEndTime,
+            needChoosePayMode : body.tenantConfig.needChoosePayMode,
             // qrCodeType : body.tenantConfig.qrCodeType,
             tenantId: body.tenantId,
             longitude: body.tenantConfig.longitude,
             latitude: body.tenantConfig.latitude,
             officialNews: body.tenantConfig.officialNews,
-            needChoosePeopleNumberPage: body.tenantConfig.needChoosePeopleNumberPage,
+            needChoosePeopleNumberPage: JSON.stringify(body.tenantConfig.needChoosePeopleNumberPage),
             openFlag: body.tenantConfig.openFlag,
             firstDiscount: body.tenantConfig.firstDiscount,
             invaildTime: body.tenantConfig.invaildTime,
@@ -130,7 +135,7 @@ module.exports = {
         ctx.checkBody('/condition/tenantId', true).first().notEmpty();
         let keys = ['wecharPayee_account', 'payee_account', 'isRealTime', 'vipFee', 'vipRemindFee',
             'homeImage', 'startTime', 'name','endTime','needVip','longitude','address','phone','latitude',
-            'officialNews','needChoosePeopleNumberPage','openFlag','firstDiscount','invaildTime','deliveryStartTime','deliveryEndTime'];
+            'officialNews','needChoosePeopleNumberPage','openFlag','firstDiscount','invaildTime','deliveryStartTime','deliveryEndTime','needChoosePayMode'];
         let body = ctx.request.body;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
@@ -150,6 +155,11 @@ module.exports = {
                     tenantId : body.condition.tenantId
                 }
             })
+            await Consignees.update({
+                name : condition.name
+            },{ where:{
+                tenantId : body.condition.tenantId
+            }})
             console.log(condition)
         }
         console.log(condition)
@@ -173,6 +183,16 @@ module.exports = {
                 }
             })
             await delete condition.phone
+        }
+        if(condition.needChoosePayMode!=null){
+            if(!Tool.isArray(condition.needChoosePayMode)){
+                let needChoosePayMode = []
+                needChoosePayMode.push(condition.needChoosePayMode)
+                condition.needChoosePayMode = JSON.stringify(needChoosePayMode)
+            }else{
+                condition.needChoosePayMode = JSON.stringify(condition.needChoosePayMode)
+            }
+            console.log(condition)
         }
         // console.log(condition)
         await TenantInfo.update(condition,{

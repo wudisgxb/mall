@@ -1117,7 +1117,7 @@ const amountManger = (function () {
         }
         let json = {
             customerPaymentPrice : customerPaymentPrice.toFixed(2),
-            merchantPrice : (merchantIntos).toFixed(2),
+            merchantTotalPrice : (merchantIntos).toFixed(2),
             platformPrice : (platformInfos).toFixed(2),
             totalPrice : (totalPrice).toFixed(2),
             serviceFeePrice : serviceFeePrice.toFixed(2),
