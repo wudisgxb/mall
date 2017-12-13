@@ -38,7 +38,7 @@ const amountManger = (function () {
 
         let totalAmount = 0;
 
-        let platformAmount = 0;
+        // let platformAmount = 0;
         let platformCouponFee = 0;
         let merchantCouponFee = 0;
         let couponType = null;
@@ -203,6 +203,7 @@ const amountManger = (function () {
             totalAmount = Math.round(totalAmount * 99.4) / 100;//减去配送费的支付宝手续费
             totalAmount = totalAmount - refund_amount; //减去退款
         } else {
+            totalAmount = Math.round(totalAmount * 99.0) / 100;
             totalAmount = totalAmount - refund_amount; //减去退款
         }
 
@@ -354,7 +355,7 @@ const amountManger = (function () {
                         //门店收百分之2，写死
                         //ownRate为平台分成比率
                         //1-平台分成比率 = 商家分成比率
-                        console.log(11111111111111111111)
+                        console.log(1111111111111)
                         merchantAmount = totalAmount * (1-profitsharing.ownRate);
                         consigneeAmount = 0;
                     }
