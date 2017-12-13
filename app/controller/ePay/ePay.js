@@ -24,17 +24,21 @@ const WXPay = require('co-wechat-payment')
 const client = new OAuth(config.wechat.appId, config.wechat.secret);
 const axios = require('axios');
 
-const wxpay = new WXPay({
-    appId: config.wechat.appId,
-    mchId: config.wechat.mchId,
-    partnerKey: config.wechat.partnerKey, //微信商户平台API密钥
-    pfx: fs.readFileSync('./app/config/apiclient_cert.p12'), //微信商户平台证书
-})
-
 const pathName = path.resolve(__dirname,"..")
 const configPath = path.resolve(pathName,'..')
 const sandBoxPath = path.resolve(configPath,'config/file/pem/sandbox_iobox_private.pem')
 const aliPath = path.resolve(configPath,'config/file/pem/sandbox_ali_public.pem')
+
+const wechatPath = path.resolve(configPath,'config/apiclient_cert.p12')
+
+const wxpay = new WXPay({
+    appId: config.wechat.appId,
+    mchId: config.wechat.mchId,
+    partnerKey: config.wechat.partnerKey, //微信商户平台API密钥
+    pfx: fs.readFileSync(wechatPath), //微信商户平台证书
+})
+
+
 
 const aliEPay = new Alipay({
     appId: config.alipay.appId,

@@ -23,11 +23,16 @@ const ip = require('ip').address();
 const config = require('../config/config')
 const amountManager = require('../controller/amount/amountManager')
 
+const pathName = path.resolve(__dirname,"..")
+const configPath = path.resolve(pathName,'..')
+const sandBoxPath = path.resolve(configPath,'config/apiclient_cert.p12')
+
+
 const wxpay = new WXPay({
     appId: config.wechat.appId,
     mchId: config.wechat.mchId,
     partnerKey: config.wechat.partnerKey, //微信商户平台API密钥
-    pfx: fs.readFileSync('./app/config/apiclient_cert.p12'), //微信商户平台证书
+    pfx: fs.readFileSync(sandBoxPath), //微信商户平台证书
 })
 
 
