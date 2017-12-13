@@ -77,6 +77,4 @@ module.exports = function (app) {
     app.on('error', function (err, ctx) {
         logger.error('server error', err, ctx)
     })
-
-
 }

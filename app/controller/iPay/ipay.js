@@ -40,13 +40,16 @@ const wxpay = new WXPay({
     pfx: fs.readFileSync('./app/config/apiclient_cert.p12'), //微信商户平台证书
 })
 
-
+const pathName = path.resolve(__dirname,"..")
+const configPath = path.resolve(pathName,'..')
+const sandBoxPath = path.resolve(configPath,'config/file/pem/sandbox_iobox_private.pem')
+const aliPath = path.resolve(configPath,'config/file/pem/sandbox_ali_public.pem')
 const aliEPay = new Alipay({
     appId: config.alipay.appId,
     notify_url: config.alipay.iPay_notify_url,
     return_url: config.alipay.iPay_return_url,
-    rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
-    rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
+    rsaPrivate: sandBoxPath,
+    rsaPublic: aliPath,
     sandbox: false,
     signType: 'RSA2'
 });

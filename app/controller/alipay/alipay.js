@@ -21,7 +21,7 @@ const Foods = db.models.Foods;
 const ProfitSharings = db.models.ProfitSharings;
 const infoPushManager = require('../infoPush/infoPush');
 const Tool = require('../../Tool/tool');
-const sqlClienteleIntegrals = require('../clienteleIntegrals/clienteleIntegrals')
+// const sqlClienteleIntegrals = require('../clienteleIntegrals/clienteleIntegrals')
 const transAccountsManager = require('./transferAccounts')
 const transAccounts = require('../customer/transAccount')
 const sqlMerchantIntegrals = require('../merchantIntegrals/merchantIntegrals')
@@ -32,12 +32,17 @@ const orderManager = require('../customer/order');
 const config = require('../../config/config');
 const getstatistics = require('../statistics/orderStatistic');
 
+const pathName = path.resolve(__dirname,"..")
+const configPath = path.resolve(pathName,'..')
+const sandBoxPath = path.resolve(configPath,'config/file/pem/sandbox_iobox_private.pem')
+const aliPath = path.resolve(configPath,'config/file/pem/sandbox_ali_public.pem')
+
 const aliDeal = new Alipay({
     appId: config.alipay.appId,
     notify_url: config.alipay.notify_url,//后台回调
     return_url: config.alipay.return_url,//前台回调
-    rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
-    rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
+    rsaPrivate: sandBoxPath,
+    rsaPublic: aliPath,
     sandbox: false,
     signType: 'RSA2'
 });
@@ -46,8 +51,8 @@ const aliEshop = new Alipay({
     appId: config.alipay.appId,
     notify_url: config.alipay.notify_url,
     return_url: config.alipay.return_url,
-    rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
-    rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
+    rsaPrivate: sandBoxPath,
+    rsaPublic: aliPath,
     sandbox: false,
     signType: 'RSA2'
 });

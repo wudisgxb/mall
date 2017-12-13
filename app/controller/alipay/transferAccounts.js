@@ -9,13 +9,17 @@ const config = require('../../config/config');
 
 const transferAccountsManger = (function () {
 
+    const pathName = path.resolve(__dirname,"..")
+    const configPath = path.resolve(pathName,'..')
+    const sandBoxPath = path.resolve(configPath,'config/file/pem/sandbox_iobox_private.pem')
+    const aliPath = path.resolve(configPath,'config/file/pem/sandbox_ali_public.pem')
     let transferAccounts = function (payee_account, amount, payee_real_name, remark, tenantId) {
         const myAli = new myAlipay({
             appId: config.alipay.appId,
             notify_url: 'http://deal.xiaovbao.cn/alipay',//暂时乱写的，没用到
             return_url: 'http://deal.xiaovbao.cn/alipay-callback',//暂时乱写的，没用到
-            rsaPrivate: path.resolve('./app/config/file/pem/sandbox_iobox_private.pem'),
-            rsaPublic: path.resolve('./app/config/file/pem/sandbox_ali_public.pem'),
+            rsaPrivate: sandBoxPath,
+            rsaPublic: aliPath,
             sandbox: false,
             signType: 'RSA2'
         });
