@@ -31,6 +31,7 @@ const orderManager = require('../customer/order');
 const config = require('../../config/config')
 const axios = require('axios');
 const Tool = require('../../Tool/tool')
+const path = require('path')
 
 const getstatistics = require('../statistics/orderStatistic');
 
@@ -41,11 +42,16 @@ const jsonwebtoken = require('jsonwebtoken');
 const sqlAllianceMerchants = require('../businessAlliance/allianceMerchants')
 
 const client = new OAuth(config.wechat.appId, config.wechat.secret)
+
+const pathName = path.resolve(__dirname,"..")
+const configPath = path.resolve(pathName,'..')
+const sandBoxPath = path.resolve(configPath,'config/apiclient_cert.p12')
+
 const wxpay = new WXPay({
     appId: config.wechat.appId,
     mchId: config.wechat.mchId,
     partnerKey: config.wechat.partnerKey, //微信商户平台API密钥
-    pfx: fs.readFileSync('./app/config/apiclient_cert.p12'), //微信商户平台证书
+    pfx: fs.readFileSync(sandBoxPath), //微信商户平台证书
 })
 
 module.exports = {
