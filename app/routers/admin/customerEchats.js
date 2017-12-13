@@ -1,5 +1,5 @@
-const db = require('../../db/mysql/index');
-const sequelize = require('sequelize');
+// const db = require('../../db/mysql/index');
+// const sequelize = require('sequelize');
 
 let customerEchats = require('../../controller/admin/customerEchats')
 

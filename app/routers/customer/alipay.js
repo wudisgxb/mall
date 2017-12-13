@@ -1,4 +1,4 @@
-var db = require('../../db/mysql/index');
+// var db = require('../../db/mysql/index');
 var sequelize = require('sequelize');
 
 let alipay = require('../../controller/alipay/alipay');

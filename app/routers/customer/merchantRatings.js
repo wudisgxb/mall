@@ -1,4 +1,4 @@
-var db = require('../../db/mysql/index');
+// var db = require('../../db/mysql/index');
 let mer = require('../../controller/customer/merchantRatings')
 
 const router = new (require('koa-router'))()

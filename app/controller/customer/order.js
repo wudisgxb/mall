@@ -398,7 +398,7 @@ module.exports = {
 
     async saveUserEshopOrder (ctx, next) {
         ctx.checkBody('tableName').notEmpty();
-        ctx.checkBody('remark').notEmpty();
+        // ctx.checkBody('remark').notEmpty();
         ctx.checkBody('tenantId').notEmpty();
         ctx.checkBody('phoneNumber').notEmpty();
         ctx.checkBody('consigneeId').notEmpty();
@@ -444,7 +444,7 @@ module.exports = {
                 $or: [{status: 0}, {status: 1}],
                 consigneeId: body.consigneeId,
                 isOfflinePayment : {
-                    $ne : "1"
+                    $ne : true
                 }
             }
         })
@@ -520,6 +520,10 @@ module.exports = {
 
         if (order == null) {
             let orderLimit = await promotionManager.getOrderLimit(body.qrcodeId, body.tenantId);
+            let remark = null
+            if(body.remark!=null){
+                remark = body.remark
+            }
 
             await Orders.create({
                 phone: body.phoneNumber,

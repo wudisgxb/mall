@@ -96,6 +96,7 @@ module.exports = {
             result[k].payTime = orders[k].payTime;
             result[k].acceptTime = orders[k].acceptTime
             result[k].receiveTime = orders[k].receiveTime
+            result[k].isOfflinePayment = orders[k].isOfflinePayment==null||orders[k].isOfflinePayment==""?false:true
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
             //result[k].totalPrice = Math.round(totalPrice * 100) / 100;
@@ -268,7 +269,6 @@ module.exports = {
         //根据tenantId，查询当前时间的订单
         let orders = [];
         if(ctx.query.status!=null){
-            console.log(222222222222222222)
             if (ctx.query.pageNumber == null && ctx.query.pageSize == null) {
                 orders = await Orders.findAll({
                     where: {
@@ -374,6 +374,7 @@ module.exports = {
             result[k].payTime = orders[k].payTime;
             result[k].acceptTime = orders[k].acceptTime
             result[k].receiveTime = orders[k].receiveTime
+            result[k].isOfflinePayment = orders[k].isOfflinePayment==null||orders[k].isOfflinePayment==""?false:true
             result[k].foods = foodJson;
             result[k].totalNum = totalNum;
             //result[k].totalPrice = Math.round(totalPrice * 100) / 100;

@@ -1,6 +1,6 @@
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
-const logger = require('koa-log4').getLogger('AddressController')
+// const logger = require('koa-log4').getLogger('AddressController')
 const db = require('../../db/mysql/index');
 const QRCodeTemplates = db.models.QRCodeTemplates;
 const PaymentReqs = db.models.PaymentReqs;
@@ -13,7 +13,7 @@ const Consignees = db.models.Consignees;
 const DistanceAndPrices = db.models.DistanceAndPrices;
 const TenantConfigs = db.models.TenantConfigs;
 const Tool = require('../../Tool/tool');
-const Alipay = require('../alipay/index');
+// const Alipay = require('../alipay/index');
 
 module.exports = {
     //获取二维码模板

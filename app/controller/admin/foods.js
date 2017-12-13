@@ -3,31 +3,38 @@ const ApiResult = require('../../db/mongo/ApiResult')
 const logger = require('koa-log4').getLogger('AddressController')
 const Sequelize = require('sequelize')
 let db = require('../../db/mysql/index');
-let getFoodNum = require('../../controller/statistics/statistics');
+// let getFoodNum = require('../../controller/statistics/statistics');
 let OrderGoods = db.models.OrderGoods
 let Foods = db.models.Foods;
 let Menus = db.models.Menus;
 let Units = db.models.Units;
 let Foodsofmenus = db.models.FoodsOfTMenus;
+let TenantConfigs = db.models.TenantConfigs;
 
 const Tool = require('../../Tool/tool');
 
 
 module.exports = {
     async updateAdminFoodsBySellCount(ctx, next){
-        let foods = await Foods.findAll({})
+        let foods = await TenantConfigs.findAll({})
         // console.log(foods.length)
-        let foodSellcount = [];
         for (let i = 0; i < foods.length; i++) {
-            foodSellcount.push(Foods.update({
-                sellCount: "0"
-            }, {
-                where: {
-                    id: foods[i].id
+            if(foods[i].homeImage!=""){
+                let homeimage = foods[i].homeImage
+                let homeimages = homeimage
+                if(homeimage.indexOf("deal")){
+                    homeimages = homeimage.replace(/deal/i,'sales')
+
                 }
-            }))
+                await TenantConfigs.update({
+                    homeImage : homeimages
+                },{
+                    where:{
+                        id : foods[i].id
+                    }
+                })
+            }
         }
-        await foodSellcount
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
     async saveAdminFoods (ctx, next) {

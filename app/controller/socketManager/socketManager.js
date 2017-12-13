@@ -33,6 +33,7 @@ var server = http.createServer(function (request, response) {
 });
 server.listen(webSocketsServerPort, function () {
     console.log((new Date()) + " websocket Server is listening on port " + webSocketsServerPort);
+    console.log(11111111111111111111)
 });
 
 /**
@@ -53,7 +54,9 @@ const SocketManager = (function () {
 
         // This callback function is called every time someone
 // tries to connect to the WebSocket server
+        
         wsServer.on('request', function (request) {
+
             console.log((new Date()) + ' Connection from origin ' + request.origin + '.');
 
             // accept connection - you should check 'request.origin' to make sure that

@@ -1,6 +1,4 @@
-const sequelize = require('sequelize');
-const util = require('util');
-const moment = require('moment');
+
 let makeAppintment = require('../../controller/admin/makeAppintment');
 
 

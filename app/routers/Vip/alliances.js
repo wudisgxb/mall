@@ -1,5 +1,4 @@
-let db = require('../../db/mysql/index');
-let Admins = db.models.Adminer;
+
 const alliances = require('../../controller/vip/alliances');
 const router = new (require('koa-router'))()
 // todo: redirect

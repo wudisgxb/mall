@@ -1,5 +1,5 @@
 
-var db = require('../../db/mysql/index');
+
 var goodsInfo = require('../../controller/admin/goodsInfo')
 
 const router = new (require('koa-router'))()

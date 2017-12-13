@@ -1,5 +1,5 @@
 
-var db = require('../../db/mysql/index');
+
 var goodsPromotionManager = require('../../controller/admin/goodsPromotions')
 
 const router = new (require('koa-router'))()

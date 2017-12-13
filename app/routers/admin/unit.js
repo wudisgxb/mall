@@ -1,4 +1,3 @@
-var sequelize = require('sequelize');
 
 var unit = require('../../controller/admin/unit');
 const router = new (require('koa-router'))()

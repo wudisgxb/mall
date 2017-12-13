@@ -27,9 +27,9 @@ router.put('/api/test/customer/eshop/onlinePayment', Oauth.onlinePayment.bind(Oa
 
 // router.post('/api/test/customer/eshop/onlinePaymentCallback', Oauth.onlinePaymentCallback);
 
-router.get('/api/test/admin/eshop/onlinePayment', Oauth.getOnlinePayment);
-
-router.put('/api/test/admin/eshop/onlinePayment', Oauth.onlinePaymentByCarryOut);
+// router.get('/api/test/admin/eshop/onlinePayment', Oauth.getOnlinePayment);
+//
+// router.put('/api/test/admin/eshop/onlinePayment', Oauth.onlinePaymentByCarryOut);
 
 
 //router.get('/api/v3/transfers', Oauth.transfers)

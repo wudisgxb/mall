@@ -1,5 +1,4 @@
 
-var db = require('../../db/mysql/index');
 var print = require('../../controller/admin/print')
 
 const router = new (require('koa-router'))()

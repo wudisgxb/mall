@@ -1,5 +1,5 @@
-var db = require('../../db/mysql/index');
-var Admins = db.models.Adminer;
+// var db = require('../../db/mysql/index');
+// var Admins = db.models.Adminer;
 const auth = require('../../controller/admin/auth');
 const Oauth = require('../../controller/wechatPay/wechatOauth')
 const router = new (require('koa-router'))()

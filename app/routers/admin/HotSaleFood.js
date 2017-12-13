@@ -1,5 +1,4 @@
-var db = require('../../db/mysql/index');
-var Admins = db.models.Adminer;
+
 const HotSaleFood = require('../../controller/admin/HotSaleFood');
 const router = new (require('koa-router'))()
 // todo: redirect

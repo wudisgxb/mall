@@ -1,5 +1,5 @@
-var db = require('../../db/mysql/index');
-var sequelize = require('sequelize');
+// var db = require('../../db/mysql/index');
+// var sequelize = require('sequelize');
 
 let iPay = require('../../controller/iPay/ipay');
 const router = new (require('koa-router'))()

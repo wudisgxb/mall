@@ -1,5 +1,5 @@
 
-var db = require('../../db/mysql/index');
+// var db = require('../../db/mysql/index');
 //var Admins = db.models.Adminer;
 const consignees = require('../../controller/admin/consignees');
 const router = new (require('koa-router'))()

@@ -1,4 +1,4 @@
-var db = require('../../db/mysql/index');
+// var db = require('../../db/mysql/index');
 var sequelize = require('sequelize');
 
 let ePay = require('../../controller/ePay/ePay');

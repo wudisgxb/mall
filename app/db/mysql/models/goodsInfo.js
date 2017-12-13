@@ -21,6 +21,7 @@ module.exports = function (sequelize, DataTypes) {
         isActive: shortDataTypes.Bool(),
 
         tenantId : shortDataTypes.String(),
+        
     }, {
         associate: function (models) {
         },

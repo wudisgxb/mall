@@ -1,10 +1,10 @@
 /**
  * Created by bian on 12/3/15.
  */
-var tool = require('../../Tool/tool')
+
 const order = require('../../controller/admin/order')
 const orderCustomer = require('../../controller/customer/order')
-const ApiResult = require('../../db/mongo/ApiResult');
+
 const router = new (require('koa-router'))()
 
 //查询订单

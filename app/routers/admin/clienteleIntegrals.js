@@ -1,7 +1,7 @@
-const db = require('../../db/mysql/index');
-const sequelize = require('sequelize');
-const util = require('util');
-const moment = require('moment');
+// const db = require('../../db/mysql/index');
+// const sequelize = require('sequelize');
+// const util = require('util');
+// const moment = require('moment');
 let clienteleIntegrals = require('../../controller/admin/clienteleIntegrals');
 
 

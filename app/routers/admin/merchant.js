@@ -1,4 +1,3 @@
-let sequelize = require('sequelize');
 
 let merchant = require('../../controller/admin/merchant');
 const router = new (require('koa-router'))()

@@ -1,8 +1,7 @@
-const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')
 let db = require('../../db/mysql/index');
 let Tool = require('../../Tool/tool')
-let Captcha = db.models.Captcha
+// let Captcha = db.models.Captcha
 let Admins = db.models.Adminer
 let Alliances = db.models.Alliances
 let AdminCorresponding = db.models.AdminCorresponding
@@ -356,19 +355,19 @@ module.exports = {
             await AdminCorresponding.create({
                 phone: body.phone,
                 correspondingType: 1,
-                correspondingId: adminId
+                correspondingId: body.adminId
             })
         } else if (adminId = "2222") {
             await AdminCorresponding.create({
                 phone: body.phone,
                 correspondingType: 2,
-                correspondingId: adminId
+                correspondingId: body.adminId
             })
         } else {
             await AdminCorresponding.create({
                 phone: body.phone,
                 correspondingType: 3,
-                correspondingId: adminId
+                correspondingId: body.adminId
             })
         }
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS)

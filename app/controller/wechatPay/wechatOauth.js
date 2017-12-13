@@ -52,7 +52,6 @@ module.exports = {
 
     async onlinePayment(ctx, next){
         ctx.checkBody('tenantId').notBlank()
-        // ctx.checkBody('tableName').notBlank()
         ctx.checkBody('tradeNo').notBlank()
 
         if(ctx.errors){
@@ -73,8 +72,8 @@ module.exports = {
                 return
             }
 
-            orders.status = 1
-            orders.isOfflinePayment = 1
+            orders.status = 3
+
             await orders.save()
             let order = await Orders.findOne({
                 where:{
@@ -164,6 +163,7 @@ module.exports = {
             console.log(foodArray)
             let aaa = foodArray.map(e=>e.name+"*"+e.num).join()
             let info = order.info==""||order.info==null?"无":order.info
+            let status = order.status
             let remark = "订单总价格:  "+totalPrice+"\n"+"商品:  "+aaa+"\n备注信息:  "+info
             console.log(remark)
             if(tenantConfig!=null){
@@ -198,7 +198,7 @@ module.exports = {
                                     "color": "#173177"
                                 },
                                 "keyword4": {
-                                    "value": "已支付",
+                                    "value": "线下订单已支付",
                                     "color": "#173177"
                                 },
                                 "keyword5": {
@@ -225,163 +225,163 @@ module.exports = {
 
     },
 
-    async getOnlinePayment(ctx, next){
-        let keys = ["tenantId","tableName","startDate","endDate"]
-        console.log(ctx.query.tenantId)
-        let condition = keys.reduce((accu, curr) => {
-            if (ctx.query[curr]) {
-                accu[curr] = ctx.query[curr]
-            }
-            return accu;
-        }, {})
-        if(ctx.errors){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
-            return
-        }
-        let startTime
-        if(condition.startTime==null||condition.startTime==""){
-            startTime = new Date("2000-1-1")
-        }
-        let endTime
-        if(condition.endTime==null||condition.endTime==""){
-            endTime = new Date()
-        }
+    // async getOnlinePayment(ctx, next){
+    //     let keys = ["tenantId","tableName","startDate","endDate"]
+    //     console.log(ctx.query.tenantId)
+    //     let condition = keys.reduce((accu, curr) => {
+    //         if (ctx.query[curr]) {
+    //             accu[curr] = ctx.query[curr]
+    //         }
+    //         return accu;
+    //     }, {})
+    //     if(ctx.errors){
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
+    //         return
+    //     }
+    //     let startTime
+    //     if(condition.startTime==null||condition.startTime==""){
+    //         startTime = new Date("2000-1-1")
+    //     }
+    //     let endTime
+    //     if(condition.endTime==null||condition.endTime==""){
+    //         endTime = new Date()
+    //     }
+    //
+    //     // let pageNumber = parseInt(ctx.query.pageNumber);
+    //     //
+    //     // if(pageNumber<1){
+    //     //     pageNumber=1
+    //     // }
+    //     //
+    //     // let pageSize = parseInt(ctx.query.pageSize);
+    //     // if(pageSize<1){
+    //     //     pageSize=1
+    //     // }
+    //     // let place = (pageNumber - 1) * pageSize;
+    //     // let limitJson = {}
+    //     // if(pageNumber!=null&&pageNumber!=""&&pageSize!=null&&pageSize!=""){
+    //     //     limitJson = {
+    //     //         offset: Number(place),
+    //     //         limit: Number(pageSize)
+    //     //     }
+    //     // }
+    //     try{
+    //
+    //         if(condition.tableName!=null){
+    //
+    //             let table = await Tables.findOne({
+    //                 where:{
+    //                     tenantId : ctx.query.tenantId,
+    //                     name : ctx.query.tableName,
+    //                 }
+    //             })
+    //             condition.TableId = table.id
+    //             delete condition.tableName
+    //             if(table==null){
+    //                 ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此房间号")
+    //                 return
+    //             }
+    //         }
+    //
+    //         condition.isOfflinePayment = 1
+    //
+    //         condition.status = 1
+    //         //查询所有线下支付的订单
+    //
+    //         let orders = await Orders.findAll({
+    //             where:condition
+    //             // limitJson
+    //         })
+    //
+    //         if(orders.length==0){
+    //             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
+    //             return
+    //         }
+    //         let orderArray = []
+    //         for(let i = 0; i < orders.length; i++){
+    //             let tradeNo = orders[i].trade_no
+    //             let ordersGoods = await OrderGoods.findAll({
+    //                 where:{
+    //                     tenantId : ctx.query.tenantId,
+    //                     trade_no : tradeNo
+    //                 }
+    //             })
+    //             let totalPrice = 0
+    //             for(let j = 0; j<ordersGoods.length; j++){
+    //                 totalPrice += ordersGoods[j].num*ordersGoods[j].price
+    //             }
+    //             orders[i].dataValues.orderGoods = ordersGoods
+    //             orders[i].dataValues.totalPrice = totalPrice
+    //             orderArray.push(orders[i].dataValues)
+    //         }
+    //         ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderArray)
+    //     }catch(e){
+    //         ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,e)
+    //         return
+    //     }
+    // },
 
-        // let pageNumber = parseInt(ctx.query.pageNumber);
-        //
-        // if(pageNumber<1){
-        //     pageNumber=1
-        // }
-        //
-        // let pageSize = parseInt(ctx.query.pageSize);
-        // if(pageSize<1){
-        //     pageSize=1
-        // }
-        // let place = (pageNumber - 1) * pageSize;
-        // let limitJson = {}
-        // if(pageNumber!=null&&pageNumber!=""&&pageSize!=null&&pageSize!=""){
-        //     limitJson = {
-        //         offset: Number(place),
-        //         limit: Number(pageSize)
-        //     }
-        // }
-        try{
-
-            if(condition.tableName!=null){
-
-                let table = await Tables.findOne({
-                    where:{
-                        tenantId : ctx.query.tenantId,
-                        name : ctx.query.tableName,
-                    }
-                })
-                condition.TableId = table.id
-                delete condition.tableName
-                if(table==null){
-                    ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"没有此房间号")
-                    return
-                }
-            }
-
-            condition.isOfflinePayment = 1
-
-            condition.status = 1
-            //查询所有线下支付的订单
-
-            let orders = await Orders.findAll({
-                where:condition
-                // limitJson
-            })
-
-            if(orders.length==0){
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
-                return
-            }
-            let orderArray = []
-            for(let i = 0; i < orders.length; i++){
-                let tradeNo = orders[i].trade_no
-                let ordersGoods = await OrderGoods.findAll({
-                    where:{
-                        tenantId : ctx.query.tenantId,
-                        trade_no : tradeNo
-                    }
-                })
-                let totalPrice = 0
-                for(let j = 0; j<ordersGoods.length; j++){
-                    totalPrice += ordersGoods[j].num*ordersGoods[j].price
-                }
-                orders[i].dataValues.orderGoods = ordersGoods
-                orders[i].dataValues.totalPrice = totalPrice
-                orderArray.push(orders[i].dataValues)
-            }
-            ctx.body = new ApiResult(ApiResult.Result.SUCCESS,orderArray)
-        }catch(e){
-            ctx.body = new ApiResult(ApiResult.Result.SELECT_ERROR,e)
-            return
-        }
-    },
-
-    async onlinePaymentByCarryOut(ctx, next){
-
-        // ctx.checkBody('tenantId').notBlank()
-        // ctx.checkBody('tradeNo').notBlank()
-        let body = ctx.request.body
-        let key = ["tenantId","trade_no","tableName"]
-        let condition = key.reduce((accu,curr)=>{
-            if(body[curr]){
-                accu[curr] = body[curr]
-            }
-            return accu
-        },{})
-
-        try{
-            // let tableJson = {}
-            // console.log(2222222222222)
-            if(condition.tableName!=null){
-
-                let table = await Tables.findOne({
-                    where:{
-                        tenantId : condition.tenantId,
-                        name : condition.tableName
-                    }
-                })
-                condition.TableId = table.id
-                delete condition.tableName
-            }
-
-            // let trade_noJson = {}
-            if(condition.trade_no!=null){
-                if(Tool.isArray(condition.trade_no)){
-
-                    condition.trade_no = {
-                        $in : condition.trade_no
-                    }
-
-                }else{
-                    ctx.body = new ApiResult(ApiResult.Result.TYPE_ERROR,"trade_no必须是数组")
-                    return
-                }
-            }
-            condition.isOfflinePayment = 1
-            condition.status = 1
-            let orders = await Orders.findAll({
-                where: condition
-            })
-            if(orders.length==0){
-                ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
-                return
-            }
-            // console.log(444444444444444444)
-            for(let o of orders){
-                o.status = 2
-                await o.save()
-            }
-        }catch (e){
-            ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,e.message)
-            return
-        }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
-    },
+    // async onlinePaymentByCarryOut(ctx, next){
+    //
+    //     // ctx.checkBody('tenantId').notBlank()
+    //     // ctx.checkBody('tradeNo').notBlank()
+    //     let body = ctx.request.body
+    //     let key = ["tenantId","trade_no","tableName"]
+    //     let condition = key.reduce((accu,curr)=>{
+    //         if(body[curr]){
+    //             accu[curr] = body[curr]
+    //         }
+    //         return accu
+    //     },{})
+    //
+    //     try{
+    //         // let tableJson = {}
+    //         // console.log(2222222222222)
+    //         if(condition.tableName!=null){
+    //
+    //             let table = await Tables.findOne({
+    //                 where:{
+    //                     tenantId : condition.tenantId,
+    //                     name : condition.tableName
+    //                 }
+    //             })
+    //             condition.TableId = table.id
+    //             delete condition.tableName
+    //         }
+    //
+    //         // let trade_noJson = {}
+    //         if(condition.trade_no!=null){
+    //             if(Tool.isArray(condition.trade_no)){
+    //
+    //                 condition.trade_no = {
+    //                     $in : condition.trade_no
+    //                 }
+    //
+    //             }else{
+    //                 ctx.body = new ApiResult(ApiResult.Result.TYPE_ERROR,"trade_no必须是数组")
+    //                 return
+    //             }
+    //         }
+    //         condition.isOfflinePayment = 1
+    //         condition.status = 1
+    //         let orders = await Orders.findAll({
+    //             where: condition
+    //         })
+    //         if(orders.length==0){
+    //             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
+    //             return
+    //         }
+    //         // console.log(444444444444444444)
+    //         for(let o of orders){
+    //             o.status = 2
+    //             await o.save()
+    //         }
+    //     }catch (e){
+    //         ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,e.message)
+    //         return
+    //     }
+    //     ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
+    // },
 
     async  getWechatInfo(ctx, next) {
         var token = await client.getAccessToken(ctx.query.code);
