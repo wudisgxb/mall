@@ -25,8 +25,7 @@ const amountManager = require('../controller/amount/amountManager')
 
 const pathName = path.resolve(__dirname,"..")
 const configPath = path.resolve(pathName,'..')
-const sandBoxPath = path.resolve(configPath,'config/apiclient_cert.p12')
-
+const sandBoxPath = path.resolve(configPath,'./app/config/apiclient_cert.p12')
 
 const wxpay = new WXPay({
     appId: config.wechat.appId,

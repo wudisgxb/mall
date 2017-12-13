@@ -45,7 +45,8 @@ const client = new OAuth(config.wechat.appId, config.wechat.secret)
 
 const pathName = path.resolve(__dirname,"..")
 const configPath = path.resolve(pathName,'..')
-const sandBoxPath = path.resolve(configPath,'config/apiclient_cert.p12')
+
+const sandBoxPath = path.resolve(configPath,'./config/apiclient_cert.p12')
 
 const wxpay = new WXPay({
     appId: config.wechat.appId,
