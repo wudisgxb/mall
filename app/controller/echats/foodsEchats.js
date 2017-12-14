@@ -24,10 +24,13 @@ const getFoodEchats = (function () {
             let day=oneDay.getDay(start,end);
             let result = [];
             for(let i = 0; i < day.length; i++){
+                let orderTradeNoArray = []
                 let neworder = await NewOrders.findAll({
                     where:{
                         tenantId : tenantId,
-                        status : 2,
+                        status : {
+                            $gte : 2
+                        },
                         createdAt:{
                             $gt:day[i].start,
                             $lt:day[i].end
@@ -37,26 +40,30 @@ const getFoodEchats = (function () {
                 let ArrayFoodName=[]
                 let jsonFoodName={}
                 for(let j = 0; j< neworder.length; j++){
+                    orderTradeNoArray.push(neworder[i].trade_no)
                     let ordergoods = await OrderGoods.findAll({
                         where:{
                             tenantId : tenantId,
                             trade_no:neworder[i].trade_no
                         }
                     })
+
                     for(let k = 0; k<ordergoods.length; k++){
                         if(!ArrayFoodName.contains(ordergoods[k].goodsName)){
                             ArrayFoodName.push(ordergoods[k].goodsName)
                         }
                     }
                 }
-                console.log(day[i].start)
-                console.log(ArrayFoodName)
+
                 for(let g = 0; g<ArrayFoodName.length; g++){
                     console.log(ArrayFoodName[g])
                     let ordergoodsNum = await OrderGoods.sum("num",{
                         where:{
                             tenantId : tenantId,
                             goodsName:ArrayFoodName[g],
+                            trade_no : {
+                                $in : orderTradeNoArray
+                            },
                             createdAt:{
                                 $gt:day[i].start,
                                 $lte:day[i].end
