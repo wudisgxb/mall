@@ -71,6 +71,12 @@ Tool.getLength = function (object) {
     return count;
 }
 
+Tool.getSign = function (str,signType) {
+    var signValue = signTypes[signType](str).toUpperCase();
+    return signValue;
+};
+
+
 Tool.jsonCompare = function(objA,objB){
     var flag = true;
     for (var key in objA) {

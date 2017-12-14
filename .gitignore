@@ -66,3 +66,4 @@ typings/
 /app/config
 /app/db/mysql/index.js
 /app/controller/socketManager/socketManager.js
+/app/db/statisticsMySql/index.js

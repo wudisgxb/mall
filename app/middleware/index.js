@@ -20,10 +20,10 @@ const ApiError = require('../db/mongo/ApiError')
 module.exports = function (app) {
     app.use(async(ctx, next) => {
         try {
-            console.log(444)
+
             await next()
         } catch (err) {
-            console.log(555)
+
             if (err.status === 401) {
                 ctx.status = 401
                 ctx.body = 'Protected resource, use Authorization header to get access; Format is "Authorization: Bearer <token>"\n'
@@ -38,7 +38,7 @@ module.exports = function (app) {
             }
         }
     })
-    console.log(333)
+
     //xml
     var xmlParser = require('koa-xml-body'); // note the default
     app.use(xmlParser());

@@ -9,13 +9,18 @@ const getAnYearEchats = (function () {
         let result = [];
 
         for (let i = 0; i < year; i++) {
+            //开始月份
             let Month = i + 1
+            //结束月份
             let lastMonth = Month + 1
+            //开始
             let startYear = startDay
-            if (Month == 12) {
-                startYear + 1
-                lastMonth == 1
+            console.log(Month)
+            if (Month % 12==0) {
+                startYear += 1
+                lastMonth = 1
             }
+
             result.push({
                 start: new Date(startDay.toString() + "-" + Month.toString()),
                 end: new Date(startYear.toString() + "-" + lastMonth.toString())

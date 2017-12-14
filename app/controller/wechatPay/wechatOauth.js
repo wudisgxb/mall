@@ -1016,6 +1016,7 @@ module.exports = {
         })
 
         let fn = co.wrap(wxpay.getSign.bind(wxpay));
+
         const sign = await fn(str, 'MD5')
 
         let trade_no = xml.out_trade_no.toString().substr(0, xml.out_trade_no.toString().length - 4);
@@ -1176,7 +1177,7 @@ module.exports = {
                 let amountJson
                 console.log("order================"+order)
                 amountJson= await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
-                console.log(amountJson)
+                // console.log(amountJson)
                 let allianceMerchants = await AllianceMerchants.findOne({
                     where:{
                         tenantId :tenantId
@@ -1212,7 +1213,7 @@ module.exports = {
                     isVip: isVip
                 }
                 await customer.saveCustomer(customerJson);
-                console.log(Merchants)
+                // console.log(Merchants)
                 let merchant = await Merchants.findOne({
                     where:{
                         tenantId :tenantId
