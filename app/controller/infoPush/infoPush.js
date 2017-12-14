@@ -1,5 +1,5 @@
 var JPush = require("../../../node_modules/jpush-sdk/lib/JPush/JPush.js")
-var client = JPush.buildClient('bd59abef4f3868f6c6edd605', '41fdfaa1e56a9f739031ea55')
+var client = JPush.buildClient('115403a872e663f1f06ef137', '60866e63ec48e0e6cde76bef')
 
 
 const infoPushManager = (function () {
