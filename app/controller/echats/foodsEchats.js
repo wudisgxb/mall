@@ -74,7 +74,6 @@ const getFoodEchats = (function () {
                         where:{
                             tenantId : tenantId,
                             goodsName: ArrayFoodName[g],
-
                         }
                     })
                     jsonFoodName={
