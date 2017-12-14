@@ -12,7 +12,7 @@ const GoodsPromotions = db.models.GoodsPromotions;
 const QRCodeTemplates = db.models.QRCodeTemplates;
 const DeliveryFees = db.models.DeliveryFees;
 const DistanceAndPrices = db.models.DistanceAndPrices;
-const PaymentReqs = db.models.PaymentReqs;
+
 const webSocket = require('../../controller/socketManager/socketManager');
 const infoPushManager = require('../../controller/infoPush/infoPush');
 const tool = require('../../Tool/tool');

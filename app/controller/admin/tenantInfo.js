@@ -49,6 +49,7 @@ module.exports = {
             result.officialNews = tenantInfo.officialNews;
             result.firstDiscount = tenantInfo.firstDiscount;
             result.startTime = tenantInfo.startTime;
+            result.outOfServiceTimePrompt = tenantInfo.outOfServiceTimePrompt;
             result.endTime = tenantInfo.endTime;
             result.deliveryStartTime = tenantInfo.deliveryStartTime;
             result.deliveryEndTime = tenantInfo.deliveryEndTime;
@@ -117,6 +118,7 @@ module.exports = {
             deliveryStartTime : body.tenantConfig.deliveryStartTime,
             deliveryEndTime : body.tenantConfig.deliveryEndTime,
             needChoosePayMode : body.tenantConfig.needChoosePayMode,
+            outOfServiceTimePrompt : body.tenantConfig.outOfServiceTimePrompt,
             // qrCodeType : body.tenantConfig.qrCodeType,
             tenantId: body.tenantId,
             longitude: body.tenantConfig.longitude,
@@ -135,7 +137,8 @@ module.exports = {
         ctx.checkBody('/condition/tenantId', true).first().notEmpty();
         let keys = ['wecharPayee_account', 'payee_account', 'isRealTime', 'vipFee', 'vipRemindFee',
             'homeImage', 'startTime', 'name','endTime','needVip','longitude','address','phone','latitude',
-            'officialNews','needChoosePeopleNumberPage','openFlag','firstDiscount','invaildTime','deliveryStartTime','deliveryEndTime','needChoosePayMode'];
+            'officialNews','needChoosePeopleNumberPage','openFlag','firstDiscount','invaildTime','deliveryStartTime',
+            'deliveryEndTime','needChoosePayMode','outOfServiceTimePrompt'];
         let body = ctx.request.body;
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
