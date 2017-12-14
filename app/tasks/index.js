@@ -16,7 +16,7 @@ const TransferAccounts = db.models.TransferAccounts;
 const Consignees = db.models.Consignees;
 const TenantConfigs = db.models.TenantConfigs;
 const ProfitSharings = db.models.ProfitSharings;
-
+const OrderGoods = db.models.OrderGoods
 const co = require('co')
 const WXPay = require('co-wechat-payment')
 const ip = require('ip').address();
@@ -238,7 +238,7 @@ module.exports = async function tasks(app) {
                         consigneeId: consigneeId
                     }
                 });
-                
+
                 console.log("租户微信转账金额：" + merchantAmount);
                 console.log("代售微信转账金额：" + consigneeAmount);
                 //判断是否有利润分成
@@ -1189,13 +1189,21 @@ module.exports = async function tasks(app) {
                     }
                 }
             });
+
             var trade_no;
             for (var i = 0; i < orders.length; i++) {
                 if ((Date.now() - orders[i].createdAt.getTime()) > 10 * 60 * 1000) {
                     //获取订单号
                     trade_no = orders[i].trade_no;
                     console.log("超时订单号：" + trade_no)
-
+                    let ordergoods = await OrderGoods.findAll({
+                        where: {
+                            trade_no : trade_no
+                        }
+                    })
+                    for(let og of ordergoods){
+                        await og.destroy()
+                    }
 
                     await orders[i].destroy();
 

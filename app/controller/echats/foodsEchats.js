@@ -61,9 +61,6 @@ const getFoodEchats = (function () {
                         where:{
                             tenantId : tenantId,
                             goodsName:ArrayFoodName[g],
-                            trade_no : {
-                                $in : orderTradeNoArray
-                            },
                             createdAt:{
                                 $gt:day[i].start,
                                 $lte:day[i].end
@@ -74,6 +71,10 @@ const getFoodEchats = (function () {
                         where:{
                             tenantId : tenantId,
                             goodsName: ArrayFoodName[g],
+                            createdAt:{
+                                $gt:day[i].start,
+                                $lte:day[i].end
+                            }
                         }
                     })
                     jsonFoodName={
@@ -86,6 +87,81 @@ const getFoodEchats = (function () {
                     }
                     result.push(jsonFoodName)
                 }
+
+
+
+                // let order = await NewOrders.findAll({
+                //     where:{
+                //         tenantId : tenantId,
+                //         createdAt:{
+                //             $gt:day[i].start,
+                //             $lte:day[i].end
+                //         },
+                //         status : {
+                //             $gte : 2
+                //         }
+                //     }
+                // })
+                // let orderTrade_no = []
+                // for(let j = 0 ; j< order.length;j++){
+                //     orderTrade_no.push(order[j].trade_no)
+                // }
+                //
+                // let ordergoods = await OrderGoods.findAll({
+                //     where:{
+                //         tenantId : tenantId,
+                //         trade_no : {
+                //             $in : orderTrade_no
+                //         }
+                //     }
+                // })
+                //
+                // let trade_noArray=[]
+                // let nameArray = []
+                // for(let i = 0; i < ordergoods.length; i++){
+                //     if(!trade_noArray.contains(ordergoods[i].trade_no)){
+                //         trade_noArray.push(ordergoods[i].trade_no)
+                //     }
+                //     if(!nameArray.contains(ordergoods[i].goodsName)){
+                //         nameArray.push(ordergoods[i].goodsName)
+                //     }
+                // }
+                //
+                // let difference = orderTrade_no.concat(trade_noArray).filter(v => !orderTrade_no.includes(v) || !trade_noArray.includes(v))
+                //
+                // for(let k = 0; k < nameArray.length; k++){
+                //     let ordergoodsNum = await OrderGoods.sum("num",{
+                //         where:{
+                //             tenantId : tenantId,
+                //             goodsName: nameArray[k],
+                //             // trade_no : {
+                //             //     $notIn : difference
+                //             // },
+                //             createdAt:{
+                //                 $gt:day[i].start,
+                //                 $lte:day[i].end
+                //             }
+                //         }
+                //     })
+                //     console.log(ordergoodsNum)
+                //     let ordergoodsPrice = await OrderGoods.findOne({
+                //         where:{
+                //             tenantId : tenantId,
+                //             goodsName: nameArray[k],
+                //         }
+                //     })
+                //
+                //     jsonFoodName={
+                //         price : ordergoodsPrice.price,
+                //         goodsName : nameArray[k],
+                //         consume : Number(ordergoodsPrice.price)*ordergoodsNum,
+                //         vipConsume:ordergoodsPrice.vipPrice*ordergoodsNum,
+                //         time: day[i].start,
+                //         num : ordergoodsNum
+                //     }
+                //     result.push(jsonFoodName)
+                // }
+
             }
             return result;
         }
