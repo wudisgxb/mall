@@ -15,12 +15,6 @@ try {
 //http://www.nodepeixun.com/a/nodekuangjia/20170122/138.html
 log4js.configure({
     "appenders": [{
-      "type": "logLevelFilter",
-      "level": "DEBUG",
-      "appender": {
-        "type": "console"
-      }
-    }, {
       "type": "clustered",
       "appenders": [{
         "type": "dateFile",
@@ -42,7 +36,7 @@ log4js.configure({
         }
       }]
     }],
-    "replaceConsole":true
+    "replaceConsole":false
   }, { cwd: logDir })
   //注册日志： 日志名（前缀）startup
 const logger = log4js.getLogger('startup')

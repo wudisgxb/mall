@@ -39,15 +39,16 @@ module.exports = function (app) {
                     var nextPath = path.join(dir, file);
                     var stat = fs.statSync(nextPath);
                     if (stat.isDirectory()) {
+
                         loadDir(nextPath);
                     } else if (stat.isFile() && file.indexOf('.') !== 0 && file !== 'index.js' && file !== 'url.js') {
-                        const router = require(nextPath)
+                        // const router = require(nextPath)
                         app.use(router.routes(), router.allowedMethods());
                     }
                 });
         };
-
         loadDir(__dirname);
+
     } catch (e) {
         app.emit('error', e)
     }

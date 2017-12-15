@@ -77,7 +77,7 @@ const getFoodEchats = (function () {
                             }
                         }
                     })
-                    jsonFoodName={
+                    jsonFoodName = {
                         price : ordergood.price,
                         goodsName : ArrayFoodName[g],
                         consume : Number(ordergood.price)*ordergoodsNum,
@@ -87,8 +87,6 @@ const getFoodEchats = (function () {
                     }
                     result.push(jsonFoodName)
                 }
-
-
 
                 // let order = await NewOrders.findAll({
                 //     where:{
