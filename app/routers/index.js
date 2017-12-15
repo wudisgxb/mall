@@ -42,7 +42,7 @@ module.exports = function (app) {
 
                         loadDir(nextPath);
                     } else if (stat.isFile() && file.indexOf('.') !== 0 && file !== 'index.js' && file !== 'url.js') {
-                        // const router = require(nextPath)
+                        const router = require(nextPath)
                         app.use(router.routes(), router.allowedMethods());
                     }
                 });
