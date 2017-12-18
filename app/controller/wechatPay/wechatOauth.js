@@ -745,7 +745,7 @@ module.exports = {
         ctx.checkQuery('consigneeId').notEmpty();
         ctx.checkQuery('phoneNumber').notEmpty();
 
-        logger.info(tenantId+"获取"+phoneNumber+"用户订单")
+        logger.info(ctx.query.tenantId+"获取"+ctx.query.phoneNumber+"用户订单")
         if (ctx.errors) {
             ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR, ctx.errors)
             return;
@@ -941,15 +941,15 @@ module.exports = {
             order.status = 1;//待支付
             order.paymentMethod = '微信';
             await order.save();
-            logger.lnfo("电话为:"+ctx.query.phoneNumber+"\n订单号为："+trade_no+"的顾客正在支付下面进入回调")
+            logger.info("电话为:"+ctx.query.phoneNumber+"\n订单号为："+trade_no+"的顾客正在支付下面进入回调")
             ctx.body = new ApiResult(ApiResult.Result.SUCCESS, new_params)
         }
 
     },
 
     async wechatPayNotify(ctx, next) {
-        Logger.info("进入微信回调")
-        Logger.info("JSON.stringify(ctx.xmlBody)"+JSON.stringify(ctx.xmlBody));
+        logger.info("进入微信回调")
+        logger.info("JSON.stringify(ctx.xmlBody)"+JSON.stringify(ctx.xmlBody));
         let xmlBody = ctx.xmlBody;
         // var xmlBody = {
         //     "xml": {
@@ -1023,14 +1023,17 @@ module.exports = {
         const sign = await fn(str, 'MD5')
 
         let trade_no = xml.out_trade_no.toString().substr(0, xml.out_trade_no.toString().length - 4);
-        console.log(trade_no)
+        logger.info("xml.sign[0]======="+xml.sign[0])
+        logger.info("sign========"+sign)
         if (sign !== xml.sign[0]) {
+            console.log(1111)
             AlipayErrors.create({
                 errRsp: JSON.stringify(ctx.xmlBody),
                 signFlag: false,
             });
         } else {
-            console.log(JSON.stringify({
+            console.log(22222)
+            logger.info(JSON.stringify({
                 trade_no: trade_no,
                 app_id: xml.appid,
                 total_amount: xml.total_fee / 100,
@@ -1074,6 +1077,7 @@ module.exports = {
                     FoodNameArray.push(json)
                 }
             }
+            logger.info("FoodNameArray===="+FoodNameArray)
 
             let foodArray = FoodNameArray.reduce((accu,curr) => {
                 const sameNameEle = accu.find(e => e.name === curr.name)
@@ -1085,9 +1089,9 @@ module.exports = {
                 return accu
             },[])
 
-            console.log(foodArray)
+            logger.info("foodArray===="+foodArray)
             let aaa = foodArray.map(e=>e.name+"*"+e.num).join()
-
+            logger.info(aaa)
             let paymentReqs = await PaymentReqs.findAll({
                 where: {
                     trade_no: trade_no,
