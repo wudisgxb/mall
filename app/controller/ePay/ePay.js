@@ -20,7 +20,7 @@ const transAccounts = require('../customer/transAccount')
 const config = require('../../config/config');
 const ip = require('ip').address();
 const OAuth = require('co-wechat-oauth')
-const WXPay = require('co-wechat-payment')
+const WXPay = require('../wechatPay/index')
 const client = new OAuth(config.wechat.appId, config.wechat.secret);
 const axios = require('axios');
 

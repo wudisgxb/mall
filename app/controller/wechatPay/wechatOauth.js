@@ -1,6 +1,6 @@
 const OAuth = require('co-wechat-oauth')
 const co = require('co')
-const WXPay = require('co-wechat-payment')
+const WXPay = require('./index')
 const fs = require('fs')
 const ApiError = require('../../db/mongo/ApiError')
 const ApiResult = require('../../db/mongo/ApiResult')

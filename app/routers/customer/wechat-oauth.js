@@ -14,7 +14,6 @@ router.get('/api/test/customer/eshop/fetch-openid/redirectUrl', Oauth.userEshopO
 router.get('/api/test/customer/deal/wechatpay/wap', Oauth.getUserDealWechatPayParams)
 
 router.get('/api/test/customer/eshop/wechatpay/wap', Oauth.getUserEshopWechatPayParams)
-
 //获取openid
 router.get('/api/test/customer/eshop/fetch-openid/wap', Oauth.getOpenId)
 
