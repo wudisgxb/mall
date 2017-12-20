@@ -168,12 +168,12 @@ module.exports = {
                 return accu
             },[])
 
-            console.log(foodArray)
+            logger.info(foodArray)
             let aaa = foodArray.map(e=>e.name+"*"+e.num).join()
             let info = order.info==""||order.info==null?"无":order.info
             let status = order.status
             let remark = "订单总价格:  "+totalPrice+"\n"+"商品:  "+aaa+"\n备注信息:  "+info
-            console.log(remark)
+            logger.info(remark)
             if(tenantConfig!=null){
                 if (tenantConfig.openIds != null) {
 
@@ -235,7 +235,7 @@ module.exports = {
 
     // async getOnlinePayment(ctx, next){
     //     let keys = ["tenantId","tableName","startDate","endDate"]
-    //     console.log(ctx.query.tenantId)
+    //     logger.info(ctx.query.tenantId)
     //     let condition = keys.reduce((accu, curr) => {
     //         if (ctx.query[curr]) {
     //             accu[curr] = ctx.query[curr]
@@ -344,7 +344,7 @@ module.exports = {
     //
     //     try{
     //         // let tableJson = {}
-    //         // console.log(2222222222222)
+    //         // logger.info(2222222222222)
     //         if(condition.tableName!=null){
     //
     //             let table = await Tables.findOne({
@@ -379,7 +379,7 @@ module.exports = {
     //             ctx.body = new ApiResult(ApiResult.Result.NOT_FOUND,"找不到此订单信息")
     //             return
     //         }
-    //         // console.log(444444444444444444)
+    //         // logger.info(444444444444444444)
     //         for(let o of orders){
     //             o.status = 2
     //             await o.save()
@@ -395,7 +395,7 @@ module.exports = {
         var token = await client.getAccessToken(ctx.query.code);
         var openid = token.data.openid;
         var userInfo = await client.getUser(openid);
-        console.log("userInfo====" + JSON.stringify(userInfo));
+        logger.info("userInfo====" + JSON.stringify(userInfo));
         let ret = await axios.post('http://api.wechat.huizhanren.cn/api/wxFans/', {
             OpenId: openid,
             nickname: userInfo.nickname,
@@ -412,15 +412,15 @@ module.exports = {
 
         // const auth_callback_url = 'http://119.29.180.92/user'
 
-        console.log(`auth_callback_url: ${auth_callback_url}`)
+        logger.info(`auth_callback_url: ${auth_callback_url}`)
 
         const url = client.getAuthorizeURL(auth_callback_url, config.wechat.state, 'snsapi_base')
-        console.log(`redirect url: ${url}`)
+        logger.info(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, url)
-        console.log(`start: ${new Date()}`)
+        logger.info(`start: ${new Date()}`)
     },
 
     async userEshopRedirect(ctx, next) {
@@ -430,14 +430,14 @@ module.exports = {
 
         // const auth_callback_url = 'http://119.29.180.92/user'
 
-        console.log(`auth_callback_url: ${auth_callback_url}`)
+        logger.info(`auth_callback_url: ${auth_callback_url}`)
 
         const url = client.getAuthorizeURL(auth_callback_url, config.wechat.state, 'snsapi_base')
-        console.log(`redirect url: ${url}`)
+        logger.info(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, url)
-        console.log(`start: ${new Date()}`)
+        logger.info(`start: ${new Date()}`)
     },
 
     async userEshopOpenIdRedirect(ctx, next) {
@@ -447,14 +447,14 @@ module.exports = {
 
         // const auth_callback_url = 'http://119.29.180.92/user'
 
-        console.log(`auth_callback_url: ${auth_callback_url}`)
+        logger.info(`auth_callback_url: ${auth_callback_url}`)
 
         const url = client.getAuthorizeURL(auth_callback_url, 'openid', 'snsapi_base')
-        console.log(`redirect url: ${url}`)
+        logger.info(`redirect url: ${url}`)
         // 重定向请求到微信服务器
         //ctx.redirect(url);
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, url)
-        console.log(`start: ${new Date()}`)
+        logger.info(`start: ${new Date()}`)
     },
 
     // async getUser(ctx, next) {
@@ -471,7 +471,7 @@ module.exports = {
 
     async getOpenId(ctx, next) {
         const token = await client.getAccessToken(ctx.query.code);
-        console.log(ctx.query.code)
+        logger.info(ctx.query.code)
 
         ctx.body = new ApiResult(ApiResult.Result.SUCCESS, {openId: token.data.openid})
     },
@@ -484,10 +484,10 @@ module.exports = {
     async  getTenantIdsByCode(ctx, next) {
         try {
             const token = await client.getAccessToken(ctx.query.code);
-            console.log(ctx.query.code)
+            logger.info(ctx.query.code)
             let openId = token.data.openid;
 
-            console.log("-----openId===" + openId);
+            logger.info("-----openId===" + openId);
 
             //通过openId查找租户
             let tenantConfigs = await TenantConfigs.findAll({
@@ -610,15 +610,15 @@ module.exports = {
 
         //查找桌名
         let tableName = table.name;
-        console.log("tableName:" + tableName);
+        logger("tableName:" + tableName);
         let merchant = tenantConfigs.name;
-        console.log("merchant:" + merchant);
+        logger("merchant:" + merchant);
 
-        console.log(`code: ${ctx.query.code}`)
+        logger.info(`code: ${ctx.query.code}`)
         const token = await client.getAccessToken(ctx.query.code)
         const ip = ctx.request.headers['x-real-ip']
 
-        console.log(`openid: ${token.data.openid}; ip: ${ip}`)
+        logger.info(`openid: ${token.data.openid}; ip: ${ip}`)
 
         //存openid
         await User.create({
@@ -632,7 +632,7 @@ module.exports = {
 
         const fn = co.wrap(wxpay.getBrandWCPayRequestParams.bind(wxpay))
 
-        console.log("total_amount ============" + total_amount);
+        logger.info("total_amount ============" + total_amount);
 
         let new_params = await fn({
             openid: token.data.openid,
@@ -646,7 +646,7 @@ module.exports = {
         })
         new_params.trade_no = wechat_trade_no;
 
-        console.log(new_params)
+        logger.info(new_params)
 
         let app_id = new_params.appId;
 
@@ -787,7 +787,7 @@ module.exports = {
         }
 
         let trade_no = order.trade_no;
-        console.log(trade_no)
+        logger.info(trade_no)
 
         //首单折扣，-1表示不折扣，根据手机号和租户id
         let firstDiscount = await orderManager.getFirstDiscount(order.phone, ctx.query.tenantId);
@@ -815,15 +815,15 @@ module.exports = {
 
         //查找桌名
         let tableName = table.name;
-        console.log("tableName:" + tableName);
+        logger.info("tableName:" + tableName);
         let merchant = tenantConfigs.name;
-        console.log("merchant:" + merchant);
+        logger.info("merchant:" + merchant);
 
-        console.log(`code: ${ctx.query.code}`)
+        logger.info(`code: ${ctx.query.code}`)
         const token = await client.getAccessToken(ctx.query.code)
         const ip = ctx.request.headers['x-real-ip']
         logger.info("用户的openId"+token.data.openid)
-        console.log(`openid: ${token.data.openid}; ip: ${ip}`)
+        logger.info(`openid: ${token.data.openid}; ip: ${ip}`)
 
         //存openid
         await User.create({
@@ -851,7 +851,7 @@ module.exports = {
         })
         new_params.trade_no = wechat_trade_no;
 
-        console.log(new_params)
+        logger.info(new_params)
 
         let app_id = new_params.appId;
 
@@ -1003,36 +1003,40 @@ module.exports = {
         //         ]
         //     }
         // };
+        logger.info("xmlBody : "+JSON.stringify(xmlBody))
         let xml = xmlBody.xml;
         let tableId = 0;
         let str = "";
         let arr = Object.keys(xml);
+        logger.info("xml+++"+JSON.stringify(xml))
+        logger.info("arr+++"+arr)
         arr.forEach(function (e) {
-            console.log(e + "||" + xml[e]);
-            if (e != 'sign') {
-                if (arr[arr.s - 1] != e) {
+            logger.info(e + "||" + xml[e]);
+            if (e !== 'sign') {
+                if (arr[arr.length - 1] != e) {
                     str = str + e + '=' + xml[e] + '&';
                 } else {
                     str = str + e + '=' + xml[e] + '&' + 'key=EXvIG4rOpC7AlcooAFkoMAgWIoYa1VbR';
                 }
             }
         })
+        logger.info(str)
 
         let fn = co.wrap(wxpay.getSign.bind(wxpay));
-
+        logger.info("fn====="+fn)
         const sign = await fn(str, 'MD5')
-
+        logger.info("sign=="+sign)
         let trade_no = xml.out_trade_no.toString().substr(0, xml.out_trade_no.toString().length - 4);
         logger.info("xml.sign[0]======="+xml.sign[0])
         logger.info("sign========"+sign)
         if (sign !== xml.sign[0]) {
-            console.log(1111)
+            logger.info(1111)
             AlipayErrors.create({
                 errRsp: JSON.stringify(ctx.xmlBody),
                 signFlag: false,
             });
         } else {
-            console.log(22222)
+            logger.info(22222)
             logger.info(JSON.stringify({
                 trade_no: trade_no,
                 app_id: xml.appid,
@@ -1183,7 +1187,7 @@ module.exports = {
                 //output:object（总金额，租户金额，代售金额）
 
                 let amountJson
-                console.log("order================"+order)
+                logger.info("order================"+order)
                 amountJson= await amountManager.getTransAccountAmount(tenantId, consigneeId, trade_no, '微信', 0);
                 // console.log(amountJson)
                 let allianceMerchants = await AllianceMerchants.findOne({
@@ -1252,10 +1256,10 @@ module.exports = {
                     // console.log("amountJson===="+amountJson)
                     await getstatistics.setOrders(amountJson);
                 } catch (e) {
-                    console.log(e);
+                    logger.info("没加入统计表中"+e);
                 }
 
-                console.log("amountJson = " + JSON.stringify(amountJson, null, 2));
+                logger.info("amountJson = " + JSON.stringify(amountJson, null, 2));
 
                 //支付完成推送支付成功消息
                 let date = new Date().format("hh:mm");
@@ -1272,7 +1276,7 @@ module.exports = {
                     if (tenantConfig.openIds != null) {
 
                         let openIds = JSON.parse(tenantConfig.openIds);
-                        console.log(openIds)
+                        logger.info(openIds)
                         let remark = "订单总价格:  "+amountJson.totalPrice+"\n"+"商品:  "+aaa+"\n备注信息:  "+info
                         for (let j = 0; j < openIds.length; j++) {
                             //先获取token
@@ -1337,7 +1341,7 @@ module.exports = {
                                     desc: '收益',
                                     spbill_create_ip: ip
                                 }
-                                console.log(params)
+                                logger.info(params)
                                 try {
                                     result = await fn(params);
                                     logger.info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
@@ -1353,7 +1357,7 @@ module.exports = {
                                     logger.info(e);
                                 }
                             } else {
-                                console.log("有代售商")
+                                logger.info("有代售商")
                                 let profitsharing = await ProfitSharings.findOne({
                                     where: {
                                         tenantId: tenantId,
@@ -1376,7 +1380,7 @@ module.exports = {
                                     try {
                                         logger.info("profitsharing为空")
                                         result = await fn(params);
-                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
+                                        logger.info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
                                         if (result.result_code == 'SUCCESS') {
                                             paymentReqs[0].TransferAccountIsFinish = true;
                                             await paymentReqs[0].save();
@@ -1386,7 +1390,7 @@ module.exports = {
                                             }
                                         }
                                     } catch (e) {
-                                        console.log(e);
+                                        logger.info(e);
                                     }
                                 } else {
                                     //找到对应关系
@@ -1402,7 +1406,7 @@ module.exports = {
 
                                     try {
                                         result = await fn(params);
-                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result, null, 2));
+                                        logger.info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result, null, 2));
                                         if (result.result_code == 'SUCCESS') {
                                             paymentReqs[0].TransferAccountIsFinish = true;
                                             await paymentReqs[0].save();
@@ -1419,7 +1423,7 @@ module.exports = {
                                             }
 
                                             result = await fn(params);
-                                            console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result, null, 2));
+                                            logger.info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT3result:" + JSON.stringify(result, null, 2));
 
                                             if (result.result_code == 'SUCCESS') {
                                                 paymentReqs[0].consigneeTransferAccountIsFinish = true;
@@ -1439,7 +1443,7 @@ module.exports = {
                                             }
                                         }
                                     } catch (e) {
-                                        console.log(e);
+                                        logger.info(e);
                                     }
                                 }
                             }
@@ -1469,7 +1473,7 @@ module.exports = {
 
                                 try {
                                     result = await fn(params);
-                                    console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
+                                    logger.info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
                                     if (result.result_code == 'SUCCESS') {
                                         paymentReqs[0].TransferAccountIsFinish = true;
                                         await paymentReqs[0].save();
@@ -1480,7 +1484,7 @@ module.exports = {
                                         }
                                     }
                                 } catch (e) {
-                                    console.log(e);
+                                    logger.info(e);
                                 }
                             } else {
                                 logger.info("有代售酒店")
@@ -1507,7 +1511,7 @@ module.exports = {
 
                                     try {
                                         result = await fn(params);
-                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
+                                        logger.info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT1result:" + JSON.stringify(result, null, 2));
                                         if (result.result_code == 'SUCCESS') {
                                             paymentReqs[0].TransferAccountIsFinish = true;
                                             await paymentReqs[0].save();
@@ -1517,7 +1521,7 @@ module.exports = {
                                             }
                                         }
                                     } catch (e) {
-                                        console.log(e);
+                                        logger.info(e);
                                     }
                                 } else {
                                     //因为开启了商户利润分配所以商户和代售点就没有利润的说法，一切以商户的利润比率来算
@@ -1535,7 +1539,7 @@ module.exports = {
 
                                     try {
                                         result = await fn(params);
-                                        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result, null, 2));
+                                        logger.info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT2result:" + JSON.stringify(result, null, 2));
                                         if (result.result_code == 'SUCCESS') {
                                             paymentReqs[0].TransferAccountIsFinish = true;
                                             await paymentReqs[0].save();
@@ -1573,7 +1577,7 @@ module.exports = {
                                             // }
                                         }
                                     } catch (e) {
-                                        console.log(e);
+                                        logger.info(e);
                                     }
                                 }
                             }
@@ -1600,7 +1604,7 @@ module.exports = {
                                         await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, '收益', '微信', '租户', tenantId, consigneeId);
                                     }
                                 } else {
-                                    console.log("66666666666666666666666666")
+                                    logger.info("66666666666666666666666666")
                                     if (getProfitRate.merchantTotalPrice > 0) {
                                         await transAccounts.pendingTransferAccounts(trade_no, tenantConfig.wecharPayee_account, getProfitRate.merchantTotalPrice, profitsharing.merchantRemark, '微信', '租户', tenantId, consigneeId);
                                     }
@@ -1663,7 +1667,7 @@ module.exports = {
         //const ip = ctx.request.headers['x-real-ip']
 
         var ip = Ip.address();
-        console.log("服务器公网IP：" + ip);
+        logger.info("服务器公网IP：" + ip);
         const params = {
             partner_trade_no: Date.now(), //商户订单号，需保持唯一性
             openid: 'oeGC00rSlKScZMw7g9Bz3xj5hrsc',
@@ -1677,7 +1681,7 @@ module.exports = {
 
         const result = await fn(params)
 
-        console.log(result)
+        logger.info(result)
         ctx.body = result
     },
 
@@ -1722,7 +1726,7 @@ module.exports = {
 
         try {
             const result = await fn(params);
-            console.log("KKKKKKKKKKKKKKKKKKKKKKKK-退款结果：" + JSON.stringify(result, null, 2));
+            logger.info("KKKKKKKKKKKKKKKKKKKKKKKK-退款结果：" + JSON.stringify(result, null, 2));
 
             if (result.result_code == 'SUCCESS') {
                 paymentReqs[0].refund_amount = paymentReqs[0].refund_amount + result.refund_fee / 100;
@@ -1744,7 +1748,7 @@ module.exports = {
             }
 
         } catch (e) {
-            console.log(e);
+            logger.info(e);
             ctx.body = {
                 resCode: -2,
                 resMsg: e
@@ -1794,7 +1798,7 @@ module.exports = {
 
         try {
             const result = await fn(params);
-            console.log("KKKKKKKKKKKKKKKKKKKKKKKK-退款结果：" + JSON.stringify(result, null, 2));
+            logger.info("KKKKKKKKKKKKKKKKKKKKKKKK-退款结果：" + JSON.stringify(result, null, 2));
 
             if (result.result_code == 'SUCCESS') {
                 paymentReqs[0].refund_amount = paymentReqs[0].refund_amount + result.refund_fee / 100;
@@ -1816,7 +1820,7 @@ module.exports = {
             }
 
         } catch (e) {
-            console.log(e);
+            logger.info(e);
             ctx.body = {
                 resCode: -2,
                 resMsg: e
@@ -1860,9 +1864,9 @@ module.exports = {
         })
 
         if (tenantConfig != null) {
-            console.log("服务器公网IP：" + ip);
+            logger.info("服务器公网IP：" + ip);
             fn = co.wrap(wxpay.transfers.bind(wxpay))
-            console.log((merchantAmount * 100))
+            logger.info((merchantAmount * 100))
             var params = {
                 partner_trade_no: Date.now(), //商户订单号，需保持唯一性
                 openid: tenantConfig.wecharPayee_account,
@@ -1873,9 +1877,9 @@ module.exports = {
             }
 
             try {
-                console.log(11111111111)
+                logger.info(11111111111)
                 var result = await fn(params);
-                console.log(result)
+                logger.info(result)
                 // console.log("定时器TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT0result:" + JSON.stringify(result, null, 2));
                 if (result.result_code == 'SUCCESS') {
 
@@ -1890,12 +1894,12 @@ module.exports = {
                             consigneeTransferAccountIsFinish: false
                         }
                     });
-                    console.log(22222222222)
+                    logger.info(22222222222)
                     for (var j = 0; j < paymentReqs.length; j++) {
                         paymentReqs[j].TransferAccountIsFinish = true;
                         await paymentReqs[j].save();
                     }
-                    console.log(3333333333333)
+                    logger.info(3333333333333)
                     //待转账表状态修改从0-1
                     transferAccounts = await TransferAccounts.findAll({
                         where: {
@@ -1906,20 +1910,20 @@ module.exports = {
                             status: 0
                         }
                     })
-                    console.log(44444444444)
+                    logger.info(44444444444)
                     for (var k = 0; k < transferAccounts.length; k++) {
                         transferAccounts[k].status = 1;
                         transferAccounts[k].pay_date = payDate;
                         await transferAccounts[k].save();
                     }
-                    console.log(5555555555555)
-                    console.log("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
-                    console.log("当前微信转账记录0||tenantId:" + tenantId + " consignee:" + consignee + " merchantAmount:" + merchantAmount);
+                    logger.info(5555555555555)
+                    logger.info("转账时间:", new Date().format('yyyy-MM-dd hh:mm:ss'));
+                    logger.info("当前微信转账记录0||tenantId:" + tenantId + " consignee:" + consignee + " merchantAmount:" + merchantAmount);
                 }else{
                     return -1
                 }
             } catch (e) {
-                console.log(e);
+                logger.info(e);
             }
         }
     },
