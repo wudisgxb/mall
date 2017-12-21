@@ -155,7 +155,7 @@ module.exports = {
         //     })
         // }
         await Foodsofmenus.create({
-            FoodId: foods.id,
+            FoodId: foods[0].id,
             MenuId: body.food.menuId,
             tenantId: body.tenantId
         });
