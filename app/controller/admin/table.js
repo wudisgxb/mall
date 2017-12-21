@@ -5,75 +5,39 @@ let db = require('../../db/mysql/index');
 let Tables = db.models.Tables;
 const Consignees = db.models.Consignees;
 const Merchants = db.models.Merchants;
+const QRCodeTemplates = db.models.QRCodeTemplates;
 const Tool = require('../../Tool/tool')
 
 module.exports = {
 
     //房间号生成
     async saveTableName(ctx,next){
-        // ctx.checkBody("name").notBlank();
-        // ctx.checkBody("status").notBlank();
-        // ctx.checkBody("info").notBlank();
-        // ctx.checkBody("tenantId").notBlank();
-        // ctx.checkBody("consigneeId").notBlank();
-        // if(ctx.errors){
-        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
-        //     return
-        // }
-        // let body = ctx.request.body
-        // if(body.name.length==0){
-        //     ctx.body = new ApiResult(ApiResult.Result.PARAMS_ERROR,ctx.errors)
-        //     return
-        // }
+
         ctx.checkBody("tenantId").notBlank()
         ctx.checkBody("consigneeId").notBlank()
         ctx.checkBody("tableName").notBlank()
-        if(ctx.errors){
-
-        }
-        let tenantInfo = await Merchants.findOne({
-
-        })
-        // let name =8200
-        // let nameArray = []
-        // for(let j = 0; j < 25; j ++){
-        //     name ++
-        //     if(name%10==4){
-        //         name ++
-        //     }
-        //     if(name%100==25){
-        //         name++
-        //     }
-        //     nameArray.push(name)
-        // }
-        // console.log(nameArray)
-        // // let namesArray = []
-        // let names = 8300
-        // for(let g = 0; g < 42; g++){
-        //     names ++
-        //     if(names%10==4){
-        //         names ++
-        //     }
-        //     if(names%100==25){
-        //         names++
-        //     }
-        //     if(names/10%10==4){
-        //         names+=10
-        //     }
-        //     nameArray.push(names)
-        // }
-        // console.log(nameArray)
-        // console.log(nameArray.length)
-        for(let i = 0 ; i < nameArray.length; i ++){
+        let body = ctx.request.body
+        for(let i = 0 ; i < body.tableName.length; i++){
             await Tables.create({
-                name : nameArray[i],
+                name : body.tableName[i],
                 status : 0,
                 info : "房间号",
-                tenantId :"33334f14444089f1334e0fb32d6f17b6",
-                consigneeId : "44b1514a72e7c30cd10b969ee28fbce6"
+                tenantId :body.tenantId,
+                consigneeId : body.consigneeId
+            })
+            let qrCodeTemplateId = new Date().format("yyyyMMddhhmmssS") + parseInt(Math.random() * 8999 + 1000);
+            await QRCodeTemplates.create({
+                QRCodeTemplateId : qrCodeTemplateId,
+                bizType : "eshop",
+                tableName : body.tableName[i],
+                tenantId : body.tenantId,
+                consigneeId : body.consigneeId,
+                orderLimit : -1,
+                isShared : 0
             })
         }
-        ctx.body = new ApiResult(ApiResult.Result.SUCCESS,nameArray)
+
+        ctx.body = new ApiResult(ApiResult.Result.SUCCESS)
     },
 
     //获取租户下桌信息
@@ -214,7 +178,7 @@ module.exports = {
         let tableName = body.table.name
         let tableArray = []
         for(let name of tableName ){
-            
+
         }
 
 

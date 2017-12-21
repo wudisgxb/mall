@@ -31,6 +31,7 @@ module.exports = {
                     tenantId: ctx.query.tenantId,
                 }
             })
+            console.log(merchant)
             result.name = tenantInfo.name;
             result.payee_account = tenantInfo.payee_account;
             result.wecharPayee_account = tenantInfo.wecharPayee_account;

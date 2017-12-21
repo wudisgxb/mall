@@ -77,8 +77,8 @@ module.exports = {
                 correspondingId: correspondingId == null ? Tool.allocTenantId() : correspondingId
             })
 
-            
-            if (body.role == 3) {
+
+            if (body.role == "3") {
                 console.log(11111)
                 await Merchants.create({
                     name: body.userName,
@@ -113,7 +113,12 @@ module.exports = {
                     startTime: "",
                     endTime: "",
                     isProfitRate: false,
-                    profitRate: 0
+                    profitRate: 0,
+                    rate : 0,
+                    deliveryStartTime : "",
+                    deliveryEndTime : "",
+                    needChoosePayMode : "",
+                    outOfServiceTimePrompt : ""
                 })
                 let consigneeId = Tool.allocTenantId()
                 await Consignees.create({
